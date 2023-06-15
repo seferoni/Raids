@@ -19,10 +19,10 @@
     },
     CaravanCargoDescriptors =
     {
-        Common = 1,
-        Uncommon = 2,
-        Rare = 3,
-        Famed = 4
+        Provisions = 1,
+        Trade = 2,
+        Armaments = 3,
+        Exotic = 4
     },
     CampaignModifiers =
     {
@@ -37,6 +37,12 @@
         Decrement = 2,
         Reset = 3
     },
+    Severity =
+    {
+        Unscathed = 0,
+        Looted = 1,
+        Sacked = 2
+    }
 
     function createMundaneCaravanCargo( _itemScriptPath, _caravanWealth )
     {
@@ -52,22 +58,63 @@
         return cargo;
     }
 
-    function createRareCaravanCargo( _caravanWealth )
+    function createRareCaravanCargo( _caravanWealth, _isSouthern )
     {
         local cargo = [];
-        local armorCandidates = ["light_scale_armor", "reinforced_mail_hauberk", "sellsword_armor", "heavy_lamellar_armor", "footman_armor"];
-        // TODO: figure out candidate selection as you can't get bofa
-        if (::Math.rand(1, 100) <= this.CampaignModifiers.RareCargoBaseChance * _caravanWealth)
+        local armorCandidates =
+        [
+            "light_scale_armor",
+            "reinforced_mail_hauberk",
+            "sellsword_armor",
+            "heavy_lamellar_armor",
+            "footman_armor"
+        ];
+        local weaponCandidates =
+        [
+            "noble_sword",
+            "fencing_sword",
+            "fighting_axe",
+            "greatsword",
+            "war_bow"
+        ];
+        local southernCandidates =
+        [
+
+        ];
+
+        if (::Math.rand(1, 100) > this.CampaignModifiers.RareCargoBaseChance * _caravanWealth)
+        {
+            return cargo;
+        }
+
+        if (_isSouthern)
+        {
+            cargo.push(::new("scripts/items" + southernCandidates[::Math.rand(0, southernCandidates.len() - 1)]));
+            return cargo;
+        }
+
+        if (::Math.rand(1, 100) <= 50)
         {
             cargo.push(::new("scripts/items/armor/" + armorCandidates[::Math.rand(0, armorCandidates.len() - 1)]));
         }
+        else
+        {
+            cargo.push(::new("scripts/items/weapons/" + weaponCandidates[::Math.rand(0, weaponCandidates.len() - 1)]));
+        }
+
+        return cargo;
     }
 
-    function getDescriptor( _parameter, _referenceTable )
+    function createNamedCaravanCargo( _caravanWealth )
+    {
+
+    }
+
+    function getDescriptor( _valueToMatch, _referenceTable )
     {
         foreach( descriptor, value in _referenceTable )
         {
-            if (value == _score)
+            if (value == _valueToMatch)
             {
                 return descriptor;
             }
@@ -98,7 +145,7 @@
 
         if (activeContract != null && activeContract.isTileUsed(_settlement.getTile()))
         {
-            return ::RPGR_Brigandage.Severity.Unscathed;
+            return this.Severity.Unscathed;
         }
 
         switch (_settlement.getSize())
@@ -144,43 +191,45 @@
     }
 
     function initialiseCaravanParameters( _caravan, _settlement )
-    {
+    { // TODO: figure out wealth-based troop reinforcement
         local wealthModifier = (_settlement.isMilitary() || _settlement.isSouthern()) ? _settlement.getSize() + 1 : _settlement.getSize();
         _caravan.getFlags().set("CaravanWealth", ::Math.min(this.CaravanWealthDescriptors.Gilded, ::Math.rand(0, 1) + wealthModifier));
 
         if (::Math.rand(1, 500) <= this.CampaignModifiers.CaravanRareAndAboveChance)
         {
-            _caravan.getFlags().set("CaravanCargo", this.CaravanWealthDescriptors.Famed);
+            _caravan.getFlags().set("CaravanCargo", this.CaravanWealthDescriptors.Exotic);
         }
         else if (::Math.rand(1, 100) <= this.CampaignModifiers.CaravanRareAndAboveChance)
         {
-            _caravan.getFlags().set("CaravanCargo", this.CaravanWealthDescriptors.Rare);
+            _caravan.getFlags().set("CaravanCargo", this.CaravanWealthDescriptors.Armaments);
         }
         else
         {
-            _caravan.getFlags().set("CaravanCargo", ::Math.rand(this.CaravanWealthDescriptors.Common, this.CaravanWealthDescriptors.Uncommon));
+            _caravan.getFlags().set("CaravanCargo", ::Math.rand(this.CaravanWealthDescriptors.Provisions, this.CaravanWealthDescriptors.Trade));
         }
     }
 
-    function retrieveCaravanCargo( _cargoValue, _caravanWealth )
+    function retrieveCaravanCargo( _cargoValue, _caravanWealth, _isSouthern )
     {
         local cargo = [];
 
         switch (_cargoValue)
         {
-            case (this.CaravanCargoDescriptors.Famed):
+            case (this.CaravanCargoDescriptors.Exotic):
                 cargo.extend(this.createNamedCaravanCargo(_caravanWealth));
-                cargo.extend(this.createNamedCaravanCargo(_caravanWealth));
-            case (this.CaravanCargoDescriptors.Rare):
-                cargo.extend(this.createRareCaravanCargo(_caravanWealth));
-            case (this.CaravanCargoDescriptors.Uncommon):
+
+            case (this.CaravanCargoDescriptors.Armaments):
+                cargo.extend(this.createRareCaravanCargo(_caravanWealth, _isSouthern));
+
+            case (this.CaravanCargoDescriptors.Trade):
                 cargo.extend(this.createMundaneCaravanCargo("trade",_caravanWealth));
-            case (this.CaravanCargoDescriptors.Common):
+
+            case (this.CaravanCargoDescriptors.Provisions):
                 cargo.extend(this.createMundaneCaravanCargo("supplies",_caravanWealth));
                 break;
+
             default:
                 ::logError("Could not find matching caravan cargo descriptor.");
-
         }
     }
 
@@ -193,12 +242,15 @@
             case (this.Procedures.Increment):
                 lairFlags.increment("Agitation");
                 break;
+
             case (this.Procedures.Decrement):
                 lairFlags.increment("Agitation", -1);
                 break;
+
             case (this.Procedures.Reset):
                 lairFlags.set("Agitation", this.AgitationDescriptors.Relaxed);
                 break;
+
             default:
                 ::logError("RPGR - Brigandage: setLairAgitation was called with an invalid procedure value.");
         }
@@ -235,8 +287,6 @@
     local agitationIncrementChance = pageGeneral.addRangeSetting("AgitationIncrementChance", 100, 0, 100, 1.0, "Agitation Increment Chance");
     agitationIncrementChance.setDescription("Determines the chance for a location's agitation value to increase by one tier upon victory against a roaming party, if within proximity.");
 
-    local modifyTooltip = pageGeneral.addBooleanSetting("ModifyTooltip", true, "Modify Tooltip");
-    modifyTooltip.setDescription("Global switch for all of Brigandage's UI-related features.");
 
     foreach( file in ::IO.enumerateFiles("mod_rpgr_brigandage/hooks") )
     {

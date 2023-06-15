@@ -19,27 +19,31 @@
             return vanilla_onCombatFinished();
         }
 
-        local faction = null;
+        local factions = [];
 
         foreach( party in this.m.PartiesInCombat )
         {
             if (!party.isAlive() && !party.isLocation() && !party.isAlliedWithPlayer()) // TODO: consider the ramifications of this
             {
-                faction = ::World.FactionManager.getFaction(party.getFaction());
-                break;
+                factions.push(::World.FactionManager.getFaction(party.getFaction()));
             }
         }
 
         // TODO: note that there can be multiple factions in a fight. Test behaviour for such cases before shipping
 
-        if (faction == null)
+        local filteredFactions = faction.filter(function( factionIndex, faction )
         {
-            ::logInfo("Party has no faction, returning.");
+            return faction != null && faction != ::Const.Faction.Beasts;
+        });
+
+        if (filteredFactions.len() == 0)
+        {
+            ::logInfo("Parties have no applicable faction, returning.");
             return vanilla_onCombatFinished();
         }
 
         ::logInfo("Proceeding to lair candidate selection.");
-        local lairs = faction.getSettlements().filter(function( locationIndex, location )
+        local lairs = filteredFactions.getSettlements().filter(function( locationIndex, location )
         {
             return location.getLocationType() == ::Const.World.LocationType.Lair && ::World.State.getPlayer().getTile().getDistanceTo(location.getTile()) <= ::RPGR_Brigandage.CampaignModifiers.MaximumDistanceToAgitate;
         });
