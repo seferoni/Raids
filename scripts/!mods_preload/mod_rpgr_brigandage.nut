@@ -279,7 +279,7 @@
         }
 
         lairFlags.set("LastAgitationUpdate", ::World.getTime().Days);
-        _lair.m.Resources = ::Math.floor(lairFlags.get("BaseResources") * lairFlags.get("Agitation")); // TODO: rewrite this
+        _lair.m.Resources = ::Math.floor(lairFlags.get("BaseResources") * lairFlags.get("Agitation") * ::RPGR_Brigandage.Mod.ModSettings.getSetting("AgitationResourceModifier")); // TODO: rewrite this
         _lair.setLootScaleBasedOnResources( _lair.m.Resources );
     }
 
@@ -310,6 +310,8 @@
     local agitationIncrementChance = pageGeneral.addRangeSetting("AgitationIncrementChance", 100, 0, 100, 1.0, "Agitation Increment Chance");
     agitationIncrementChance.setDescription("Determines the chance for a location's agitation value to increase by one tier upon victory against a roaming party, if within proximity.");
 
+    local agitationResourceModifier = pageGeneral.addRangeSetting("AgitationResourceModifier", 0.5, 0.0, 1.0, 0.1, "Agitation Resource Modifier");
+    agitationResourceModifier.setDescription("Controls how lair resource calculation is handled after each agitation tier change. Higher values result in greater resources, and therefore more powerful garrisoned troops.");
 
     foreach( file in ::IO.enumerateFiles("mod_rpgr_brigandage/hooks") )
     {
