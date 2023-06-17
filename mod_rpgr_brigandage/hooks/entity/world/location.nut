@@ -53,7 +53,7 @@
         local tooltipArray = gT_nullCheck == null ? this[parentName].getTooltip() : gT_nullCheck();
         local activeContract = ::World.Contracts.getActiveContract();
 
-        if (this.m.LocationType != ::Const.World.LocationType.Lair)
+        if (this.getLocationType() != ::Const.World.LocationType.Lair)
         {
             return tooltipArray;
         }
@@ -94,24 +94,37 @@
             });
         }
 
-        local lastUpdateTime = this.getFlags().get("LastUpdateTime");
+        return tooltipArray;
+    }
+
+    local oU_nullCheck = "onUpdate" in object ? object.onUpdate : null;
+    object.onUpdate <- function()
+    {
+        local vanilla_onUpdate = oU_nullCheck == null ? this[parentName].onUpdate() : oU_nullCheck();
+
+        if (this.getLocationType() != ::Const.World.LocationType.Lair)
+        {
+            return vanilla_onUpdate;
+        }
+
+        if (this.getFlags().get("Agitation") == ::RPGR_Brigandage.AgitationDescriptors.Relaxed)
+        {
+            return vanilla_onUpdate;
+        }
+
+        local lastUpdateTime = this.getFlags().get("LastAgitationUpdate");
 
         if (lastUpdateTime == false)
         {
-            return tooltipArray;
+            return vanilla_onUpdate;
         }
 
         if (::World.getTime().Days - lastUpdateTime < ::RPGR_Brigandage.Mod.ModSettings.getSetting("AgitationDecayInterval").getValue())
         {
-            return tooltipArray;
+            return vanilla_onUpdate;
         }
 
-        if (agitationState == ::RPGR_Brigandage.AgitationDescriptors.Relaxed)
-        {
-            return tooltipArray;
-        }
-        // TODO: disadvantage of forcing updates on tooltip is that lairs won't decrement agitation properly outside player interv
         ::RPGR_Brigandage.setLairAgitation(this, ::RPGR_Brigandage.Procedures.Decrement);
-        return tooltipArray;
+        return vanilla_onUpdate;
     }
 });
