@@ -27,9 +27,8 @@
     CampaignModifiers =
     {
         CaravanRareAndAboveChance = 1,
-        FamedChanceOnCampSpawn = 5,
-        MaximumDistanceToAgitate = 20, // TODO: test this, find out if it's a reasonable value
-        RareCargoBaseChance = 10
+        FamedChanceOnCampSpawn = 30,
+        MaximumDistanceToAgitate = 15
     },
     Procedures =
     {
@@ -45,8 +44,9 @@
     }
 
     function createMundaneCaravanCargo( _itemScriptPath, _caravanWealth )
-    {
+    { // TODO: exclude strange meat lol it has too much weight for some reason
         local cargo = [];
+        local exclusionList = [];
         local scriptFiles = ::IO.enumerateFiles("scripts/items/" + _itemScriptPath);
         local iterations = ::Math.rand(1, _caravanWealth);
 
@@ -61,7 +61,7 @@
     function createRareCaravanCargo( _caravanWealth, _isSouthern )
     {
         local cargo = [];
-        local armorCandidates =
+        local armorCandidates = // TODO: consider a different way of doing this
         [
             "light_scale_armor",
             "reinforced_mail_hauberk",
@@ -79,13 +79,9 @@
         ];
         local southernCandidates =
         [
-
+            "armor/oriental/padded_mail_and_lamellar_hauberk",
+            "weapons/oriental/two_handed_saif"
         ];
-
-        if (::Math.rand(1, 100) > this.CampaignModifiers.RareCargoBaseChance * _caravanWealth)
-        {
-            return cargo;
-        }
 
         if (_isSouthern)
         {
@@ -107,7 +103,8 @@
 
     function createNamedCaravanCargo( _caravanWealth )
     {
-
+        local cargo = [];
+        return cargo;
     }
 
     function getDescriptor( _valueToMatch, _referenceTable )
@@ -190,22 +187,46 @@
         return score;
     }
 
+    function isFactionViable( _faction )
+    {
+        if (_faction == null)
+        {
+            return false;
+        }
+
+        local exclusionList = [::Const.FactionType.Beasts, ::Const.FactionType.Settlement, ::Const.FactionType.NobleHouse, ::Const.FactionType.Orcs];
+        local factionType = _faction.getType();
+        ::logInfo("FactionType gets us " + factionType + ".");
+
+        foreach( excludedFaction in exclusionList )
+        {
+            if (factionType == excludedFaction)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     function initialiseCaravanParameters( _caravan, _settlement )
     { // TODO: figure out wealth-based troop reinforcement
-        local wealthModifier = (_settlement.isMilitary() || _settlement.isSouthern()) ? _settlement.getSize() + 1 : _settlement.getSize();
-        _caravan.getFlags().set("CaravanWealth", ::Math.min(this.CaravanWealthDescriptors.Gilded, ::Math.rand(0, 1) + wealthModifier));
+        local flags = _caravan.getFlags();
+        local typeModifier = (_settlement.isMilitary() || _settlement.isSouthern()) ? 1 : 0; // TODO: rework this
+        local sizeModifier = _settlement.getSize() >= 3 ? 1 : 0;
+        flags.set("CaravanWealth", ::Math.min(this.CaravanWealthDescriptors.Gilded, ::Math.rand(1, 2) + typeModifier + sizeModifier));
 
         if (::Math.rand(1, 500) <= this.CampaignModifiers.CaravanRareAndAboveChance)
         {
-            _caravan.getFlags().set("CaravanCargo", this.CaravanWealthDescriptors.Exotic);
+            flags.set("CaravanCargo", this.CaravanCargoDescriptors.Exotic);
         }
         else if (::Math.rand(1, 100) <= this.CampaignModifiers.CaravanRareAndAboveChance)
         {
-            _caravan.getFlags().set("CaravanCargo", this.CaravanWealthDescriptors.Armaments);
+            flags.set("CaravanCargo", this.CaravanCargoDescriptors.Armaments);
         }
         else
         {
-            _caravan.getFlags().set("CaravanCargo", ::Math.rand(this.CaravanWealthDescriptors.Provisions, this.CaravanWealthDescriptors.Trade));
+            flags.set("CaravanCargo", ::Math.rand(this.CaravanCargoDescriptors.Provisions, this.CaravanCargoDescriptors.Trade));
         }
     }
 
@@ -231,6 +252,8 @@
             default:
                 ::logError("Could not find matching caravan cargo descriptor.");
         }
+
+        return cargo;
     }
 
     function setLairAgitation( _lair, _procedure )
@@ -256,7 +279,7 @@
         }
 
         lairFlags.set("LastAgitationUpdate", ::World.getTime().Days);
-        _lair.m.Resources = ::Math.floor(lairFlags.get("BaseResources") * lairFlags.get("Agitation"));
+        _lair.m.Resources = ::Math.floor(lairFlags.get("BaseResources") * lairFlags.get("Agitation")); // TODO: rewrite this
         _lair.setLootScaleBasedOnResources( _lair.m.Resources );
     }
 

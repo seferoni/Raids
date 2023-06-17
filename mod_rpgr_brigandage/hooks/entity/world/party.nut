@@ -2,18 +2,24 @@
 {
     local parentName = object.SuperName;
 
-    local c_nullCheck = "create" in object ? object.create : null;
-    object.create = function()
+    local oD_nullCheck = "onDiscovered" in object ? object.onDiscovered : null;
+    object.onDiscovered = function()
     {
-        local vanilla_create = c_nullCheck == null ? this[parentName].create() : c_nullCheck()
+        local vanilla_onDiscovered = oD_nullCheck == null ? this[parentName].onDiscovered() : oD_nullCheck()
 
         if (this.getFlags().get("IsCaravan") == false)
         {
-            return vanilla_create;
+            return vanilla_onDiscovered;
         }
 
-        ::RPGR_Brigandage.initialiseCaravanParameters(this, this.getFaction().getNearestSettlement(this.getTile()));
-        return vanilla_create;
+        if (this.getFlags().get("CaravanWealth") != false || this.getFlags().get("CaravanCargo") != false)
+        {
+            return vanilla_onDiscovered;
+        }
+
+        ::logInfo("Assigning caravan parameters.");
+        ::RPGR_Brigandage.initialiseCaravanParameters(this, ::World.FactionManager.getFaction(this.getFaction()).getNearestSettlement(this.getTile()));
+        return vanilla_onDiscovered;
     }
 
     local gT_nullCheck = "getTooltip" in object ? object.getTooltip : null;
@@ -26,18 +32,14 @@
             return tooltipArray;
         }
 
-        /*if (::RPGR_Brigandage.Mod.ModSettings.getSetting("ModifyTooltip").getValue() == false)
-        {
-            return tooltipArray;
-        }*/
-
         local iconPath = "ui/icons/";
         local flags = this.getFlags();
         local caravanWealth = flags.get("CaravanWealth");
         local caravanCargo = flags.get("CaravanCargo");
 
-        if (caravanWealth == false || caravanGoods == false)
+        if (caravanWealth == false || caravanCargo == false)
         {
+            ::logInfo("Flags uninitialised.");
             return tooltipArray;
         }
 
@@ -48,7 +50,7 @@
                 break;
 
             case(::RPGR_Brigandage.CaravanCargoDescriptors.Trade):
-                iconPath += "relations.png"
+                iconPath += "asset_business_reputation.png"
                 break;
 
             case(::RPGR_Brigandage.CaravanCargoDescriptors.Armaments):
@@ -60,7 +62,7 @@
                 break;
 
             default:
-                ::logInfo("No matching caravan cargo descriptor found for caravan.");
+                ::logError("No matching caravan cargo descriptor found for caravan.");
                 return tooltipArray;
         }
 
@@ -68,18 +70,19 @@
         local caravanCargoDescriptor = ::RPGR_Brigandage.getDescriptor(caravanCargo, ::RPGR_Brigandage.CaravanCargoDescriptors);
 
         tooltipArray.extend([
-        {
-            id = 50,
-            type = "hint",
-            icon = iconPath,
-            text = caravanCargoDescriptor
-        },
-        {
-            id = 50,
-            type = "hint",
-            icon = "ui/icons/money.png",
-            text = caravanWealthDescriptor
-        }]);
+            {
+                id = 2,
+                type = "hint",
+                icon = iconPath,
+                text = caravanCargoDescriptor
+            },
+            {
+                id = 2,
+                type = "hint",
+                icon = "ui/icons/bag.png",
+                text = caravanWealthDescriptor
+            }
+        ]);
 
         return tooltipArray;
     }
@@ -88,15 +91,20 @@
     object.onDropLootForPlayer = function( _lootTable )
     {
         local vanilla_onDropLootForPlayer = oDLFP_nullCheck == null ? this[parentName].onDropLootForPlayer : oDLFP_nullCheck;
-        local isSouthern = this.getFaction().hasTrait(::Const.FactionTrait.OrientalCityState);
+        local isSouthern = ::World.FactionManager.getFaction(this.getFaction()).getType() == ::Const.FactionType.OrientalCityState;
         local flags = this.getFlags();
 
-        if (flags().get("IsCaravan") == false)
+        if (flags.get("IsCaravan") == false)
         {
             return vanilla_onDropLootForPlayer(_lootTable);
         }
 
         local retrievedCargo = ::RPGR_Brigandage.retrieveCaravanCargo(flags.get("CaravanCargo"), flags.get("CaravanWealth"), isSouthern);
+
+        if (retrievedCargo.len() == 0)
+        {
+            return vanilla_onDropLootForPlayer(_lootTable);
+        }
 
         foreach( item in retrievedCargo )
         {

@@ -19,21 +19,26 @@
             return vanilla_onCombatFinished();
         }
 
-        local factions = [];
+        local factionCandidates = [];
 
         foreach( party in this.m.PartiesInCombat )
         {
-            if (!party.isAlive() && !party.isLocation() && !party.isAlliedWithPlayer()) // TODO: consider the ramifications of this
+            if (party.isAlive() && party.m.Troops.len() == 0 && !party.isLocation() && !party.isAlliedWithPlayer()) // TODO: consider the ramifications of this
             {
-                factions.push(::World.FactionManager.getFaction(party.getFaction()));
+                factionCandidates.push(::World.FactionManager.getFaction(party.getFaction()));
             }
+        }
+
+        if (factionCandidates.len() == 0)
+        {
+            ::logInfo("Factions was found to be empty.");
         }
 
         // TODO: note that there can be multiple factions in a fight. Test behaviour for such cases before shipping
 
-        local filteredFactions = faction.filter(function( factionIndex, faction )
+        local filteredFactions = factionCandidates.filter(function( factionIndex, faction )
         {
-            return faction != null && faction != ::Const.Faction.Beasts;
+            return ::RPGR_Brigandage.isFactionViable(faction) && faction.getSettlements().len() != 0;
         });
 
         if (filteredFactions.len() == 0)
@@ -43,7 +48,9 @@
         }
 
         ::logInfo("Proceeding to lair candidate selection.");
-        local lairs = filteredFactions.getSettlements().filter(function( locationIndex, location )
+
+        local agitatedFaction = filteredFactions[::Math.rand(0, filteredFactions.len() - 1)];
+        local lairs = agitatedFaction.getSettlements().filter(function( locationIndex, location )
         {
             return location.getLocationType() == ::Const.World.LocationType.Lair && ::World.State.getPlayer().getTile().getDistanceTo(location.getTile()) <= ::RPGR_Brigandage.CampaignModifiers.MaximumDistanceToAgitate;
         });

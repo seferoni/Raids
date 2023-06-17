@@ -13,7 +13,6 @@
         }
 
         this.getFlags().set("BaseResources", this.m.Resources);
-        this.m.Resources = ::Math.floor(this.getFlags().get("BaseResources") / 2);
         this.getFlags().set("Agitation", ::RPGR_Brigandage.AgitationDescriptors.Relaxed);
 
         if (this.getLoot().isEmpty())
@@ -41,7 +40,7 @@
         foreach( item in garbage )
         {
             local index = items.find(item);
-            items.remove(index); // TODO: check if this works lol
+            items.remove(index);
             ::logInfo("Removed " + item.m.Name + " at index " + index + ".");
         }
 
@@ -67,7 +66,7 @@
 
         local resources = this.m.Resources;
         local agitationState = this.getFlags().get("Agitation");
-        local agitationDescriptor = ::RPGR_Brigandage.getAgitationDescriptor(agitationState);
+        local agitationDescriptor = ::RPGR_Brigandage.getDescriptor(agitationState, ::RPGR_Brigandage.AgitationDescriptors);
 
         tooltipArray.push({
             id = 20,
@@ -111,7 +110,7 @@
         {
             return tooltipArray;
         }
-
+        // TODO: disadvantage of forcing updates on tooltip is that lairs won't decrement agitation properly outside player interv
         ::RPGR_Brigandage.setLairAgitation(this, ::RPGR_Brigandage.Procedures.Decrement);
         return tooltipArray;
     }
