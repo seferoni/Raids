@@ -69,7 +69,7 @@
 
             if (index != null)
             {
-                ::logInfo("Removed " + excludedFile + " from supply pool");
+                ::logInfo("Removed " + excludedFile + " from supply pool.");
                 scriptFiles.remove(index);
             }
         }
@@ -82,10 +82,30 @@
         return cargo;
     }
 
-    function createNamedCaravanCargo( _caravanWealth )
-    { // TODO: finish this
+    function createNamedCaravanCargo()
+    {
         local cargo = [];
+        local namedLoot = this.createNamedLootArray();
+        cargo.push(::new("scripts/items/" + namedLoot[::Math.rand(0, namedLoot.len() - 1)]));
         return cargo;
+    }
+
+    function createNamedLootArray()
+    {
+        local namedItemKeys = ["NamedArmors", "NamedHelmets", "NamedShields"]
+        local namedLoot = clone ::Const.Items.NamedWeapons;
+
+        foreach( key in namedItemKeys )
+        {
+            namedLoot.extend(::Const.Items[key]);
+        }
+
+        return namedLoot;
+    }
+
+    function depopulateLairNamedLoot( _lair )
+    {
+        // TODO: write this
     }
 
     function getDescriptor( _valueToMatch, _referenceTable )
@@ -206,6 +226,19 @@
         }
     }
 
+    function repopulateLairNamedLoot( _lair )
+    {
+        local namedLootChance = ::RPGR_Raids.Mod.ModSettings.getSetting("LairNamedLootChance").getValue() * _lair.getFlags().get("Agitation"); // TODO: reconsider this
+
+        if (::Math.rand(1, 100) <= namedLootChance)
+        {
+            return;
+        }
+
+        local namedLoot = this.createNamedLootArray();
+        _lair.m.Loot.add(::new("scripts/items/" + namedLoot[::Math.rand(0, namedLoot.len() - 1)]));
+    }
+
     function retrieveCaravanCargo( _cargoValue, _caravanWealth )
     {
         local cargo = [];
@@ -213,7 +246,7 @@
         switch (_cargoValue)
         {
             case (this.CaravanCargoDescriptors.Oddities):
-                cargo.extend(this.createNamedCaravanCargo(_caravanWealth));
+                cargo.extend(this.createNamedCaravanCargo());
 
             case (this.CaravanCargoDescriptors.Assortment):
                 cargo.extend(this.createMundaneCaravanCargo("supplies/", _caravanWealth, true));
@@ -240,18 +273,21 @@
         {
             case (this.Procedures.Increment):
                 lairFlags.increment("Agitation");
+                this.repopulateLairNamedLoot(_lair);
                 break;
 
             case (this.Procedures.Decrement):
                 lairFlags.increment("Agitation", -1);
+                this.depopulateLairNamedLoot(_lair);
                 break;
 
             case (this.Procedures.Reset):
                 lairFlags.set("Agitation", this.AgitationDescriptors.Relaxed);
+                this.depopulateLairNamedLoot(_lair);
                 break;
 
             default:
-                ::logError("[RPGR] setLairAgitation was called with an invalid procedure value.");
+                ::logError("[Raids] setLairAgitation was called with an invalid procedure value.");
         }
 
         lairFlags.set("LastAgitationUpdate", ::World.getTime().Days);
@@ -287,7 +323,10 @@
     agitationIncrementChance.setDescription("Determines the chance for a location's agitation value to increase by one tier upon victory against a roaming party, if within proximity.");
 
     local agitationResourceModifier = pageGeneral.addRangeSetting("AgitationResourceModifier", 0.5, 0.0, 1.0, 0.1, "Agitation Resource Modifier");
-    agitationResourceModifier.setDescription("Controls how lair resource calculation is handled after each agitation tier change. Higher values result in greater resources, and therefore more powerful garrisoned troops.");
+    agitationResourceModifier.setDescription("Controls how lair resource calculation is handled after each agitation tier change. Higher values result in greater resources, and therefore more powerful garrisoned troops and better loot.");
+
+    local lairNamedLootChance = pageGeneral.addRangeSetting("LairNamedLootChance", 12, 1, 25, 1.0, "Lair Named Item Chance");
+    lairNamedLootChance.setDescription("Determines the base chance for lairs to contain new named items when agitation is incremented.");
 
     foreach( file in ::IO.enumerateFiles("mod_rpgr_raids/hooks") )
     {
