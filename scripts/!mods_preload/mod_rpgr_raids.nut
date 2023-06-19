@@ -119,6 +119,24 @@
         }
     }
 
+    function getNamedLootChance( _lair )
+    {
+        local nearestSettlementDistance = 9000;
+		local lairTile = _lair.getTile();
+
+		foreach( settlement in ::World.EntityManager.getSettlements() )
+		{
+			local distance = lairTile.getDistanceTo(settlement.getTile());
+
+			if (distance < nearestSettlementDistance)
+			{
+				nearestSettlementDistance = distance;
+			}
+		}
+
+		return (_lair.m.Resources + nearestSettlementDistance * 4) / 5.0 - 37.0;
+    }
+
     function getSeverityScore( _settlement )
     {
         local score = 0.0;
@@ -227,8 +245,10 @@
     }
 
     function repopulateLairNamedLoot( _lair )
-    {
-        local namedLootChance = this.Mod.ModSettings.getSetting("LairNamedLootChance").getValue() * _lair.getFlags().get("Agitation"); // TODO: reconsider this with a settlement distance modifier
+    { // with an agitation value of 4 and a configured setting of 25, end up with a guaranteed chance for named item spawn which is not desirable? should be some buffer
+        local namedLootChance = this.getNamedLootChance(_lair);
+        ::logInfo("namedLootChance is " + namedLootChance + " for lair " + _lair.getName());
+        #local namedLootChance = this.Mod.ModSettings.getSetting("LairNamedLootChance").getValue() * _lair.getFlags().get("Agitation"); // TODO: reconsider this
 
         if (::Math.rand(1, 100) > namedLootChance)
         {
@@ -319,10 +339,10 @@
     local agitationDecayInterval = pageGeneral.addRangeSetting("AgitationDecayInterval", 7, 1, 14, 1.0, "Agitation Decay Interval"); // TODO: test this
     agitationDecayInterval.setDescription("Determines the time interval in days after which a location's agitation value drops by one tier.");
 
-    local agitationIncrementChance = pageGeneral.addRangeSetting("AgitationIncrementChance", 100, 0, 100, 1.0, "Agitation Increment Chance");
+    local agitationIncrementChance = pageGeneral.addRangeSetting("AgitationIncrementChance", 100, 0, 100, 1.0, "Agitation Increment Chance"); // TODO: this should be default 50 when raids ship
     agitationIncrementChance.setDescription("Determines the chance for a location's agitation value to increase by one tier upon victory against a roaming party, if within proximity.");
 
-    local agitationResourceModifier = pageGeneral.addRangeSetting("AgitationResourceModifier", 0.5, 0.0, 1.0, 0.1, "Agitation Resource Modifier");
+    local agitationResourceModifier = pageGeneral.addRangeSetting("AgitationResourceModifier", 0.5, 0.0, 1.0, 0.1, "Agitation Resource Modifier"); // TODO: test if MSU doesn't fuck up float display
     agitationResourceModifier.setDescription("Controls how lair resource calculation is handled after each agitation tier change. Higher values result in greater resources, and therefore more powerful garrisoned troops and better loot.");
 
     local lairNamedLootChance = pageGeneral.addRangeSetting("LairNamedLootChance", 12, 1, 25, 1.0, "Lair Named Item Chance");
