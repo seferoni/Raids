@@ -26,7 +26,7 @@
     },
     CampaignModifiers =
     {
-        CaravanRareAndAboveChance = 1,
+        CaravanNamedLootChance = 1,
         FamedChanceOnCampSpawn = 30,
         MaximumDistanceToAgitate = 15
     },
@@ -63,7 +63,7 @@
         exclusionList.extend(assortedGoods);
         local scriptFiles = ::IO.enumerateFiles("scripts/items/" + _folderPath);
 
-        foreach( excludedFile in exclusionList )
+        foreach( excludedFile in exclusionList ) // TODO: test this
         {
             local index = scriptFiles.find(excludedFile);
 
@@ -195,7 +195,7 @@
             return false;
         }
 
-        local exclusionList = [::Const.FactionType.Beasts, ::Const.FactionType.Settlement, ::Const.FactionType.NobleHouse, ::Const.FactionType.Orcs];
+        local exclusionList = [::Const.FactionType.Beasts, ::Const.FactionType.Settlement, ::Const.FactionType.NobleHouse];
         local factionType = _faction.getType();
 
         foreach( excludedFaction in exclusionList )
@@ -214,9 +214,9 @@
         local flags = _caravan.getFlags();
         local typeModifier = (_settlement.isMilitary() || _settlement.isSouthern()) ? 1 : 0;
         local sizeModifier = _settlement.getSize() >= 3 ? 1 : 0;
-        flags.set("CaravanWealth", ::Math.min(this.CaravanWealthDescriptors.Gilded, ::Math.rand(1, 2) + typeModifier + sizeModifier));
+        flags.set("CaravanWealth", ::Math.min(this.CaravanWealthDescriptors.Opulent, ::Math.rand(1, 2) + typeModifier + sizeModifier));
 
-        if (::Math.rand(1, 500) <= this.CampaignModifiers.CaravanRareAndAboveChance && flags.get("CaravanWealth") == this.CaravanWealthDescriptors.Gilded)
+        if (::Math.rand(1, 100) <= this.CampaignModifiers.CaravanNamedLootChance && flags.get("CaravanWealth") == this.CaravanWealthDescriptors.Opulent)
         {
             flags.set("CaravanCargo", this.CaravanCargoDescriptors.Oddities);
         }
@@ -228,9 +228,9 @@
 
     function repopulateLairNamedLoot( _lair )
     {
-        local namedLootChance = ::RPGR_Raids.Mod.ModSettings.getSetting("LairNamedLootChance").getValue() * _lair.getFlags().get("Agitation"); // TODO: reconsider this
+        local namedLootChance = this.Mod.ModSettings.getSetting("LairNamedLootChance").getValue() * _lair.getFlags().get("Agitation"); // TODO: reconsider this with a settlement distance modifier
 
-        if (::Math.rand(1, 100) <= namedLootChance)
+        if (::Math.rand(1, 100) > namedLootChance)
         {
             return;
         }
@@ -291,7 +291,7 @@
         }
 
         lairFlags.set("LastAgitationUpdate", ::World.getTime().Days);
-        _lair.m.Resources = ::Math.floor(lairFlags.get("BaseResources") * lairFlags.get("Agitation") * ::RPGR_Raids.Mod.ModSettings.getSetting("AgitationResourceModifier"));
+        _lair.m.Resources = ::Math.floor(lairFlags.get("BaseResources") * lairFlags.get("Agitation") * this.Mod.ModSettings.getSetting("AgitationResourceModifier"));
         _lair.setLootScaleBasedOnResources( _lair.m.Resources );
     }
 
