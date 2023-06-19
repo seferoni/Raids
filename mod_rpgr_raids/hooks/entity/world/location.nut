@@ -1,5 +1,5 @@
 ::mods_hookExactClass("entity/world/location", function( object )
-{ // TODO: figure out how to repopulate loot pools after each agitation increment
+{
     local parentName = object.SuperName;
 
     local oS_nullCheck = "onSpawned" in object ? object.onSpawned : null;

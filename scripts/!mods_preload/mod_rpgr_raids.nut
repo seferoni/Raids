@@ -245,7 +245,7 @@
     }
 
     function repopulateLairNamedLoot( _lair )
-    { // with an agitation value of 4 and a configured setting of 25, end up with a guaranteed chance for named item spawn which is not desirable? should be some buffer
+    { // this ignores location-specific nameds, which is bad
         local namedLootChance = this.getNamedLootChance(_lair);
         ::logInfo("namedLootChance is " + namedLootChance + " for lair " + _lair.getName());
         #local namedLootChance = this.Mod.ModSettings.getSetting("LairNamedLootChance").getValue() * _lair.getFlags().get("Agitation"); // TODO: reconsider this
@@ -256,6 +256,7 @@
         }
 
         local namedLoot = this.createNamedLootArray();
+        # extend namedLoot with the base named loot field list
         _lair.m.Loot.add(::new("scripts/items/" + namedLoot[::Math.rand(0, namedLoot.len() - 1)]));
     }
 
