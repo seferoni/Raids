@@ -14,36 +14,7 @@
 
         this.getFlags().set("BaseResources", this.m.Resources);
         this.getFlags().set("Agitation", ::RPGR_Raids.AgitationDescriptors.Relaxed);
-
-        if (this.getLoot().isEmpty())
-        {
-            return vanilla_onSpawned;
-        }
-
-        if (::Math.rand(1, 100) <= ::RPGR_Raids.CampaignModifiers.FamedChanceOnCampSpawn)
-        {
-            ::logInfo("Bailing out for named item removal.");
-            return vanilla_onSpawned;
-        }
-
-        local garbage = [];
-        local items = this.getLoot().getItems();
-
-        foreach( item in items )
-        {
-            if (item.isItemType(::Const.Items.ItemType.Named))
-            {
-                garbage.push(item);
-            }
-        }
-
-        foreach( item in garbage )
-        {
-            local index = items.find(item);
-            items.remove(index);
-            ::logInfo("Removed " + item.m.Name + " at index " + index + ".");
-        }
-
+        ::RPGR_Brigandage.depopulateLairNamedLoot(this, ::RPGR_Raids.CampaignModifiers.FamedChanceOnCampSpawn);
         return vanilla_onSpawned;
     }
 

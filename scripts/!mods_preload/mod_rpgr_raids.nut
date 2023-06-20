@@ -90,7 +90,7 @@
         return cargo;
     }
 
-    function createNamedLootArray()
+    function createNamedLootArray( _lair = null )
     {
         local namedItemKeys = ["NamedArmors", "NamedHelmets", "NamedShields"]
         local namedLoot = clone ::Const.Items.NamedWeapons;
@@ -98,14 +98,47 @@
         foreach( key in namedItemKeys )
         {
             namedLoot.extend(::Const.Items[key]);
+
+            if (_lair != null && _lair.m[key + "List"] != null)
+            {
+                namedLoot.extend(_lair.m[key + "List"]);
+            }
         }
 
         return namedLoot;
     }
 
-    function depopulateLairNamedLoot( _lair )
+    function depopulateLairNamedLoot( _lair, _chance = null )
     {
-        // TODO: write this
+        if (_lair.getLoot().isEmpty())
+        {
+            return;
+        }
+
+        local namedLootChance = _chance == null ? this.getNamedLootChance(_lair) : _chance;
+
+        if (::Math.rand(1, 100) <= namedLootChance)
+        {
+            return;
+        }
+
+        local garbage = [];
+        local items = _lair.getLoot().getItems();
+
+        foreach( item in items )
+        {
+            if (item.isItemType(::Const.Items.ItemType.Named))
+            {
+                garbage.push(item);
+            }
+        }
+
+        foreach( item in garbage )
+        {
+            local index = items.find(item);
+            items.remove(index);
+            ::logInfo("Removed " + item.m.Name + " at index " + index + ".");
+        }
     }
 
     function getDescriptor( _valueToMatch, _referenceTable )
@@ -245,18 +278,16 @@
     }
 
     function repopulateLairNamedLoot( _lair )
-    { // this ignores location-specific nameds, which is bad
+    {
         local namedLootChance = this.getNamedLootChance(_lair);
         ::logInfo("namedLootChance is " + namedLootChance + " for lair " + _lair.getName());
-        #local namedLootChance = this.Mod.ModSettings.getSetting("LairNamedLootChance").getValue() * _lair.getFlags().get("Agitation"); // TODO: reconsider this
 
         if (::Math.rand(1, 100) > namedLootChance)
         {
             return;
         }
 
-        local namedLoot = this.createNamedLootArray();
-        # extend namedLoot with the base named loot field list
+        local namedLoot = this.createNamedLootArray(_lair);
         _lair.m.Loot.add(::new("scripts/items/" + namedLoot[::Math.rand(0, namedLoot.len() - 1)]));
     }
 
@@ -280,7 +311,7 @@
                 break;
 
             default:
-                ::logError("Could not find matching caravan cargo descriptor.");
+                ::logError("[Raids] Could not find matching caravan cargo descriptor.");
         }
 
         return cargo;
@@ -312,8 +343,8 @@
         }
 
         lairFlags.set("LastAgitationUpdate", ::World.getTime().Days);
-        _lair.m.Resources = ::Math.floor(lairFlags.get("BaseResources") * lairFlags.get("Agitation") * this.Mod.ModSettings.getSetting("AgitationResourceModifier"));
-        _lair.setLootScaleBasedOnResources( _lair.m.Resources );
+        _lair.m.Resources = _procedure == this.Procedures.Reset ? lairFlags.get("BaseResources") : ::Math.floor(lairFlags.get("BaseResources") * lairFlags.get("Agitation") * this.Mod.ModSettings.getSetting("AgitationResourceModifier").getValue());
+        _lair.setLootScaleBasedOnResources(_lair.m.Resources);
     }
 
     function setRaidedSettlementVisuals( _settlement, _isBurning )
