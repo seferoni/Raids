@@ -26,7 +26,7 @@
     },
     CampaignModifiers =
     {
-        CaravanNamedLootChance = 1,
+        CaravanNamedLootChance = 50, // FIXME: this is inflated, revert to 5
         FamedChanceOnCampSpawn = 30,
         MaximumDistanceToAgitate = 15
     },
@@ -59,17 +59,16 @@
             return cargo;
         }
 
-        local exclusionList = ["strange_meat_item", "fermented_unhold_heart_item"];
+        local exclusionList = ["food_item", "strange_meat_item", "fermented_unhold_heart_item", "black_marsh_stew_item"];
         exclusionList.extend(assortedGoods);
         local scriptFiles = ::IO.enumerateFiles("scripts/items/" + _folderPath);
 
-        foreach( excludedFile in exclusionList ) // TODO: test this
+        foreach( excludedFile in exclusionList )
         {
-            local index = scriptFiles.find(excludedFile);
+            local index = scriptFiles.find("scripts/items/" + _folderPath + excludedFile);
 
             if (index != null)
             {
-                ::logInfo("Removed " + excludedFile + " from supply pool.");
                 scriptFiles.remove(index);
             }
         }
@@ -246,7 +245,14 @@
             return false;
         }
 
-        local exclusionList = [::Const.FactionType.Beasts, ::Const.FactionType.Settlement, ::Const.FactionType.NobleHouse];
+        local exclusionList =
+        [
+            ::Const.FactionType.Beasts,
+            ::Const.FactionType.Player,
+            ::Const.FactionType.Settlement,
+            ::Const.FactionType.NobleHouse,
+            ::Const.FactionType.OrientalCityState
+        ];
         local factionType = _faction.getType();
 
         foreach( excludedFaction in exclusionList )
@@ -374,7 +380,7 @@
     local agitationIncrementChance = pageGeneral.addRangeSetting("AgitationIncrementChance", 100, 0, 100, 1.0, "Agitation Increment Chance"); // TODO: this should be default 50 when raids ship
     agitationIncrementChance.setDescription("Determines the chance for a location's agitation value to increase by one tier upon victory against a roaming party, if within proximity.");
 
-    local agitationResourceModifier = pageGeneral.addRangeSetting("AgitationResourceModifier", 0.5, 0.0, 1.0, 0.1, "Agitation Resource Modifier"); // TODO: test if MSU doesn't fuck up float display
+    local agitationResourceModifier = pageGeneral.addRangeSetting("AgitationResourceModifier", 0.5, 0.0, 1.0, 0.1, "Agitation Resource Modifier"); // FIXME: Floating number display bug
     agitationResourceModifier.setDescription("Controls how lair resource calculation is handled after each agitation tier change. Higher values result in greater resources, and therefore more powerful garrisoned troops and better loot.");
 
     local lairNamedLootChance = pageGeneral.addRangeSetting("LairNamedLootChance", 12, 1, 25, 1.0, "Lair Named Item Chance");

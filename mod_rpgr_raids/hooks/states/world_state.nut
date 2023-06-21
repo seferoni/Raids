@@ -23,7 +23,7 @@
 
         foreach( party in this.m.PartiesInCombat )
         {
-            if (party.isAlive() && party.m.Troops.len() == 0 && !party.isLocation() && !party.isAlliedWithPlayer())
+            if (party.isAlive() && party.m.Troops.len() == 0 && !party.isLocation())
             {
                 factionCandidates.push(::World.FactionManager.getFaction(party.getFaction()));
             }
@@ -31,7 +31,8 @@
 
         if (factionCandidates.len() == 0)
         {
-            ::logInfo("Factions was found to be empty.");
+            ::logWarning("[Raids] onCombatFinished found no eligible parties.");
+            return vanilla_onCombatFinished();
         }
 
         // TODO: note that there can be multiple factions in a fight. Test behaviour for such cases before shipping
@@ -43,7 +44,7 @@
 
         if (filteredFactions.len() == 0)
         {
-            ::logInfo("Parties have no applicable faction, returning.");
+            ::logInfo("[Raids] onCombatFinished found no eligible factions.");
             return vanilla_onCombatFinished();
         }
 

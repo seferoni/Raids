@@ -14,7 +14,7 @@
 
         this.getFlags().set("BaseResources", this.m.Resources);
         this.getFlags().set("Agitation", ::RPGR_Raids.AgitationDescriptors.Relaxed);
-        ::RPGR_Brigandage.depopulateLairNamedLoot(this, ::RPGR_Raids.CampaignModifiers.FamedChanceOnCampSpawn);
+        ::RPGR_Raids.depopulateLairNamedLoot(this, ::RPGR_Raids.CampaignModifiers.FamedChanceOnCampSpawn);
         return vanilla_onSpawned;
     }
 
@@ -22,14 +22,15 @@
     object.getTooltip = function()
     {
         local tooltipArray = gT_nullCheck == null ? this[parentName].getTooltip() : gT_nullCheck();
-        local activeContract = ::World.Contracts.getActiveContract();
 
         if (this.getLocationType() != ::Const.World.LocationType.Lair)
         {
             return tooltipArray;
         }
 
-        if (activeContract != null && activeContract.m.Destination == this) // TODO: test this
+        local activeContract = ::World.Contracts.getActiveContract();
+
+        if (activeContract != null && "Destination" in activeContract.m && activeContract.m.Destination == this) // TODO: test this
         {
             ::logInfo(this.getName() + " was found to be an active contract location, aborting.");
             return tooltipArray;

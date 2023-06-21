@@ -1,25 +1,25 @@
 ::mods_hookExactClass("entity/world/party", function( object )
-{
+{ // TODO: consider tweaking caravan scaling in general
     local parentName = object.SuperName;
 
-    local oD_nullCheck = "onDiscovered" in object ? object.onDiscovered : null;
-    object.onDiscovered = function()
+    local c_nullCheck = "create" in object ? object.create : null; // why did we originally do onDiscovered here?
+    object.create = function()
     {
-        local vanilla_onDiscovered = oD_nullCheck == null ? this[parentName].onDiscovered() : oD_nullCheck()
+        local vanilla_create = c_nullCheck == null ? this[parentName].create() : c_nullCheck()
 
         if (this.getFlags().get("IsCaravan") == false)
         {
-            return vanilla_onDiscovered;
+            return vanilla_create;
         }
 
         if (this.getFlags().get("CaravanWealth") != false || this.getFlags().get("CaravanCargo") != false)
         {
-            return vanilla_onDiscovered;
+            return vanilla_create;
         }
 
         ::logInfo("Assigning caravan parameters.");
         ::RPGR_Raids.initialiseCaravanParameters(this, ::World.FactionManager.getFaction(this.getFaction()).getNearestSettlement(this.getTile()));
-        return vanilla_onDiscovered;
+        return vanilla_create;
     }
 
     local gT_nullCheck = "getTooltip" in object ? object.getTooltip : null;
@@ -28,6 +28,13 @@
         local tooltipArray = gT_nullCheck == null ? this[parentName].getTooltip() : gT_nullCheck();
 
         if (this.getFlags().get("IsCaravan") == false)
+        {
+            return tooltipArray;
+        }
+
+        local activeContract = ::World.Contracts.getActiveContract();
+
+        if (activeContract != null && "Caravan" in activeContract.m && activeContract.m.Caravan == this) // TODO: test this
         {
             return tooltipArray;
         }
@@ -54,7 +61,7 @@
                 break;
 
             case(::RPGR_Raids.CaravanCargoDescriptors.Trade):
-                iconPath += "asset_business_reputation.png"
+                iconPath += "money.png";
                 break;
 
             case(::RPGR_Raids.CaravanCargoDescriptors.Rations):
@@ -107,6 +114,7 @@
 
         foreach( item in retrievedCargo )
         {
+            ::logInfo("Added " + item.getName() + " to the loot table.");
             _lootTable.push(item);
         }
 
