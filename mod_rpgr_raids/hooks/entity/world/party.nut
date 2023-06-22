@@ -1,26 +1,6 @@
 ::mods_hookExactClass("entity/world/party", function( object )
-{ // TODO: consider tweaking caravan scaling in general
+{
     local parentName = object.SuperName;
-
-    local c_nullCheck = "create" in object ? object.create : null; // why did we originally do onDiscovered here?
-    object.create = function()
-    {
-        local vanilla_create = c_nullCheck == null ? this[parentName].create() : c_nullCheck()
-
-        if (this.getFlags().get("IsCaravan") == false)
-        {
-            return vanilla_create;
-        }
-
-        if (this.getFlags().get("CaravanWealth") != false || this.getFlags().get("CaravanCargo") != false)
-        {
-            return vanilla_create;
-        }
-
-        ::logInfo("Assigning caravan parameters.");
-        ::RPGR_Raids.initialiseCaravanParameters(this, ::World.FactionManager.getFaction(this.getFaction()).getNearestSettlement(this.getTile()));
-        return vanilla_create;
-    }
 
     local gT_nullCheck = "getTooltip" in object ? object.getTooltip : null;
     object.getTooltip = function()
@@ -105,7 +85,8 @@
             return vanilla_onDropLootForPlayer(_lootTable);
         }
 
-        local retrievedCargo = ::RPGR_Raids.retrieveCaravanCargo(flags.get("CaravanCargo"), flags.get("CaravanWealth"));
+        local isSouthern = ::World.FactionManager.getFaction(this.getFaction()).getType() == ::Const.FactionType.OrientalCityState;
+        local retrievedCargo = ::RPGR_Raids.retrieveCaravanCargo(flags.get("CaravanCargo"), flags.get("CaravanWealth"), isSouthern);
 
         if (retrievedCargo.len() == 0)
         {

@@ -43,7 +43,7 @@
         Sacked = 2
     }
 
-    function createMundaneCaravanCargo( _folderPath, _caravanWealth, _isAssorted )
+    function createMundaneCaravanCargo( _caravanWealth, _isAssorted, _folderPath = null, _isSouthern = false )
     {
         local cargo = [];
         local assortedGoods = ["ammo_item", "medicine_item", "armor_parts_item"];
@@ -53,15 +53,33 @@
         {
             for( local i = 0; i != iterations; i = ++i )
             {
-                cargo.push(::new("scripts/items/" + _folderPath + assortedGoods[::Math.rand(0, assortedGoods.len() - 1)]));
+                cargo.push(::new("scripts/items/supplies/" + assortedGoods[::Math.rand(0, assortedGoods.len() - 1)]));
             }
 
             return cargo;
         }
 
-        local exclusionList = ["food_item", "strange_meat_item", "fermented_unhold_heart_item", "black_marsh_stew_item"];
+        local exclusionList = ["food_item", "trading_good_item", "strange_meat_item", "fermented_unhold_heart_item", "black_marsh_stew_item"];
         exclusionList.extend(assortedGoods);
+        local southernCandidates = ["dates_item", "rice_item", "silk_item", "spices_item"];
         local scriptFiles = ::IO.enumerateFiles("scripts/items/" + _folderPath);
+
+        if (_isSouthern) // TODO: test this
+        {
+            local southernGoods = southernCandidates.filter(function( index, candidate )
+            {
+                return scriptFiles.find("scripts/items/" + _folderPath + candidate) != null;
+            });
+
+            for( local i = 0; i != iterations; i = ++i )
+            {
+                cargo.push(::new("scripts/items/" + _folderPath + southernGoods[::Math.rand(0, southernGoods.len() - 1)]));
+            }
+
+            return cargo;
+        }
+
+        exclusionList.extend(southernCandidates);
 
         foreach( excludedFile in exclusionList )
         {
@@ -91,8 +109,8 @@
 
     function createNamedLootArray( _lair = null )
     {
-        local namedItemKeys = ["NamedArmors", "NamedHelmets", "NamedShields"]
-        local namedLoot = clone ::Const.Items.NamedWeapons;
+        local namedItemKeys = ["NamedArmors", "NamedWeapons", "NamedHelmets", "NamedShields"]
+        local namedLoot = [];
 
         foreach( key in namedItemKeys )
         {
@@ -198,11 +216,11 @@
 
         switch (_settlement.getSize())
         {
-            case 3:
+            case 1:
                 score += smallestIncrement;
             case 2:
                 score += smallestIncrement;
-            case 1:
+            case 3:
                 break;
             default:
                 ::logError("Settlement size indeterminate.");
@@ -297,7 +315,7 @@
         _lair.m.Loot.add(::new("scripts/items/" + namedLoot[::Math.rand(0, namedLoot.len() - 1)]));
     }
 
-    function retrieveCaravanCargo( _cargoValue, _caravanWealth )
+    function retrieveCaravanCargo( _cargoValue, _caravanWealth, _isSouthern )
     {
         local cargo = [];
 
@@ -307,13 +325,13 @@
                 cargo.extend(this.createNamedCaravanCargo());
 
             case (this.CaravanCargoDescriptors.Assortment):
-                cargo.extend(this.createMundaneCaravanCargo("supplies/", _caravanWealth, true));
+                cargo.extend(this.createMundaneCaravanCargo(_caravanWealth, true));
 
             case (this.CaravanCargoDescriptors.Trade):
-                cargo.extend(this.createMundaneCaravanCargo("trade/", _caravanWealth, false));
+                cargo.extend(this.createMundaneCaravanCargo(_caravanWealth, false, "trade/", _isSouthern));
 
             case (this.CaravanCargoDescriptors.Rations):
-                cargo.extend(this.createMundaneCaravanCargo("supplies/", _caravanWealth, false));
+                cargo.extend(this.createMundaneCaravanCargo(_caravanWealth, false, "supplies/", _isSouthern));
                 break;
 
             default:
@@ -380,7 +398,7 @@
     local agitationIncrementChance = pageGeneral.addRangeSetting("AgitationIncrementChance", 100, 0, 100, 1.0, "Agitation Increment Chance"); // TODO: this should be default 50 when raids ship
     agitationIncrementChance.setDescription("Determines the chance for a location's agitation value to increase by one tier upon victory against a roaming party, if within proximity.");
 
-    local agitationResourceModifier = pageGeneral.addRangeSetting("AgitationResourceModifier", 0.5, 0.0, 1.0, 0.1, "Agitation Resource Modifier"); // FIXME: Floating number display bug
+    local agitationResourceModifier = pageGeneral.addRangeSetting("AgitationResourceModifier", 0.7, 0.0, 1.0, 0.1, "Agitation Resource Modifier"); // FIXME: Floating number display bug
     agitationResourceModifier.setDescription("Controls how lair resource calculation is handled after each agitation tier change. Higher values result in greater resources, and therefore more powerful garrisoned troops and better loot.");
 
     local lairNamedLootChance = pageGeneral.addRangeSetting("LairNamedLootChance", 12, 1, 25, 1.0, "Lair Named Item Chance");
