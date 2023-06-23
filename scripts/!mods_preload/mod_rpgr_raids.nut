@@ -99,6 +99,36 @@
         return cargo;
     }
 
+    function createCaravanTroopsArray( _caravan, _isMilitary )
+    {
+        local troops = [];
+
+        if (_isMilitary)
+        {
+            troops.extend([
+                ::Const.World.Spawn.Troops.Billman,
+                ::Const.World.Spawn.Troops.Footman,
+                ::Const.World.Spawn.Troops.Arbalester,
+                ::Const.World.Spawn.Troops.ArmoredWardog
+            ]);
+
+            return troops;
+        }
+
+        troops.extend([
+            ::Const.World.Spawn.Troops.MercenaryLOW,
+            ::Const.World.Spawn.Troops.Mercenary,
+            ::Const.World.Spawn.Troops.MercenaryRanged
+        ]);
+
+        return troops;
+    }
+
+    function createEliteCaravanTroops( _caravan, _isMilitary )
+    {
+
+    }
+
     function createNamedCaravanCargo()
     {
         local cargo = [];
@@ -299,6 +329,8 @@
         {
             flags.set("CaravanCargo", ::Math.rand(this.CaravanCargoDescriptors.Rations, this.CaravanCargoDescriptors.Assortment));
         }
+
+        this.reinforceCaravanTroops( _caravan, ::World.FactionManager.getFaction(_caravan.getFaction()).getType() == ::Const.FactionType.NobleHouse );
     }
 
     function repopulateLairNamedLoot( _lair )
