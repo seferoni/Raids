@@ -59,12 +59,12 @@
             return cargo;
         }
 
-        local exclusionList = ["food_item", "trading_good_item", "strange_meat_item", "fermented_unhold_heart_item", "black_marsh_stew_item"];
+        local exclusionList = ["food_item", "money_item", "trading_good_item", "strange_meat_item", "fermented_unhold_heart_item", "black_marsh_stew_item"];
         exclusionList.extend(assortedGoods);
         local southernCandidates = ["dates_item", "rice_item", "silk_item", "spices_item"];
         local scriptFiles = ::IO.enumerateFiles("scripts/items/" + _folderPath);
 
-        if (_isSouthern) // TODO: test this
+        if (_isSouthern)
         {
             local southernGoods = southernCandidates.filter(function( index, candidate )
             {
@@ -151,12 +151,19 @@
     {
         local cargo = [];
         local namedLoot = this.createNamedLoot();
-        cargo.push(::new("scripts/items/" + namedLoot[::Math.rand(0, namedLoot.len() - 1)]));
+        local namedItem = ::new("scripts/items/" + namedLoot[::Math.rand(0, namedLoot.len() - 1)]);
+
+        if (namedItem.m.Name.len() == 0)
+		{
+			namedItem.setName(namedItem.createRandomName());
+		}
+
+        cargo.push(namedItem);
         return cargo;
     }
 
     function createNamedLoot( _lair = null )
-    {
+    { // FIXME: named items are being assigned to cargo without their names
         local namedItemKeys = ["NamedArmors", "NamedWeapons", "NamedHelmets", "NamedShields"]
         local namedLoot = [];
 
@@ -304,6 +311,28 @@
         return score;
     }
 
+    function isCaravan( _party )
+    {
+        local troopCandidates =
+        [
+            ::Const.World.Spawn.Troops.CaravanDonkey,
+            ::Const.World.Spawn.Troops.MilitaryDonkey,
+            ::Const.World.Spawn.Troops.SouthernDonkey
+        ];
+
+        foreach( candidate in troopCandidates )
+        {
+            local index = _party.getTroops().find(candidate);
+
+            if (index != null)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     function isFactionViable( _faction )
     {
         if (_faction == null)
@@ -449,7 +478,7 @@
         _lair.m.Resources = flags.get("Agitation") == this.AgitationDescriptors.Relaxed ? flags.get("BaseResources") : ::Math.floor(flags.get("BaseResources") * flags.get("Agitation") * this.Mod.ModSettings.getSetting("AgitationResourceModifier").getValue());
         _lair.setLootScaleBasedOnResources(_lair.m.Resources);
     }
-
+    // TODO: migrate settlement raid code to secondary mod
     function setRaidedSettlementVisuals( _settlement, _isBurning )
     {
         local spriteBrushString = _isBurning == true ? "_ruins" : "";

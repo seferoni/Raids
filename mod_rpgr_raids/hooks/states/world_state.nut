@@ -4,7 +4,7 @@
 
     local oCF_nullCheck = "onCombatFinished" in object ? object.onCombatFinished : null;
     object.onCombatFinished = function()
-    {
+    { // TODO: migrate this to party
         local vanilla_onCombatFinished = oCF_nullCheck == null ? this[parentName].onCombatFinished : oCF_nullCheck;
         local activeContract = ::World.Contracts.getActiveContract();
 
@@ -22,7 +22,13 @@
         local factionCandidates = [];
 
         foreach( party in this.m.PartiesInCombat )
-        {
+        { // TODO: keep an eye on this, figure out conditions for warning logging
+
+            if (!party.isAlive())
+            {
+                ::logInfo(party.getName() + " is not alive!");
+            }
+
             if (party.isAlive() && party.m.Troops.len() == 0 && !party.isLocation())
             {
                 factionCandidates.push(::World.FactionManager.getFaction(party.getFaction()));
