@@ -99,7 +99,7 @@
         return cargo;
     }
 
-    function createCaravanTroopsArray( _caravan, _isMilitary )
+    function createCaravanTroops( _caravan, _isMilitary )
     {
         local troops = [];
 
@@ -126,18 +126,36 @@
 
     function createEliteCaravanTroops( _caravan, _isMilitary )
     {
+        local troops = [];
 
+        if (_isMilitary)
+        {
+            troops.extend([
+                ::Const.World.Spawn.Troops.MasterArcher,
+                ::Const.World.Spawn.Troops.Greatsword,
+                ::Const.World.Spawn.Troops.Knight
+            ]);
+
+            return troops;
+        }
+
+        troops.extend([
+            ::Const.World.Spawn.Troops.HedgeKnight,
+            ::Const.World.Spawn.Troops.Swordmaster
+        ]);
+
+        return troops;
     }
 
     function createNamedCaravanCargo()
     {
         local cargo = [];
-        local namedLoot = this.createNamedLootArray();
+        local namedLoot = this.createNamedLoot();
         cargo.push(::new("scripts/items/" + namedLoot[::Math.rand(0, namedLoot.len() - 1)]));
         return cargo;
     }
 
-    function createNamedLootArray( _lair = null )
+    function createNamedLoot( _lair = null )
     {
         local namedItemKeys = ["NamedArmors", "NamedWeapons", "NamedHelmets", "NamedShields"]
         local namedLoot = [];
@@ -330,7 +348,36 @@
             flags.set("CaravanCargo", ::Math.rand(this.CaravanCargoDescriptors.Rations, this.CaravanCargoDescriptors.Assortment));
         }
 
-        this.reinforceCaravanTroops( _caravan, ::World.FactionManager.getFaction(_caravan.getFaction()).getType() == ::Const.FactionType.NobleHouse );
+        this.reinforceCaravanTroops(_caravan);
+    }
+
+    function reinforceCaravanTroops( _caravan )
+    {
+        local flags = _caravan.getFlags();
+        local wealth = flags.get("CaravanWealth");
+
+        if (wealth < this.CaravanWealthDescriptors.Deprived)
+        {
+            return;
+        }
+
+        local cargo = flags.get("CaravanCargo");
+        local iterations = ::Math.rand(1, wealth + cargo);
+        local isMilitary = ::World.FactionManager.getFaction(_caravan.getFaction()).getType() == ::Const.FactionType.NobleHouse;
+        local mundaneTroops = this.createCaravanTroops(_caravan, isMilitary);
+
+        for( local i = 0; i != iterations; i = ++i )
+        {
+            ::Const.World.Common.addTroop(_caravan, {Type = mundaneTroops[::Math.rand(0, mundaneTroops.len() - 1)]}, true);
+        }
+
+        if (!(wealth == this.CaravanWealthDescriptors.Opulent && cargo == this.CaravanCargoDescriptors.Oddities))
+        {
+            return;
+        }
+
+        local eliteTroops = this.createEliteCaravanTroops(_caravan, isMilitary);
+        ::Const.World.Common.addTroop(_caravan, {Type = eliteTroops[::Math.rand(0, eliteTroops.len() - 1)]}, true);
     }
 
     function repopulateLairNamedLoot( _lair )
@@ -343,7 +390,7 @@
             return;
         }
 
-        local namedLoot = this.createNamedLootArray(_lair);
+        local namedLoot = this.createNamedLoot(_lair);
         _lair.m.Loot.add(::new("scripts/items/" + namedLoot[::Math.rand(0, namedLoot.len() - 1)]));
     }
 
@@ -375,22 +422,22 @@
 
     function setLairAgitation( _lair, _procedure )
     {
-        local lairFlags = _lair.getFlags();
+        local flags = _lair.getFlags();
 
         switch (_procedure)
         {
             case (this.Procedures.Increment):
-                lairFlags.increment("Agitation");
+                flags.increment("Agitation");
                 this.repopulateLairNamedLoot(_lair);
                 break;
 
             case (this.Procedures.Decrement):
-                lairFlags.increment("Agitation", -1);
+                flags.increment("Agitation", -1);
                 this.depopulateLairNamedLoot(_lair);
                 break;
 
             case (this.Procedures.Reset):
-                lairFlags.set("Agitation", this.AgitationDescriptors.Relaxed);
+                flags.set("Agitation", this.AgitationDescriptors.Relaxed);
                 this.depopulateLairNamedLoot(_lair);
                 break;
 
@@ -398,8 +445,8 @@
                 ::logError("[Raids] setLairAgitation was called with an invalid procedure value.");
         }
 
-        lairFlags.set("LastAgitationUpdate", ::World.getTime().Days);
-        _lair.m.Resources = _procedure == this.Procedures.Reset ? lairFlags.get("BaseResources") : ::Math.floor(lairFlags.get("BaseResources") * lairFlags.get("Agitation") * this.Mod.ModSettings.getSetting("AgitationResourceModifier").getValue());
+        flags.set("LastAgitationUpdate", ::World.getTime().Days);
+        _lair.m.Resources = flags.get("Agitation") == this.AgitationDescriptors.Relaxed ? flags.get("BaseResources") : ::Math.floor(flags.get("BaseResources") * flags.get("Agitation") * this.Mod.ModSettings.getSetting("AgitationResourceModifier").getValue());
         _lair.setLootScaleBasedOnResources(_lair.m.Resources);
     }
 

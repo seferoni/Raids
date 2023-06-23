@@ -12,6 +12,14 @@
             return vanilla_onExecute;
         }
 
+        local activeContract = ::World.Contracts.getActiveContract();
+
+        if (activeContract != null && "Caravan" in activeContract.m && activeContract.m.Caravan == _entity) // TODO: test this
+        {
+            ::logInfo("Caravan was found to be the target of an active contract.");
+            return vanilla_onExecute;
+        }
+
         if (_entity.getFlags().get("CaravanWealth") != false || _entity.getFlags().get("CaravanCargo") != false) // TODO: remove this as it's redundant
         {
             ::logInfo("Caravan parameters already initialised.");
