@@ -64,7 +64,7 @@
 
         foreach( lair in lairs )
         {
-            if (lair.getFlags().get("Agitation") <= ::RPGR_Raids.AgitationDescriptors.Desperate && (activeContract == null || activeContract.m.Destination != this))
+            if (lair.getFlags().get("Agitation") <= ::RPGR_Raids.AgitationDescriptors.Desperate && (activeContract == null || "Destination" in activeContract.m && activeContract.m.Destination.get() != lair))
             {
                 ::RPGR_Raids.setLairAgitation(lair, ::RPGR_Raids.Procedures.Increment);
                 ::logInfo("Found lair candidate, incremented agitation.");

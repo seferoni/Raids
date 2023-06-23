@@ -14,7 +14,7 @@
 
         local activeContract = ::World.Contracts.getActiveContract();
 
-        if (activeContract != null && "Caravan" in activeContract.m && activeContract.m.Caravan == _entity) // TODO: test this
+        if (activeContract != null && "Caravan" in activeContract.m && activeContract.m.Caravan.get() == _entity) // TODO: test this
         {
             ::logInfo("Caravan was found to be the target of an active contract.");
             return vanilla_onExecute;

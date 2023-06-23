@@ -14,7 +14,7 @@
 
         local activeContract = ::World.Contracts.getActiveContract();
 
-        if (activeContract != null && "Caravan" in activeContract.m && activeContract.m.Caravan == this) // TODO: remove this, rely on flag check
+        if (activeContract != null && "Caravan" in activeContract.m && activeContract.m.Caravan.get() == this) // TODO: remove this, rely on flag check
         {
             return tooltipArray;
         }

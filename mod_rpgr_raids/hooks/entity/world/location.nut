@@ -30,7 +30,7 @@
 
         local activeContract = ::World.Contracts.getActiveContract();
 
-        if (activeContract != null && "Destination" in activeContract.m && activeContract.m.Destination == this) // TODO: test this
+        if (activeContract != null && "Destination" in activeContract.m && activeContract.m.Destination.get() == this) // TODO: test this
         {
             ::logInfo(this.getName() + " was found to be an active contract location, aborting.");
             return tooltipArray;
