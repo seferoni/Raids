@@ -4,7 +4,7 @@
 
     local oCF_nullCheck = "onCombatFinished" in object ? object.onCombatFinished : null;
     object.onCombatFinished = function()
-    { // TODO: migrate this to party
+    {
         local vanilla_onCombatFinished = oCF_nullCheck == null ? this[parentName].onCombatFinished : oCF_nullCheck;
         local activeContract = ::World.Contracts.getActiveContract();
 
@@ -70,11 +70,10 @@
 
         foreach( lair in lairs )
         {
-            if (lair.getFlags().get("Agitation") <= ::RPGR_Raids.AgitationDescriptors.Desperate && (activeContract == null || "Destination" in activeContract.m && activeContract.m.Destination.get() != lair))
+            if (activeContract == null || ("Destination" in activeContract.m && activeContract.m.Destination.get() != lair))
             {
                 ::RPGR_Raids.setLairAgitation(lair, ::RPGR_Raids.Procedures.Increment);
-                ::logInfo("Found lair candidate, incremented agitation.");
-                break;
+                ::logInfo("Found lair candidate.");
             }
         }
 

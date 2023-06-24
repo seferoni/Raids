@@ -1,4 +1,4 @@
-::mods_hookExactClass("factions/actions/send_caravan_action", function( object )
+::mods_hookExactClass("factions/actions/send_supplies_action", function( object )
 {
     local parentName = object.SuperName;
 

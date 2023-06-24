@@ -71,7 +71,7 @@
 
     local oU_nullCheck = "onUpdate" in object ? object.onUpdate : null;
     object.onUpdate <- function()
-    {
+    { // FIXME: this is not an efficient solution. tether updates to getTooltip, allow for cumulative updating of agitation state
         local vanilla_onUpdate = oU_nullCheck == null ? this[parentName].onUpdate() : oU_nullCheck();
 
         if (this.getLocationType() != ::Const.World.LocationType.Lair)
@@ -80,11 +80,6 @@
         }
 
         ::logInfo("onUpdate called.");
-        if (this.getFlags().get("Agitation") == ::RPGR_Raids.AgitationDescriptors.Relaxed)
-        {
-            return vanilla_onUpdate;
-        }
-
         local lastUpdateTime = this.getFlags().get("LastAgitationUpdate");
 
         if (lastUpdateTime == false)

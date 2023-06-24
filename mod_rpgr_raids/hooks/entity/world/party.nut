@@ -2,39 +2,9 @@
 {
     local parentName = object.SuperName;
 
-    /*local c_nullCheck = "create" in object ? object.create : null;
-    object.create = function()
-    {
-        local vanilla_create = c_nullCheck == null ? this[parentName].create() : c_nullCheck();
-
-        if (!::RPGR_Raids.isCaravan(this))
-        {
-            return vanilla_create;
-        }
-
-        local flags = this.getFlags();
-        local activeContract = ::World.Contracts.getActiveContract();
-
-        if (activeContract != null && "Caravan" in activeContract.m && activeContract.m.Caravan.get() == this) // TODO: test this
-        {
-            ::logInfo("Caravan was found to be the target of an active contract.");
-            return vanilla_create;
-        }
-
-        if (flags.get("CaravanWealth") != false || flags.get("CaravanCargo") != false) // TODO: remove this as it's redundant
-        {
-            ::logInfo("Caravan parameters already initialised.");
-            return vanilla_create;
-        }
-
-        ::logInfo("Assigning caravan parameters.");
-        ::RPGR_Raids.initialiseCaravanParameters(this, ::World.FactionManager.getFaction(this.getFaction()).getNearestSettlement(this.getTile()));
-        return vanilla_create;
-    }*/
-
     local gT_nullCheck = "getTooltip" in object ? object.getTooltip : null;
     object.getTooltip = function()
-    {
+    { // TODO: add distance check
         local tooltipArray = gT_nullCheck == null ? this[parentName].getTooltip() : gT_nullCheck();
 
         if (this.getFlags().get("IsCaravan") == false)
@@ -126,6 +96,7 @@
         foreach( item in retrievedCargo )
         {
             ::logInfo("Added " + item.getName() + " to the loot table.");
+            item.onAddedToStash(null); // TODO: test this
             _lootTable.push(item);
         }
 

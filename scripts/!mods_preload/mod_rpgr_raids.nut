@@ -28,19 +28,13 @@
     {
         CaravanNamedLootChance = 50, // FIXME: this is inflated, revert to 5
         FamedChanceOnCampSpawn = 30,
-        MaximumDistanceToAgitate = 15
+        MaximumDistanceToAgitate = 9
     },
     Procedures =
     {
         Increment = 1,
         Decrement = 2,
         Reset = 3
-    },
-    Severity =
-    {
-        Unscathed = 0,
-        Looted = 1,
-        Sacked = 2
     }
 
     function createMundaneCaravanCargo( _caravanWealth, _isAssorted, _folderPath = null, _isSouthern = false )
@@ -163,7 +157,7 @@
     }
 
     function createNamedLoot( _lair = null )
-    { // FIXME: named items are being assigned to cargo without their names
+    { // FIXME: there is no point in extending this with what the lair alr has
         local namedItemKeys = ["NamedArmors", "NamedWeapons", "NamedHelmets", "NamedShields"]
         local namedLoot = [];
 
@@ -242,97 +236,6 @@
 		return (_lair.m.Resources + nearestSettlementDistance * 4) / 5.0 - 37.0;
     }
 
-    function getSeverityScore( _settlement )
-    {
-        local score = 0.0;
-        local smallestIncrement = 1.0;
-        local synergisticSituations =
-        [
-            "situation.ambushed_trade_routes",
-            "situation.greenskins",
-            "situation.disappearing_villagers",
-            "situation.conquered",
-            "situation.warehouse_burned_down",
-            "situation.drought"
-        ];
-        local antagonisticSituations =
-        [
-            "situation.well_supplied",
-            "situation.good_harvest",
-            "situation.safe_roads",
-            "situation.mustering_troops"
-        ];
-        local activeContract = ::World.Contracts.getActiveContract();
-
-        if (activeContract != null && activeContract.isTileUsed(_settlement.getTile()))
-        {
-            return this.Severity.Unscathed;
-        }
-
-        switch (_settlement.getSize())
-        {
-            case 1:
-                score += smallestIncrement;
-            case 2:
-                score += smallestIncrement;
-            case 3:
-                break;
-            default:
-                ::logError("Settlement size indeterminate.");
-        }
-
-        foreach( situation in synergisticSituations )
-        {
-            if (_settlement.getSituationByID(situation) != null)
-            {
-                score += smallestIncrement;
-            }
-        }
-
-        foreach( situation in antagonisticSituations )
-        {
-            if (_settlement.getSituationByID(situation) != null)
-            {
-                score -= smallestIncrement;
-            }
-        }
-
-        if (_settlement.isMilitary())
-        {
-            score -= smallestIncrement;
-        }
-
-        if (_settlement.isIsolated() || _settlement.isIsolatedFromRoads() || _settlement.isCoastal())
-        {
-            score += smallestIncrement;
-        }
-
-        ::logInfo(_settlement.getName() + " was calculated to have a severity score of " + score + ".");
-        return score;
-    }
-
-    function isCaravan( _party )
-    {
-        local troopCandidates =
-        [
-            ::Const.World.Spawn.Troops.CaravanDonkey,
-            ::Const.World.Spawn.Troops.MilitaryDonkey,
-            ::Const.World.Spawn.Troops.SouthernDonkey
-        ];
-
-        foreach( candidate in troopCandidates )
-        {
-            local index = _party.getTroops().find(candidate);
-
-            if (index != null)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     function isFactionViable( _faction )
     {
         if (_faction == null)
@@ -358,6 +261,24 @@
             }
         }
 
+        return true;
+    }
+
+    function isLairEligible(_flags, _procedure)
+    {
+        local agitationState = _flags.get("Agitation");
+        if (_procedure == this.Procedures.Increment && agitationState >= this.AgitationDescriptors.Desperate)
+        {
+            ::logInfo("Agitation is capped, bailing.");
+            return false;
+        }
+
+        if (_procedure == this.Procedures.Decrement && agitationState <= this.AgitationDescriptors.Relaxed)
+        {
+            return false;
+        }
+
+        ::logInfo("Lair is eligible.");
         return true;
     }
 
@@ -452,6 +373,12 @@
     function setLairAgitation( _lair, _procedure )
     {
         local flags = _lair.getFlags();
+        local isLairEligible = this.isLairEligible(flags, _procedure);
+
+        if (!isLairEligible)
+        {
+            return;
+        }
 
         switch (_procedure)
         {
@@ -477,19 +404,6 @@
         flags.set("LastAgitationUpdate", ::World.getTime().Days);
         _lair.m.Resources = flags.get("Agitation") == this.AgitationDescriptors.Relaxed ? flags.get("BaseResources") : ::Math.floor(flags.get("BaseResources") * flags.get("Agitation") * this.Mod.ModSettings.getSetting("AgitationResourceModifier").getValue());
         _lair.setLootScaleBasedOnResources(_lair.m.Resources);
-    }
-    // TODO: migrate settlement raid code to secondary mod
-    function setRaidedSettlementVisuals( _settlement, _isBurning )
-    {
-        local spriteBrushString = _isBurning == true ? "_ruins" : "";
-        _settlement.getSprite("location_banner").Visible = !_isBurning;
-		_settlement.getLabel("name").Visible = !_isBurning; // TODO: test if this works as envisioned
-		_settlement.getSprite("body").setBrush(_settlement.m.Sprite + spriteBrushString);
-
-        if (_isBurning)
-        {
-            _settlement.spawnFireAndSmoke()
-        }
     }
 };
 
