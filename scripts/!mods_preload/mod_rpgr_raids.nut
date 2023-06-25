@@ -302,7 +302,7 @@
     }
 
     function reinforceCaravanTroops( _caravan )
-    {
+    { // TODO: rebalance this
         local flags = _caravan.getFlags();
         local wealth = flags.get("CaravanWealth");
 

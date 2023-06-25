@@ -12,14 +12,13 @@
             return tooltipArray;
         }
 
-        local activeContract = ::World.Contracts.getActiveContract();
+        /*local activeContract = ::World.Contracts.getActiveContract();
 
         if (activeContract != null && "Caravan" in activeContract.m && activeContract.m.Caravan.get() == this) // TODO: remove this, rely on flag check
         {
             return tooltipArray;
-        }
+        }*/
 
-        local iconPath = "ui/icons/";
         local flags = this.getFlags();
         local caravanWealth = flags.get("CaravanWealth");
         local caravanCargo = flags.get("CaravanCargo");
@@ -29,6 +28,8 @@
             ::logInfo("Flags uninitialised.");
             return tooltipArray;
         }
+
+        local iconPath = "ui/icons/";
 
         switch (caravanCargo)
         {
