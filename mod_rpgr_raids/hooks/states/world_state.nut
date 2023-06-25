@@ -59,7 +59,7 @@
         local agitatedFaction = filteredFactions[::Math.rand(0, filteredFactions.len() - 1)];
         local lairs = agitatedFaction.getSettlements().filter(function( locationIndex, location )
         {
-            return location.getLocationType() == ::Const.World.LocationType.Lair && ::World.State.getPlayer().getTile().getDistanceTo(location.getTile()) <= ::RPGR_Raids.CampaignModifiers.MaximumDistanceToAgitate;
+            return location.getLocationType() == ::Const.World.LocationType.Lair && ::RPGR_Raids.isPlayerInProximityTo(location.getTile());
         });
 
         if (lairs.len() == 0)

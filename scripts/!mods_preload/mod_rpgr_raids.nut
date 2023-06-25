@@ -26,9 +26,9 @@
     },
     CampaignModifiers =
     {
-        CaravanNamedLootChance = 50, // FIXME: this is inflated, revert to 5
-        FamedChanceOnCampSpawn = 30,
-        MaximumDistanceToAgitate = 9
+        CaravanNamedItemChance = 50, // FIXME: this is inflated, revert to 5
+        NamedItemChanceOnSpawn = 30,
+        GlobalProximityTiles = 9
     },
     Procedures =
     {
@@ -264,7 +264,12 @@
         return true;
     }
 
-    function isLairEligible(_flags, _procedure)
+    function isLocationEligible( _locationType )
+    {
+        return _locationType == ::Const.World.LocationType.Lair;
+    }
+
+    function isLairEligible( _flags, _procedure )
     {
         local agitationState = _flags.get("Agitation");
         if (_procedure == this.Procedures.Increment && agitationState >= this.AgitationDescriptors.Desperate)
@@ -282,6 +287,24 @@
         return true;
     }
 
+    function isActiveContractObject( _object, _key )
+    {
+        local activeContract = ::World.Contracts.getActiveContract();
+
+        if (activeContract != null && _key in activeContract.m && activeContract.m[_key].get() == this)
+        {
+            ::logInfo(this.getName() + " was found to be an active contract object, aborting.");
+            return true;
+        }
+
+        return false;
+    }
+
+    function isPlayerInProximityTo( _targetTile )
+    {
+        return ::World.State.getPlayer().getTile().getDistanceTo(_targetTile) <= ::RPGR_Raids.CampaignModifiers.GlobalProximityTiles;
+    }
+
     function initialiseCaravanParameters( _caravan, _settlement )
     {
         local flags = _caravan.getFlags();
@@ -289,7 +312,7 @@
         local sizeModifier = _settlement.getSize() >= 3 ? 1 : 0;
         flags.set("CaravanWealth", ::Math.min(this.CaravanWealthDescriptors.Opulent, ::Math.rand(1, 2) + typeModifier + sizeModifier));
 
-        if (::Math.rand(1, 100) <= this.CampaignModifiers.CaravanNamedLootChance && flags.get("CaravanWealth") == this.CaravanWealthDescriptors.Opulent)
+        if (::Math.rand(1, 100) <= this.CampaignModifiers.CaravanNamedItemChance && flags.get("CaravanWealth") == this.CaravanWealthDescriptors.Opulent)
         {
             flags.set("CaravanCargo", this.CaravanCargoDescriptors.Oddities);
         }
@@ -405,6 +428,39 @@
         _lair.m.Resources = flags.get("Agitation") == this.AgitationDescriptors.Relaxed ? flags.get("BaseResources") : ::Math.floor(flags.get("BaseResources") * flags.get("Agitation") * this.Mod.ModSettings.getSetting("AgitationResourceModifier").getValue());
         _lair.setLootScaleBasedOnResources(_lair.m.Resources);
     }
+
+    function updateCumulativeLairAgitation( _lair )
+    {
+        local flags = _lair.getFlags();
+        local lastUpdateTimeDays = flags.get("LastAgitationUpdate");
+
+        if (lastUpdateTimeDays == false)
+        {
+            return;
+        }
+
+        local currentTimeDays = ::World.getTime().Days;
+        local decayInterval = this.Mod.ModSettings.getSetting("AgitationDecayInterval").getValue();
+        local difference = currentTimeDays - lastUpdateTime;
+
+        if (difference < decayInterval)
+        {
+            return;
+        }
+
+        ::logInfo("Difference is  " + difference + " decayInterval is " + decayInterval);
+        local decrementIterations = ::Math.floor(difference / decayInterval);
+
+        for( local i = 0; i != decrementIterations; i = ++i )
+        {
+            this.setLairAgitation(_lair, this.Procedures.Decrement);
+
+            if (flags.get("Agitation") == this.AgitationDescriptors.Relaxed)
+            {
+                break;
+            }
+        }
+    }
 };
 
 ::mods_registerMod(::RPGR_Raids.ID, ::RPGR_Raids.Version, ::RPGR_Raids.Name);
@@ -422,9 +478,6 @@
 
     local agitationResourceModifier = pageGeneral.addRangeSetting("AgitationResourceModifier", 0.7, 0.0, 1.0, 0.1, "Agitation Resource Modifier"); // FIXME: Floating number display bug
     agitationResourceModifier.setDescription("Controls how lair resource calculation is handled after each agitation tier change. Higher values result in greater resources, and therefore more powerful garrisoned troops and better loot.");
-
-    local lairNamedLootChance = pageGeneral.addRangeSetting("LairNamedLootChance", 12, 1, 25, 1.0, "Lair Named Item Chance");
-    lairNamedLootChance.setDescription("Determines the base chance for lairs to contain new named items when agitation is incremented.");
 
     foreach( file in ::IO.enumerateFiles("mod_rpgr_raids/hooks") )
     {

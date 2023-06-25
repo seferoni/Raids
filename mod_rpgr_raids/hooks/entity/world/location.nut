@@ -7,14 +7,15 @@
     {
         local vanilla_onSpawned = oS_nullCheck == null ? this[parentName].onSpawned() : oS_nullCheck();
 
-        if (this.m.LocationType != ::Const.World.LocationType.Lair)
+        if (!::RPGR_Raids.isLocationEligible(this.getLocationType()))
         {
             return vanilla_onSpawned;
         }
 
-        this.getFlags().set("BaseResources", this.m.Resources);
-        this.getFlags().set("Agitation", ::RPGR_Raids.AgitationDescriptors.Relaxed);
-        ::RPGR_Raids.depopulateLairNamedLoot(this, ::RPGR_Raids.CampaignModifiers.FamedChanceOnCampSpawn);
+        local flags = this.getFlags();
+        flags.set("BaseResources", this.m.Resources);
+        flags.set("Agitation", ::RPGR_Raids.AgitationDescriptors.Relaxed);
+        ::RPGR_Raids.depopulateLairNamedLoot(this, ::RPGR_Raids.CampaignModifiers.NamedItemChanceOnSpawn);
         return vanilla_onSpawned;
     }
 
@@ -23,14 +24,17 @@
     {
         local tooltipArray = gT_nullCheck == null ? this[parentName].getTooltip() : gT_nullCheck();
 
-        if (this.getLocationType() != ::Const.World.LocationType.Lair)
+        if (!::RPGR_Raids.isLocationEligible(this.getLocationType()))
         {
             return tooltipArray;
         }
 
-        local activeContract = ::World.Contracts.getActiveContract();
+        if (!::RPGR_Raids.isPlayerInProximityTo(this.getTile()))
+        {
+            return tooltipArray;
+        }
 
-        if (activeContract != null && "Destination" in activeContract.m && activeContract.m.Destination.get() == this) // TODO: test this, use MSU functionality as a last resort
+        if (::RPGR_Raids.isActiveContractObject(this, "Location"))
         {
             ::logInfo(this.getName() + " was found to be an active contract location, aborting.");
             return tooltipArray;
@@ -66,33 +70,7 @@
             });
         }
 
+        ::RPGR_Raids.updateCumulativeLairAgitation(this);
         return tooltipArray;
-    }
-
-    local oU_nullCheck = "onUpdate" in object ? object.onUpdate : null;
-    object.onUpdate <- function()
-    { // FIXME: this is not an efficient solution. tether updates to getTooltip, allow for cumulative updating of agitation state
-        local vanilla_onUpdate = oU_nullCheck == null ? this[parentName].onUpdate() : oU_nullCheck();
-
-        if (this.getLocationType() != ::Const.World.LocationType.Lair)
-        {
-            return vanilla_onUpdate;
-        }
-
-        ::logInfo("onUpdate called.");
-        local lastUpdateTime = this.getFlags().get("LastAgitationUpdate");
-
-        if (lastUpdateTime == false)
-        {
-            return vanilla_onUpdate;
-        }
-
-        if (::World.getTime().Days - lastUpdateTime < ::RPGR_Raids.Mod.ModSettings.getSetting("AgitationDecayInterval").getValue())
-        {
-            return vanilla_onUpdate;
-        }
-
-        ::RPGR_Raids.setLairAgitation(this, ::RPGR_Raids.Procedures.Decrement);
-        return vanilla_onUpdate;
     }
 });

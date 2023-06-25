@@ -26,14 +26,6 @@
             return vanilla_onExecute;
         }
 
-        /*local activeContract = ::World.Contracts.getActiveContract();
-
-        if (activeContract != null && "Caravan" in activeContract.m && activeContract.m.Caravan.get() == caravan) // FIXME: we no longer need this as contract-spawned caravans use their own caravan spawn procedure
-        {
-            ::logInfo("Caravan was found to be the target of an active contract.");
-            return vanilla_onExecute;
-        }*/
-
         ::logInfo("Assigning caravan parameters.");
         ::RPGR_Raids.initialiseCaravanParameters(caravan, this.m.Start);
         return vanilla_onExecute;

@@ -12,13 +12,6 @@
             return tooltipArray;
         }
 
-        /*local activeContract = ::World.Contracts.getActiveContract();
-
-        if (activeContract != null && "Caravan" in activeContract.m && activeContract.m.Caravan.get() == this) // TODO: remove this, rely on flag check
-        {
-            return tooltipArray;
-        }*/
-
         local flags = this.getFlags();
         local caravanWealth = flags.get("CaravanWealth");
         local caravanCargo = flags.get("CaravanCargo");

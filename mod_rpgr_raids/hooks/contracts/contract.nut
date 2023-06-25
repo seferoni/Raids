@@ -15,7 +15,7 @@
             return fetch;
         }
 
-        if (this.m.Destination.getLocationType() == ::Const.World.LocationType.Lair)
+        if (::RPGR_Raids.isLocationEligible(this.m.Destination.getLocationType()))
         {
             ::RPGR_Raids.setLairAgitation(this.m.Destination, ::RPGR_Raids.Procedures.Reset);
         }
