@@ -6,7 +6,6 @@
     object.onCombatFinished = function()
     {
         local vanilla_onCombatFinished = oCF_nullCheck == null ? this[parentName].onCombatFinished : oCF_nullCheck;
-        local activeContract = ::World.Contracts.getActiveContract();
 
         if (::World.Statistics.getFlags().get("LastCombatWasArena"))
         {
@@ -15,15 +14,13 @@
 
         if (::Math.rand(1, 100) > ::RPGR_Raids.Mod.ModSettings.getSetting("AgitationIncrementChance").getValue())
         {
-            ::logInfo("Random number was larger than agitation increment chance.");
             return vanilla_onCombatFinished();
         }
 
         local factionCandidates = [];
 
         foreach( party in this.m.PartiesInCombat )
-        { // TODO: keep an eye on this, figure out conditions for warning logging
-
+        {
             if (!party.isAlive())
             {
                 ::logInfo(party.getName() + " is not alive!");
@@ -37,7 +34,7 @@
 
         if (factionCandidates.len() == 0)
         {
-            ::logWarning("[Raids] onCombatFinished found no eligible parties.");
+            ::logInfo("[Raids] onCombatFinished found no eligible parties.");
             return vanilla_onCombatFinished();
         }
 
@@ -59,7 +56,7 @@
         local agitatedFaction = filteredFactions[::Math.rand(0, filteredFactions.len() - 1)];
         local lairs = agitatedFaction.getSettlements().filter(function( locationIndex, location )
         {
-            return location.getLocationType() == ::Const.World.LocationType.Lair && ::RPGR_Raids.isPlayerInProximityTo(location.getTile());
+            return ::RPGR_Raids.isLocationEligible(location.getLocationType()) && ::RPGR_Raids.isPlayerInProximityTo(location.getTile());
         });
 
         if (lairs.len() == 0)
@@ -70,7 +67,7 @@
 
         foreach( lair in lairs )
         {
-            if (activeContract == null || ("Destination" in activeContract.m && activeContract.m.Destination.get() != lair))
+            if (!::RPGR_Raids.isActiveContractLocation(lair))
             {
                 ::RPGR_Raids.setLairAgitation(lair, ::RPGR_Raids.Procedures.Increment);
                 ::logInfo("Found lair candidate.");

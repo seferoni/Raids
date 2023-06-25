@@ -4,65 +4,41 @@
 
     local gT_nullCheck = "getTooltip" in object ? object.getTooltip : null;
     object.getTooltip = function()
-    { // TODO: add distance check
+    {
         local tooltipArray = gT_nullCheck == null ? this[parentName].getTooltip() : gT_nullCheck();
+        local flags = this.getFlags();
 
-        if (this.getFlags().get("IsCaravan") == false)
+        if (!::RPGR_Raids.isPartyEligible(flags))
         {
             return tooltipArray;
         }
 
-        local flags = this.getFlags();
-        local caravanWealth = flags.get("CaravanWealth");
-        local caravanCargo = flags.get("CaravanCargo");
-
-        if (caravanWealth == false || caravanCargo == false)
+        if (!::RPGR_Raids.areCaravanFlagsInitialised(flags))
         {
             ::logInfo("Flags uninitialised.");
             return tooltipArray;
         }
 
-        local iconPath = "ui/icons/";
-
-        switch (caravanCargo)
+        if (!::RPGR_Raids.isPlayerInProximityTo(this.getTile()))
         {
-            case(::RPGR_Raids.CaravanCargoDescriptors.Oddities):
-                iconPath += "perks.png"
-                break;
-
-            case (::RPGR_Raids.CaravanCargoDescriptors.Assortment):
-                iconPath += "asset_supplies.png";
-                break;
-
-            case(::RPGR_Raids.CaravanCargoDescriptors.Trade):
-                iconPath += "money.png";
-                break;
-
-            case(::RPGR_Raids.CaravanCargoDescriptors.Rations):
-                iconPath += "asset_food.png"
-                break;
-
-            default:
-                ::logError("No matching caravan cargo descriptor found for caravan.");
-                return tooltipArray;
+            return tooltipArray;
         }
 
-        local caravanWealthDescriptor = ::RPGR_Raids.getDescriptor(caravanWealth, ::RPGR_Raids.CaravanWealthDescriptors);
-        local caravanCargoDescriptor = ::RPGR_Raids.getDescriptor(caravanCargo, ::RPGR_Raids.CaravanCargoDescriptors);
+        local caravanCargo = flags.get("CaravanCargo");
+        local cargoIconPath = ::RPGR_Raids.retrieveCaravanCargoIconPath(caravanCargo);
+
+        if (cargoIconPath == null)
+        {
+            return tooltipArray;
+        }
+
+        local iconPath = "ui/icons/" + cargoIconPath;
+        local id = 2;
+        local type = "hint";
 
         tooltipArray.extend([
-            {
-                id = 2,
-                type = "hint",
-                icon = iconPath,
-                text = caravanCargoDescriptor
-            },
-            {
-                id = 2,
-                type = "hint",
-                icon = "ui/icons/bag.png",
-                text = caravanWealthDescriptor
-            }
+            ::RPGR_Raids.generateTooltipTableEntry(id, type, iconPath, ::RPGR_Raids.getDescriptor(caravanCargo, ::RPGR_Raids.CaravanCargoDescriptors)),
+            ::RPGR_Raids.generateTooltipTableEntry(id, type, "ui/icons/bag.png", ::RPGR_Raids.getDescriptor(flags.get("CaravanWealth"), ::RPGR_Raids.CaravanWealthDescriptors))
         ]);
 
         return tooltipArray;
@@ -74,7 +50,12 @@
         local vanilla_onDropLootForPlayer = oDLFP_nullCheck == null ? this[parentName].onDropLootForPlayer : oDLFP_nullCheck;
         local flags = this.getFlags();
 
-        if (flags.get("IsCaravan") == false)
+        if (!::RPGR_Raids.isPartyEligible(flags))
+        {
+            return vanilla_onDropLootForPlayer(_lootTable);
+        }
+
+        if (!::RPGR_Raids.areCaravanFlagsInitialised(flags))
         {
             return vanilla_onDropLootForPlayer(_lootTable);
         }

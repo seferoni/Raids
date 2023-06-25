@@ -34,41 +34,22 @@
             return tooltipArray;
         }
 
-        if (::RPGR_Raids.isActiveContractObject(this, "Location"))
+        if (::RPGR_Raids.isActiveContractLocation(this))
         {
             ::logInfo(this.getName() + " was found to be an active contract location, aborting.");
             return tooltipArray;
         }
 
-        local resources = this.m.Resources;
         local agitationState = this.getFlags().get("Agitation");
-        local agitationDescriptor = ::RPGR_Raids.getDescriptor(agitationState, ::RPGR_Raids.AgitationDescriptors);
+        local id = 20;
+        local type = "text";
+        local iconPath = agitationState == ::RPGR_Raids.AgitationDescriptors.Relaxed ? "vision.png" : "miniboss.png";
+        local textColour = agitationState == ::RPGR_Raids.AgitationDescriptors.Relaxed ? ::Const.UI.Color.PositiveValue : ::Const.UI.Color.NegativeValue;
 
-        tooltipArray.push({
-            id = 20,
-            type = "text",
-            icon = "ui/icons/asset_money.png",
-            text = "[color=" + ::Const.UI.Color.PositiveValue + "]" + resources + "[/color] resource units"
-        });
-
-        if (agitationState == ::RPGR_Raids.AgitationDescriptors.Relaxed)
-        {
-            tooltipArray.push({
-                id = 20,
-                type = "text",
-                icon = "ui/icons/vision.png",
-                text = "[color=" + ::Const.UI.Color.PositiveValue + "]" + agitationDescriptor + "[/color]"
-            });
-        }
-        else
-        {
-            tooltipArray.push({
-                id = 20,
-                type = "text",
-                icon = "ui/icons/miniboss.png",
-                text = "[color=" + ::Const.UI.Color.NegativeValue + "]" + agitationDescriptor + "[/color]"
-            });
-        }
+        tooltipArray.extend([
+            ::RPGR_Raids.generateTooltipTableEntry(id, type, "ui/icons/asset_money.png", "[color=" + ::Const.UI.Color.PositiveValue + "]" + this.m.Resources + "[/color] resource units"),
+            ::RPGR_Raids.generateTooltipTableEntry(id, type, "ui/icons/" + iconPath, "[color=" + textColour + "]" + ::RPGR_Raids.getDescriptor(agitationState, ::RPGR_Raids.AgitationDescriptors) + "[/color]")
+        ]);
 
         ::RPGR_Raids.updateCumulativeLairAgitation(this);
         return tooltipArray;

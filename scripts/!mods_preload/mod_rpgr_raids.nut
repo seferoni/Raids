@@ -37,7 +37,12 @@
         Reset = 3
     }
 
-    function createMundaneCaravanCargo( _caravanWealth, _isAssorted, _folderPath = null, _isSouthern = false )
+    function areCaravanFlagsInitialised( _flags )
+    {
+        return (_flags.get("CaravanCargo") != false && _flags.get("CaravanWealth") != false);
+    }
+
+    function createMundaneCaravanCargo( _caravanWealth, _isAssorted, _filePath = null, _isSouthern = false )
     {
         local cargo = [];
         local assortedGoods = ["ammo_item", "medicine_item", "armor_parts_item"];
@@ -56,18 +61,18 @@
         local exclusionList = ["food_item", "money_item", "trading_good_item", "strange_meat_item", "fermented_unhold_heart_item", "black_marsh_stew_item"];
         exclusionList.extend(assortedGoods);
         local southernCandidates = ["dates_item", "rice_item", "silk_item", "spices_item"];
-        local scriptFiles = ::IO.enumerateFiles("scripts/items/" + _folderPath);
+        local scriptFiles = ::IO.enumerateFiles("scripts/items/" + _filePath);
 
         if (_isSouthern)
         {
             local southernGoods = southernCandidates.filter(function( index, candidate )
             {
-                return scriptFiles.find("scripts/items/" + _folderPath + candidate) != null;
+                return scriptFiles.find("scripts/items/" + _filePath + candidate) != null;
             });
 
             for( local i = 0; i != iterations; i = ++i )
             {
-                cargo.push(::new("scripts/items/" + _folderPath + southernGoods[::Math.rand(0, southernGoods.len() - 1)]));
+                cargo.push(::new("scripts/items/" + _filePath + southernGoods[::Math.rand(0, southernGoods.len() - 1)]));
             }
 
             return cargo;
@@ -77,7 +82,7 @@
 
         foreach( excludedFile in exclusionList )
         {
-            local index = scriptFiles.find("scripts/items/" + _folderPath + excludedFile);
+            local index = scriptFiles.find("scripts/items/" + _filePath + excludedFile);
 
             if (index != null)
             {
@@ -157,7 +162,7 @@
     }
 
     function createNamedLoot( _lair = null )
-    { // FIXME: there is no point in extending this with what the lair alr has
+    { // FIXME: there is no point in extending this with what the lair alr has HIGH PRIORITY
         local namedItemKeys = ["NamedArmors", "NamedWeapons", "NamedHelmets", "NamedShields"]
         local namedLoot = [];
 
@@ -205,6 +210,19 @@
             items.remove(index);
             ::logInfo("Removed " + item.m.Name + " at index " + index + ".");
         }
+    }
+
+    function generateTooltipTableEntry( _id, _type, _icon, _text )
+    {
+        local tableEntry =
+        {
+            id = _id,
+            type = _type,
+            icon = _icon,
+            text = _text
+        }
+
+        return tableEntry;
     }
 
     function getDescriptor( _valueToMatch, _referenceTable )
@@ -287,11 +305,26 @@
         return true;
     }
 
-    function isActiveContractObject( _object, _key )
+    function isPartyEligible( _flags )
+    {
+        return _flags.get("IsCaravan");
+    }
+
+    function isActiveContractLocation( _object )
     {
         local activeContract = ::World.Contracts.getActiveContract();
 
-        if (activeContract != null && _key in activeContract.m && activeContract.m[_key].get() == this)
+        if (activeContract == null)
+        {
+            return false;
+        }
+
+        if (!("Destination" in activeContract.m))
+        {
+            return false;
+        }
+
+        if (activeContract.m.Destination.get() == this)
         {
             ::logInfo(this.getName() + " was found to be an active contract object, aborting.");
             return true;
@@ -325,7 +358,7 @@
     }
 
     function reinforceCaravanTroops( _caravan )
-    { // TODO: rebalance this
+    {
         local flags = _caravan.getFlags();
         local wealth = flags.get("CaravanWealth");
 
@@ -335,7 +368,7 @@
         }
 
         local cargo = flags.get("CaravanCargo");
-        local iterations = ::Math.rand(1, wealth + cargo);
+        local iterations = cargo > this.CaravanCargoDescriptors.Trade ? ::Math.rand(1, wealth + cargo) : ::Math.rand(1, wealth);
         local isMilitary = ::World.FactionManager.getFaction(_caravan.getFaction()).getType() == ::Const.FactionType.NobleHouse;
         local mundaneTroops = this.createCaravanTroops(_caravan, isMilitary);
 
@@ -393,12 +426,40 @@
         return cargo;
     }
 
+    function retrieveCaravanCargoIconPath( _cargoValue )
+    {
+        local iconPath = null;
+
+        switch (_cargoValue)
+        {
+            case(::RPGR_Raids.CaravanCargoDescriptors.Oddities):
+                iconPath = "perks.png"
+                break;
+
+            case (::RPGR_Raids.CaravanCargoDescriptors.Assortment):
+                iconPath = "asset_supplies.png";
+                break;
+
+            case(::RPGR_Raids.CaravanCargoDescriptors.Trade):
+                iconPath = "money.png";
+                break;
+
+            case(::RPGR_Raids.CaravanCargoDescriptors.Rations):
+                iconPath = "asset_food.png"
+                break;
+
+            default:
+                ::logError("[Raids] Invalid caravan cargo value.");
+        }
+
+        return iconPath;
+    }
+
     function setLairAgitation( _lair, _procedure )
     {
         local flags = _lair.getFlags();
-        local isLairEligible = this.isLairEligible(flags, _procedure);
 
-        if (!isLairEligible)
+        if (!this.isLairEligible(flags, _procedure))
         {
             return;
         }
@@ -430,7 +491,7 @@
     }
 
     function updateCumulativeLairAgitation( _lair )
-    {
+    {   // TODO: test this
         local flags = _lair.getFlags();
         local lastUpdateTimeDays = flags.get("LastAgitationUpdate");
 
@@ -470,7 +531,7 @@
 
     local pageGeneral = ::RPGR_Raids.Mod.ModSettings.addPage("General");
 
-    local agitationDecayInterval = pageGeneral.addRangeSetting("AgitationDecayInterval", 7, 1, 14, 1.0, "Agitation Decay Interval"); // TODO: test this
+    local agitationDecayInterval = pageGeneral.addRangeSetting("AgitationDecayInterval", 7, 1, 14, 1.0, "Agitation Decay Interval");
     agitationDecayInterval.setDescription("Determines the time interval in days after which a location's agitation value drops by one tier.");
 
     local agitationIncrementChance = pageGeneral.addRangeSetting("AgitationIncrementChance", 100, 0, 100, 1.0, "Agitation Increment Chance"); // TODO: this should be default 50 when raids ship
