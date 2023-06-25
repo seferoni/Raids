@@ -432,19 +432,19 @@
 
         switch (_cargoValue)
         {
-            case(::RPGR_Raids.CaravanCargoDescriptors.Oddities):
+            case(this.CaravanCargoDescriptors.Oddities):
                 iconPath = "perks.png"
                 break;
 
-            case (::RPGR_Raids.CaravanCargoDescriptors.Assortment):
+            case (this.CaravanCargoDescriptors.Assortment):
                 iconPath = "asset_supplies.png";
                 break;
 
-            case(::RPGR_Raids.CaravanCargoDescriptors.Trade):
+            case(this.CaravanCargoDescriptors.Trade):
                 iconPath = "money.png";
                 break;
 
-            case(::RPGR_Raids.CaravanCargoDescriptors.Rations):
+            case(this.CaravanCargoDescriptors.Rations):
                 iconPath = "asset_food.png"
                 break;
 
