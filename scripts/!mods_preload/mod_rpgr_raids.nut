@@ -161,22 +161,40 @@
         return cargo;
     }
 
+    function createNaiveNamedLoot( _namedItemKeys )
+    {
+        local namedLoot = [];
+
+        foreach( key in _namedItemKeys )
+        {
+            namedLoot.extend(::Const.Items[key]);
+        }
+
+        return namedLoot;
+    }
+
     function createNamedLoot( _lair = null )
-    { // FIXME: there is no point in extending this with what the lair alr has HIGH PRIORITY
+    {
         local namedItemKeys = ["NamedArmors", "NamedWeapons", "NamedHelmets", "NamedShields"]
         local namedLoot = [];
 
+        if (_lair == null)
+        {
+            return namedLoot.extend(this.createNaiveNamedLoot(namedItemKeys));
+        }
+
         foreach( key in namedItemKeys )
         {
-            namedLoot.extend(::Const.Items[key]);
-
-            if (_lair != null && _lair.m[key + "List"] != null)
+            if (_lair.m[key + "List"] != null)
             {
                 namedLoot.extend(_lair.m[key + "List"]);
             }
         }
 
-        return namedLoot;
+        if (namedLoot.len() == 0)
+        {
+            return namedLoot.extend(this.createNaiveNamedLoot(namedItemKeys));
+        }
     }
 
     function depopulateLairNamedLoot( _lair, _chance = null )
