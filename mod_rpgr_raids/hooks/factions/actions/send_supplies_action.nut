@@ -22,7 +22,7 @@
 
         if (caravan == null)
         {
-            ::logInfo("Caravan not located.");
+            ::logInfo("[Raids] onExecute found no caravans near " + this.m.Start.getName() + ".");
             return vanilla_onExecute;
         }
 

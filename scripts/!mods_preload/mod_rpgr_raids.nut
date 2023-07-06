@@ -1,5 +1,6 @@
 ::RPGR_Raids <-
-{
+{   // TODO: begin culling needlessly verbose logging when ready to ship
+    // TODO: change assignment operators to new slot operators where applicable
     ID = "mod_rpgr_raids",
     Name = "RPG Rebalance - Raids",
     Version = "1.0.0",
@@ -12,17 +13,10 @@
     },
     CaravanWealthDescriptors =
     {
-        Impoverished = 1,
-        Deprived = 2,
-        Prosperous = 3,
-        Opulent = 4
-    },
-    CaravanCargoDescriptors =
-    {
-        Rations = 1,
-        Trade = 2,
-        Assortment = 3,
-        Oddities = 4
+        Light = 1,
+        Moderate = 2,
+        Plentiful = 3,
+        Abundant = 4
     },
     CampaignModifiers =
     {
@@ -37,52 +31,105 @@
         Reset = 3
     }
 
-    function areCaravanFlagsInitialised( _flags )
+    function addToCaravanInventory( _caravan, _goodsPool )
     {
-        return (_flags.get("CaravanCargo") != false && _flags.get("CaravanWealth") != false);
+        local iterations = ::Math.rand(1, _caravan.getFlags().get("CaravanWealth") - 1);
+
+        for( local i = 0; i != iterations; i = ++i )
+        {
+            _caravan.addToInventory(_goodsPool[::Math.rand(0, _goodsPool.len() - 1)]);
+        }
     }
 
-    function createMundaneCaravanCargo( _caravanWealth, _isAssorted, _filePath = null, _isSouthern = false )
+    function areCaravanFlagsInitialised( _flags )
     {
-        local cargo = [];
-        local assortedGoods = ["ammo_item", "medicine_item", "armor_parts_item"];
-        local iterations = ::Math.rand(1, _caravanWealth);
+        return _flags.get("CaravanWealth") != false;
+    }
 
-        if (_isAssorted)
+    function calculateCaravanReinforcementModifier( _settlement )
+    {   // FIXME: rewrite
+        local modifier = ::Math.rand(0, 2);
+        local smallestIncrement = 1.0;
+        local synergisticSituations =
+        [
+            "situation.well_supplied",
+            "situation.good_harvest",
+            "situation.safe_roads"
+        ];
+        local antagonisticSituations =
+        [
+            "situation.ambushed_trade_routes",
+            "situation.disappearing_villagers",
+            "situation.greenskins",
+            "situation.raided"
+        ];
+
+        foreach( situation in synergisticSituations )
         {
-            for( local i = 0; i != iterations; i = ++i )
+            if (_settlement.getSituationByID(situation) != null)
             {
-                cargo.push(::new("scripts/items/supplies/" + assortedGoods[::Math.rand(0, assortedGoods.len() - 1)]));
+                modifier += smallestIncrement;
             }
-
-            return cargo;
         }
 
-        local exclusionList = ["food_item", "money_item", "trading_good_item", "strange_meat_item", "fermented_unhold_heart_item", "black_marsh_stew_item"];
-        exclusionList.extend(assortedGoods);
-        local southernCandidates = ["dates_item", "rice_item", "silk_item", "spices_item"];
-        local scriptFiles = ::IO.enumerateFiles("scripts/items/" + _filePath);
-
-        if (_isSouthern)
+        foreach( situation in antagonisticSituations )
         {
-            local southernGoods = southernCandidates.filter(function( index, candidate )
+            if (_settlement.getSituationByID(situation) != null)
             {
-                return scriptFiles.find("scripts/items/" + _filePath + candidate) != null;
-            });
-
-            for( local i = 0; i != iterations; i = ++i )
-            {
-                cargo.push(::new("scripts/items/" + _filePath + southernGoods[::Math.rand(0, southernGoods.len() - 1)]));
+                modifier -= smallestIncrement;
             }
+        }
 
-            return cargo;
+        return ::Math.max(0, ::Math.floor(modifier));
+    }
+
+    function createCaravanCargo( _caravan, _settlement )
+    {
+        local produce = _settlement.getProduce();
+
+        if (produce.len() == 0)
+        {
+            ::logInfo("Source settlement has no produce.");
+            this.createNaiveCaravanCargo(_caravan);
+            return;
+        }
+
+        this.addToCaravanInventory(_caravan, produce);
+    }
+
+    function createNaiveCaravanCargo( _caravan )
+    { // FIXME: top to bottom rewrite
+        local exclusionList =
+        [
+            "supplies/food_item",
+            "supplies/money_item",
+            "trade/trading_good_item",
+            "supplies/strange_meat_item",
+            "supplies/fermented_unhold_heart_item",
+            "supplies/black_marsh_stew_item"
+        ];
+        local southernGoods =
+        [
+            "supplies/dates_item",
+            "supplies/rice_item",
+            "trade/silk_item",
+            "trade/spices_item",
+            "trade/incense_item"
+        ];
+
+        if (::World.FactionManager.getFaction(_caravan.getFaction()).getType() == ::Const.FactionType.OrientalCityState)
+        {
+            this.addToCaravanInventory(_caravan, southernGoods);
+            return;
         }
 
         exclusionList.extend(southernCandidates);
+        local scriptFiles = ::IO.enumerateFiles("scripts/items/supplies");
+        scriptFiles.extend(::IO.enumerateFiles("scripts/items/trade"));
 
         foreach( excludedFile in exclusionList )
         {
-            local index = scriptFiles.find("scripts/items/" + _filePath + excludedFile);
+            local index = scriptFiles.find("scripts/items/" + excludedFile);
 
             if (index != null)
             {
@@ -90,10 +137,10 @@
             }
         }
 
-        for( local i = 0; i != iterations; i = ++i )
+        local goods = scriptFiles.map(function( value )
         {
-            cargo.push(::new(scriptFiles[::Math.rand(0, scriptFiles.len() - 1)]));
-        }
+            return value.slice(); // FIXME: incomplete
+        })
 
         return cargo;
     }
@@ -146,19 +193,10 @@
         return troops;
     }
 
-    function createNamedCaravanCargo()
+    function createNamedCaravanCargo( _caravan )
     {
-        local cargo = [];
         local namedLoot = this.createNamedLoot();
-        local namedItem = ::new("scripts/items/" + namedLoot[::Math.rand(0, namedLoot.len() - 1)]);
-
-        if (namedItem.m.Name.len() == 0)
-		{
-			namedItem.setName(namedItem.createRandomName());
-		}
-
-        cargo.push(namedItem);
-        return cargo;
+        this.addToCaravanInventory(_caravan, namedLoot);
     }
 
     function createNaiveNamedLoot( _namedItemKeys )
@@ -176,12 +214,13 @@
     function createNamedLoot( _lair = null )
     {
         local namedItemKeys = ["NamedArmors", "NamedWeapons", "NamedHelmets", "NamedShields"]
-        local namedLoot = [];
 
         if (_lair == null)
         {
-            return namedLoot.extend(this.createNaiveNamedLoot(namedItemKeys));
+            return this.createNaiveNamedLoot(namedItemKeys);
         }
+
+        local namedLoot = [];
 
         foreach( key in namedItemKeys )
         {
@@ -193,8 +232,10 @@
 
         if (namedLoot.len() == 0)
         {
-            return namedLoot.extend(this.createNaiveNamedLoot(namedItemKeys));
+            return this.createNaiveNamedLoot(namedItemKeys);
         }
+
+        return namedLoot;
     }
 
     function depopulateLairNamedLoot( _lair, _chance = null )
@@ -272,6 +313,22 @@
 		return (_lair.m.Resources + nearestSettlementDistance * 4) / 5.0 - 37.0;
     }
 
+    function initialiseCaravanParameters( _caravan, _settlement )
+    {
+        local flags = _caravan.getFlags();
+        local typeModifier = (_settlement.isMilitary() || _settlement.isSouthern()) ? 1 : 0;
+        local sizeModifier = _settlement.getSize() >= 3 ? 1 : 0;
+        flags.set("CaravanWealth", ::Math.min(this.CaravanWealthDescriptors.Abundant, ::Math.rand(1, 2) + typeModifier + sizeModifier));
+
+        if (::Math.rand(1, 100) <= this.CampaignModifiers.CaravanNamedItemChance && flags.get("CaravanWealth") == this.CaravanWealthDescriptors.Abundant)
+        {
+            flags.set("CaravanHasNamedItems", true);
+        }
+
+        this.populateCaravanInventory(_caravan, _settlement);
+        this.reinforceCaravanTroops(_caravan, _settlement);
+    }
+
     function isFactionViable( _faction )
     {
         if (_faction == null)
@@ -302,7 +359,7 @@
 
     function isLocationEligible( _locationType )
     {
-        return _locationType == ::Const.World.LocationType.Lair;
+        return _locationType == ::Const.World.LocationType.Lair || _locationType == (::Const.World.LocationType.Lair | ::Const.World.LocationType.Mobile);
     }
 
     function isLairEligible( _flags, _procedure )
@@ -344,7 +401,7 @@
 
         if (activeContract.m.Destination.get() == this)
         {
-            ::logInfo(this.getName() + " was found to be an active contract object, aborting.");
+            ::logInfo(this.getName() + " was found to be an active contract location, aborting.");
             return true;
         }
 
@@ -353,49 +410,45 @@
 
     function isPlayerInProximityTo( _targetTile )
     {
-        return ::World.State.getPlayer().getTile().getDistanceTo(_targetTile) <= ::RPGR_Raids.CampaignModifiers.GlobalProximityTiles;
+        return ::World.State.getPlayer().getTile().getDistanceTo(_targetTile) <= this.CampaignModifiers.GlobalProximityTiles;
     }
 
-    function initialiseCaravanParameters( _caravan, _settlement )
+    function populateCaravanInventory( _caravan, _settlement )
     {
         local flags = _caravan.getFlags();
-        local typeModifier = (_settlement.isMilitary() || _settlement.isSouthern()) ? 1 : 0;
-        local sizeModifier = _settlement.getSize() >= 3 ? 1 : 0;
-        flags.set("CaravanWealth", ::Math.min(this.CaravanWealthDescriptors.Opulent, ::Math.rand(1, 2) + typeModifier + sizeModifier));
 
-        if (::Math.rand(1, 100) <= this.CampaignModifiers.CaravanNamedItemChance && flags.get("CaravanWealth") == this.CaravanWealthDescriptors.Opulent)
-        {
-            flags.set("CaravanCargo", this.CaravanCargoDescriptors.Oddities);
-        }
-        else
-        {
-            flags.set("CaravanCargo", ::Math.rand(this.CaravanCargoDescriptors.Rations, this.CaravanCargoDescriptors.Assortment));
-        }
-
-        this.reinforceCaravanTroops(_caravan);
-    }
-
-    function reinforceCaravanTroops( _caravan )
-    {
-        local flags = _caravan.getFlags();
-        local wealth = flags.get("CaravanWealth");
-
-        if (wealth < this.CaravanWealthDescriptors.Deprived)
+        if (flags.get("CaravanWealth") == this.CaravanWealthDescriptors.Light)
         {
             return;
         }
 
-        local cargo = flags.get("CaravanCargo");
-        local iterations = cargo > this.CaravanCargoDescriptors.Trade ? ::Math.rand(1, wealth + cargo) : ::Math.rand(1, wealth);
-        local isMilitary = ::World.FactionManager.getFaction(_caravan.getFaction()).getType() == ::Const.FactionType.NobleHouse;
-        local mundaneTroops = this.createCaravanTroops(_caravan, isMilitary);
+        if (flags.get("CaravanHasNamedItems"))
+        {
+            this.createNamedCaravanCargo(_caravan);
+        }
+
+        this.createCaravanCargo(_caravan, _settlement);
+    }
+
+    function reinforceCaravanTroops( _caravan, _settlement )
+    {
+        local flags = _caravan.getFlags();
+        local wealth = flags.get("CaravanWealth");
+
+        if (wealth == this.CaravanWealthDescriptors.Light)
+        {
+            return;
+        }
+
+        local iterations = ::Math.rand(1, wealth + this.calculateCaravanReinforcementModifier(_settlement));
+        local mundaneTroops = this.createCaravanTroops(_caravan, ::World.FactionManager.getFaction(_caravan.getFaction()).getType() == ::Const.FactionType.NobleHouse);
 
         for( local i = 0; i != iterations; i = ++i )
         {
             ::Const.World.Common.addTroop(_caravan, {Type = mundaneTroops[::Math.rand(0, mundaneTroops.len() - 1)]}, true);
         }
 
-        if (!(wealth == this.CaravanWealthDescriptors.Opulent && cargo == this.CaravanCargoDescriptors.Oddities))
+        if (!(wealth == this.CaravanWealthDescriptors.Abundant && flags.get("CaravanHasNamedItems")))
         {
             return;
         }
@@ -416,61 +469,6 @@
 
         local namedLoot = this.createNamedLoot(_lair);
         _lair.m.Loot.add(::new("scripts/items/" + namedLoot[::Math.rand(0, namedLoot.len() - 1)]));
-    }
-
-    function retrieveCaravanCargo( _cargoValue, _caravanWealth, _isSouthern )
-    {
-        local cargo = [];
-
-        switch (_cargoValue)
-        {
-            case (this.CaravanCargoDescriptors.Oddities):
-                cargo.extend(this.createNamedCaravanCargo());
-
-            case (this.CaravanCargoDescriptors.Assortment):
-                cargo.extend(this.createMundaneCaravanCargo(_caravanWealth, true));
-
-            case (this.CaravanCargoDescriptors.Trade):
-                cargo.extend(this.createMundaneCaravanCargo(_caravanWealth, false, "trade/", _isSouthern));
-
-            case (this.CaravanCargoDescriptors.Rations):
-                cargo.extend(this.createMundaneCaravanCargo(_caravanWealth, false, "supplies/", _isSouthern));
-                break;
-
-            default:
-                ::logError("[Raids] Could not find matching caravan cargo descriptor.");
-        }
-
-        return cargo;
-    }
-
-    function retrieveCaravanCargoIconPath( _cargoValue )
-    {
-        local iconPath = null;
-
-        switch (_cargoValue)
-        {
-            case(this.CaravanCargoDescriptors.Oddities):
-                iconPath = "perks.png"
-                break;
-
-            case (this.CaravanCargoDescriptors.Assortment):
-                iconPath = "asset_supplies.png";
-                break;
-
-            case(this.CaravanCargoDescriptors.Trade):
-                iconPath = "money.png";
-                break;
-
-            case(this.CaravanCargoDescriptors.Rations):
-                iconPath = "asset_food.png"
-                break;
-
-            default:
-                ::logError("[Raids] Invalid caravan cargo value.");
-        }
-
-        return iconPath;
     }
 
     function setLairAgitation( _lair, _procedure )
@@ -544,15 +542,15 @@
 
 ::mods_registerMod(::RPGR_Raids.ID, ::RPGR_Raids.Version, ::RPGR_Raids.Name);
 ::mods_queue(::RPGR_Raids.ID, "mod_msu(>=1.2.6)", function()
-{
+{ // TODO: consider additional configurability
     ::RPGR_Raids.Mod <- ::MSU.Class.Mod(::RPGR_Raids.ID, ::RPGR_Raids.Version, ::RPGR_Raids.Name);
 
     local pageGeneral = ::RPGR_Raids.Mod.ModSettings.addPage("General");
 
-    local agitationDecayInterval = pageGeneral.addRangeSetting("AgitationDecayInterval", 7, 1, 14, 1.0, "Agitation Decay Interval");
+    local agitationDecayInterval = pageGeneral.addRangeSetting("AgitationDecayInterval", 7, 1, 14, 1, "Agitation Decay Interval");
     agitationDecayInterval.setDescription("Determines the time interval in days after which a location's agitation value drops by one tier.");
 
-    local agitationIncrementChance = pageGeneral.addRangeSetting("AgitationIncrementChance", 100, 0, 100, 1.0, "Agitation Increment Chance"); // TODO: this should be default 50 when raids ship
+    local agitationIncrementChance = pageGeneral.addRangeSetting("AgitationIncrementChance", 100, 0, 100, 1, "Agitation Increment Chance"); // TODO: this should be default 50 when raids ship
     agitationIncrementChance.setDescription("Determines the chance for a location's agitation value to increase by one tier upon victory against a roaming party, if within proximity.");
 
     local agitationResourceModifier = pageGeneral.addRangeSetting("AgitationResourceModifier", 0.7, 0.0, 1.0, 0.1, "Agitation Resource Modifier"); // FIXME: Floating number display bug
