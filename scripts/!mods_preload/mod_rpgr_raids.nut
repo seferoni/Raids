@@ -18,6 +18,12 @@
         Plentiful = 3,
         Abundant = 4
     },
+    CaravanCargoDescriptors =
+    {
+        Supplies = 1,
+        Trade = 2,
+        Assortment = 3
+    },
     CampaignModifiers =
     {
         CaravanNamedItemChance = 50, // FIXME: this is inflated, revert to 5
@@ -37,18 +43,20 @@
 
         for( local i = 0; i != iterations; i = ++i )
         {
-            _caravan.addToInventory(_goodsPool[::Math.rand(0, _goodsPool.len() - 1)]);
+            local good = _goodsPool[::Math.rand(0, _goodsPool.len() - 1)];
+            ::logInfo("Added item with filepath " + good + " to caravan inventory.");
+            _caravan.addToInventory(good);
         }
     }
 
     function areCaravanFlagsInitialised( _flags )
     {
-        return _flags.get("CaravanWealth") != false;
+        return _flags.get("CaravanWealth") != false && _flags.get("CaravanCargo") != false;
     }
 
-    function calculateCaravanReinforcementModifier( _settlement )
-    {   // FIXME: rewrite
-        local modifier = ::Math.rand(0, 2);
+    function calculateCaravanReinforcementModifier( _caravanWealth, _settlement )
+    {   // TODO: consider adapting this for wealth calc HIGH PRIORITY
+        local modifier = ::Math.rand(0, _caravanWealth);
         local smallestIncrement = 1.0;
         local synergisticSituations =
         [
@@ -86,10 +94,16 @@
     function createCaravanCargo( _caravan, _settlement )
     {
         local produce = _settlement.getProduce();
+        local descriptor = this.getDescriptor(_caravan.getFlags().get("CaravanCargo"), this.CaravanCargoDescriptors).tolower();
 
-        if (produce.len() == 0)
+        local actualProduce = produce.filter(function( index, value )
         {
-            ::logInfo("Source settlement has no produce.");
+            return value.find(descriptor) != null; // TODO: needs testing
+        });
+
+        if (actualProduce.len() == 0)
+        {
+            ::logInfo("[Raids] Source settlement has no produce.");
             this.createNaiveCaravanCargo(_caravan);
             return;
         }
@@ -98,7 +112,7 @@
     }
 
     function createNaiveCaravanCargo( _caravan )
-    { // FIXME: top to bottom rewrite
+    {
         local exclusionList =
         [
             "supplies/food_item",
@@ -123,7 +137,7 @@
             return;
         }
 
-        exclusionList.extend(southernCandidates);
+        exclusionList.extend(southernGoods);
         local scriptFiles = ::IO.enumerateFiles("scripts/items/supplies");
         scriptFiles.extend(::IO.enumerateFiles("scripts/items/trade"));
 
@@ -137,12 +151,12 @@
             }
         }
 
-        local goods = scriptFiles.map(function( value )
+        local goods = scriptFiles.map(function( stringPath )
         {
-            return value.slice(); // FIXME: incomplete
-        })
+            return stringPath.slice(14);
+        });
 
-        return cargo;
+        this.addToCaravanInventory(_caravan, goods);
     }
 
     function createCaravanTroops( _caravan, _isMilitary )
@@ -191,12 +205,6 @@
         ]);
 
         return troops;
-    }
-
-    function createNamedCaravanCargo( _caravan )
-    {
-        local namedLoot = this.createNamedLoot();
-        this.addToCaravanInventory(_caravan, namedLoot);
     }
 
     function createNaiveNamedLoot( _namedItemKeys )
@@ -325,6 +333,7 @@
             flags.set("CaravanHasNamedItems", true);
         }
 
+        flags.set("CaravanCargo", ::Math.rand(this.CaravanCargoDescriptors.Supplies, this.CaravanCargoDescriptors.Assortment));
         this.populateCaravanInventory(_caravan, _settlement);
         this.reinforceCaravanTroops(_caravan, _settlement);
     }
@@ -422,9 +431,10 @@
             return;
         }
 
-        if (flags.get("CaravanHasNamedItems"))
+        if (flags.get("CaravanCargo") == this.CaravanCargoDescriptors.Assortment)
         {
-            this.createNamedCaravanCargo(_caravan);
+            this.createNaiveCaravanCargo(_caravan);
+            return;
         }
 
         this.createCaravanCargo(_caravan, _settlement);
@@ -440,7 +450,7 @@
             return;
         }
 
-        local iterations = ::Math.rand(1, wealth + this.calculateCaravanReinforcementModifier(_settlement));
+        local iterations = ::Math.rand(1, wealth + this.calculateCaravanReinforcementModifier(wealth, _settlement));
         local mundaneTroops = this.createCaravanTroops(_caravan, ::World.FactionManager.getFaction(_caravan.getFaction()).getType() == ::Const.FactionType.NobleHouse);
 
         for( local i = 0; i != iterations; i = ++i )
@@ -469,6 +479,40 @@
 
         local namedLoot = this.createNamedLoot(_lair);
         _lair.m.Loot.add(::new("scripts/items/" + namedLoot[::Math.rand(0, namedLoot.len() - 1)]));
+    }
+
+    function retrieveCaravanCargoIconPath( _cargoValue )
+    {
+        local iconPath = null;
+
+        switch (_cargoValue)
+        {
+            case (this.CaravanCargoDescriptors.Assortment):
+                iconPath = "asset_supplies.png";
+                break;
+
+            case(this.CaravanCargoDescriptors.Trade):
+                iconPath = "money.png";
+                break;
+
+            case(this.CaravanCargoDescriptors.Supplies):
+                iconPath = "asset_food.png"
+                break;
+
+            default:
+                ::logError("[Raids] Invalid caravan cargo value, unable to retrieve icon.");
+        }
+
+        return iconPath;
+    }
+
+    function retrieveNamedCaravanCargo( _lootTable )
+    {
+        local namedCargo = this.createNamedLoot();
+        local namedItem = ::new("scripts/items/" + namedCargo[::Math.rand(0, namedCargo.len() - 1)]);
+        namedItem.onAddedToStash(null);
+        ::logInfo("Added " + namedItem.getName() + " to the loot table.");
+        _lootTable.push(namedItem);
     }
 
     function setLairAgitation( _lair, _procedure )

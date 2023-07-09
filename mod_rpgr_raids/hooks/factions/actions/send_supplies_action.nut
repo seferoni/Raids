@@ -5,7 +5,6 @@
     local oE_nullCheck = "onExecute" in object ? object.onExecute : null;
     object.onExecute = function( _faction )
     {
-        ::logInfo("onExecute firing.");
         local vanilla_onExecute = oE_nullCheck == null ? this[parentName].onExecute(_faction) : oE_nullCheck(_faction);
         local grossEntities = ::World.getAllEntitiesAtPos(this.m.Start.getPos(), 1.0);
         local caravan = null;
@@ -14,7 +13,7 @@
         {
             local flags = entity.getFlags();
 
-            if (flags.get("IsCaravan") && (flags.get("CaravanCargo") == false && flags.get("CaravanWealth") == false))
+            if (::RPGR_Raids.isPartyEligible(flags) && !::RPGR_Raids.areCaravanFlagsInitialised(flags))
             {
                 caravan = entity;
             }
