@@ -22,7 +22,8 @@
     {
         Supplies = 1,
         Trade = 2,
-        Assortment = 3
+        Assortment = 3,
+        Unassorted = 4 // TODO: integrate this within code
     },
     CampaignModifiers =
     {
@@ -94,8 +95,16 @@
     function createCaravanCargo( _caravan, _settlement )
     {
         local produce = _settlement.getProduce();
-        local descriptor = this.getDescriptor(_caravan.getFlags().get("CaravanCargo"), this.CaravanCargoDescriptors).tolower();
 
+        if (produce.len() == 0)
+        {
+            ::logInfo("[Raids] Source settlement has no produce.");
+            _caravan.getFlags().set("CaravanCargo", this.CaravanCargoDescriptors.Assortment);
+            this.createNaiveCaravanCargo(_caravan);
+            return;
+        }
+
+        local descriptor = this.getDescriptor(_caravan.getFlags().get("CaravanCargo"), this.CaravanCargoDescriptors).tolower();
         local actualProduce = produce.filter(function( index, value )
         {
             return value.find(descriptor) != null; // TODO: needs testing
@@ -103,12 +112,13 @@
 
         if (actualProduce.len() == 0)
         {
-            ::logInfo("[Raids] Source settlement has no produce.");
-            this.createNaiveCaravanCargo(_caravan);
+            ::logInfo("[Raids] Source settlement has no produce corresponding to caravan cargo type.");
+            _caravan.getFlags().set("CaravanCargo", this.CaravanCargoDescriptors.Unassorted);
+            this.addToCaravanInventory(_caravan, produce);
             return;
         }
 
-        this.addToCaravanInventory(_caravan, produce);
+        this.addToCaravanInventory(_caravan, actualProduce);
     }
 
     function createNaiveCaravanCargo( _caravan )
@@ -599,6 +609,9 @@
 
     local agitationResourceModifier = pageGeneral.addRangeSetting("AgitationResourceModifier", 0.7, 0.0, 1.0, 0.1, "Agitation Resource Modifier"); // FIXME: Floating number display bug
     agitationResourceModifier.setDescription("Controls how lair resource calculation is handled after each agitation tier change. Higher values result in greater resources, and therefore more powerful garrisoned troops and better loot.");
+
+    local depopulateLairLootOnSpawn = pageGeneral.addBooleanSetting("DepopulateLairLootOnSpawn", false, "Depopulate Lair Loot On Spawn");
+    depopulateLairLootOnSpawn.setDescription("Determines whether Raids should depopulate newly spawned lairs of named loot to compensate for broadly higher named loot frequency with the introduction of agitation as a game mechanic.");
 
     foreach( file in ::IO.enumerateFiles("mod_rpgr_raids/hooks") )
     {
