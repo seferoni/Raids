@@ -23,7 +23,7 @@
         Supplies = 1,
         Trade = 2,
         Assortment = 3,
-        Unassorted = 4 // TODO: integrate this within code
+        Unassorted = 4
     },
     CampaignModifiers =
     {
@@ -55,9 +55,9 @@
         return _flags.get("CaravanWealth") != false && _flags.get("CaravanCargo") != false;
     }
 
-    function calculateCaravanReinforcementModifier( _caravanWealth, _settlement )
-    {   // TODO: consider adapting this for wealth calc HIGH PRIORITY
-        local modifier = ::Math.rand(0, _caravanWealth);
+    function calculateSettlementSituationModifier( _settlement )
+    {
+        local modifier = 0;
         local smallestIncrement = 1.0;
         local synergisticSituations =
         [
@@ -107,7 +107,7 @@
         local descriptor = this.getDescriptor(_caravan.getFlags().get("CaravanCargo"), this.CaravanCargoDescriptors).tolower();
         local actualProduce = produce.filter(function( index, value )
         {
-            return value.find(descriptor) != null; // TODO: needs testing
+            return value.find(descriptor) != null;
         });
 
         if (actualProduce.len() == 0)
@@ -169,7 +169,7 @@
         this.addToCaravanInventory(_caravan, goods);
     }
 
-    function createCaravanTroops( _caravan, _isMilitary )
+    function createCaravanTroops( _isMilitary, _isSouthern )
     {
         local troops = [];
 
@@ -185,6 +185,21 @@
             return troops;
         }
 
+        if (_isSouthern)
+        {
+            troops.extend([
+                ::Const.World.Spawn.Troops.Conscript,
+                ::Const.World.Spawn.Troops.ConscriptPolearm
+            ]);
+        }
+        else
+        {
+            troops.extend([
+                ::Const.World.Spawn.Troops.CaravanHand,
+                ::Const.World.Spawn.Troops.CaravanGuard
+            ])
+        }
+
         troops.extend([
             ::Const.World.Spawn.Troops.MercenaryLOW,
             ::Const.World.Spawn.Troops.Mercenary,
@@ -194,7 +209,7 @@
         return troops;
     }
 
-    function createEliteCaravanTroops( _caravan, _isMilitary )
+    function createEliteCaravanTroops( _isMilitary )
     {
         local troops = [];
 
@@ -336,7 +351,8 @@
         local flags = _caravan.getFlags();
         local typeModifier = (_settlement.isMilitary() || _settlement.isSouthern()) ? 1 : 0;
         local sizeModifier = _settlement.getSize() >= 3 ? 1 : 0;
-        flags.set("CaravanWealth", ::Math.min(this.CaravanWealthDescriptors.Abundant, ::Math.rand(1, 2) + typeModifier + sizeModifier));
+        local situationModifier = this.calculateSettlementSituationModifier(_settlement) > 0 ? 1 : 0;
+        flags.set("CaravanWealth", ::Math.min(this.CaravanWealthDescriptors.Abundant, ::Math.rand(1, 2) + typeModifier + sizeModifier + situationModifier));
 
         if (::Math.rand(1, 100) <= this.CampaignModifiers.CaravanNamedItemChance && flags.get("CaravanWealth") == this.CaravanWealthDescriptors.Abundant)
         {
@@ -460,8 +476,9 @@
             return;
         }
 
-        local iterations = ::Math.rand(1, wealth + this.calculateCaravanReinforcementModifier(wealth, _settlement));
-        local mundaneTroops = this.createCaravanTroops(_caravan, ::World.FactionManager.getFaction(_caravan.getFaction()).getType() == ::Const.FactionType.NobleHouse);
+        local iterations = ::Math.rand(1, wealth * 2);
+        local factionType = ::World.FactionManager.getFaction(_caravan.getFaction()).getType();
+        local mundaneTroops = this.createCaravanTroops(factionType == ::Const.FactionType.NobleHouse, factionType == ::Const.FactionType.OrientalCityState);
 
         for( local i = 0; i != iterations; i = ++i )
         {
@@ -473,7 +490,7 @@
             return;
         }
 
-        local eliteTroops = this.createEliteCaravanTroops(_caravan, isMilitary);
+        local eliteTroops = this.createEliteCaravanTroops(factionType == ::Const.FactionType.NobleHouse);
         ::Const.World.Common.addTroop(_caravan, {Type = eliteTroops[::Math.rand(0, eliteTroops.len() - 1)]}, true);
     }
 
@@ -497,8 +514,12 @@
 
         switch (_cargoValue)
         {
+            case (this.CaravanCargoDescriptors.Unassorted):
+                iconPath = "bag.png";
+                break;
+
             case (this.CaravanCargoDescriptors.Assortment):
-                iconPath = "asset_supplies.png";
+                iconPath = "asset_money.png";
                 break;
 
             case(this.CaravanCargoDescriptors.Trade):
