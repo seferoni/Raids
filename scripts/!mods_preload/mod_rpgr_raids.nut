@@ -89,22 +89,14 @@
             }
         }
 
-        return ::Math.max(0, ::Math.floor(modifier));
+        return modifier;
     }
 
     function createCaravanCargo( _caravan, _settlement )
     {
         local produce = _settlement.getProduce();
-
-        if (produce.len() == 0)
-        {
-            ::logInfo("[Raids] Source settlement has no produce.");
-            _caravan.getFlags().set("CaravanCargo", this.CaravanCargoDescriptors.Assortment);
-            this.createNaiveCaravanCargo(_caravan);
-            return;
-        }
-
-        local descriptor = this.getDescriptor(_caravan.getFlags().get("CaravanCargo"), this.CaravanCargoDescriptors).tolower();
+        local flags = _caravan.getFlags();
+        local descriptor = this.getDescriptor(flags.get("CaravanCargo"), this.CaravanCargoDescriptors).tolower();
         local actualProduce = produce.filter(function( index, value )
         {
             return value.find(descriptor) != null;
@@ -112,8 +104,8 @@
 
         if (actualProduce.len() == 0)
         {
-            ::logInfo("[Raids] Source settlement has no produce corresponding to caravan cargo type.");
-            _caravan.getFlags().set("CaravanCargo", this.CaravanCargoDescriptors.Unassorted);
+            ::logInfo("[Raids] " + _settlement.getName() + " has no produce corresponding to caravan cargo type.");
+            flags.set("CaravanCargo", this.CaravanCargoDescriptors.Unassorted);
             this.addToCaravanInventory(_caravan, produce);
             return;
         }
@@ -359,7 +351,15 @@
             flags.set("CaravanHasNamedItems", true);
         }
 
-        flags.set("CaravanCargo", ::Math.rand(this.CaravanCargoDescriptors.Supplies, this.CaravanCargoDescriptors.Assortment));
+        if (::Math.rand(1, 100) <= 15 || _settlement.getProduce().len() == 0)
+        {
+            flags.set("CaravanCargo", this.CaravanCargoDescriptors.Assortment);
+        }
+        else
+        {
+            flags.set("CaravanCargo", ::Math.rand(this.CaravanCargoDescriptors.Supplies, this.CaravanCargoDescriptors.Trade));
+        }
+
         this.populateCaravanInventory(_caravan, _settlement);
         this.reinforceCaravanTroops(_caravan, _settlement);
     }
@@ -420,7 +420,7 @@
         return _flags.get("IsCaravan");
     }
 
-    function isActiveContractLocation( _object )
+    function isActiveContractLocation( _lair )
     {
         local activeContract = ::World.Contracts.getActiveContract();
 
@@ -434,9 +434,9 @@
             return false;
         }
 
-        if (activeContract.m.Destination.get() == this)
+        if (activeContract.m.Destination.get() == _lair)
         {
-            ::logInfo(this.getName() + " was found to be an active contract location, aborting.");
+            ::logInfo("[Raids] " +_lair.getName() + " was found to be an active contract location, aborting.");
             return true;
         }
 
