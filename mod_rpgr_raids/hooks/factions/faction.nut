@@ -17,7 +17,19 @@
             return party;
         }
 
-        local lairResources = ::RPGR_Raids.getClosestLair(_tile).getResources();
+        local lair = ::RPGR_Raids.getLairWithinProximity(_tile); // return false when none in proximity
+
+        if (lair == false)
+        {
+            return party;
+        }
+
+        if (::RPGR_Raids.isActiveContractLocation(lair))
+        {
+            return party;
+        }
+
+        local lairResources = lair.getResources();
 
         if (lairResources <= _resources)
         {
