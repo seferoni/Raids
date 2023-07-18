@@ -45,6 +45,7 @@
             return tooltipArray;
         }
 
+        ::RPGR_Raids.updateCumulativeLairAgitation(this); // TODO: test where this needs to be called
         local agitationState = this.getFlags().get("Agitation");
         local id = 20;
         local type = "text";
@@ -56,7 +57,6 @@
             ::RPGR_Raids.generateTooltipTableEntry(id, type, "ui/icons/" + iconPath, "[color=" + textColour + "]" + ::RPGR_Raids.getDescriptor(agitationState, ::RPGR_Raids.AgitationDescriptors) + "[/color]")
         ]);
 
-        ::RPGR_Raids.updateCumulativeLairAgitation(this);
         return tooltipArray;
     }
 });

@@ -58,7 +58,7 @@
             return vanilla_onDropLootForPlayer(_lootTable);
         }
 
-        if (!flags.get("CaravanHasNamedLoot"))
+        if (!flags.get("CaravanHasNamedItems"))
         {
             return vanilla_onDropLootForPlayer(_lootTable);
         }

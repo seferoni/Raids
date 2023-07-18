@@ -29,4 +29,4 @@
         ::RPGR_Raids.initialiseCaravanParameters(caravan, this.m.Start);
         return vanilla_onExecute;
     }
-})
+});

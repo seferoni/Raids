@@ -105,7 +105,15 @@
         if (actualProduce.len() == 0)
         {
             ::logInfo("[Raids] " + _settlement.getName() + " has no produce corresponding to caravan cargo type.");
-            flags.set("CaravanCargo", this.CaravanCargoDescriptors.Unassorted);
+            local newCargoType = ::Math.rand(1, 100) <= 50 ? this.CaravanCargoDescriptors.Assortment : this.CaravanCargoDescriptors.Unassorted;
+            flags.set("CaravanCargo", newCargoType);
+
+            if (newCargoType == this.CaravanCargoDescriptors.Assortment)
+            {
+                this.createNaiveCaravanCargo(_caravan);
+                return;
+            }
+
             this.addToCaravanInventory(_caravan, produce);
             return;
         }
@@ -320,6 +328,21 @@
         }
     }
 
+    function getLairWithinProximityOf( _tile, _locationCandidates )
+    {
+        local lairs = _locationCandidates.filter(function( locationIndex, location )
+        {
+            return ::RPGR_Raids.isLocationEligible(location) && location.getTile().getDistanceTo(_tile) <= 1;
+        });
+
+        if (lairs.len() == 0)
+        {
+            return false;
+        }
+
+        return lairs[0];
+    }
+
     function getNamedLootChance( _lair )
     {
         local nearestSettlementDistance = 9000;
@@ -335,7 +358,7 @@
 			}
 		}
 
-		return (_lair.m.Resources + nearestSettlementDistance * 4) / 5.0 - 37.0;
+		return (_lair.getResources() + nearestSettlementDistance * 4) / 5.0 - 37.0;
     }
 
     function initialiseCaravanParameters( _caravan, _settlement )
@@ -344,6 +367,12 @@
         local typeModifier = (_settlement.isMilitary() || _settlement.isSouthern()) ? 1 : 0;
         local sizeModifier = _settlement.getSize() >= 3 ? 1 : 0;
         local situationModifier = this.calculateSettlementSituationModifier(_settlement) > 0 ? 1 : 0;
+        local distributions =
+        {
+            Supplies = 35,
+            Trade = 45,
+            Assortment = 20
+        }
         flags.set("CaravanWealth", ::Math.min(this.CaravanWealthDescriptors.Abundant, ::Math.rand(1, 2) + typeModifier + sizeModifier + situationModifier));
 
         if (::Math.rand(1, 100) <= this.CampaignModifiers.CaravanNamedItemChance && flags.get("CaravanWealth") == this.CaravanWealthDescriptors.Abundant)
@@ -351,13 +380,19 @@
             flags.set("CaravanHasNamedItems", true);
         }
 
-        if (::Math.rand(1, 100) <= 15 || _settlement.getProduce().len() == 0)
+        local randomNumber = ::Math.rand(1, 100);
+
+        if (randomNumber <= distributions.Assortment || _settlement.getProduce().len() == 0)
         {
             flags.set("CaravanCargo", this.CaravanCargoDescriptors.Assortment);
         }
+        else if (randomNumber <= distributions.Supplies)
+        {
+            flags.set("CaravanCargo", this.CaravanCargoDescriptors.Supplies);
+        }
         else
         {
-            flags.set("CaravanCargo", ::Math.rand(this.CaravanCargoDescriptors.Supplies, this.CaravanCargoDescriptors.Trade));
+            flags.set("CaravanCargo", this.CaravanCargoDescriptors.Trade);
         }
 
         this.populateCaravanInventory(_caravan, _settlement);
@@ -397,7 +432,7 @@
         return _locationType == ::Const.World.LocationType.Lair || _locationType == (::Const.World.LocationType.Lair | ::Const.World.LocationType.Mobile);
     }
 
-    function isLairEligible( _flags, _procedure )
+    function isLairEligibleForProcedure( _flags, _procedure )
     {
         local agitationState = _flags.get("Agitation");
         if (_procedure == this.Procedures.Increment && agitationState >= this.AgitationDescriptors.Desperate)
@@ -550,7 +585,7 @@
     {
         local flags = _lair.getFlags();
 
-        if (!this.isLairEligible(flags, _procedure))
+        if (!this.isLairEligibleForProcedure(flags, _procedure))
         {
             return;
         }
@@ -578,7 +613,7 @@
 
         flags.set("LastAgitationUpdate", ::World.getTime().Days);
         _lair.m.Resources = flags.get("Agitation") == this.AgitationDescriptors.Relaxed ? flags.get("BaseResources") : ::Math.floor(flags.get("BaseResources") * flags.get("Agitation") * this.Mod.ModSettings.getSetting("AgitationResourceModifier").getValue());
-        _lair.setLootScaleBasedOnResources(_lair.m.Resources);
+        _lair.setLootScaleBasedOnResources(_lair.getResources());
     }
 
     function updateCumulativeLairAgitation( _lair )
