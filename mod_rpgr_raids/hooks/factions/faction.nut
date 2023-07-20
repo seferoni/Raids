@@ -33,12 +33,12 @@
 
         if (lairResources <= _resources)
         {
-            ::logInfo("Lair resource count for " + _lair.getName() + ", with " + lairResources + " resources, is currently insufficient compared to the initial value of " + _resources + ".");
+            ::RPGR_Raids.logWrapper("Lair resource count for " + _lair.getName() + ", with " + lairResources + " resources, is currently insufficient compared to the initial value of " + _resources + ".");
             return party;
         }
 
         ::Const.World.Common.assignTroops(party, _template, lairResources - _resources); // TODO: test resource calc
-        ::logInfo("Party with name " + _name + " has been reinforced with resource count " + lairResources - _resources + ".");
+        ::RPGR_Raids.logWrapper("[Raids] Party with name " + _name + " has been reinforced with resource count " + lairResources - _resources + ".");
         return party;
     }
 });

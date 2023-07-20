@@ -45,7 +45,7 @@
         for( local i = 0; i != iterations; i = ++i )
         {
             local good = _goodsPool[::Math.rand(0, _goodsPool.len() - 1)];
-            ::logInfo("Added item with filepath " + good + " to caravan inventory.");
+            this.logWrapper("[Raids] Added item with filepath " + good + " to caravan inventory.");
             _caravan.addToInventory(good);
         }
     }
@@ -104,7 +104,7 @@
 
         if (actualProduce.len() == 0)
         {
-            ::logInfo("[Raids] " + _settlement.getName() + " has no produce corresponding to caravan cargo type.");
+            this.logWrapper("[Raids] " + _settlement.getName() + " has no produce corresponding to caravan cargo type.");
             local newCargoType = ::Math.rand(1, 100) <= 50 ? this.CaravanCargoDescriptors.Assortment : this.CaravanCargoDescriptors.Unassorted;
             flags.set("CaravanCargo", newCargoType);
 
@@ -169,11 +169,11 @@
         this.addToCaravanInventory(_caravan, goods);
     }
 
-    function createCaravanTroops( _isMilitary, _isSouthern )
+    function createCaravanTroops( _wealth, _factionType )
     {
         local troops = [];
 
-        if (_isMilitary)
+        if (_factionType == ::Const.FactionType.NobleHouse)
         {
             troops.extend([
                 ::Const.World.Spawn.Troops.Billman,
@@ -185,7 +185,18 @@
             return troops;
         }
 
-        if (_isSouthern)
+        if (_wealth >= this.CaravanWealthDescriptors.Plentiful)
+        {
+            troops.extend([
+                ::Const.World.Spawn.Troops.MercenaryLOW,
+                ::Const.World.Spawn.Troops.Mercenary,
+                ::Const.World.Spawn.Troops.MercenaryRanged
+            ]);
+
+            return troops;
+        }
+
+        if (_factionType == ::Const.FactionType.OrientalCityState)
         {
             troops.extend([
                 ::Const.World.Spawn.Troops.Conscript,
@@ -197,23 +208,17 @@
             troops.extend([
                 ::Const.World.Spawn.Troops.CaravanHand,
                 ::Const.World.Spawn.Troops.CaravanGuard
-            ])
+            ]);
         }
-
-        troops.extend([
-            ::Const.World.Spawn.Troops.MercenaryLOW,
-            ::Const.World.Spawn.Troops.Mercenary,
-            ::Const.World.Spawn.Troops.MercenaryRanged
-        ]);
 
         return troops;
     }
 
-    function createEliteCaravanTroops( _isMilitary )
+    function createEliteCaravanTroops( _factionType )
     {
         local troops = [];
 
-        if (_isMilitary)
+        if (_factionType == ::Const.FactionType.NobleHouse)
         {
             troops.extend([
                 ::Const.World.Spawn.Troops.MasterArcher,
@@ -300,7 +305,7 @@
         {
             local index = items.find(item);
             items.remove(index);
-            ::logInfo("Removed " + item.m.Name + " at index " + index + ".");
+            this.logWrapper("[Raids] Removed " + item.m.Name + " at index " + index + ".");
         }
     }
 
@@ -359,6 +364,22 @@
 		}
 
 		return (_lair.getResources() + nearestSettlementDistance * 4) / 5.0 - 37.0;
+    }
+
+    function logWrapper( _string, _isError = false )
+    {
+        if (this.Mod.ModSettings.getSetting("VerboseLogging").getValue() == false)
+        {
+            return;
+        }
+
+        if (_isError)
+        {
+            ::logError(_string);
+            return;
+        }
+
+        ::logInfo(_string);
     }
 
     function initialiseCaravanParameters( _caravan, _settlement )
@@ -432,12 +453,13 @@
         return _locationType == ::Const.World.LocationType.Lair || _locationType == (::Const.World.LocationType.Lair | ::Const.World.LocationType.Mobile);
     }
 
-    function isLairEligibleForProcedure( _flags, _procedure )
+    function isLairEligibleForProcedure( _lair, _procedure )
     {
-        local agitationState = _flags.get("Agitation");
+        local agitationState = _lair.getFlags().get("Agitation");
+
         if (_procedure == this.Procedures.Increment && agitationState >= this.AgitationDescriptors.Desperate)
         {
-            ::logInfo("Agitation is capped, bailing.");
+            this.logWrapper("[Raids] Agitation for " + _lair.getName() + " is capped, aborting procedure.");
             return false;
         }
 
@@ -446,7 +468,7 @@
             return false;
         }
 
-        ::logInfo("Lair is eligible.");
+        this.logWrapper("[Raids] Lair " + _lair.getName() + " is eligible for agitation state change procedures.");
         return true;
     }
 
@@ -471,7 +493,7 @@
 
         if (activeContract.m.Destination.get() == _lair)
         {
-            ::logInfo("[Raids] " +_lair.getName() + " was found to be an active contract location, aborting.");
+            this.logWrapper("[Raids] " +_lair.getName() + " was found to be an active contract location, aborting.");
             return true;
         }
 
@@ -513,7 +535,7 @@
 
         local iterations = ::Math.rand(1, wealth * 2);
         local factionType = ::World.FactionManager.getFaction(_caravan.getFaction()).getType();
-        local mundaneTroops = this.createCaravanTroops(factionType == ::Const.FactionType.NobleHouse, factionType == ::Const.FactionType.OrientalCityState);
+        local mundaneTroops = this.createCaravanTroops(wealth, factionType);
 
         for( local i = 0; i != iterations; i = ++i )
         {
@@ -525,14 +547,14 @@
             return;
         }
 
-        local eliteTroops = this.createEliteCaravanTroops(factionType == ::Const.FactionType.NobleHouse);
+        local eliteTroops = this.createEliteCaravanTroops(factionType);
         ::Const.World.Common.addTroop(_caravan, {Type = eliteTroops[::Math.rand(0, eliteTroops.len() - 1)]}, true);
     }
 
     function repopulateLairNamedLoot( _lair )
     {
         local namedLootChance = this.getNamedLootChance(_lair);
-        ::logInfo("namedLootChance is " + namedLootChance + " for lair " + _lair.getName());
+        this.logWrapper("[Raids] namedLootChance is " + namedLootChance + " for lair " + _lair.getName());
 
         if (::Math.rand(1, 100) > namedLootChance)
         {
@@ -577,18 +599,18 @@
         local namedCargo = this.createNamedLoot();
         local namedItem = ::new("scripts/items/" + namedCargo[::Math.rand(0, namedCargo.len() - 1)]);
         namedItem.onAddedToStash(null);
-        ::logInfo("Added " + namedItem.getName() + " to the loot table.");
+        this.logWrapper("Added " + namedItem.getName() + " to the loot table.");
         _lootTable.push(namedItem);
     }
 
     function setLairAgitation( _lair, _procedure )
     {
-        local flags = _lair.getFlags();
-
-        if (!this.isLairEligibleForProcedure(flags, _procedure))
+        if (!this.isLairEligibleForProcedure(_lair, _procedure))
         {
             return;
         }
+
+        local flags = _lair.getFlags();
 
         switch (_procedure)
         {
@@ -635,7 +657,7 @@
             return;
         }
 
-        ::logInfo("Difference is  " + difference + " decayInterval is " + decayInterval);
+        this.logWrapper("[Raids] Difference is  " + difference + " decayInterval is " + decayInterval); // TODO: remove this
         local decrementIterations = ::Math.floor(difference / decayInterval);
 
         for( local i = 0; i != decrementIterations; i = ++i )
@@ -668,6 +690,9 @@
 
     local depopulateLairLootOnSpawn = pageGeneral.addBooleanSetting("DepopulateLairLootOnSpawn", false, "Depopulate Lair Loot On Spawn");
     depopulateLairLootOnSpawn.setDescription("Determines whether Raids should depopulate newly spawned lairs of named loot to compensate for broadly higher named loot frequency with the introduction of agitation as a game mechanic.");
+
+    local verboseLogging = pageGeneral.addBooleanSetting("VerboseLogging", true, "Verbose Logging"); // TODO: set this to false when done
+    verboseLogging.setDescription("Enables verbose logging. Recommended for testing purposes only, as the volume of logged messages can make parsing the log more difficult for general use and debugging.");
 
     foreach( file in ::IO.enumerateFiles("mod_rpgr_raids/hooks") )
     {

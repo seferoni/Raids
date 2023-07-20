@@ -31,7 +31,7 @@
 
         tooltipArray.extend([
             ::RPGR_Raids.generateTooltipTableEntry(id, type, "ui/icons/" + cargoIconPath, ::RPGR_Raids.getDescriptor(caravanCargo, ::RPGR_Raids.CaravanCargoDescriptors)),
-            ::RPGR_Raids.generateTooltipTableEntry(id, type, "ui/icons/asset_business_reputation.png", ::RPGR_Raids.getDescriptor(flags.get("CaravanWealth"), ::RPGR_Raids.CaravanWealthDescriptors))
+            ::RPGR_Raids.generateTooltipTableEntry(id, type, "ui/icons/money2.png", ::RPGR_Raids.getDescriptor(flags.get("CaravanWealth"), ::RPGR_Raids.CaravanWealthDescriptors))
         ]); // TODO: change icon path for wealth
 
         if (flags.get("CaravanHasNamedItems"))
