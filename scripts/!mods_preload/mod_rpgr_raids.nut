@@ -390,8 +390,8 @@
         local situationModifier = this.calculateSettlementSituationModifier(_settlement) > 0 ? 1 : 0;
         local distributions =
         {
-            Supplies = 35,
-            Trade = 45,
+            Supplies = 30,  // FIXME: this is majorly borked, and does not work the way you think it does
+            Trade = 50,
             Assortment = 20
         }
         flags.set("CaravanWealth", ::Math.min(this.CaravanWealthDescriptors.Abundant, ::Math.rand(1, 2) + typeModifier + sizeModifier + situationModifier));
@@ -416,6 +416,7 @@
             flags.set("CaravanCargo", this.CaravanCargoDescriptors.Trade);
         }
 
+        this.logWrapper("[Raids] Rolled " + randomNumber + " for caravan cargo assignment for caravan from " + _settlement.getName() + " of the newly assigned cargo type " + this.getDescriptor(flags.get("CaravanCargo"), this.CaravanCargoDescriptors) + ".");
         this.populateCaravanInventory(_caravan, _settlement);
         this.reinforceCaravanTroops(_caravan, _settlement);
     }
