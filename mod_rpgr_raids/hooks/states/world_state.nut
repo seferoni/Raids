@@ -23,7 +23,7 @@
         {
             if (!party.isAlive())
             {
-                ::logInfo(party.getName() + " is not alive!");
+                this.logWrapper("[Raids] " + party.getName() + " is not flagged as alive.");
             }
 
             if (party.isAlive() && party.m.Troops.len() == 0 && !party.isLocation())

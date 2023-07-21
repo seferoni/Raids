@@ -251,7 +251,7 @@
 
     function createNamedLoot( _lair = null )
     {
-        local namedItemKeys = ["NamedArmors", "NamedWeapons", "NamedHelmets", "NamedShields"]
+        local namedItemKeys = ["NamedArmors", "NamedWeapons", "NamedHelmets", "NamedShields"];
 
         if (_lair == null)
         {
@@ -390,8 +390,8 @@
         local situationModifier = this.calculateSettlementSituationModifier(_settlement) > 0 ? 1 : 0;
         local distributions =
         {
-            Supplies = 30,  // FIXME: this is majorly borked, and does not work the way you think it does
-            Trade = 50,
+            Supplies = 50,
+            Trade = 100,
             Assortment = 20
         }
         flags.set("CaravanWealth", ::Math.min(this.CaravanWealthDescriptors.Abundant, ::Math.rand(1, 2) + typeModifier + sizeModifier + situationModifier));
@@ -691,6 +691,9 @@
 
     local depopulateLairLootOnSpawn = pageGeneral.addBooleanSetting("DepopulateLairLootOnSpawn", false, "Depopulate Lair Loot On Spawn");
     depopulateLairLootOnSpawn.setDescription("Determines whether Raids should depopulate newly spawned lairs of named loot to compensate for broadly higher named loot frequency with the introduction of agitation as a game mechanic.");
+
+    local scalingRoamers = pageGeneral.addBooleanSetting("ScalingRoamers", true, "Scaling Roamers");
+    scalingRoamers.setDescription("Determines whether hostile roaming and ambusher parties spawning from lairs scale in strength with respect to the originating lair's resource count. Does not affect beasts.");
 
     local verboseLogging = pageGeneral.addBooleanSetting("VerboseLogging", true, "Verbose Logging"); // TODO: set this to false when done
     verboseLogging.setDescription("Enables verbose logging. Recommended for testing purposes only, as the volume of logged messages can make parsing the log more difficult for general use and debugging.");
