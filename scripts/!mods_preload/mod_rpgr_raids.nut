@@ -1,5 +1,5 @@
 ::RPGR_Raids <-
-{   // TODO: begin culling needlessly verbose logging when ready to ship
+{
     // TODO: change assignment operators to new slot operators where applicable
     ID = "mod_rpgr_raids",
     Name = "RPG Rebalance - Raids",
@@ -45,7 +45,7 @@
         for( local i = 0; i != iterations; i = ++i )
         {
             local good = _goodsPool[::Math.rand(0, _goodsPool.len() - 1)];
-            this.logWrapper("[Raids] Added item with filepath " + good + " to caravan inventory.");
+            this.logWrapper("Added item with filepath " + good + " to caravan inventory.");
             _caravan.addToInventory(good);
         }
     }
@@ -104,7 +104,7 @@
 
         if (actualProduce.len() == 0)
         {
-            this.logWrapper("[Raids] " + _settlement.getName() + " has no produce corresponding to caravan cargo type.");
+            this.logWrapper(_settlement.getName() + " has no produce corresponding to caravan cargo type.");
             local newCargoType = ::Math.rand(1, 100) <= 50 ? this.CaravanCargoDescriptors.Assortment : this.CaravanCargoDescriptors.Unassorted;
             flags.set("CaravanCargo", newCargoType);
 
@@ -305,7 +305,7 @@
         {
             local index = items.find(item);
             items.remove(index);
-            this.logWrapper("[Raids] Removed " + item.m.Name + " at index " + index + ".");
+            this.logWrapper("Removed " + item.m.Name + " at index " + index + ".");
         }
     }
 
@@ -375,11 +375,11 @@
 
         if (_isError)
         {
-            ::logError(_string);
+            ::logError("[Raids] " + _string);
             return;
         }
 
-        ::logInfo(_string);
+        ::logInfo("[Raids] " + _string);
     }
 
     function initialiseCaravanParameters( _caravan, _settlement )
@@ -393,7 +393,7 @@
             Supplies = 50,
             Trade = 100,
             Assortment = 20
-        }
+        };
         flags.set("CaravanWealth", ::Math.min(this.CaravanWealthDescriptors.Abundant, ::Math.rand(1, 2) + typeModifier + sizeModifier + situationModifier));
 
         if (::Math.rand(1, 100) <= this.CampaignModifiers.CaravanNamedItemChance && flags.get("CaravanWealth") == this.CaravanWealthDescriptors.Abundant)
@@ -416,7 +416,7 @@
             flags.set("CaravanCargo", this.CaravanCargoDescriptors.Trade);
         }
 
-        this.logWrapper("[Raids] Rolled " + randomNumber + " for caravan cargo assignment for caravan from " + _settlement.getName() + " of the newly assigned cargo type " + this.getDescriptor(flags.get("CaravanCargo"), this.CaravanCargoDescriptors) + ".");
+        this.logWrapper("Rolled " + randomNumber + " for caravan cargo assignment for caravan from " + _settlement.getName() + " of the newly assigned cargo type " + this.getDescriptor(flags.get("CaravanCargo"), this.CaravanCargoDescriptors) + ".");
         this.populateCaravanInventory(_caravan, _settlement);
         this.reinforceCaravanTroops(_caravan, _settlement);
     }
@@ -460,7 +460,7 @@
 
         if (_procedure == this.Procedures.Increment && agitationState >= this.AgitationDescriptors.Desperate)
         {
-            this.logWrapper("[Raids] Agitation for " + _lair.getName() + " is capped, aborting procedure.");
+            this.logWrapper("Agitation for " + _lair.getName() + " is capped, aborting procedure.");
             return false;
         }
 
@@ -469,7 +469,7 @@
             return false;
         }
 
-        this.logWrapper("[Raids] Lair " + _lair.getName() + " is eligible for agitation state change procedures.");
+        this.logWrapper("Lair " + _lair.getName() + " is eligible for agitation state change procedures.");
         return true;
     }
 
@@ -494,7 +494,7 @@
 
         if (activeContract.m.Destination.get() == _lair)
         {
-            this.logWrapper("[Raids] " +_lair.getName() + " was found to be an active contract location, aborting.");
+            this.logWrapper(_lair.getName() + " was found to be an active contract location, aborting.");
             return true;
         }
 
@@ -555,7 +555,7 @@
     function repopulateLairNamedLoot( _lair )
     {
         local namedLootChance = this.getNamedLootChance(_lair);
-        this.logWrapper("[Raids] namedLootChance is " + namedLootChance + " for lair " + _lair.getName());
+        this.logWrapper("namedLootChance is " + namedLootChance + " for lair " + _lair.getName());
 
         if (::Math.rand(1, 100) > namedLootChance)
         {
@@ -589,7 +589,7 @@
                 break;
 
             default:
-                ::logError("[Raids] Invalid caravan cargo value, unable to retrieve icon.");
+                ::logError("Invalid caravan cargo value, unable to retrieve icon.");
         }
 
         return iconPath;
@@ -631,7 +631,7 @@
                 break;
 
             default:
-                ::logError("[Raids] setLairAgitation was called with an invalid procedure value.");
+                ::logError("setLairAgitation was called with an invalid procedure value.");
         }
 
         flags.set("LastAgitationUpdate", ::World.getTime().Days);
@@ -651,14 +651,14 @@
 
         local currentTimeDays = ::World.getTime().Days;
         local decayInterval = this.Mod.ModSettings.getSetting("AgitationDecayInterval").getValue();
-        local difference = currentTimeDays - lastUpdateTime;
+        local difference = currentTimeDays - lastUpdateTimeDays;
 
         if (difference < decayInterval)
         {
             return;
         }
 
-        this.logWrapper("[Raids] Difference is  " + difference + " decayInterval is " + decayInterval); // TODO: remove this
+        this.logWrapper("Difference is  " + difference + " decayInterval is " + decayInterval); // TODO: remove this
         local decrementIterations = ::Math.floor(difference / decayInterval);
 
         for( local i = 0; i != decrementIterations; i = ++i )
@@ -694,6 +694,9 @@
 
     local scalingRoamers = pageGeneral.addBooleanSetting("ScalingRoamers", true, "Scaling Roamers");
     scalingRoamers.setDescription("Determines whether hostile roaming and ambusher parties spawning from lairs scale in strength with respect to the originating lair's resource count. Does not affect beasts.");
+
+    local handleSupplyCaravans = pageGeneral.addBooleanSetting("HandleSupplyCaravans", false, "Handle Supply Caravans");
+    handleSupplyCaravans.setDescription("Determines whether Raids should handle supply caravans in the same manner as trading caravans, or if they should behave as in the base game.");
 
     local verboseLogging = pageGeneral.addBooleanSetting("VerboseLogging", true, "Verbose Logging"); // TODO: set this to false when done
     verboseLogging.setDescription("Enables verbose logging. Recommended for testing purposes only, as the volume of logged messages can make parsing the log more difficult for general use and debugging.");

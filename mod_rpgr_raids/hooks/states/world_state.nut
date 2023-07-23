@@ -23,7 +23,7 @@
         {
             if (!party.isAlive())
             {
-                this.logWrapper("[Raids] " + party.getName() + " is not flagged as alive.");
+                ::RPGR_Raids.logWrapper(party.getName() + " is not flagged as alive.");
             }
 
             if (party.isAlive() && party.m.Troops.len() == 0 && !party.isLocation())
@@ -34,7 +34,7 @@
 
         if (factionCandidates.len() == 0)
         {
-            ::logInfo("[Raids] onCombatFinished found no eligible parties.");
+            ::RPGR_Raids.logWrapper("onCombatFinished found no eligible parties.");
             return vanilla_onCombatFinished();
         }
 
@@ -47,11 +47,11 @@
 
         if (filteredFactions.len() == 0)
         {
-            ::logInfo("[Raids] onCombatFinished found no eligible factions.");
+            ::RPGR_Raids.logWrapper("onCombatFinished found no eligible factions.");
             return vanilla_onCombatFinished();
         }
 
-        ::logInfo("Proceeding to lair candidate selection.");
+        ::RPGR_Raids.logWrapper("Proceeding to lair candidate selection.");
 
         local agitatedFaction = filteredFactions[::Math.rand(0, filteredFactions.len() - 1)];
         local lairs = agitatedFaction.getSettlements().filter(function( locationIndex, location )
@@ -61,7 +61,7 @@
 
         if (lairs.len() == 0)
         {
-            ::logInfo("Could not find any lairs within proximity.");
+            ::RPGR_Raids.logWrapper("Could not find any lairs within proximity.");
             return vanilla_onCombatFinished();
         }
 
@@ -70,7 +70,7 @@
             if (!::RPGR_Raids.isActiveContractLocation(lair))
             {
                 ::RPGR_Raids.setLairAgitation(lair, ::RPGR_Raids.Procedures.Increment);
-                ::logInfo("Found lair candidate.");
+                ::RPGR_Raids.logWrapper("Found lair candidate.");
             }
         }
 

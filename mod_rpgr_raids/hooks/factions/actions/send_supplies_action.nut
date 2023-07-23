@@ -6,6 +6,12 @@
     object.onExecute = function( _faction )
     {
         local vanilla_onExecute = oE_nullCheck == null ? this[parentName].onExecute(_faction) : oE_nullCheck(_faction);
+
+        if (::RPGR_Raids.Mod.ModSettings.getSetting("HandleSupplyCaravans").getValue() == false)
+        {
+            return vanilla_onExecute;
+        }
+
         local grossEntities = ::World.getAllEntitiesAtPos(this.m.Start.getPos(), 1.0);
         local caravan = null;
 
@@ -21,11 +27,11 @@
 
         if (caravan == null)
         {
-            ::logInfo("[Raids] onExecute found no caravans near " + this.m.Start.getName() + ".");
+            ::RPGR_Raids.logWrapper("onExecute found no caravans near " + this.m.Start.getName() + ".", true);
             return vanilla_onExecute;
         }
 
-        ::logInfo("Assigning caravan parameters.");
+        ::RPGR_Raids.logWrapper("Assigning caravan parameters.");
         ::RPGR_Raids.initialiseCaravanParameters(caravan, this.m.Start);
         return vanilla_onExecute;
     }
