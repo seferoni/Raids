@@ -26,7 +26,7 @@
                 ::RPGR_Raids.logWrapper(party.getName() + " is not flagged as alive.");
             }
 
-            if (party.isAlive() && party.m.Troops.len() == 0 && !party.isLocation())
+            if (/*party.isAlive() && */party.m.Troops.len() == 0 && !party.isLocation())
             {
                 factionCandidates.push(::World.FactionManager.getFaction(party.getFaction()));
             }
