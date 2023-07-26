@@ -26,7 +26,7 @@
                 ::RPGR_Raids.logWrapper(party.getName() + " is not flagged as alive.");
             }
 
-            if (/*party.isAlive() && */party.m.Troops.len() == 0 && !party.isLocation())
+            if (party.getTroops().len() == 0 && !party.isLocation())
             {
                 factionCandidates.push(::World.FactionManager.getFaction(party.getFaction()));
             }
@@ -37,8 +37,6 @@
             ::RPGR_Raids.logWrapper("onCombatFinished found no eligible parties.");
             return vanilla_onCombatFinished();
         }
-
-        // TODO: note that there can be multiple factions in a fight. Test behaviour for such cases before shipping
 
         local filteredFactions = factionCandidates.filter(function( factionIndex, faction )
         {
@@ -53,7 +51,7 @@
 
         ::RPGR_Raids.logWrapper("Proceeding to lair candidate selection.");
 
-        local agitatedFaction = filteredFactions[::Math.rand(0, filteredFactions.len() - 1)];
+        local agitatedFaction = filteredFactions[::Math.rand(0, filteredFactions.len() - 1)]; // TODO: consider functionalising this
         local lairs = agitatedFaction.getSettlements().filter(function( locationIndex, location )
         {
             return ::RPGR_Raids.isLocationEligible(location.getLocationType()) && ::RPGR_Raids.isPlayerInProximityTo(location.getTile());
