@@ -18,18 +18,29 @@
         }
 
         local factionCandidates = [];
-
-        foreach( party in this.m.PartiesInCombat )
+        local filteredParties = this.m.Parties.InCombat.filter(function( index, party )
         {
             if (!party.isAlive())
             {
                 ::RPGR_Raids.logWrapper(party.getName() + " is not flagged as alive.");
             }
 
-            if (party.getTroops().len() == 0 && !party.isLocation())
+            return party.getTroops().len() == 0 && !party.isLocation() && party.isAlive();
+        });
+
+        foreach( party in filteredParties )
+        {
+            /*if (party.getFaction() > ::World.FactionManager.getFactions().len()) // this doesn't make sense at first glance
             {
-                factionCandidates.push(::World.FactionManager.getFaction(party.getFaction()));
+                continue;
             }
+
+            if (::World.FactionManager.getFactions().find(party.getFaction()) == null)
+            {
+                continue;
+            }*/
+
+            factionCandidates.push(::World.FactionManager.getFaction(party.getFaction()));
         }
 
         if (factionCandidates.len() == 0)
