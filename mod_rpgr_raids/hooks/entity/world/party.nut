@@ -2,57 +2,73 @@
 {
     local parentName = object.SuperName;
 
-    local oCL_nullCheck = "onCombatLost" in object ? object.onCombatLost : null;
-    object.onCombatLost = function()
+    local oD_nullCheck = "onDiscovered" in object ? object.onDiscovered : null;
+    object.onDiscovered = function()
     {
-        local vanilla_onCombatLost = oCL_nullCheck == null ? this[parentName].onCombatFinished : oCL_nullCheck;
+        ::RPGR_Raids.logWrapper("onDiscovered called.");
+        local vanilla_onDiscovered = oD_nullCheck == null ? this[parentName].onDiscovered() : oD_nullCheck();
 
-        if (::World.Statistics.getFlags().get("LastCombatWasArena"))
+        if (::Math.rand(1, 100) > ::RPGR_Raids.Mod.ModSettings.getSetting("AgitationIncrementChance").getValue()) // TODO: revise this
         {
-            return vanilla_onCombatLost();
-        }
-
-        if (::Math.rand(1, 100) > ::RPGR_Raids.Mod.ModSettings.getSetting("AgitationIncrementChance").getValue())
-        {
-            return vanilla_onCombatLost();
+            return vanilla_onDiscovered;
         }
 
         local faction = ::World.FactionManager.getFaction(this.getFaction());
 
-        if (!::RPGR_Raids.isFactionViable(faction))
+        if (faction == null)
         {
-            ::RPGR_Raids.logWrapper("onCombatLost found no eligible factions.");
-            return vanilla_onCombatLost();
+            return vanilla_onDiscovered;
         }
 
-        if (faction.getSettlements().len() == 0)
+        local lairs = ::RPGR_Raids.findLairCandidates(faction);
+
+        if (lairs == null)
         {
-            ::RPGR_Raids.logWrapper("onCombatLost found an eligible faction, but this faction has no settlements at present.");
-            return vanilla_onCombatLost();
+            return vanilla_onDiscovered;
         }
 
-        ::RPGR_Raids.logWrapper("Proceeding to lair candidate selection.");
-        local lairs = faction.getSettlements().filter(function( locationIndex, location )
-        {
-            return ::RPGR_Raids.isLocationEligible(location.getLocationType()) && ::RPGR_Raids.isPlayerInProximityTo(location.getTile());
-        });
+        ::RPGR_Raids.agitateViableLairs(lairs);
+        return vanilla_onDiscovered;
+    }
 
-        if (lairs.len() == 0)
+    local oCS_nullCheck = "onCombatStarted" in object ? object.onCombatStarted : null;
+    object.onCombatStarted = function()
+    {
+        ::RPGR_Raids.logWrapper("onCombatStarted called.");
+        local vanilla_onCombatStarted = oCS_nullCheck == null ? this[parentName].onCombatStarted : oCS_nullCheck;
+
+        if (::World.Statistics.getFlags().get("LastCombatWasArena"))
         {
-            ::RPGR_Raids.logWrapper("onCombatLost could not find any lairs within proximity.");
-            return vanilla_onCombatLost();
+            return vanilla_onCombatStarted();
         }
 
-        foreach( lair in lairs )
+        if (::Math.rand(1, 100) > ::RPGR_Raids.Mod.ModSettings.getSetting("AgitationIncrementChance").getValue()) // TODO: revise this
         {
-            if (!::RPGR_Raids.isActiveContractLocation(lair))
-            {
-                ::RPGR_Raids.setLairAgitation(lair, ::RPGR_Raids.Procedures.Increment);
-                ::RPGR_Raids.logWrapper("Found lair candidate.");
-            }
+            return vanilla_onCombatStarted();
         }
 
-        return vanilla_onCombatLost();
+        if (!::RPGR_Raids.isPlayerInProximityTo(this.getTile()))
+        {
+            ::RPGR_Raids.logWrapper("Player not in proximity to defeated party, aborting."); // TODO: get rid of this
+            return vanilla_onCombatStarted();
+        }
+
+        local faction = ::World.FactionManager.getFaction(this.getFaction());
+
+        if (faction == null)
+        {
+            return vanilla_onCombatStarted();
+        }
+
+        local lairs = ::RPGR_Raids.findLairCandidates(faction);
+
+        if (lairs == null)
+        {
+            return vanilla_onCombatStarted();
+        }
+
+        ::RPGR_Raids.agitateViableLairs(lairs);
+        return vanilla_onCombatStarted();
     }
 
     local oDLFP_nullCheck = "onDropLootForPlayer" in object ? object.onDropLootForPlayer : null;

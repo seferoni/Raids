@@ -50,6 +50,18 @@
         }
     }
 
+    function agitateViableLairs( _lairs )
+    {
+        foreach( lair in _lairs )
+        {
+            if (!this.isActiveContractLocation(lair))
+            {
+                this.logWrapper("Found lair candidate.");
+                this.setLairAgitation(lair, this.Procedures.Increment);
+            }
+        }
+    }
+
     function areCaravanFlagsInitialised( _flags )
     {
         return _flags.get("CaravanWealth") != false && _flags.get("CaravanCargo") != false;
@@ -307,6 +319,35 @@
             items.remove(index);
             this.logWrapper("Removed " + item.m.Name + " at index " + index + ".");
         }
+    }
+
+    function findLairCandidates( _faction )
+    {
+        if (!this.isFactionViable(faction))
+        {
+            this.logWrapper("findLairCandidates took on a non-viable faction as an argument.");
+            return null;
+        }
+
+        if (faction.getSettlements().len() == 0)
+        {
+            this.logWrapper("findLairCandidates was passed a viable faction as an argument, but this faction has no settlements at present.");
+            return null;
+        }
+
+        this.logWrapper("Proceeding to lair candidate selection.");
+        local lairs = faction.getSettlements().filter(function( locationIndex, location )
+        {
+            return ::RPGR_Raids.isLocationEligible(location.getLocationType()) && ::RPGR_Raids.isPlayerInProximityTo(location.getTile());
+        });
+
+        if (lairs.len() == 0)
+        {
+            this.logWrapper("findLairCandidates could not find any lairs within proximity of the player.");
+            return null;
+        }
+
+        return lairs;
     }
 
     function generateTooltipTableEntry( _id, _type, _icon, _text )
