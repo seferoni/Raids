@@ -1,25 +1,27 @@
 ::mods_hookBaseClass("contracts/contract", function( object )
 {
-    local vanilla_start = object.start;
+    local s_nullCheck = "start" in object ? object.start : null;
     object.start = function()
     {
-        local fetch = vanilla_start();
+        local vanilla_start = s_nullCheck == null ? this[parentName].start() : s_nullCheck();
 
         if (!("Destination" in this.m))
         {
-            return fetch;
+            return vanilla_start;
         }
 
-        if (this.m.Destination == null)
+        local destination = this.m.Destination;
+
+        if (destination == null)
         {
-            return fetch;
+            return vanilla_start;
         }
 
-        if (::RPGR_Raids.isLocationEligible(this.m.Destination.getLocationType()))
+        if (::RPGR_Raids.isLocationEligible(destination.getLocationType()))
         {
-            ::RPGR_Raids.setLairAgitation(this.m.Destination, ::RPGR_Raids.Procedures.Reset);
+            ::RPGR_Raids.setLairAgitation(destination, ::RPGR_Raids.Procedures.Reset);
         }
 
-        return fetch;
+        return vanilla_start;
     }
 });
