@@ -323,20 +323,20 @@
 
     function findLairCandidates( _faction )
     {
-        if (!this.isFactionViable(faction))
+        if (!this.isFactionViable(_faction))
         {
-            this.logWrapper("findLairCandidates took on a non-viable faction as an argument.");
+            this.logWrapper("findLairCandidates took on a non-viable _faction as an argument.");
             return null;
         }
 
-        if (faction.getSettlements().len() == 0)
+        if (_faction.getSettlements().len() == 0)
         {
-            this.logWrapper("findLairCandidates was passed a viable faction as an argument, but this faction has no settlements at present.");
+            this.logWrapper("findLairCandidates was passed a viable _faction as an argument, but this _faction has no settlements at present.");
             return null;
         }
 
         this.logWrapper("Proceeding to lair candidate selection.");
-        local lairs = faction.getSettlements().filter(function( locationIndex, location )
+        local lairs = _faction.getSettlements().filter(function( locationIndex, location )
         {
             return ::RPGR_Raids.isLocationEligible(location.getLocationType()) && ::RPGR_Raids.isPlayerInProximityTo(location.getTile());
         });
