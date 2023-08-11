@@ -288,6 +288,24 @@
         return namedLoot;
     }
 
+    function cullFilePathsFromEnumeratedList( _array, _exclusionList )
+    {
+        local filteredList = _array.filter(function( filePath )
+        {
+            foreach( entry in _exclusionList )
+            {
+                if (filePath.find(entry))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        });
+
+        return filteredList;
+    }
+
     function depopulateLairNamedLoot( _lair, _chance = null )
     {
         if (_lair.getLoot().isEmpty())
@@ -319,6 +337,18 @@
             items.remove(index);
             this.logWrapper("Removed " + item.m.Name + " at index " + index + ".");
         }
+    }
+
+    function enumerateFiles( _directoryPath, _exclusionList = null )
+    {
+        local files = ::IO.enumerateFiles("scripts/items/" + _directoryPath);
+
+        if (_exclusionList != null)
+        {
+            this.cullFilePathsFromEnumeratedList(files, _exclusionList);
+        }
+
+        return files;
     }
 
     function findLairCandidates( _faction )
