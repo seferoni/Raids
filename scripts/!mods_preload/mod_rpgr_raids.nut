@@ -173,6 +173,9 @@
             }
         }
 
+        local string = "scripts/items/"
+        ::logInfo("length is " + string.len());
+
         local goods = scriptFiles.map(function( stringPath )
         {
             return stringPath.slice(14);
@@ -288,24 +291,6 @@
         return namedLoot;
     }
 
-    function cullFilePathsFromEnumeratedList( _array, _exclusionList )
-    {
-        local filteredList = _array.filter(function( filePath )
-        {
-            foreach( entry in _exclusionList )
-            {
-                if (filePath.find(entry))
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        });
-
-        return filteredList;
-    }
-
     function depopulateLairNamedLoot( _lair, _chance = null )
     {
         if (_lair.getLoot().isEmpty())
@@ -339,29 +324,17 @@
         }
     }
 
-    function enumerateFiles( _directoryPath, _exclusionList = null )
-    {
-        local files = ::IO.enumerateFiles("scripts/items/" + _directoryPath);
-
-        if (_exclusionList != null)
-        {
-            this.cullFilePathsFromEnumeratedList(files, _exclusionList);
-        }
-
-        return files;
-    }
-
     function findLairCandidates( _faction )
     {
         if (!this.isFactionViable(_faction))
         {
-            this.logWrapper("findLairCandidates took on a non-viable _faction as an argument.");
+            this.logWrapper("findLairCandidates took on a non-viable faction as an argument.");
             return null;
         }
 
         if (_faction.getSettlements().len() == 0)
         {
-            this.logWrapper("findLairCandidates was passed a viable _faction as an argument, but this _faction has no settlements at present.");
+            this.logWrapper("findLairCandidates was passed a viable faction as an argument, but this faction has no settlements at present.");
             return null;
         }
 
