@@ -381,7 +381,7 @@
     {
         local lairs = _locationCandidates.filter(function( locationIndex, location )
         {
-            return ::RPGR_Raids.isLocationEligible(location) && location.getTile().getDistanceTo(_tile) <= 1;
+            return ::RPGR_Raids.isLocationEligible(location) && location.getTile().getDistanceTo(_tile) <= 3;
         });
 
         if (lairs.len() == 0)
@@ -502,10 +502,21 @@
     {
         local agitationState = _lair.getFlags().get("Agitation");
 
-        if (_procedure == this.Procedures.Increment && agitationState >= this.AgitationDescriptors.Desperate)
+        if (_procedure == this.Procedures.Increment)
         {
-            this.logWrapper("Agitation for " + _lair.getName() + " is capped, aborting procedure.");
-            return false;
+            if (agitationState >= this.AgitationDescriptors.Desperate)
+            {
+                this.logWrapper("Agitation for " + _lair.getName() + " is capped, aborting procedure.");
+                return false;
+            }
+
+            local lastAgitationUpdate = _lair.getFlags().get("LastAgitationUpdate");
+
+            if (lastAgitationUpdate != false && ::World.getTime().Days - lastAgitationUpdate <= 1)
+            {
+                this.logWrapper("Agitation for " + _lair.getName() + " cannot be incremented until the passage of a full day since last update, aborting procedure.");
+                return false;
+            }
         }
 
         if (_procedure == this.Procedures.Decrement && agitationState <= this.AgitationDescriptors.Relaxed)
@@ -678,6 +689,9 @@
                 ::logError("setLairAgitation was called with an invalid procedure value.");
         }
 
+        _lair.resetDefenderSpawnDay();
+        ::RPGR_Raids("Refreshing lair defender roster on agitation update.");
+        _lair.createDefenders();
         flags.set("LastAgitationUpdate", ::World.getTime().Days);
         _lair.m.Resources = flags.get("Agitation") == this.AgitationDescriptors.Relaxed ? flags.get("BaseResources") : ::Math.floor(flags.get("BaseResources") * flags.get("Agitation") * this.Mod.ModSettings.getSetting("AgitationResourceModifier").getValue());
         _lair.setLootScaleBasedOnResources(_lair.getResources());
