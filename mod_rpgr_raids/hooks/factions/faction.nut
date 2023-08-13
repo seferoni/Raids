@@ -9,7 +9,7 @@
         ::RPGR_Raids.logWrapper("spawnEntity called.");
         if (!::RPGR_Raids.isFactionViable(this))
         {
-            ::RPGR_Raids.logWrapper("Faction " + ::RPGR_Raids.getDescriptor(this.getFaction(), ::Const.Factions) + " are not viable.");
+            ::RPGR_Raids.logWrapper("Faction is not viable.");
             return party;
         }
 

@@ -2,35 +2,6 @@
 {
     local parentName = object.SuperName;
 
-    local oD_nullCheck = "onDiscovered" in object ? object.onDiscovered : null;
-    object.onDiscovered = function()
-    {
-        ::RPGR_Raids.logWrapper("onDiscovered called.");
-        local vanilla_onDiscovered = oD_nullCheck == null ? this[parentName].onDiscovered() : oD_nullCheck();
-
-        if (::Math.rand(1, 100) > ::RPGR_Raids.Mod.ModSettings.getSetting("AgitationIncrementChance").getValue()) // TODO: revise this
-        {
-            return vanilla_onDiscovered;
-        }
-
-        local faction = ::World.FactionManager.getFaction(this.getFaction());
-
-        if (faction == null)
-        {
-            return vanilla_onDiscovered;
-        }
-
-        local lairs = ::RPGR_Raids.findLairCandidates(faction);
-
-        if (lairs == null)
-        {
-            return vanilla_onDiscovered;
-        }
-
-        ::RPGR_Raids.agitateViableLairs(lairs);
-        return vanilla_onDiscovered;
-    }
-
     local oCS_nullCheck = "onCombatStarted" in object ? object.onCombatStarted : null;
     object.onCombatStarted = function()
     {
@@ -43,6 +14,11 @@
         }
 
         if (::Math.rand(1, 100) > ::RPGR_Raids.Mod.ModSettings.getSetting("AgitationIncrementChance").getValue()) // TODO: revise this
+        {
+            return vanilla_onCombatStarted();
+        }
+
+        if (::RPGR_Raids.isFactionViable(this.getFaction()))
         {
             return vanilla_onCombatStarted();
         }
