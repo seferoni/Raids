@@ -6,9 +6,10 @@
     object.spawnEntity <- function( _tile, _name, _uniqueName, _template, _resources )
     {   // TODO: guard clause for scaling roamer setting to be written
         local party = sE_nullCheck == null ? this[parentName].spawnEntity(_tile, _name, _uniqueName, _template, _resources) : sE_nullCheck(_tile, _name, _uniqueName, _template, _resources);
-
+        ::RPGR_Raids.logWrapper("spawnEntity called.");
         if (!::RPGR_Raids.isFactionViable(this))
         {
+            ::RPGR_Raids.logWrapper("Faction " + ::RPGR_Raids.getDescriptor(this.getFaction(), ::Const.Factions) + " are not viable.");
             return party;
         }
 
@@ -21,6 +22,7 @@
 
         if (lair == false)
         {
+            ::RPGR_Raids.logWrapper("No lair in proximity of spawned party.", true);
             return party;
         }
 
