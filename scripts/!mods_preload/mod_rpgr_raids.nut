@@ -173,12 +173,11 @@
             }
         }
 
-        local string = "scripts/items/"
-        ::logInfo("length is " + string.len());
+        local culledString = "scripts/items/"
 
         local goods = scriptFiles.map(function( stringPath )
         {
-            return stringPath.slice(14);
+            return stringPath.slice(culledString.len());
         });
 
         this.addToCaravanInventory(_caravan, goods);
@@ -341,7 +340,7 @@
         this.logWrapper("Proceeding to lair candidate selection.");
         local lairs = _faction.getSettlements().filter(function( locationIndex, location )
         {
-            return ::RPGR_Raids.isLocationEligible(location.getLocationType()) && ::RPGR_Raids.isPlayerInProximityTo(location.getTile());
+            return ::RPGR_Raids.isLocationTypeEligible(location.getLocationType()) && ::RPGR_Raids.isPlayerInProximityTo(location.getTile());
         });
 
         if (lairs.len() == 0)
@@ -381,7 +380,8 @@
     {
         local lairs = _locationCandidates.filter(function( locationIndex, location )
         {
-            return ::RPGR_Raids.isLocationEligible(location) && location.getTile().getDistanceTo(_tile) <= 3;
+            //::RPGR_Raids.logWrapper("Location with name " + location.getName() + " is at a distance of " + location.getTile().getDistanceTo(_tile) + " tiles.");
+            return ::RPGR_Raids.isLocationTypeEligible(location.getLocationType()) && location.getTile().getDistanceTo(_tile) <= 1;
         });
 
         if (lairs.len() == 0)
@@ -493,7 +493,7 @@
         return true;
     }
 
-    function isLocationEligible( _locationType )
+    function isLocationTypeEligible( _locationType )
     {
         return _locationType == ::Const.World.LocationType.Lair || _locationType == (::Const.World.LocationType.Lair | ::Const.World.LocationType.Mobile);
     }

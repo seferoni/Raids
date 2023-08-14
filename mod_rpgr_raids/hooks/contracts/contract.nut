@@ -17,7 +17,7 @@
             return vanilla_start;
         }
 
-        if (::RPGR_Raids.isLocationEligible(destination.getLocationType()))
+        if (::RPGR_Raids.isLocationTypeEligible(destination.getLocationType()))
         {
             ::RPGR_Raids.setLairAgitation(destination, ::RPGR_Raids.Procedures.Reset);
         }
