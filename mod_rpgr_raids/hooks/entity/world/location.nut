@@ -45,12 +45,21 @@
             return tooltipArray;
         }
 
-        ::RPGR_Raids.updateCumulativeLairAgitation(this); // TODO: test where this needs to be called
+        ::RPGR_Raids.updateCumulativeLairAgitation(this);
         local agitationState = this.getFlags().get("Agitation");
         local id = 20;
         local type = "text";
-        local iconPath = agitationState == ::RPGR_Raids.AgitationDescriptors.Relaxed ? "vision.png" : "miniboss.png";
         local textColour = agitationState == ::RPGR_Raids.AgitationDescriptors.Relaxed ? ::Const.UI.Color.PositiveValue : ::Const.UI.Color.NegativeValue;
+        local iconPath;
+
+        if (::RPGR_Raids.isLairEligibleForAgitationUpdate(this))
+        {
+            iconPath = agitationState == ::RPGR_Raids.AgitationDescriptors.Relaxed ? "vision.png" : "miniboss.png";
+        }
+        else
+        {
+            iconPath = "locked_small.png";
+        }
 
         tooltipArray.extend([
             ::RPGR_Raids.generateTooltipTableEntry(id, type, "ui/icons/asset_money.png", "[color=" + ::Const.UI.Color.PositiveValue + "]" + this.m.Resources + "[/color] resource units"),
