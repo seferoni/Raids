@@ -498,6 +498,19 @@
         return _locationType == ::Const.World.LocationType.Lair || _locationType == (::Const.World.LocationType.Lair | ::Const.World.LocationType.Mobile);
     }
 
+    function isLairEligibleForAgitationUpdate( _lair )
+    {
+        local lastAgitationUpdate = _lair.getFlags().get("LastAgitationUpdate");
+
+        if (lastAgitationUpdate != false && ::World.getTime().Days - lastAgitationUpdate <= 1)
+        {
+            this.logWrapper("Agitation updates for " + _lair.getName() + " are currently time-restricted, aborting procedure.");
+            return false;
+        }
+
+        return true;
+    }
+
     function isLairEligibleForProcedure( _lair, _procedure )
     {
         local agitationState = _lair.getFlags().get("Agitation");
@@ -510,13 +523,7 @@
                 return false;
             }
 
-            local lastAgitationUpdate = _lair.getFlags().get("LastAgitationUpdate");
-
-            if (lastAgitationUpdate != false && ::World.getTime().Days - lastAgitationUpdate <= 1)
-            {
-                this.logWrapper("Agitation for " + _lair.getName() + " cannot be incremented until the passage of a full day since last update, aborting procedure.");
-                return false;
-            }
+            return isLairEligibleForAgitationUpdate(_lair);
         }
 
         if (_procedure == this.Procedures.Decrement && agitationState <= this.AgitationDescriptors.Relaxed)
@@ -693,7 +700,7 @@
         ::RPGR_Raids("Refreshing lair defender roster on agitation update.");
         _lair.createDefenders();
         flags.set("LastAgitationUpdate", ::World.getTime().Days);
-        _lair.m.Resources = flags.get("Agitation") == this.AgitationDescriptors.Relaxed ? flags.get("BaseResources") : ::Math.floor(flags.get("BaseResources") * flags.get("Agitation") * this.Mod.ModSettings.getSetting("AgitationResourceModifier").getValue());
+        _lair.m.Resources = flags.get("Agitation") == this.AgitationDescriptors.Relaxed ? flags.get("BaseResources") : ::Math.floor(flags.get("BaseResources") * flags.get("Agitation") * this.Mod.ModSettings.getSetting("AgitationResourceModifier").getValue() * 1/100);
         _lair.setLootScaleBasedOnResources(_lair.getResources());
     }
 
@@ -733,7 +740,7 @@
 
 ::mods_registerMod(::RPGR_Raids.ID, ::RPGR_Raids.Version, ::RPGR_Raids.Name);
 ::mods_queue(::RPGR_Raids.ID, "mod_msu(>=1.2.6)", function()
-{ // TODO: consider additional configurability
+{
     ::RPGR_Raids.Mod <- ::MSU.Class.Mod(::RPGR_Raids.ID, ::RPGR_Raids.Version, ::RPGR_Raids.Name);
 
     local pageGeneral = ::RPGR_Raids.Mod.ModSettings.addPage("General");
@@ -744,8 +751,8 @@
     local agitationIncrementChance = pageGeneral.addRangeSetting("AgitationIncrementChance", 100, 0, 100, 1, "Agitation Increment Chance"); // TODO: this should be default 50 when raids ship
     agitationIncrementChance.setDescription("Determines the chance for a location's agitation value to increase by one tier upon victory against a roaming party, if within proximity.");
 
-    local agitationResourceModifier = pageGeneral.addRangeSetting("AgitationResourceModifier", 0.7, 0.0, 1.0, 0.1, "Agitation Resource Modifier"); // FIXME: Floating number display bug
-    agitationResourceModifier.setDescription("Controls how lair resource calculation is handled after each agitation tier change. Higher values result in greater resources, and therefore more powerful garrisoned troops and better loot.");
+    local agitationResourceModifier = pageGeneral.addRangeSetting("AgitationResourceModifier", 70, 0, 100, 10, "Agitation Resource Modifier"); // FIXME: Floating number display bug
+    agitationResourceModifier.setDescription("Controls how lair resource calculation is handled after each agitation tier change. Higher percentage values result in greater resources, and therefore more powerful garrisoned troops and better loot.");
 
     local depopulateLairLootOnSpawn = pageGeneral.addBooleanSetting("DepopulateLairLootOnSpawn", false, "Depopulate Lair Loot On Spawn");
     depopulateLairLootOnSpawn.setDescription("Determines whether Raids should depopulate newly spawned lairs of named loot to compensate for broadly higher named loot frequency with the introduction of agitation as a game mechanic.");
