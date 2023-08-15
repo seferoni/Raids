@@ -67,6 +67,40 @@
         return _flags.get("CaravanWealth") != false && _flags.get("CaravanCargo") != false;
     }
 
+    function assignTroops( _party, _partyList, _resources )
+    {
+        local templateCandidates = [];
+
+        foreach( partyCandidate in _partyList )
+		{
+			if (partyCandidate.Cost > _resources) // stop looking for parties after we reach a point where parties cost more than resources
+			{
+				break;
+			}
+
+			if (partyCandidate.Cost > _resources * 0.7) // look for parties that cost more than 70% of resources
+			{
+				templateCandidates.push(partyCandidate);
+			}
+        }
+
+        if (templateCandidates.len() == 0)
+        {
+            return;
+        }
+
+        local templateCandidate = templateCandidates[::Math.rand(0, templateCandidates.len() - 1)];
+
+        foreach( troop in templateCandidate.troops )
+        {
+            while (_resources >= 0)
+            {
+                // this.addTroop(_party, t, false);
+            }
+        }
+
+    }
+
     function calculateSettlementSituationModifier( _settlement )
     {
         local modifier = 0;
@@ -696,9 +730,8 @@
                 ::logError("setLairAgitation was called with an invalid procedure value.");
         }
 
-        _lair.resetDefenderSpawnDay();
         ::RPGR_Raids("Refreshing lair defender roster on agitation update.");
-        _lair.createDefenders();
+        _lair.createDefenders(); // TODO: test the ramifications of this
         flags.set("LastAgitationUpdate", ::World.getTime().Days);
         _lair.m.Resources = flags.get("Agitation") == this.AgitationDescriptors.Relaxed ? flags.get("BaseResources") : ::Math.floor(flags.get("BaseResources") * flags.get("Agitation") * this.Mod.ModSettings.getSetting("AgitationResourceModifier").getValue() * 1/100);
         _lair.setLootScaleBasedOnResources(_lair.getResources());
