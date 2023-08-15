@@ -207,12 +207,11 @@
             }
         }
 
-        local string = "scripts/items/"
-        ::logInfo("length is " + string.len());
+        local culledString = "scripts/items/"
 
         local goods = scriptFiles.map(function( stringPath )
         {
-            return stringPath.slice(14);
+            return stringPath.slice(culledString.len());
         });
 
         this.addToCaravanInventory(_caravan, goods);
@@ -375,7 +374,7 @@
         this.logWrapper("Proceeding to lair candidate selection.");
         local lairs = _faction.getSettlements().filter(function( locationIndex, location )
         {
-            return ::RPGR_Raids.isLocationEligible(location.getLocationType()) && ::RPGR_Raids.isPlayerInProximityTo(location.getTile());
+            return ::RPGR_Raids.isLocationTypeEligible(location.getLocationType()) && ::RPGR_Raids.isPlayerInProximityTo(location.getTile());
         });
 
         if (lairs.len() == 0)
@@ -415,7 +414,8 @@
     {
         local lairs = _locationCandidates.filter(function( locationIndex, location )
         {
-            return ::RPGR_Raids.isLocationEligible(location) && location.getTile().getDistanceTo(_tile) <= 3;
+            //::RPGR_Raids.logWrapper("Location with name " + location.getName() + " is at a distance of " + location.getTile().getDistanceTo(_tile) + " tiles.");
+            return ::RPGR_Raids.isLocationTypeEligible(location.getLocationType()) && location.getTile().getDistanceTo(_tile) <= 1;
         });
 
         if (lairs.len() == 0)
@@ -527,7 +527,7 @@
         return true;
     }
 
-    function isLocationEligible( _locationType )
+    function isLocationTypeEligible( _locationType )
     {
         return _locationType == ::Const.World.LocationType.Lair || _locationType == (::Const.World.LocationType.Lair | ::Const.World.LocationType.Mobile);
     }
@@ -730,10 +730,11 @@
                 ::logError("setLairAgitation was called with an invalid procedure value.");
         }
 
-        ::RPGR_Raids("Refreshing lair defender roster on agitation update.");
-        _lair.createDefenders(); // TODO: test the ramifications of this
         flags.set("LastAgitationUpdate", ::World.getTime().Days);
-        _lair.m.Resources = flags.get("Agitation") == this.AgitationDescriptors.Relaxed ? flags.get("BaseResources") : ::Math.floor(flags.get("BaseResources") * flags.get("Agitation") * this.Mod.ModSettings.getSetting("AgitationResourceModifier").getValue() * 1/100);
+        _lair.m.Resources = flags.get("Agitation") == this.AgitationDescriptors.Relaxed ? flags.get("BaseResources") : ::Math.floor(flags.get("BaseResources") * flags.get("Agitation") * (this.Mod.ModSettings.getSetting("AgitationResourceModifier").getValue() / 100.0));
+        _lair.resetDefenderSpawnDay();
+        ::RPGR_Raids.logWrapper("Refreshing lair defender roster on agitation update.");
+        _lair.createDefenders();
         _lair.setLootScaleBasedOnResources(_lair.getResources());
     }
 
@@ -782,16 +783,19 @@
     agitationDecayInterval.setDescription("Determines the time interval in days after which a location's agitation value drops by one tier.");
 
     local agitationIncrementChance = pageGeneral.addRangeSetting("AgitationIncrementChance", 100, 0, 100, 1, "Agitation Increment Chance"); // TODO: this should be default 50 when raids ship
-    agitationIncrementChance.setDescription("Determines the chance for a location's agitation value to increase by one tier upon victory against a roaming party, if within proximity.");
+    agitationIncrementChance.setDescription("Determines the chance for a location's agitation value to increase by one tier upon engagement with a roaming party, if within proximity.");
 
     local agitationResourceModifier = pageGeneral.addRangeSetting("AgitationResourceModifier", 70, 0, 100, 10, "Agitation Resource Modifier"); // FIXME: Floating number display bug
     agitationResourceModifier.setDescription("Controls how lair resource calculation is handled after each agitation tier change. Higher percentage values result in greater resources, and therefore more powerful garrisoned troops and better loot.");
 
     local depopulateLairLootOnSpawn = pageGeneral.addBooleanSetting("DepopulateLairLootOnSpawn", false, "Depopulate Lair Loot On Spawn");
-    depopulateLairLootOnSpawn.setDescription("Determines whether Raids should depopulate newly spawned lairs of named loot to compensate for broadly higher named loot frequency with the introduction of agitation as a game mechanic.");
+    depopulateLairLootOnSpawn.setDescription("Determines whether Raids should depopulate newly spawned lairs of named loot. This is recommended to compensate for the additional named loot brought about by the introduction of agitation as a game mechanic.");
 
     local scalingRoamers = pageGeneral.addBooleanSetting("ScalingRoamers", true, "Scaling Roamers");
     scalingRoamers.setDescription("Determines whether hostile roaming and ambusher parties spawning from lairs scale in strength with respect to the originating lair's resource count. Does not affect beasts.");
+
+    local roamerResourceModifier = pageGeneral.addRangeSetting("RoamerResourceModifier", 40, 10, 100, 10, "Roamer Resource Modifier"); // FIXME: Floating number display bug
+    roamerResourceModifier.setDescription("Controls how resource calculation is handled for roaming parties. Higher percentage values result in greater resources, and therefore more powerful roaming troops. Does nothing if Scaling Roamers is not enabled.");
 
     local handleSupplyCaravans = pageGeneral.addBooleanSetting("HandleSupplyCaravans", false, "Handle Supply Caravans");
     handleSupplyCaravans.setDescription("Determines whether Raids should handle supply caravans in the same manner as trading caravans, or if they should behave as in the base game.");

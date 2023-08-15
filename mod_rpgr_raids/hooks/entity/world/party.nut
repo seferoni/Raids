@@ -18,7 +18,14 @@
             return vanilla_onCombatStarted();
         }
 
-        if (::RPGR_Raids.isFactionViable(this.getFaction()))
+        local faction = ::World.FactionManager.getFaction(this.getFaction());
+
+        if (faction == null)
+        {
+            return vanilla_onCombatStarted();
+        }
+
+        if (!::RPGR_Raids.isFactionViable(faction))
         {
             return vanilla_onCombatStarted();
         }

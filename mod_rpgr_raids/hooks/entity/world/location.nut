@@ -7,7 +7,7 @@
     {
         local vanilla_onSpawned = oS_nullCheck == null ? this[parentName].onSpawned() : oS_nullCheck();
 
-        if (!::RPGR_Raids.isLocationEligible(this.getLocationType()))
+        if (!::RPGR_Raids.isLocationTypeEligible(this.getLocationType()))
         {
             return vanilla_onSpawned;
         }
@@ -29,7 +29,7 @@
     {
         local tooltipArray = gT_nullCheck == null ? this[parentName].getTooltip() : gT_nullCheck();
 
-        if (!::RPGR_Raids.isLocationEligible(this.getLocationType()))
+        if (!::RPGR_Raids.isLocationTypeEligible(this.getLocationType()))
         {
             return tooltipArray;
         }
