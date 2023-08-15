@@ -732,7 +732,6 @@
 
         flags.set("LastAgitationUpdate", ::World.getTime().Days);
         _lair.m.Resources = flags.get("Agitation") == this.AgitationDescriptors.Relaxed ? flags.get("BaseResources") : ::Math.floor(flags.get("BaseResources") * flags.get("Agitation") * (this.Mod.ModSettings.getSetting("AgitationResourceModifier").getValue() / 100.0));
-        _lair.resetDefenderSpawnDay();
         ::RPGR_Raids.logWrapper("Refreshing lair defender roster on agitation update.");
         _lair.createDefenders();
         _lair.setLootScaleBasedOnResources(_lair.getResources());
