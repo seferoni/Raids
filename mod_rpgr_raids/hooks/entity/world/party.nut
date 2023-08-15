@@ -13,6 +13,12 @@
             return vanilla_onCombatStarted();
         }
 
+        if (!::RPGR_Raids.isPlayerInProximityTo(this.getTile()))
+        {
+            ::RPGR_Raids.logWrapper("Player not in proximity to attacked party, aborting.");
+            return vanilla_onCombatStarted();
+        }
+
         if (::Math.rand(1, 100) > ::RPGR_Raids.Mod.ModSettings.getSetting("AgitationIncrementChance").getValue())
         {
             return vanilla_onCombatStarted();
@@ -27,12 +33,6 @@
 
         if (!::RPGR_Raids.isFactionViable(faction))
         {
-            return vanilla_onCombatStarted();
-        }
-
-        if (!::RPGR_Raids.isPlayerInProximityTo(this.getTile()))
-        {
-            ::RPGR_Raids.logWrapper("Player not in proximity to attacked party, aborting.");
             return vanilla_onCombatStarted();
         }
 

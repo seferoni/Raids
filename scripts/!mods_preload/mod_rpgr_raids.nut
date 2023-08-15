@@ -69,36 +69,27 @@
 
     function assignTroops( _party, _partyList, _resources )
     {
-        local templateCandidates = [];
+        local partyTemplateCandidate = _partyList[::Math.rand(0, _partyList.len() - 1)];
+        local troopsTemplate = partyTemplateCandidate.Troops.filter(function( troopIndex, troop )
+        {
+            return troop.Type.Cost <= _resources;
+        });
 
-        foreach( partyCandidate in _partyList )
-		{
-			if (partyCandidate.Cost > _resources) // stop looking for parties after we reach a point where parties cost more than resources
-			{
-				break;
-			}
-
-			if (partyCandidate.Cost > _resources * 0.7) // look for parties that cost more than 70% of resources
-			{
-				templateCandidates.push(partyCandidate);
-			}
-        }
-
-        if (templateCandidates.len() == 0)
+        if (troopsTemplate.len() == 0)
         {
             return;
         }
 
-        local templateCandidate = templateCandidates[::Math.rand(0, templateCandidates.len() - 1)];
-
-        foreach( troop in templateCandidate.troops )
+        foreach( troop in troopsTemplate )
         {
             while (_resources >= 0)
             {
-                // this.addTroop(_party, t, false);
+                ::Const.World.Common.addTroop(_party, troop, false);
+                _resources -= troop.Type.Cost;
             }
         }
 
+        _party.updateStrength();
     }
 
     function calculateSettlementSituationModifier( _settlement )
@@ -408,22 +399,6 @@
                 return descriptor;
             }
         }
-    }
-
-    function getLairWithinProximityOf( _tile, _locationCandidates )
-    {
-        local lairs = _locationCandidates.filter(function( locationIndex, location )
-        {
-            //::RPGR_Raids.logWrapper("Location with name " + location.getName() + " is at a distance of " + location.getTile().getDistanceTo(_tile) + " tiles.");
-            return ::RPGR_Raids.isLocationTypeEligible(location.getLocationType()) && location.getTile().getDistanceTo(_tile) <= 1;
-        });
-
-        if (lairs.len() == 0)
-        {
-            return false;
-        }
-
-        return lairs[0];
     }
 
     function getNamedLootChance( _lair )

@@ -22,13 +22,30 @@
             return party;
         }
 
-        local lair = ::RPGR_Raids.getLairWithinProximityOf(_tile, this.getSettlements());
-
-        if (lair == false)
+        local entities = ::World.getAllEntitiesAndOneLocationAtPos(party.getPos(), 1.0);
+        local lairs = entities.filter(function( entityIndex, entity )
         {
-            ::RPGR_Raids.logWrapper("No lair in proximity of spawned party " + _name + ".", true);
+            if (!::isKindOf(entity, "location"))
+            {
+                ::RPGR_Raids.logWrapper(entity.getName() + " is not a location.");
+                return false;
+            }
+            else if (!::RPGR_Raids.isLocationTypeEligible(entity.getLocationType()))
+            {
+                ::RPGR_Raids.logWrapper(entity.getName() + " is not an eligible lair.")
+                return false;
+            }
+
+            return true;
+        });
+
+        if (lairs.len() == 0)
+        {
+            ::RPGR_Raids.logWrapper("No eligible lair in proximity of spawned party " + _name + ".");
             return party;
         }
+
+        local lair = lairs[0];
 
         if (::RPGR_Raids.isActiveContractLocation(lair))
         {
