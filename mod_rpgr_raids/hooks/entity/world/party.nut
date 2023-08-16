@@ -8,7 +8,7 @@
         ::RPGR_Raids.logWrapper("onCombatStarted called.");
         local vanilla_onCombatStarted = oCS_nullCheck == null ? this[parentName].onCombatStarted : oCS_nullCheck;
 
-        if (::World.Statistics.getFlags().get("LastCombatWasArena"))
+        if (::World.Statistics.getFlags().get("LastCombatWasArena")) // TODO: test this
         {
             return vanilla_onCombatStarted();
         }

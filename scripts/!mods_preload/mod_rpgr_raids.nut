@@ -82,10 +82,13 @@
 
         foreach( troop in troopsTemplate )
         {
-            while (_resources >= 0)
+            local bailOut = 0;
+
+            while (_resources >= 0 && bailOut < 7)
             {
                 ::Const.World.Common.addTroop(_party, troop, false);
                 _resources -= troop.Type.Cost;
+                bailOut += 1;
             }
         }
 
