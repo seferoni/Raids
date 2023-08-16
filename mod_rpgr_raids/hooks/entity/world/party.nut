@@ -2,7 +2,7 @@
 {
     local parentName = object.SuperName;
 
-    local oCS_nullCheck = "onCombatStarted" in object ? object.onCombatStarted : null;
+    /*local oCS_nullCheck = "onCombatStarted" in object ? object.onCombatStarted : null;
     object.onCombatStarted = function()
     {
         ::RPGR_Raids.logWrapper("onCombatStarted called.");
@@ -52,7 +52,7 @@
 
         ::RPGR_Raids.agitateViableLairs(lairs);
         return vanilla_onCombatStarted();
-    }
+    }*/
 
     local oDLFP_nullCheck = "onDropLootForPlayer" in object ? object.onDropLootForPlayer : null;
     object.onDropLootForPlayer = function( _lootTable )
