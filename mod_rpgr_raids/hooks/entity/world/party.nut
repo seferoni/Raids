@@ -2,58 +2,6 @@
 {
     local parentName = object.SuperName;
 
-    /*local oCS_nullCheck = "onCombatStarted" in object ? object.onCombatStarted : null;
-    object.onCombatStarted = function()
-    {
-        ::RPGR_Raids.logWrapper("onCombatStarted called.");
-        local vanilla_onCombatStarted = oCS_nullCheck == null ? this[parentName].onCombatStarted : oCS_nullCheck;
-
-        if (::World.Statistics.getFlags().get("LastCombatWasArena")) // TODO: test this
-        {
-            return vanilla_onCombatStarted();
-        }
-
-        if (!::RPGR_Raids.isPlayerInProximityTo(this.getTile()))
-        {
-            ::RPGR_Raids.logWrapper("Player not in proximity to attacked party, aborting.");
-            return vanilla_onCombatStarted();
-        }
-
-        if (::Math.rand(1, 100) > ::RPGR_Raids.Mod.ModSettings.getSetting("AgitationIncrementChance").getValue())
-        {
-            return vanilla_onCombatStarted();
-        }
-
-        local faction = ::World.FactionManager.getFaction(this.getFaction());
-
-        if (faction == null)
-        {
-            return vanilla_onCombatStarted();
-        }
-
-        if (!::RPGR_Raids.isFactionViable(faction))
-        {
-            return vanilla_onCombatStarted();
-        }
-
-        local faction = ::World.FactionManager.getFaction(this.getFaction());
-
-        if (faction == null)
-        {
-            return vanilla_onCombatStarted();
-        }
-
-        local lairs = ::RPGR_Raids.findLairCandidates(faction);
-
-        if (lairs == null)
-        {
-            return vanilla_onCombatStarted();
-        }
-
-        ::RPGR_Raids.agitateViableLairs(lairs);
-        return vanilla_onCombatStarted();
-    }*/
-
     local oDLFP_nullCheck = "onDropLootForPlayer" in object ? object.onDropLootForPlayer : null;
     object.onDropLootForPlayer = function( _lootTable )
     {
