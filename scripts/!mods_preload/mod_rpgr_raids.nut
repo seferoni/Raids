@@ -202,12 +202,10 @@
         }
 
         local culledString = "scripts/items/"
-
         local goods = scriptFiles.map(function( stringPath )
         {
             return stringPath.slice(culledString.len());
         });
-
         this.addToCaravanInventory(_caravan, goods);
     }
 
@@ -347,7 +345,7 @@
         {
             local index = items.find(item);
             items.remove(index);
-            this.logWrapper("Removed " + item.m.Name + " at index " + index + ".");
+            this.logWrapper("Removed " + item.getName() + " at index " + index + ".");
         }
     }
 
@@ -424,7 +422,7 @@
 
     function logWrapper( _string, _isError = false )
     {
-        if (this.Mod.ModSettings.getSetting("VerboseLogging").getValue() == false)
+        if (!this.Mod.ModSettings.getSetting("VerboseLogging").getValue())
         {
             return;
         }
@@ -507,7 +505,7 @@
 
     function isLocationTypeEligible( _locationType )
     {
-        return _locationType == ::Const.World.LocationType.Lair || _locationType == (::Const.World.LocationType.Lair | ::Const.World.LocationType.Mobile);
+        return _locationType == ::Const.World.LocationType.Lair || _locationType == ::Const.World.LocationType.Lair | ::Const.World.LocationType.Mobile;
     }
 
     function isLairEligibleForAgitationUpdate( _lair )
