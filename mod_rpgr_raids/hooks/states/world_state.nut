@@ -1,7 +1,7 @@
 ::mods_hookExactClass("states/world_state", function( object )
 {
     local parentName = object.SuperName;
-    
+
     local oCF_nullCheck = "onCombatFinished" in object ? object.onCombatFinished : null;
     object.onCombatFinished = function()
     {
@@ -14,6 +14,11 @@
         }
 
         if (::World.getPlayerRoster().getSize() == 0 || !::World.Assets.getOrigin().onCombatFinished())
+        {
+            return vanilla_onCombatFinished;
+        }
+
+        if (::RPGR_AP_ModuleFound && !worldFlags.get("LastCombatVictory"))
         {
             return vanilla_onCombatFinished;
         }
