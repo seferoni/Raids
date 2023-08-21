@@ -751,7 +751,6 @@
 ::mods_queue(::RPGR_Raids.ID, "mod_msu(>=1.2.6)", function()
 {
     ::RPGR_Raids.Mod <- ::MSU.Class.Mod(::RPGR_Raids.ID, ::RPGR_Raids.Version, ::RPGR_Raids.Name);
-    ::RPGR_AP_ModuleFound <- ::mods_getRegisteredMod("mod_rpgr_avatar_persistence") != null;
 
     local pageGeneral = ::RPGR_Raids.Mod.ModSettings.addPage("General");
 

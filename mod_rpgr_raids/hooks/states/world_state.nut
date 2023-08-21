@@ -25,14 +25,15 @@
             return vanilla_onCombatFinished;
         }
 
-        if (::RPGR_AP_ModuleFound && !worldFlags.get("LastCombatVictory"))
+        if (worldFlags.getAsInt("LastCombatResult") != 1)
         {
-            ::RPGR_Raids.logWrapper("Avatar Persistence reports combat defeat, aborting lair agitation procedure.");
+            ::RPGR_Raids.logWrapper("Last combat result was flagged as defeat, aborting lair agitation procedure.");
             return vanilla_onCombatFinished;
         }
 
         if (::Math.rand(1, 100) > ::RPGR_Raids.Mod.ModSettings.getSetting("AgitationIncrementChance").getValue())
         {
+            ::RPGR_Raids.logWrapper("Dice roll result exceeds threshold for agitation increment chance, aborting lair agitation procedure.");
             return vanilla_onCombatFinished;
         }
 
