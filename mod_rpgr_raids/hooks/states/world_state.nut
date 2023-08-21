@@ -8,8 +8,15 @@
         local vanilla_onCombatFinished = oCF_nullCheck == null ? this[parentName].onCombatFinished() : oCF_nullCheck();
         local worldFlags = ::World.Statistics.getFlags();
 
-        if (worldFlags.get("LastCombatWasArena") || worldFlags.get("LastCombatFaction") == false)
+        if (worldFlags.get("LastCombatWasArena"))
         {
+            ::RPGR_Raids.logWrapper("Last combat encounter was flagged as an arena battle, aborting lair agitation procedure.");
+            return vanilla_onCombatFinished;
+        }
+
+        if (worldFlags.get("LastCombatFaction") == false)
+        {
+            ::RPGR_Raids.logWrapper("Last encountered faction flag not initialised, aborting lair agitation procedure.", true);
             return vanilla_onCombatFinished;
         }
 
@@ -20,6 +27,7 @@
 
         if (::RPGR_AP_ModuleFound && !worldFlags.get("LastCombatVictory"))
         {
+            ::RPGR_Raids.logWrapper("Avatar Persistence reports combat defeat, aborting lair agitation procedure.");
             return vanilla_onCombatFinished;
         }
 
@@ -32,11 +40,7 @@
 
         if (faction == null)
         {
-            return vanilla_onCombatFinished;
-        }
-
-        if (!::RPGR_Raids.isFactionViable(faction))
-        {
+            ::RPGR_Raids.logWrapper("Could not identify enemy faction, aborting lair agitation procedure.", true);
             return vanilla_onCombatFinished;
         }
 
