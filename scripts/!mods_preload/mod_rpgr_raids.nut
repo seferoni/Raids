@@ -28,6 +28,7 @@
     CampaignModifiers =
     {
         CaravanNamedItemChance = 50, // FIXME: this is inflated, revert to 5
+        CaravanNamedItemThresholdDays = 0, // FIXME: this is deflated, revert to 50
         NamedItemChanceOnSpawn = 30,
         GlobalProximityTiles = 9
     },
@@ -229,11 +230,15 @@
         {
             troops.extend([
                 ::Const.World.Spawn.Troops.MercenaryLOW,
-                ::Const.World.Spawn.Troops.Mercenary,
-                ::Const.World.Spawn.Troops.MercenaryRanged
             ]);
 
-            return troops;
+            if (::World.getTime().Days >= 50) // FIXME: this is a placeholder value
+            {
+                troops.extend([
+                    ::Const.World.Spawn.Troops.Mercenary,
+                    ::Const.World.Spawn.Troops.MercenaryRanged,
+                ]);
+            }
         }
 
         if (_factionType == ::Const.FactionType.OrientalCityState)
@@ -450,7 +455,7 @@
         };
         flags.set("CaravanWealth", ::Math.min(this.CaravanWealthDescriptors.Abundant, ::Math.rand(1, 2) + typeModifier + sizeModifier + situationModifier));
 
-        if (::Math.rand(1, 100) <= this.CampaignModifiers.CaravanNamedItemChance && flags.get("CaravanWealth") == this.CaravanWealthDescriptors.Abundant)
+        if (::Math.rand(1, 100) <= this.CampaignModifiers.CaravanNamedItemChance && flags.get("CaravanWealth") == this.CaravanWealthDescriptors.Abundant && ::World.getTime().Days >= this.CampaignModifiers.CaravanNamedItemThresholdDays)
         {
             flags.set("CaravanHasNamedItems", true);
         }
@@ -472,7 +477,11 @@
 
         this.logWrapper("Rolled " + randomNumber + " for caravan cargo assignment for caravan from " + _settlement.getName() + " of the newly assigned cargo type " + this.getDescriptor(flags.get("CaravanCargo"), this.CaravanCargoDescriptors) + ".");
         this.populateCaravanInventory(_caravan, _settlement);
-        this.reinforceCaravanTroops(_caravan, _settlement);
+
+        if (this.Mod.ModSettings.getSetting("ReinforceCaravans").getValue())
+        {
+            this.reinforceCaravanTroops(_caravan, _settlement);
+        }
     }
 
     function isFactionViable( _faction )
@@ -616,6 +625,11 @@
         }
 
         if (!(wealth == this.CaravanWealthDescriptors.Abundant && flags.get("CaravanHasNamedItems")))
+        {
+            return;
+        }
+
+        if (::World.getTime().Days < this.CampaignModifiers.CaravanNamedItemThresholdDays)
         {
             return;
         }
@@ -768,6 +782,9 @@
 
     local scalingRoamers = pageGeneral.addBooleanSetting("ScalingRoamers", true, "Scaling Roamers");
     scalingRoamers.setDescription("Determines whether hostile roaming and ambusher parties spawning from lairs scale in strength with respect to the originating lair's resource count. Does not affect beasts.");
+
+    local reinforceCaravans = pageGeneral.addBooleanSetting("ReinforceCaravans", true, "Reinforce Caravans");
+    reinforceCaravans.setDescription("Determines whether caravan troop count will be reinforced based on caravan wealth, and in special cases, cargo type. If certain conditions obtain, this will result in the addition of special troops with powerful end-game gear to wealthy caravans, independent of player progression.");
 
     local roamerResourceModifier = pageGeneral.addRangeSetting("RoamerResourceModifier", 40, 10, 100, 10, "Roamer Resource Modifier"); // FIXME: Floating number display bug
     roamerResourceModifier.setDescription("Controls how resource calculation is handled for roaming parties. Higher percentage values result in greater resources, and therefore more powerful roaming troops. Does nothing if Scaling Roamers is not enabled.");
