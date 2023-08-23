@@ -7,7 +7,7 @@
     {
         local party = sE_nullCheck == null ? this[parentName].spawnEntity(_tile, _name, _uniqueName, _template, _resources) : sE_nullCheck(_tile, _name, _uniqueName, _template, _resources);
 
-        if (!::RPGR_Raids.Mod.ModSettings.getSetting("ScalingRoamers").getValue())
+        if (::Math.rand(1, 100) > ::RPGR_Raids.Mod.ModSettings.getSetting("RoamerScaleChance").getValue())
         {
             return party;
         }

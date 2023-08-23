@@ -26,6 +26,7 @@
     },
     CampaignModifiers =
     {
+        AssignmentMaximumIterations = 7,
         CaravanNamedItemChance = 50, // FIXME: this is inflated, revert to 5
         CaravanReinforcementThresholdDays = 0, // FIXME: this is deflated, revert to 50
         GlobalProximityTiles = 9
@@ -85,7 +86,7 @@
         {
             local bailOut = 0;
 
-            while (_resources >= 0 && bailOut < 7)
+            while (_resources >= 0 && bailOut < this.CampaignModifiers.AssignmentMaximumIterations)
             {
                 ::Const.World.Common.addTroop(_party, troop, false);
                 _resources -= troop.Type.Cost;
@@ -760,26 +761,26 @@
 
     local pageGeneral = ::RPGR_Raids.Mod.ModSettings.addPage("General");
 
-    local agitationDecayInterval = pageGeneral.addRangeSetting("AgitationDecayInterval", 7, 1, 14, 1, "Agitation Decay Interval");
+    local agitationDecayInterval = pageGeneral.addRangeSetting("AgitationDecayInterval", 7, 1, 50, 1, "Agitation Decay Interval");
     agitationDecayInterval.setDescription("Determines the time interval in days after which a location's agitation value drops by one tier.");
 
     local agitationIncrementChance = pageGeneral.addRangeSetting("AgitationIncrementChance", 100, 0, 100, 1, "Agitation Increment Chance"); // TODO: this should be default 50 when raids ship
     agitationIncrementChance.setDescription("Determines the chance for a location's agitation value to increase by one tier upon engagement with a roaming party, if within proximity.");
 
-    local agitationResourceModifier = pageGeneral.addRangeSetting("AgitationResourceModifier", 70, 0, 100, 10, "Agitation Resource Modifier"); // FIXME: Floating number display bug
+    local agitationResourceModifier = pageGeneral.addRangeSetting("AgitationResourceModifier", 70, 50, 100, 10, "Agitation Resource Modifier"); // FIXME: Floating number display bug
     agitationResourceModifier.setDescription("Controls how lair resource calculation is handled after each agitation tier change. Higher percentage values result in greater resources, and therefore more powerful garrisoned troops and better loot.");
 
     local depopulateLairLootOnSpawn = pageGeneral.addBooleanSetting("DepopulateLairLootOnSpawn", false, "Depopulate Lair Loot On Spawn");
     depopulateLairLootOnSpawn.setDescription("Determines whether Raids should depopulate newly spawned lairs of named loot. This is recommended to compensate for the additional named loot brought about by the introduction of agitation as a game mechanic.");
 
-    local scalingRoamers = pageGeneral.addBooleanSetting("ScalingRoamers", true, "Scaling Roamers");
-    scalingRoamers.setDescription("Determines whether hostile roaming and ambusher parties spawning from lairs scale in strength with respect to the originating lair's resource count. Does not affect beasts.");
+    local roamerScaleChance = pageGeneral.addRangeSetting("RoamerScaleChance", 100, 1, 100, 1, "Roamer Scale Chance");
+    roamerScaleChance.setDescription("Determines the percentage chance for hostile roaming and ambusher parties spawning from lairs to scale in strength with respect to the originating lair's resource count. Does not affect beasts.")
 
     local reinforceCaravans = pageGeneral.addBooleanSetting("ReinforceCaravans", true, "Reinforce Caravans");
     reinforceCaravans.setDescription("Determines whether caravan troop count will be reinforced based on caravan wealth, and in special cases, cargo type. If certain conditions obtain, this will result in the addition of special troops with powerful end-game gear to wealthy caravans, independent of player progression.");
 
     local roamerResourceModifier = pageGeneral.addRangeSetting("RoamerResourceModifier", 40, 10, 100, 10, "Roamer Resource Modifier"); // FIXME: Floating number display bug
-    roamerResourceModifier.setDescription("Controls how resource calculation is handled for roaming parties. Higher percentage values result in greater resources, and therefore more powerful roaming troops. Does nothing if Scaling Roamers is not enabled.");
+    roamerResourceModifier.setDescription("Controls how resource calculation is handled for roaming parties. Higher percentage values result in greater resources, and therefore more powerful roaming troops. Does nothing if roamer scale chance is set to zero.");
 
     local handleSupplyCaravans = pageGeneral.addBooleanSetting("HandleSupplyCaravans", false, "Handle Supply Caravans");
     handleSupplyCaravans.setDescription("Determines whether Raids should handle supply caravans in the same manner as trading caravans, or if they should behave as in the base game.");
