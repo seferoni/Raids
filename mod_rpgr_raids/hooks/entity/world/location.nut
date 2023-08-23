@@ -50,16 +50,7 @@
         local id = 20;
         local type = "text";
         local textColour = agitationState == ::RPGR_Raids.AgitationDescriptors.Relaxed ? ::Const.UI.Color.PositiveValue : ::Const.UI.Color.NegativeValue;
-        local iconPath;
-
-        if (::RPGR_Raids.isLairEligibleForAgitationUpdate(this))
-        {
-            iconPath = agitationState == ::RPGR_Raids.AgitationDescriptors.Relaxed ? "vision.png" : "miniboss.png";
-        }
-        else
-        {
-            iconPath = "locked_small.png";
-        }
+        local iconPath = agitationState == ::RPGR_Raids.AgitationDescriptors.Relaxed ? "vision.png" : "miniboss.png";
 
         tooltipArray.extend([
             ::RPGR_Raids.generateTooltipTableEntry(id, type, "ui/icons/asset_money.png", "[color=" + ::Const.UI.Color.PositiveValue + "]" + this.m.Resources + "[/color] resource units"),

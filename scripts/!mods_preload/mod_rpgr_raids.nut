@@ -1,6 +1,5 @@
 ::RPGR_Raids <-
 {
-    // TODO: change assignment operators to new slot operators where applicable
     ID = "mod_rpgr_raids",
     Name = "RPG Rebalance - Raids",
     Version = "1.0.0",
@@ -28,9 +27,10 @@
     CampaignModifiers =
     {
         CaravanNamedItemChance = 50, // FIXME: this is inflated, revert to 5
-        CaravanNamedItemThresholdDays = 0, // FIXME: this is deflated, revert to 50
-        NamedItemChanceOnSpawn = 30,
+        CaravanReinforcementThresholdDays = 0, // FIXME: this is deflated, revert to 50
         GlobalProximityTiles = 9
+        NamedItemChanceOnSpawn = 30,
+        ReinforcementMaximumIterations = 15
     },
     Procedures =
     {
@@ -232,7 +232,7 @@
                 ::Const.World.Spawn.Troops.MercenaryLOW,
             ]);
 
-            if (::World.getTime().Days >= 50) // FIXME: this is a placeholder value
+            if (::World.getTime().Days >= this.CampaignModifiers.CaravanReinforcementThresholdDays)
             {
                 troops.extend([
                     ::Const.World.Spawn.Troops.Mercenary,
@@ -427,14 +427,14 @@
 
     function logWrapper( _string, _isError = false )
     {
-        if (!this.Mod.ModSettings.getSetting("VerboseLogging").getValue())
-        {
-            return;
-        }
-
         if (_isError)
         {
             ::logError("[Raids] " + _string);
+            return;
+        }
+
+        if (!this.Mod.ModSettings.getSetting("VerboseLogging").getValue())
+        {
             return;
         }
 
@@ -455,7 +455,7 @@
         };
         flags.set("CaravanWealth", ::Math.min(this.CaravanWealthDescriptors.Abundant, ::Math.rand(1, 2) + typeModifier + sizeModifier + situationModifier));
 
-        if (::Math.rand(1, 100) <= this.CampaignModifiers.CaravanNamedItemChance && flags.get("CaravanWealth") == this.CaravanWealthDescriptors.Abundant && ::World.getTime().Days >= this.CampaignModifiers.CaravanNamedItemThresholdDays)
+        if (::Math.rand(1, 100) <= this.CampaignModifiers.CaravanNamedItemChance && flags.get("CaravanWealth") == this.CaravanWealthDescriptors.Abundant && ::World.getTime().Days >= this.CampaignModifiers.CaravanReinforcementThresholdDays)
         {
             flags.set("CaravanHasNamedItems", true);
         }
@@ -517,40 +517,30 @@
         return _locationType == ::Const.World.LocationType.Lair || _locationType == (::Const.World.LocationType.Lair | ::Const.World.LocationType.Mobile);
     }
 
-    function isLairEligibleForAgitationUpdate( _lair )
-    {
-        local lastAgitationUpdate = _lair.getFlags().get("LastAgitationUpdate");
-
-        if (lastAgitationUpdate != false && ::World.getTime().Days - lastAgitationUpdate <= 1)
-        {
-            this.logWrapper("Agitation updates for " + _lair.getName() + " are currently time-restricted, aborting procedure.");
-            return false;
-        }
-
-        return true;
-    }
-
     function isLairEligibleForProcedure( _lair, _procedure )
     {
         local agitationState = _lair.getFlags().get("Agitation");
+        local lairName = _lair.getName();
 
-        if (_procedure == this.Procedures.Increment)
+        if (agitationState > this.AgitationDescriptors.Desperate || agitationState < this.AgitationDescriptors.Relaxed)
         {
-            if (agitationState >= this.AgitationDescriptors.Desperate)
-            {
-                this.logWrapper("Agitation for " + _lair.getName() + " is capped, aborting procedure.");
-                return false;
-            }
+            this.logWrapper("Agitation for " + lairName + " occupies an out-of-bounds value.", true);
+            return false;
+        }
 
-            return isLairEligibleForAgitationUpdate(_lair);
+        if (_procedure == this.Procedures.Increment && agitationState >= this.AgitationDescriptors.Desperate)
+        {
+            this.logWrapper("Agitation for " + lairName + " is capped, aborting procedure.");
+            return false;
         }
 
         if (_procedure == this.Procedures.Decrement && agitationState <= this.AgitationDescriptors.Relaxed)
         {
+            this.logWrapper("Agitation for " + lairName + " is already at its minimum value, aborting procedure.");
             return false;
         }
 
-        this.logWrapper("Lair " + _lair.getName() + " is eligible for agitation state change procedures.");
+        this.logWrapper("Lair " + lairName + " is eligible for agitation state change procedures.");
         return true;
     }
 
@@ -615,11 +605,13 @@
             return;
         }
 
-        local iterations = ::Math.rand(1, wealth * 2);
+        local currentTimeDays = ::World.getTime().Days;
+        local timeModifier = ::Math.floor(currentTimeDays / this.CampaignModifiers.CaravanReinforcementThresholdDays);
+        local iterations = ::Math.rand(1, wealth * 2) + timeModifier > this.CampaignModifiers.ReinforcementMaximumIterations ? this.CampaignModifiers.ReinforcementMaximumIterations : ::Math.rand(1, wealth * 2) + timeModifier;
         local factionType = ::World.FactionManager.getFaction(_caravan.getFaction()).getType();
         local mundaneTroops = this.createCaravanTroops(wealth, factionType);
 
-        for( local i = 0; i != iterations; i = ++i )
+        for( local i = 0; i <= iterations; i = ++i )
         {
             ::Const.World.Common.addTroop(_caravan, {Type = mundaneTroops[::Math.rand(0, mundaneTroops.len() - 1)]}, true);
         }
@@ -629,7 +621,7 @@
             return;
         }
 
-        if (::World.getTime().Days < this.CampaignModifiers.CaravanNamedItemThresholdDays)
+        if (currentTimeDays < this.CampaignModifiers.CaravanReinforcementThresholdDays)
         {
             return;
         }
@@ -641,7 +633,7 @@
     function repopulateLairNamedLoot( _lair )
     {
         local namedLootChance = this.getNamedLootChance(_lair);
-        this.logWrapper("namedLootChance is " + namedLootChance + " for lair " + _lair.getName());
+        this.logWrapper("namedLootChance is " + namedLootChance + " for lair " + _lair.getName() + ".");
 
         if (::Math.rand(1, 100) > namedLootChance)
         {
@@ -675,7 +667,7 @@
                 break;
 
             default:
-                ::logError("Invalid caravan cargo value, unable to retrieve icon.");
+                this.logWrapper("Invalid caravan cargo value, unable to retrieve icon.", true);
         }
 
         return iconPath;
@@ -717,7 +709,7 @@
                 break;
 
             default:
-                ::logError("setLairAgitation was called with an invalid procedure value.");
+                this.logWrapper("setLairAgitation was called with an invalid procedure value.", true);
         }
 
         flags.set("LastAgitationUpdate", ::World.getTime().Days);
@@ -746,7 +738,7 @@
             return;
         }
 
-        this.logWrapper("Difference is  " + difference + " decayInterval is " + decayInterval); // TODO: remove this
+        this.logWrapper("Last agitation update occurred " + difference + " days ago.");
         local decrementIterations = ::Math.floor(difference / decayInterval);
 
         for( local i = 0; i != decrementIterations; i = ++i )
