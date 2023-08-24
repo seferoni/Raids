@@ -27,7 +27,6 @@
         {
             if (!::isKindOf(entity, "location"))
             {
-                ::RPGR_Raids.logWrapper(entity.getName() + " is not a location.");
                 return false;
             }
             else if (!::RPGR_Raids.isLocationTypeEligible(entity.getLocationType()))
@@ -46,6 +45,11 @@
         }
 
         local lair = lairs[0];
+
+        if (lair.getFlags().get("Agitation") == ::RPGR_Raids.AgitationDescriptors.Relaxed)
+        {
+            return party;
+        }
 
         if (::RPGR_Raids.isActiveContractLocation(lair))
         {

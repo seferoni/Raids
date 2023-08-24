@@ -3,7 +3,7 @@
     ID = "mod_rpgr_raids",
     Name = "RPG Rebalance - Raids",
     Version = "1.0.0",
-    AgitationDescriptors =
+    AgitationDescriptors =  // TODO: rename these to reflect greater strength
     {
         Relaxed = 1,
         Cautious = 2,

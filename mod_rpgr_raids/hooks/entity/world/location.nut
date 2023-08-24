@@ -16,7 +16,7 @@
         flags.set("BaseResources", this.m.Resources);
         flags.set("Agitation", ::RPGR_Raids.AgitationDescriptors.Relaxed);
 
-        if (::RPGR_Raids.Mod.ModSettings.getSetting("DepopulateLairLootOnSpawn").getValue() == true)
+        if (::RPGR_Raids.Mod.ModSettings.getSetting("DepopulateLairLootOnSpawn").getValue())
         {
             ::RPGR_Raids.depopulateLairNamedLoot(this, ::RPGR_Raids.CampaignModifiers.NamedItemChanceOnSpawn);
         }
