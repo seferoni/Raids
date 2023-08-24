@@ -479,7 +479,7 @@
         this.logWrapper("Rolled " + randomNumber + " for caravan cargo assignment for caravan from " + _settlement.getName() + " of the newly assigned cargo type " + this.getDescriptor(flags.get("CaravanCargo"), this.CaravanCargoDescriptors) + ".");
         this.populateCaravanInventory(_caravan, _settlement);
 
-        if (this.Mod.ModSettings.getSetting("ReinforceCaravans").getValue())
+        if (::Math.rand(1, 100) <= this.Mod.ModSettings.getSetting("ReinforceCaravans").getValue() || flags.get("CaravanWealth") >= this.CaravanWealthDescriptors.Plentiful)
         {
             this.reinforceCaravanTroops(_caravan, _settlement);
         }
@@ -776,7 +776,7 @@
     local roamerScaleChance = pageGeneral.addRangeSetting("RoamerScaleChance", 100, 1, 100, 1, "Roamer Scale Chance");
     roamerScaleChance.setDescription("Determines the percentage chance for hostile roaming and ambusher parties spawning from lairs to scale in strength with respect to the originating lair's resource count. Does not affect beasts.")
 
-    local reinforceCaravans = pageGeneral.addBooleanSetting("ReinforceCaravans", true, "Reinforce Caravans");
+    local reinforceCaravans = pageGeneral.addRangeSetting("ReinforceCaravans", 100, 1, 100, 1, "Reinforce Caravans");
     reinforceCaravans.setDescription("Determines whether caravan troop count will be reinforced based on caravan wealth, and in special cases, cargo type. If certain conditions obtain, this will result in the addition of special troops with powerful end-game gear to wealthy caravans, independent of player progression.");
 
     local roamerResourceModifier = pageGeneral.addRangeSetting("RoamerResourceModifier", 40, 10, 100, 10, "Roamer Resource Modifier"); // FIXME: Floating number display bug
