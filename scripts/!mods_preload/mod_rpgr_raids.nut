@@ -28,7 +28,7 @@
     {
         AssignmentMaximumIterations = 7,
         CaravanNamedItemChance = 50, // FIXME: this is inflated, revert to 5
-        CaravanReinforcementThresholdDays = 0, // FIXME: this is deflated, revert to 50
+        CaravanReinforcementThresholdDays = 1, // FIXME: this is deflated, revert to 50
         GlobalProximityTiles = 9
         NamedItemChanceOnSpawn = 30,
         ReinforcementMaximumIterations = 15
