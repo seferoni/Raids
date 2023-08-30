@@ -46,7 +46,7 @@
 
         local lair = lairs[0];
 
-        if (lair.getFlags().get("Agitation") == ::RPGR_Raids.AgitationDescriptors.Relaxed)
+        if (::RPGR_Raids.Mod.ModSettings.getSetting("RoamerScaleAgitationRequirement").getValue() && lair.getFlags().get("Agitation") == ::RPGR_Raids.AgitationDescriptors.Relaxed)
         {
             return party;
         }
