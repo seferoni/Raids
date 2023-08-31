@@ -65,8 +65,15 @@
         }
 
         local resourceDifference = (::RPGR_Raids.Mod.ModSettings.getSetting("RoamerResourceModifier").getValue() / 100.0) * (lairResources - _resources);
+
+        if ((resourceDifference / _resources) * 100 >= ::RPGR_Raids.CampaignModifiers.PartyReinforcementThresholdPercentage)
+        {
+            party.setName("Mighty " + _name);
+            party.getFlags().set("IsMighty", true);
+        }
+
         ::RPGR_Raids.logWrapper("Party with name " + _name + " and troop count " + party.getTroops().len() + " is eligible for reinforcement.");
-        ::RPGR_Raids.assignTroops(party, _template, resourceDifference); // TODO: test resource calc
+        ::RPGR_Raids.assignTroops(party, _template, resourceDifference);
         ::RPGR_Raids.logWrapper("Party with name " + _name + " and new troop count " + party.getTroops().len() + " has been reinforced with resource count " + resourceDifference + ".");
         return party;
     }

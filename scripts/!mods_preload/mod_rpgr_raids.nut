@@ -31,6 +31,7 @@
         CaravanReinforcementThresholdDays = 1, // FIXME: this is deflated, revert to 50
         GlobalProximityTiles = 9
         NamedItemChanceOnSpawn = 30,
+        PartyReinforcementThresholdPercentage = 50.0,
         ReinforcementMaximumIterations = 15
     },
     Procedures =
@@ -39,12 +40,6 @@
         Decrement = 2,
         Reset = 3
     },
-    ReinforcementDescriptors =
-    {
-        Reinforced = 30.0,
-        Mighty = 60.0,
-        Mythical = 90.0
-    }
 
     function addToCaravanInventory( _caravan, _goodsPool )
     {
@@ -209,7 +204,7 @@
             }
         }
 
-        local culledString = "scripts/items/"
+        local culledString = "scripts/items/";
         local goods = scriptFiles.map(function( stringPath )
         {
             return stringPath.slice(culledString.len());
