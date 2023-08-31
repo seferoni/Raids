@@ -53,16 +53,22 @@
         }
     }
 
-    function agitateViableLairs( _lairs )
+    function agitateViableLairs( _lairs, _iterations = 1 )
     {
-        foreach( lair in _lairs )
+        local viableLairs = _lairs.filter(function( lairIndex, lair )
         {
-            if (!this.isActiveContractLocation(lair))
+            return !this.isActiveContractLocation(lair);
+        });
+
+        for( local i = 0; i < _iterations; i++ )
+        {
+            foreach( lair in viableLairs )
             {
                 this.logWrapper("Found lair candidate.");
                 this.setLairAgitation(lair, this.Procedures.Increment);
             }
         }
+
     }
 
     function areCaravanFlagsInitialised( _flags )

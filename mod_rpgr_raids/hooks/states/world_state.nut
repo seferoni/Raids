@@ -52,7 +52,8 @@
             return vanilla_onCombatFinished;
         }
 
-        ::RPGR_Raids.agitateViableLairs(lairs);
+        local iterations = worldFlags.get("LastCombatMightyParty") == false ? 1 : 2;
+        ::RPGR_Raids.agitateViableLairs(lairs, iterations);
         return vanilla_onCombatFinished;
     }
 });

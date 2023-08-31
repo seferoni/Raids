@@ -2,6 +2,14 @@
 {
     local parentName = object.SuperName;
 
+    local oCS_nullCheck = "onCombatStarted" in object ? object.onCombatStarted : null;
+    object.onCombatStarted = function()
+    {
+        local vanilla_onCombatStarted = oCS_nullCheck == null ? this[parentName].onCombatStarted() : oCS_nullCheck();
+        ::World.Statistics.getFlags().set("LastCombatMightyParty", this.getFlags().get("IsMighty"));
+        return vanilla_onCombatStarted;
+    }
+    
     local oDLFP_nullCheck = "onDropLootForPlayer" in object ? object.onDropLootForPlayer : null;
     object.onDropLootForPlayer = function( _lootTable )
     {
