@@ -79,16 +79,7 @@
 
     function assignTroops( _party, _partyList, _resources )
     {
-        local partyTemplateCandidate = _partyList[::Math.rand(0, _partyList.len() - 1)];
-        local troopsTemplate = partyTemplateCandidate.Troops.filter(function( troopIndex, troop )
-        {
-            return troop.Type.Cost <= _resources;
-        });
-
-        if (troopsTemplate.len() == 0)
-        {
-            return;
-        }
+        local troopsTemplate = this.selectRandomPartyTemplate(_party, _partyList);
 
         foreach( troop in troopsTemplate )
         {
@@ -699,6 +690,30 @@
         //this.logWrapper("Added " + namedItem.getName() + " to the loot table.");
         this.logWrapper(format("Added %s to the loot table.", namedItem.getName()));
         _lootTable.push(namedItem);
+    }
+
+    function selectRandomPartyTemplate( _party, _partyList )
+    {
+        local troopsTemplate = [];
+        local bailOut = 0;
+        local maximumIterations = 10;
+
+        while (troopsTemplate.len() <= 1 && bailOut < maximumIterations)
+        {
+            local partyTemplateCandidate = _partyList[::Math.rand(0, _partyList.len() - 1)];
+            local troopsTemplate = partyTemplateCandidate.Troops.filter(function( troopIndex, troop )
+            {
+                return troop.Type.Cost <= _resources;
+            });
+            bailOut += 1;
+        }
+
+        if (bailOut == maximumIterations)
+        {
+            this.logWrapper(format("Exceeded maximum iterations for troop assignment for party %s.", _party.getName()));
+        }
+
+        return troopsTemplate;
     }
 
     function setLairAgitation( _lair, _procedure )
