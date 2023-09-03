@@ -21,11 +21,11 @@
 
         if (caravan == null)
         {
-            ::logInfo("[Raids] onExecute found no caravans near " + this.m.Start.getName() + ".");
+            ::RPGR_Raids.logWrapper(format("onExecute found no caravans near %s."), this.m.Start.getName(), true);
             return vanilla_onExecute;
         }
 
-        ::logInfo("Assigning caravan parameters.");
+        ::RPGR_Raids.logWrapper("Assigning caravan parameters.");
         ::RPGR_Raids.initialiseCaravanParameters(caravan, this.m.Start);
         return vanilla_onExecute;
     }

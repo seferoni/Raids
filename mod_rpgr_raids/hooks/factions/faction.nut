@@ -78,7 +78,7 @@
         if ((resourceDifference / _resources) * 100 >= ::RPGR_Raids.CampaignModifiers.PartyReinforcementThresholdPercentage)
         {
             ::RPGR_Raids.logWrapper(format("%s are eligible to be Mighty.", _name));
-            party.setName("Mighty " + _name);
+            party.setName(format("Mighty %s", _name));
             party.getFlags().set("IsMighty", true);
         }
 

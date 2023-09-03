@@ -7,7 +7,7 @@
     {
         local vanilla_onExecute = oE_nullCheck == null ? this[parentName].onExecute(_faction) : oE_nullCheck(_faction);
 
-        if (::RPGR_Raids.Mod.ModSettings.getSetting("HandleSupplyCaravans").getValue() == false)
+        if (!::RPGR_Raids.Mod.ModSettings.getSetting("HandleSupplyCaravans").getValue())
         {
             return vanilla_onExecute;
         }
@@ -27,7 +27,7 @@
 
         if (caravan == null)
         {
-            ::RPGR_Raids.logWrapper("onExecute found no caravans near " + this.m.Start.getName() + ".", true);
+            ::RPGR_Raids.logWrapper(format("onExecute found no caravans near %s.", this.m.Start.getName()), true);
             return vanilla_onExecute;
         }
 
