@@ -31,7 +31,6 @@
             }
             else if (!::RPGR_Raids.isLocationTypeEligible(entity.getLocationType()))
             {
-                //::RPGR_Raids.logWrapper(entity.getName() + " is not an eligible lair.")
                 ::RPGR_Raids.logWrapper(format("%s is not an eligible lair.", entity.getName()));
                 return false;
             }
@@ -41,7 +40,6 @@
 
         if (lairs.len() == 0)
         {
-            //::RPGR_Raids.logWrapper("No eligible lair in proximity of spawned party " + _name + ".");
             ::RPGR_Raids.logWrapper(format("No eligible lair in proximity of spawned party %s.", _name));
             return party;
         }
@@ -62,16 +60,13 @@
 
         if (lairResources <= _resources)
         {
-            //::RPGR_Raids.logWrapper("Lair resource count for " + lair.getName() + ", with " + lairResources + " resources, is insufficient compared to the initial value of " + _resources + ".");
             ::RPGR_Raids.logWrapper(format("Lair resource count for %s, with %g resources, is insufficient compared to the initial value of %g.", lair.getName(), lairResources, _resources));
             return party;
         }
 
         local resourceDifference = (::RPGR_Raids.Mod.ModSettings.getSetting("RoamerResourceModifier").getValue() / 100.0) * (lairResources - _resources);
-        //::RPGR_Raids.logWrapper(_name + " with troop count " + party.getTroops().len() + " is eligible for reinforcement.");
         ::RPGR_Raids.logWrapper(format("%s with troop count %i is eligible for reinforcement.", _name, party.getTroops().len()));
         ::RPGR_Raids.assignTroops(party, _template, resourceDifference);
-        //::RPGR_Raids.logWrapper(_name + " with new troop count " + party.getTroops().len() + " has been reinforced with resource count " + resourceDifference + ".");
         ::RPGR_Raids.logWrapper(format("%s with new troop count %i has been reinforced with resource count %g.", _name, party.getTroops().len(), resourceDifference));
 
 

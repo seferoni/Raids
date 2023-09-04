@@ -45,10 +45,9 @@
     {
         local iterations = ::Math.rand(1, _caravan.getFlags().get("CaravanWealth") - 1);
 
-        for( local i = 0; i != iterations; i = ++i )
+        for( local i = 0; i < iterations; i++ )
         {
             local good = _goodsPool[::Math.rand(0, _goodsPool.len() - 1)];
-            //this.logWrapper("Added item with filepath " + good + " to caravan inventory.");
             this.logWrapper(format("Added item with filepath %s to caravan inventory.", good));
             _caravan.addToInventory(good);
         }
@@ -69,7 +68,6 @@
                 this.setLairAgitation(lair, this.Procedures.Increment);
             }
         }
-
     }
 
     function areCaravanFlagsInitialised( _flags )
@@ -145,7 +143,6 @@
 
         if (actualProduce.len() == 0)
         {
-            //this.logWrapper(_settlement.getName() + " has no produce corresponding to caravan cargo type.");
             this.logWrapper(format("%s has no produce corresponding to caravan cargo type.", _settlement.getName()));
             local newCargoType = ::Math.rand(1, 100) <= 50 ? this.CaravanCargoDescriptors.Assortment : this.CaravanCargoDescriptors.Unassorted;
             flags.set("CaravanCargo", newCargoType);
@@ -351,7 +348,6 @@
         {
             local index = items.find(item);
             items.remove(index);
-            //this.logWrapper("Removed " + item.getName() + " at index " + index + ".");
             this.logWrapper(format("Removed %s at index %i.", item.getName(), index));
         }
     }
@@ -431,7 +427,7 @@
     {
         if (_isError)
         {
-            ::logError("[Raids] " + _string);
+            ::logError(format("[Raids] %s", _string));
             return;
         }
 
@@ -440,7 +436,7 @@
             return;
         }
 
-        ::logInfo("[Raids] " + _string);
+        ::logInfo(format("[Raids] %s", _string));
     }
 
     function initialiseCaravanParameters( _caravan, _settlement )
@@ -463,8 +459,10 @@
         }
 
         local randomNumber = ::Math.rand(1, 100);
+        local cargoType = (randomNumber <= distributions.Assortment || _settlement.getProduce().len() == 0) ? "Assortment" : randomNumber <= distributions.Supplies ? "Supplies" : "Trade";
+        flags.set("CaravanCargo", this.CaravanCargoDescriptors[cargoType]);
 
-        if (randomNumber <= distributions.Assortment || _settlement.getProduce().len() == 0)
+        /*if (randomNumber <= distributions.Assortment || _settlement.getProduce().len() == 0)
         {
             flags.set("CaravanCargo", this.CaravanCargoDescriptors.Assortment);
         }
@@ -475,10 +473,9 @@
         else
         {
             flags.set("CaravanCargo", this.CaravanCargoDescriptors.Trade);
-        }
+        }*/
 
-        //this.logWrapper("Rolled " + randomNumber + " for caravan cargo assignment for caravan from " + _settlement.getName() + " of the newly assigned cargo type " + this.getDescriptor(flags.get("CaravanCargo"), this.CaravanCargoDescriptors) + ".");
-        this.logWrapper(format("Rolled %i for caravan cargo assignment for caravan from %s of the newly assigned cargo type %s.", randomNumber, _settlement.getName(), this.getDescriptor(flags.get("CaravanCargoType", this.CaravanCargoDescriptors))));
+        this.logWrapper(format("Rolled %i for caravan cargo assignment for caravan from %s of the newly assigned cargo type %s.", randomNumber, _settlement.getName(), this.getDescriptor(flags.get("CaravanCargo"), this.CaravanCargoDescriptors)));
         this.populateCaravanInventory(_caravan, _settlement);
 
         if (::Math.rand(1, 100) <= this.Mod.ModSettings.getSetting("CaravanReinforcementChance").getValue() || flags.get("CaravanWealth") >= this.CaravanWealthDescriptors.Plentiful)
@@ -527,26 +524,22 @@
 
         if (agitationState > this.AgitationDescriptors.Desperate || agitationState < this.AgitationDescriptors.Relaxed)
         {
-            //this.logWrapper("Agitation for " + lairName + " occupies an out-of-bounds value.", true);
             this.logWrapper(format("Agitation for %s occupies an out-of-bounds value.", lairName), true);
             return false;
         }
 
         if (_procedure == this.Procedures.Increment && agitationState >= this.AgitationDescriptors.Desperate)
         {
-            //this.logWrapper("Agitation for " + lairName + " is capped, aborting procedure.");
             this.logWrapper(format("Agitation for %s is capped, aborting procedure.", lairName));
             return false;
         }
 
         if (_procedure == this.Procedures.Decrement && agitationState <= this.AgitationDescriptors.Relaxed)
         {
-            //this.logWrapper("Agitation for " + lairName + " is already at its minimum value, aborting procedure.");
             this.logWrapper(format("Agitation for %s is already at its minimum value, aborting procedure.", lairName));
             return false;
         }
 
-        //this.logWrapper("Lair " + lairName + " is eligible for agitation state change procedures.");
         this.logWrapper(format("Lair %s is eligible for agitation state change procedures.", lairName));
         return true;
     }
@@ -572,7 +565,6 @@
 
         if (activeContract.m.Destination.get() == _lair)
         {
-            //this.logWrapper(_lair.getName() + " was found to be an active contract location, aborting.");
             this.logWrapper(format("%s was found to be an active contract location, aborting.", lair.getName()));
             return true;
         }
@@ -641,7 +633,6 @@
     function repopulateLairNamedLoot( _lair )
     {
         local namedLootChance = this.getNamedLootChance(_lair);
-        //this.logWrapper("namedLootChance is " + namedLootChance + " for lair " + _lair.getName() + ".");
         this.logWrapper(format("namedLootChance is %g for lair %s.", namedLootChance, _lair.getName()));
 
         if (::Math.rand(1, 100) > namedLootChance)
@@ -687,7 +678,6 @@
         local namedCargo = this.createNamedLoot();
         local namedItem = ::new("scripts/items/" + namedCargo[::Math.rand(0, namedCargo.len() - 1)]);
         namedItem.onAddedToStash(null);
-        //this.logWrapper("Added " + namedItem.getName() + " to the loot table.");
         this.logWrapper(format("Added %s to the loot table.", namedItem.getName()));
         _lootTable.push(namedItem);
     }
@@ -754,7 +744,7 @@
     }
 
     function updateCumulativeLairAgitation( _lair )
-    {   // TODO: test this
+    {
         local flags = _lair.getFlags();
         local lastUpdateTimeDays = flags.get("LastAgitationUpdate");
 
@@ -772,7 +762,6 @@
             return;
         }
 
-        //this.logWrapper("Last agitation update occurred " + timeDifference + " days ago.");
         this.logWrapper(format("Last agitation update occurred %i days ago.", timeDifference));
         local decrementIterations = ::Math.floor(timeDifference / decayInterval);
 
