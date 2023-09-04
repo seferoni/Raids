@@ -21,7 +21,7 @@
 
         if (caravan == null)
         {
-            ::RPGR_Raids.logWrapper(format("onExecute found no caravans near %s."), this.m.Start.getName(), true);
+            ::RPGR_Raids.logWrapper(format("onExecute found no caravans near %s.", this.m.Start.getName()), true);
             return vanilla_onExecute;
         }
 

@@ -528,7 +528,7 @@
         if (agitationState > this.AgitationDescriptors.Desperate || agitationState < this.AgitationDescriptors.Relaxed)
         {
             //this.logWrapper("Agitation for " + lairName + " occupies an out-of-bounds value.", true);
-            this.logWrapper(format("Agitation for %s occupies an out-of-bounds value., lairName"), true);
+            this.logWrapper(format("Agitation for %s occupies an out-of-bounds value.", lairName), true);
             return false;
         }
 
@@ -641,8 +641,8 @@
     function repopulateLairNamedLoot( _lair )
     {
         local namedLootChance = this.getNamedLootChance(_lair);
-        this.logWrapper("namedLootChance is " + namedLootChance + " for lair " + _lair.getName() + ".");
-        this.logWrapper(format("namedLootChance is %f for lair %s.", namedLootChance, _lair.getName()));
+        //this.logWrapper("namedLootChance is " + namedLootChance + " for lair " + _lair.getName() + ".");
+        this.logWrapper(format("namedLootChance is %g for lair %s.", namedLootChance, _lair.getName()));
 
         if (::Math.rand(1, 100) > namedLootChance)
         {
