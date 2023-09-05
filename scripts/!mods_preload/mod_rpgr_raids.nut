@@ -77,7 +77,7 @@
 
     function assignTroops( _party, _partyList, _resources )
     {
-        local troopsTemplate = this.selectRandomPartyTemplate(_party, _partyList);
+        local troopsTemplate = this.selectRandomPartyTemplate(_party, _partyList, _resources);
 
         foreach( troop in troopsTemplate )
         {
@@ -607,7 +607,8 @@
 
         local currentTimeDays = ::World.getTime().Days;
         local timeModifier = ::Math.floor(currentTimeDays / this.CampaignModifiers.CaravanReinforcementThresholdDays);
-        local iterations = ::Math.rand(1, wealth * 2) + timeModifier > this.CampaignModifiers.ReinforcementMaximumIterations ? this.CampaignModifiers.ReinforcementMaximumIterations : ::Math.rand(1, wealth * 2) + timeModifier;
+        local naiveIterations = ::Math.rand(1, wealth * 2) + timeModifier;
+        local iterations = naiveIterations > this.CampaignModifiers.ReinforcementMaximumIterations ? this.CampaignModifiers.ReinforcementMaximumIterations : naiveIterations;
         local factionType = ::World.FactionManager.getFaction(_caravan.getFaction()).getType();
         local mundaneTroops = this.createCaravanTroops(wealth, factionType);
 
@@ -641,7 +642,7 @@
         }
 
         local namedLoot = this.createNamedLoot(_lair);
-        _lair.m.Loot.add(::new("scripts/items/" + namedLoot[::Math.rand(0, namedLoot.len() - 1)]));
+        _lair.getLoot().add(::new("scripts/items/" + namedLoot[::Math.rand(0, namedLoot.len() - 1)]));
     }
 
     function retrieveCaravanCargoIconPath( _cargoValue )
@@ -682,7 +683,7 @@
         _lootTable.push(namedItem);
     }
 
-    function selectRandomPartyTemplate( _party, _partyList )
+    function selectRandomPartyTemplate( _party, _partyList, _resources )
     {
         local troopsTemplate = [];
         local bailOut = 0;
@@ -691,10 +692,10 @@
         while (troopsTemplate.len() <= 1 && bailOut < maximumIterations)
         {
             local partyTemplateCandidate = _partyList[::Math.rand(0, _partyList.len() - 1)];
-            local troopsTemplate = partyTemplateCandidate.Troops.filter(function( troopIndex, troop )
+            troopsTemplate.extend(partyTemplateCandidate.Troops.filter(function( troopIndex, troop )
             {
                 return troop.Type.Cost <= _resources;
-            });
+            }));
             bailOut += 1;
         }
 
@@ -798,7 +799,7 @@
     local roamerScaleChance = pageLairs.addRangeSetting("RoamerScaleChance", 100, 1, 100, 1, "Roamer Scale Chance");
     roamerScaleChance.setDescription("Determines the percentage chance for hostile roaming and ambusher parties spawning from lairs to scale in strength with respect to the originating lair's resource count. Does not affect beasts.");
 
-    local roamerResourceModifier = pageLairs.addRangeSetting("RoamerResourceModifier", 40, 10, 100, 10, "Roamer Resource Modifier"); // FIXME: Floating number display bug
+    local roamerResourceModifier = pageLairs.addRangeSetting("RoamerResourceModifier", 70, 70, 100, 10, "Roamer Resource Modifier"); // FIXME: Floating number display bug
     roamerResourceModifier.setDescription("Controls how resource calculation is handled for roaming parties. Higher percentage values result in greater resources, and therefore more powerful roaming troops. Does nothing if roamer scale chance is set to zero.");
 
     local depopulateLairLootOnSpawn = pageLairs.addBooleanSetting("DepopulateLairLootOnSpawn", false, "Depopulate Lair Loot On Spawn");
