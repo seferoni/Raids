@@ -75,7 +75,7 @@
         return _flags.get("CaravanWealth") != false && _flags.get("CaravanCargo") != false;
     }
 
-    function assignTroops( _party, _partyList, _resources )
+    function assignTroops( _party, _partyList, _resources ) // TODO: revise
     {
         local troopsTemplate = this.selectRandomPartyTemplate(_party, _partyList, _resources);
 
@@ -689,7 +689,7 @@
         local bailOut = 0;
         local maximumIterations = 10;
 
-        while (troopsTemplate.len() <= 1 && bailOut < maximumIterations)
+        while (troopsTemplate.len() < 1 && bailOut < maximumIterations)
         {
             local partyTemplateCandidate = _partyList[::Math.rand(0, _partyList.len() - 1)];
             troopsTemplate.extend(partyTemplateCandidate.Troops.filter(function( troopIndex, troop )
@@ -703,6 +703,21 @@
         {
             this.logWrapper(format("Exceeded maximum iterations for troop assignment for party %s.", _party.getName()));
         }
+
+        if (troopsTemplate.len() <= 1)
+        {
+            return troopsTemplate;
+        }
+
+        troopsTemplate.sort(function( _firstTroop, _secondTroop )
+        {
+            if (_firstTroop.Type.Cost > _secondTroop.Type.Cost)
+            {
+                return -1;
+            }
+
+            return 1;
+        });
 
         return troopsTemplate;
     }
