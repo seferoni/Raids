@@ -13,7 +13,7 @@
         {
             local flags = entity.getFlags();
 
-            if (::RPGR_Raids.isPartyEligible(flags) && !::RPGR_Raids.areCaravanFlagsInitialised(flags))
+            if (::RPGR_Raids.isPartyViable(flags) && !::RPGR_Raids.areCaravanFlagsInitialised(flags))
             {
                 caravan = entity;
             }

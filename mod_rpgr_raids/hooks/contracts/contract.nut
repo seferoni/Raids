@@ -17,7 +17,7 @@
             return vanilla_start;
         }
 
-        if (::RPGR_Raids.isLocationTypeEligible(destination.getLocationType()))
+        if (::RPGR_Raids.isLocationTypeViable(destination.getLocationType()))
         {
             ::RPGR_Raids.logWrapper(format("%s has been set as contract destination, performing agitation reset procedure.", destination.getName()));
             ::RPGR_Raids.setLairAgitation(destination, ::RPGR_Raids.Procedures.Reset);

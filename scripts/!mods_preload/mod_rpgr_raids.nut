@@ -26,13 +26,14 @@
     },
     CampaignModifiers =
     {
-        AssignmentMaximumIterations = 7,
+        AssignmentMaximumTroopOffset = 7,
+        AssignmentResourceThreshold = 6,
+        AssignmentResourceThresholdPercentage = 50.0,
         CaravanNamedItemChance = 50, // FIXME: this is inflated, revert to 5
-        CaravanReinforcementThresholdDays = 1, // FIXME: this is deflated, revert to 50
-        GlobalProximityTiles = 9
-        NamedItemChanceOnSpawn = 30,
-        PartyReinforcementThresholdPercentage = 50.0,
-        ReinforcementMaximumIterations = 15
+        GlobalProximityTiles = 9,
+        LairNamedItemChance = 30,
+        ReinforcementMaximumTroopOffset = 7, // TODO: balance this
+        ReinforcementThresholdDays = 1 // FIXME: this is deflated, revert to 50
     },
     Procedures =
     {
@@ -75,23 +76,30 @@
         return _flags.get("CaravanWealth") != false && _flags.get("CaravanCargo") != false;
     }
 
-    function assignTroops( _party, _partyList, _resources ) // TODO: revise
+    function assignTroops( _party, _partyList, _resources )
     {
         local troopsTemplate = this.selectRandomPartyTemplate(_party, _partyList, _resources);
 
-        foreach( troop in troopsTemplate )
+        if (troopsTemplate.len() == 0)
         {
-            local bailOut = 0;
+            return false;
+        }
 
-            while (_resources >= 0 && bailOut < this.CampaignModifiers.AssignmentMaximumIterations)
+        local bailOut = 0;
+
+        while (_resources >= 0 && bailOut < this.CampaignModifiers.AssignmentMaximumTroopOffset)
+        {
+            foreach( troop in troopsTemplate )
             {
                 ::Const.World.Common.addTroop(_party, troop, false);
                 _resources -= troop.Type.Cost;
-                bailOut += 1;
             }
+
+            bailOut += troopsTemplate.len();
         }
 
         _party.updateStrength();
+        return true;
     }
 
     function calculateSettlementSituationModifier( _settlement )
@@ -112,7 +120,7 @@
             "situation.raided"
         ];
 
-        foreach( situation in synergisticSituations )
+        foreach( situation in synergisticSituations ) // TODO: this is not efficient
         {
             if (_settlement.getSituationByID(situation) != null)
             {
@@ -230,7 +238,7 @@
                 ::Const.World.Spawn.Troops.MercenaryLOW,
             ]);
 
-            if (::World.getTime().Days >= this.CampaignModifiers.CaravanReinforcementThresholdDays)
+            if (::World.getTime().Days >= this.CampaignModifiers.ReinforcementThresholdDays)
             {
                 troops.extend([
                     ::Const.World.Spawn.Troops.Mercenary,
@@ -369,7 +377,7 @@
         this.logWrapper("Proceeding to lair candidate selection.");
         local lairs = _faction.getSettlements().filter(function( locationIndex, location )
         {
-            return ::RPGR_Raids.isLocationTypeEligible(location.getLocationType()) && ::RPGR_Raids.isPlayerInProximityTo(location.getTile());
+            return ::RPGR_Raids.isLocationTypeViable(location.getLocationType()) && ::RPGR_Raids.isPlayerInProximityTo(location.getTile());
         });
 
         if (lairs.len() == 0)
@@ -453,7 +461,7 @@
         };
         flags.set("CaravanWealth", ::Math.min(this.CaravanWealthDescriptors.Abundant, ::Math.rand(1, 2) + typeModifier + sizeModifier + situationModifier));
 
-        if (::Math.rand(1, 100) <= this.CampaignModifiers.CaravanNamedItemChance && flags.get("CaravanWealth") == this.CaravanWealthDescriptors.Abundant && ::World.getTime().Days >= this.CampaignModifiers.CaravanReinforcementThresholdDays)
+        if (::Math.rand(1, 100) <= this.CampaignModifiers.CaravanNamedItemChance && flags.get("CaravanWealth") == this.CaravanWealthDescriptors.Abundant && ::World.getTime().Days >= this.CampaignModifiers.ReinforcementThresholdDays)
         {
             flags.set("CaravanHasNamedItems", true);
         }
@@ -461,20 +469,6 @@
         local randomNumber = ::Math.rand(1, 100);
         local cargoType = (randomNumber <= distributions.Assortment || _settlement.getProduce().len() == 0) ? "Assortment" : randomNumber <= distributions.Supplies ? "Supplies" : "Trade";
         flags.set("CaravanCargo", this.CaravanCargoDescriptors[cargoType]);
-
-        /*if (randomNumber <= distributions.Assortment || _settlement.getProduce().len() == 0)
-        {
-            flags.set("CaravanCargo", this.CaravanCargoDescriptors.Assortment);
-        }
-        else if (randomNumber <= distributions.Supplies)
-        {
-            flags.set("CaravanCargo", this.CaravanCargoDescriptors.Supplies);
-        }
-        else
-        {
-            flags.set("CaravanCargo", this.CaravanCargoDescriptors.Trade);
-        }*/
-
         this.logWrapper(format("Rolled %i for caravan cargo assignment for caravan from %s of the newly assigned cargo type %s.", randomNumber, _settlement.getName(), this.getDescriptor(flags.get("CaravanCargo"), this.CaravanCargoDescriptors)));
         this.populateCaravanInventory(_caravan, _settlement);
 
@@ -482,6 +476,29 @@
         {
             this.reinforceCaravanTroops(_caravan, _settlement);
         }
+    }
+
+    function isActiveContractLocation( _lair )
+    {
+        local activeContract = ::World.Contracts.getActiveContract();
+
+        if (activeContract == null)
+        {
+            return false;
+        }
+
+        if (!("Destination" in activeContract.m))
+        {
+            return false;
+        }
+
+        if (activeContract.m.Destination.get() == _lair)
+        {
+            this.logWrapper(format("%s was found to be an active contract location, aborting.", lair.getName()));
+            return true;
+        }
+
+        return false;
     }
 
     function isFactionViable( _faction )
@@ -512,7 +529,7 @@
         return true;
     }
 
-    function isLocationTypeEligible( _locationType )
+    function isLocationTypeViable( _locationType )
     {
         return _locationType == ::Const.World.LocationType.Lair || _locationType == (::Const.World.LocationType.Lair | ::Const.World.LocationType.Mobile);
     }
@@ -544,37 +561,34 @@
         return true;
     }
 
-    function isPartyEligible( _flags )
+    function isPartyViable( _flags )
     {
         return _flags.get("IsCaravan");
-    }
-
-    function isActiveContractLocation( _lair )
-    {
-        local activeContract = ::World.Contracts.getActiveContract();
-
-        if (activeContract == null)
-        {
-            return false;
-        }
-
-        if (!("Destination" in activeContract.m))
-        {
-            return false;
-        }
-
-        if (activeContract.m.Destination.get() == _lair)
-        {
-            this.logWrapper(format("%s was found to be an active contract location, aborting.", lair.getName()));
-            return true;
-        }
-
-        return false;
     }
 
     function isPlayerInProximityTo( _targetTile )
     {
         return ::World.State.getPlayer().getTile().getDistanceTo(_targetTile) <= this.CampaignModifiers.GlobalProximityTiles;
+    }
+
+    function isTroopViable( _troop )
+    {
+        local exclusionList =
+        [
+            ::Const.World.Spawn.Troops.BarbarianBeastmaster,
+            ::Const.World.Spawn.Troops.BarbarianUnhold,
+            ::Const.World.Spawn.Troops.Warhound
+        ]
+
+        foreach( excludedTroop in exclusionList )
+        {
+            if (_troop.Type == excludedTroop)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     function populateCaravanInventory( _caravan, _settlement )
@@ -606,9 +620,9 @@
         }
 
         local currentTimeDays = ::World.getTime().Days;
-        local timeModifier = ::Math.floor(currentTimeDays / this.CampaignModifiers.CaravanReinforcementThresholdDays);
+        local timeModifier = ::Math.floor(currentTimeDays / this.CampaignModifiers.ReinforcementThresholdDays);
         local naiveIterations = ::Math.rand(1, wealth * 2) + timeModifier;
-        local iterations = naiveIterations > this.CampaignModifiers.ReinforcementMaximumIterations ? this.CampaignModifiers.ReinforcementMaximumIterations : naiveIterations;
+        local iterations = naiveIterations > this.CampaignModifiers.ReinforcementMaximumTroopOffset ? this.CampaignModifiers.ReinforcementMaximumTroopOffset : naiveIterations;
         local factionType = ::World.FactionManager.getFaction(_caravan.getFaction()).getType();
         local mundaneTroops = this.createCaravanTroops(wealth, factionType);
 
@@ -622,7 +636,7 @@
             return;
         }
 
-        if (currentTimeDays < this.CampaignModifiers.CaravanReinforcementThresholdDays)
+        if (currentTimeDays < this.CampaignModifiers.ReinforcementThresholdDays)
         {
             return;
         }
@@ -694,7 +708,7 @@
             local partyTemplateCandidate = _partyList[::Math.rand(0, _partyList.len() - 1)];
             troopsTemplate.extend(partyTemplateCandidate.Troops.filter(function( troopIndex, troop )
             {
-                return troop.Type.Cost <= _resources;
+                return troop.Type.Cost <= _resources && ::RPGR_Raids.isTroopViable(troop);
             }));
             bailOut += 1;
         }

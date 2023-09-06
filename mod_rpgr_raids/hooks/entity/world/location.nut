@@ -7,7 +7,7 @@
     {
         local vanilla_onSpawned = oS_nullCheck == null ? this[parentName].onSpawned() : oS_nullCheck();
 
-        if (!::RPGR_Raids.isLocationTypeEligible(this.getLocationType()))
+        if (!::RPGR_Raids.isLocationTypeViable(this.getLocationType()))
         {
             return vanilla_onSpawned;
         }
@@ -18,7 +18,7 @@
 
         if (::RPGR_Raids.Mod.ModSettings.getSetting("DepopulateLairLootOnSpawn").getValue())
         {
-            ::RPGR_Raids.depopulateLairNamedLoot(this, ::RPGR_Raids.CampaignModifiers.NamedItemChanceOnSpawn);
+            ::RPGR_Raids.depopulateLairNamedLoot(this, ::RPGR_Raids.CampaignModifiers.LairNamedItemChance);
         }
 
         return vanilla_onSpawned;
@@ -29,7 +29,7 @@
     {
         local tooltipArray = gT_nullCheck == null ? this[parentName].getTooltip() : gT_nullCheck();
 
-        if (!::RPGR_Raids.isLocationTypeEligible(this.getLocationType()))
+        if (!::RPGR_Raids.isLocationTypeViable(this.getLocationType()))
         {
             return tooltipArray;
         }

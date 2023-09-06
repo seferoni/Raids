@@ -29,7 +29,7 @@
             {
                 return false;
             }
-            else if (!::RPGR_Raids.isLocationTypeEligible(entity.getLocationType()))
+            else if (!::RPGR_Raids.isLocationTypeViable(entity.getLocationType()))
             {
                 ::RPGR_Raids.logWrapper(format("%s is not an eligible lair.", entity.getName()));
                 return false;
@@ -57,24 +57,23 @@
         }
 
         local lairResources = lair.getResources();
+        local resourceDifference = (::RPGR_Raids.Mod.ModSettings.getSetting("RoamerResourceModifier").getValue() / 100.0) * (lairResources - _resources);
 
-        if (lairResources <= _resources)
+        if (lairResources - _resources <= ::RPGR_Raids.CampaignModifiers.AssignmentResourceThreshold)
         {
-            ::RPGR_Raids.logWrapper(format("Lair resource count for %s, with %g resources, is insufficient compared to the initial value of %g.", lair.getName(), lairResources, _resources));
+            ::RPGR_Raids.logWrapper(format("Lair resource count for %s with %g resources is insufficient compared to the initial value of %g.", lair.getName(), lairResources, _resources));
             return party;
         }
 
-        local resourceDifference = (::RPGR_Raids.Mod.ModSettings.getSetting("RoamerResourceModifier").getValue() / 100.0) * (lairResources - _resources);
         ::RPGR_Raids.logWrapper(format("%s with troop count %i is eligible for reinforcement.", _name, party.getTroops().len()));
-        ::RPGR_Raids.assignTroops(party, _template, resourceDifference);
+        local isReinforced = ::RPGR_Raids.assignTroops(party, _template, resourceDifference);
         ::RPGR_Raids.logWrapper(format("%s with new troop count %i has been reinforced with resource count %g.", _name, party.getTroops().len(), resourceDifference));
 
-
-        if ((resourceDifference / _resources) * 100 >= ::RPGR_Raids.CampaignModifiers.PartyReinforcementThresholdPercentage)
+        if (isReinforced && (resourceDifference / _resources) * 100 >= ::RPGR_Raids.CampaignModifiers.AssignmentResourceThresholdPercentage)
         {
-            ::RPGR_Raids.logWrapper(format("%s are eligible to be Mighty.", _name));
-            party.setName(format("Mighty %s", _name));
-            party.getFlags().set("IsMighty", true);
+            ::RPGR_Raids.logWrapper(format("%s are eligible for Vanguard status.", _name));
+            party.setName(format("Vanguard %s", _name));
+            party.getFlags().set("IsVanguard", true);
         }
 
         return party;

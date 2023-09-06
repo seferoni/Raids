@@ -12,7 +12,7 @@
             return vanilla_onCombatStarted;
         }
 
-        ::World.Statistics.getFlags().set("LastCombatMightyParty", this.getFlags().get("IsMighty"));
+        ::World.Statistics.getFlags().set("LastCombatVanguardParty", this.getFlags().get("IsVanguard"));
         return vanilla_onCombatStarted;
     }
 
@@ -22,7 +22,7 @@
         local vanilla_onDropLootForPlayer = oDLFP_nullCheck == null ? this[parentName].onDropLootForPlayer : oDLFP_nullCheck;
         local flags = this.getFlags();
 
-        if (!::RPGR_Raids.isPartyEligible(flags))
+        if (!::RPGR_Raids.isPartyViable(flags))
         {
             return vanilla_onDropLootForPlayer(_lootTable);
         }
@@ -47,7 +47,7 @@
         local tooltipArray = gT_nullCheck == null ? this[parentName].getTooltip() : gT_nullCheck();
         local flags = this.getFlags();
 
-        if (!::RPGR_Raids.isPartyEligible(flags))
+        if (!::RPGR_Raids.isPartyViable(flags))
         {
             return tooltipArray;
         }

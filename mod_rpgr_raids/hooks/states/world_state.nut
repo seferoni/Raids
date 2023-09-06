@@ -52,7 +52,7 @@
             return vanilla_onCombatFinished;
         }
 
-        local iterations = worldFlags.get("LastCombatMightyParty") == false ? 1 : 2;
+        local iterations = worldFlags.get("LastCombatVanguardParty") == false ? 1 : 2;
         ::RPGR_Raids.agitateViableLairs(lairs, iterations);
         return vanilla_onCombatFinished;
     }
