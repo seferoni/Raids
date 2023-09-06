@@ -85,7 +85,12 @@
             return false;
         }
 
-        local bailOut = 0;
+        for( local i = 0; i < iterations; i++ )
+        {
+            ::Const.World.Common.addTroop(_party, troopsTemplate[index], false);
+        }
+
+        /*local bailOut = 0;
 
         while (_resources >= 0 && bailOut < this.CampaignModifiers.AssignmentMaximumTroopOffset)
         {
@@ -96,7 +101,7 @@
             }
 
             bailOut += troopsTemplate.len();
-        }
+        }*/
 
         _party.updateStrength();
         return true;
@@ -418,7 +423,7 @@
         local nearestSettlementDistance = 9000;
 		local lairTile = _lair.getTile();
 
-		foreach( settlement in ::World.EntityManager.getSettlements() )
+		foreach( settlement in ::World.EntityManager.getSettlements() ) // TODO: find a more efficient way of doing this
 		{
 			local distance = lairTile.getDistanceTo(settlement.getTile());
 
@@ -702,13 +707,25 @@
         local troopsTemplate = [];
         local bailOut = 0;
         local maximumIterations = 10;
+        local currentResources = _resources;
 
-        while (troopsTemplate.len() < 1 && bailOut < maximumIterations)
+        while (currentResources > 0.0 && bailOut < maximumIterations) // FIXME: this is dumb.
         {
             local partyTemplateCandidate = _partyList[::Math.rand(0, _partyList.len() - 1)];
             troopsTemplate.extend(partyTemplateCandidate.Troops.filter(function( troopIndex, troop )
             {
-                return troop.Type.Cost <= _resources && ::RPGR_Raids.isTroopViable(troop);
+                if (!::RPGR_Raids.isTroopViable(troop))
+                {
+                    return false;
+                }
+
+                if (troop.Type.Cost > currentResources)
+                {
+                    return false;
+                }
+
+                currentResources -= troop.Type.Cost;
+                return true;
             }));
             bailOut += 1;
         }
@@ -822,13 +839,13 @@
     local agitationIncrementChance = pageLairs.addRangeSetting("AgitationIncrementChance", 100, 0, 100, 1, "Agitation Increment Chance"); // TODO: this should be default 50 when raids ship
     agitationIncrementChance.setDescription("Determines the chance for a location's agitation value to increase by one tier upon engagement with a roaming party, if within proximity.");
 
-    local agitationResourceModifier = pageLairs.addRangeSetting("AgitationResourceModifier", 70, 50, 100, 10, "Agitation Resource Modifier"); // FIXME: Floating number display bug
+    local agitationResourceModifier = pageLairs.addRangeSetting("AgitationResourceModifier", 70, 50, 100, 10, "Agitation Resource Modifier"); //
     agitationResourceModifier.setDescription("Controls how lair resource calculation is handled after each agitation tier change. Higher percentage values result in greater resources, and therefore more powerful garrisoned troops and better loot.");
 
     local roamerScaleChance = pageLairs.addRangeSetting("RoamerScaleChance", 100, 1, 100, 1, "Roamer Scale Chance");
     roamerScaleChance.setDescription("Determines the percentage chance for hostile roaming and ambusher parties spawning from lairs to scale in strength with respect to the originating lair's resource count. Does not affect beasts.");
 
-    local roamerResourceModifier = pageLairs.addRangeSetting("RoamerResourceModifier", 70, 70, 100, 10, "Roamer Resource Modifier"); // FIXME: Floating number display bug
+    local roamerResourceModifier = pageLairs.addRangeSetting("RoamerResourceModifier", 70, 70, 100, 10, "Roamer Resource Modifier"); //
     roamerResourceModifier.setDescription("Controls how resource calculation is handled for roaming parties. Higher percentage values result in greater resources, and therefore more powerful roaming troops. Does nothing if roamer scale chance is set to zero.");
 
     local depopulateLairLootOnSpawn = pageLairs.addBooleanSetting("DepopulateLairLootOnSpawn", false, "Depopulate Lair Loot On Spawn");
