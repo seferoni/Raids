@@ -20,6 +20,20 @@
             return vanilla_onCombatFinished;
         }
 
+        local faction = ::World.FactionManager.getFaction(worldFlags.get("LastCombatFaction"));
+
+        if (faction == null) // TODO: check if redundant
+        {
+            ::RPGR_Raids.logWrapper("Could not identify enemy faction, aborting lair agitation procedure.", true);
+            return vanilla_onCombatFinished;
+        }
+
+        if (!::RPGR_Raids.isFactionViable(faction))
+        {
+            ::RPGR_Raids.logWrapper("findLairCandidates took on a non-viable faction as an argument, aborting procedure.");
+            return vanilla_onCombatFinished;
+        }
+
         if (::World.getPlayerRoster().getSize() == 0 || !::World.Assets.getOrigin().onCombatFinished())
         {
             return vanilla_onCombatFinished;
@@ -34,14 +48,6 @@
         if (::Math.rand(1, 100) > ::RPGR_Raids.Mod.ModSettings.getSetting("AgitationIncrementChance").getValue())
         {
             ::RPGR_Raids.logWrapper("Dice roll result exceeds threshold for agitation increment chance, aborting lair agitation procedure.");
-            return vanilla_onCombatFinished;
-        }
-
-        local faction = ::World.FactionManager.getFaction(worldFlags.get("LastCombatFaction"));
-
-        if (faction == null)
-        {
-            ::RPGR_Raids.logWrapper("Could not identify enemy faction, aborting lair agitation procedure.", true);
             return vanilla_onCombatFinished;
         }
 

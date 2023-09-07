@@ -56,9 +56,9 @@
 
     function agitateViableLairs( _lairs, _iterations = 1 )
     {
-        local viableLairs = _lairs.filter(function( lairIndex, lair )
+        local viableLairs = _lairs.filter(function( _lairIndex, _lair )
         {
-            return !::RPGR_Raids.isActiveContractLocation(lair);
+            return !::RPGR_Raids.isActiveContractLocation(_lair);
         });
 
         for( local i = 0; i < _iterations; i++ )
@@ -85,14 +85,9 @@
             return false;
         }
 
-        for( local i = 0; i < iterations; i++ )
-        {
-            ::Const.World.Common.addTroop(_party, troopsTemplate[index], false);
-        }
+        local bailOut = 0;
 
-        /*local bailOut = 0;
-
-        while (_resources >= 0 && bailOut < this.CampaignModifiers.AssignmentMaximumTroopOffset)
+        while (_resources >= 0 && bailOut < this.CampaignModifiers.AssignmentMaximumTroopOffset) // TODO: refactor to reduce time complexity
         {
             foreach( troop in troopsTemplate )
             {
@@ -101,7 +96,7 @@
             }
 
             bailOut += troopsTemplate.len();
-        }*/
+        }
 
         _party.updateStrength();
         return true;
@@ -149,9 +144,9 @@
         local produce = _settlement.getProduce();
         local flags = _caravan.getFlags();
         local descriptor = this.getDescriptor(flags.get("CaravanCargo"), this.CaravanCargoDescriptors).tolower();
-        local actualProduce = produce.filter(function( index, value )
+        local actualProduce = produce.filter(function( _index, _value )
         {
-            return value.find(descriptor) != null;
+            return _value.find(descriptor) != null;
         });
 
         if (actualProduce.len() == 0)
@@ -367,12 +362,6 @@
 
     function findLairCandidates( _faction )
     {
-        if (!this.isFactionViable(_faction))
-        {
-            this.logWrapper("findLairCandidates took on a non-viable faction as an argument.");
-            return null;
-        }
-
         if (_faction.getSettlements().len() == 0)
         {
             this.logWrapper("findLairCandidates was passed a viable faction as an argument, but this faction has no settlements at present.");
@@ -380,9 +369,9 @@
         }
 
         this.logWrapper("Proceeding to lair candidate selection.");
-        local lairs = _faction.getSettlements().filter(function( locationIndex, location )
+        local lairs = _faction.getSettlements().filter(function( _locationIndex, _location )
         {
-            return ::RPGR_Raids.isLocationTypeViable(location.getLocationType()) && ::RPGR_Raids.isPlayerInProximityTo(location.getTile());
+            return ::RPGR_Raids.isLocationTypeViable(_location.getLocationType()) && ::RPGR_Raids.isPlayerInProximityTo(_location.getTile());
         });
 
         if (lairs.len() == 0)
@@ -707,25 +696,13 @@
         local troopsTemplate = [];
         local bailOut = 0;
         local maximumIterations = 10;
-        local currentResources = _resources;
 
-        while (currentResources > 0.0 && bailOut < maximumIterations) // FIXME: this is dumb.
+        while (troopsTemplate.len() < 1 && bailOut < maximumIterations)
         {
             local partyTemplateCandidate = _partyList[::Math.rand(0, _partyList.len() - 1)];
-            troopsTemplate.extend(partyTemplateCandidate.Troops.filter(function( troopIndex, troop )
+            troopsTemplate.extend(partyTemplateCandidate.Troops.filter(function( _troopIndex, _troop )
             {
-                if (!::RPGR_Raids.isTroopViable(troop))
-                {
-                    return false;
-                }
-
-                if (troop.Type.Cost > currentResources)
-                {
-                    return false;
-                }
-
-                currentResources -= troop.Type.Cost;
-                return true;
+                return _troop.Type.Cost <= _resources && ::RPGR_Raids.isTroopViable(_troop);
             }));
             bailOut += 1;
         }
