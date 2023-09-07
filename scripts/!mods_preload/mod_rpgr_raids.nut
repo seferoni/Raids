@@ -87,15 +87,12 @@
 
         local bailOut = 0;
 
-        while (_resources >= 0 && bailOut < this.CampaignModifiers.AssignmentMaximumTroopOffset) // TODO: refactor to reduce time complexity
+        while (_resources >= 0 && bailOut < this.CampaignModifiers.AssignmentMaximumTroopOffset)
         {
-            foreach( troop in troopsTemplate )
-            {
-                ::Const.World.Common.addTroop(_party, troop, false);
-                _resources -= troop.Type.Cost;
-            }
-
-            bailOut += troopsTemplate.len();
+            local troop = troopsTemplate[::Math.rand(0, troopsTemplate.len() - 1)];
+            ::Const.World.Common.addTroop(_party, troop, false);
+            _resources -= troop.Type.Cost;
+            bailOut += 1;
         }
 
         _party.updateStrength();
@@ -712,7 +709,7 @@
             this.logWrapper(format("Exceeded maximum iterations for troop assignment for party %s.", _party.getName()));
         }
 
-        if (troopsTemplate.len() <= 1)
+        /*if (troopsTemplate.len() <= 1)
         {
             return troopsTemplate;
         }
@@ -725,7 +722,7 @@
             }
 
             return 1;
-        });
+        });*/
 
         return troopsTemplate;
     }
@@ -819,7 +816,7 @@
     local agitationResourceModifier = pageLairs.addRangeSetting("AgitationResourceModifier", 70, 50, 100, 10, "Agitation Resource Modifier"); //
     agitationResourceModifier.setDescription("Controls how lair resource calculation is handled after each agitation tier change. Higher percentage values result in greater resources, and therefore more powerful garrisoned troops and better loot.");
 
-    local roamerScaleChance = pageLairs.addRangeSetting("RoamerScaleChance", 100, 1, 100, 1, "Roamer Scale Chance");
+    local roamerScaleChance = pageLairs.addRangeSetting("RoamerScaleChance", 50, 1, 100, 1, "Roamer Scale Chance");
     roamerScaleChance.setDescription("Determines the percentage chance for hostile roaming and ambusher parties spawning from lairs to scale in strength with respect to the originating lair's resource count. Does not affect beasts.");
 
     local roamerResourceModifier = pageLairs.addRangeSetting("RoamerResourceModifier", 70, 70, 100, 10, "Roamer Resource Modifier"); //
