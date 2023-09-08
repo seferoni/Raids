@@ -393,6 +393,18 @@
         return tableEntry;
     }
 
+    function getAssignmentFactionModifier( _faction )
+    {
+       switch (_faction.getType())
+       {
+            case (::Const.FactionType.Orcs):
+                return 0.25;
+
+            case (::Const.FactionType.Goblins):
+                return 0.25;
+       }
+    }
+
     function getDescriptor( _valueToMatch, _referenceTable )
     {
         foreach( descriptor, value in _referenceTable )
@@ -494,30 +506,27 @@
 
     function isFactionViable( _faction )
     {
-        if (_faction == null)
-        {
-            return false;
-        }
-
-        local exclusionList =
+        local inclusionList =
         [
-            ::Const.FactionType.Beasts,
-            ::Const.FactionType.Player,
-            ::Const.FactionType.Settlement,
-            ::Const.FactionType.NobleHouse,
-            ::Const.FactionType.OrientalCityState
+            ::Const.FactionType.Zombies,
+            ::Const.FactionType.Undead,
+            ::Const.FactionType.Orcs,
+            ::Const.FactionType.Bandits,
+            ::Const.FactionType.Goblins,
+            ::Const.FactionType.Barbarians,
+            ::Const.FactionType.OrientalBandits
         ];
         local factionType = _faction.getType();
 
-        foreach( excludedFaction in exclusionList )
+        foreach( includedFaction in inclusionList )
         {
-            if (factionType == excludedFaction)
+            if (factionType == includedFaction)
             {
-                return false;
+                return true;
             }
         }
 
-        return true;
+        return false;
     }
 
     function isLocationTypeViable( _locationType )

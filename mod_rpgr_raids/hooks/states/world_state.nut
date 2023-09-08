@@ -22,12 +22,6 @@
 
         local faction = ::World.FactionManager.getFaction(worldFlags.get("LastCombatFaction"));
 
-        if (faction == null) // TODO: check if redundant
-        {
-            ::RPGR_Raids.logWrapper("Could not identify enemy faction, aborting lair agitation procedure.", true);
-            return vanilla_onCombatFinished;
-        }
-
         if (!::RPGR_Raids.isFactionViable(faction))
         {
             ::RPGR_Raids.logWrapper("findLairCandidates took on a non-viable faction as an argument, aborting procedure.");

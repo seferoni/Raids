@@ -57,7 +57,7 @@
         }
 
         local lairResources = lair.getResources();
-        local resourceDifference = (::RPGR_Raids.Mod.ModSettings.getSetting("RoamerResourceModifier").getValue() / 100.0) * (lairResources - _resources);
+        local resourceDifference = ::RPGR_Raids.getAssignmentFactionModifier(this) * (::RPGR_Raids.Mod.ModSettings.getSetting("RoamerResourceModifier").getValue() / 100.0) * (lairResources - _resources);
 
         if (lairResources - _resources <= ::RPGR_Raids.CampaignModifiers.AssignmentResourceThreshold)
         {
