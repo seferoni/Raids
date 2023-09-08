@@ -32,6 +32,7 @@
         CaravanNamedItemChance = 50, // FIXME: this is inflated, revert to 5
         GlobalProximityTiles = 9,
         LairNamedItemChance = 30,
+        LairResourceSoftCeiling = 500.0,
         ReinforcementMaximumTroopOffset = 7, // TODO: balance this
         ReinforcementThresholdDays = 1 // FIXME: this is deflated, revert to 50
     },
@@ -395,14 +396,23 @@
 
     function getAssignmentFactionModifier( _faction )
     {
-       switch (_faction.getType())
-       {
-            case (::Const.FactionType.Orcs):
-                return 0.25;
+        local eligibleFactions =
+        [
+            ::Const.FactionType.Orcs,
+            ::Const.FactionType.Goblins
+        ];
+        local naiveModifier = 1;
+        local adjustedModifier = 0.35 * naiveModifier;
 
-            case (::Const.FactionType.Goblins):
-                return 0.25;
-       }
+        foreach( faction in eligibleFactions )
+        {
+            if (_faction.getType() == faction)
+            {
+                return adjustedModifier;
+            }
+        }
+
+        return naiveModifier;
     }
 
     function getDescriptor( _valueToMatch, _referenceTable )
@@ -718,21 +728,6 @@
             this.logWrapper(format("Exceeded maximum iterations for troop assignment for party %s.", _party.getName()));
         }
 
-        /*if (troopsTemplate.len() <= 1)
-        {
-            return troopsTemplate;
-        }
-
-        troopsTemplate.sort(function( _firstTroop, _secondTroop )
-        {
-            if (_firstTroop.Type.Cost > _secondTroop.Type.Cost)
-            {
-                return -1;
-            }
-
-            return 1;
-        });*/
-
         return troopsTemplate;
     }
 
@@ -767,7 +762,10 @@
         }
 
         flags.set("LastAgitationUpdate", ::World.getTime().Days);
-        _lair.m.Resources = flags.get("Agitation") == this.AgitationDescriptors.Relaxed ? flags.get("BaseResources") : ::Math.floor(flags.get("BaseResources") * flags.get("Agitation") * (this.Mod.ModSettings.getSetting("AgitationResourceModifier").getValue() / 100.0));
+        local baseResources = flags.get("BaseResources");
+        local resourceModifier = baseResources > this.CampaignModifiers.LairResourceSoftCeiling ? 0.1 : 0.4;
+        local agitationResourceOffset = resourceModifier * baseResources * (flags.get("Agitation") - 1) * (this.Mod.ModSettings.getSetting("AgitationResourceModifier").getValue() / 100.0);
+        _lair.m.Resources = baseResources + agitationResourceOffset;
         ::RPGR_Raids.logWrapper("Refreshing lair defender roster on agitation update.");
         _lair.createDefenders();
         _lair.setLootScaleBasedOnResources(_lair.getResources());
