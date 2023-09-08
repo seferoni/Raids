@@ -671,31 +671,23 @@
 
     function retrieveCaravanCargoIconPath( _cargoValue )
     {
-        local iconPath = null;
-
         switch (_cargoValue)
         {
             case (this.CaravanCargoDescriptors.Unassorted):
-                iconPath = "bag.png";
-                break;
+                return "bag.png";
 
             case (this.CaravanCargoDescriptors.Assortment):
-                iconPath = "asset_money.png";
-                break;
+                return "asset_money.png";
 
             case(this.CaravanCargoDescriptors.Trade):
-                iconPath = "money.png";
-                break;
+                return "money.png";
 
             case(this.CaravanCargoDescriptors.Supplies):
-                iconPath = "asset_food.png"
-                break;
+                return "asset_food.png"
 
             default:
                 this.logWrapper("Invalid caravan cargo value, unable to retrieve icon.", true);
         }
-
-        return iconPath;
     }
 
     function retrieveNamedCaravanCargo( _lootTable )
