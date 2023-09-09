@@ -117,18 +117,18 @@
             "situation.greenskins",
             "situation.raided"
         ];
-
-        foreach( situation in synergisticSituations ) // TODO: this is not efficient
+        local settlementSituations = _settlement.getSituations().map(function( _situation )
         {
-            if (_settlement.getSituationByID(situation) != null)
+            return _situation.getID();
+        });
+
+        foreach( situation in settlementSituations )
+        {
+            if (synergisticSituations.find(situation) != null)
             {
                 modifier += smallestIncrement;
             }
-        }
-
-        foreach( situation in antagonisticSituations )
-        {
-            if (_settlement.getSituationByID(situation) != null)
+            else if (antagonisticSituations.find(situation) != null)
             {
                 modifier -= smallestIncrement;
             }
@@ -407,7 +407,8 @@
 
     function getNamedLootChance( _lair )
     {
-        local nearestSettlementDistance = 9000;
+        local resources = _lair.getResources();
+        /*local nearestSettlementDistance = 9000;
 		local lairTile = _lair.getTile();
 
 		foreach( settlement in ::World.EntityManager.getSettlements() ) // TODO: find a more efficient way of doing this
@@ -420,7 +421,7 @@
 			}
 		}
 
-		return (_lair.getResources() + nearestSettlementDistance * 4) / 5.0 - 37.0;
+		return (_lair.getResources() + nearestSettlementDistance * 4) / 5.0 - 37.0;*/
     }
 
     function logWrapper( _string, _isError = false )
