@@ -3,12 +3,12 @@
     ID = "mod_rpgr_raids",
     Name = "RPG Rebalance - Raids",
     Version = "1.0.0",
-    AgitationDescriptors =  // TODO: rename these to reflect greater strength
+    AgitationDescriptors =
     {
         Relaxed = 1,
         Cautious = 2,
         Vigilant = 3,
-        Desperate = 4
+        Militant = 4
     },
     CaravanWealthDescriptors =
     {
@@ -33,7 +33,7 @@
         GlobalProximityTiles = 9,
         LairNamedItemChance = 30,
         LairResourceSoftCeiling = 500.0,
-        ReinforcementMaximumTroopOffset = 7, // TODO: balance this
+        ReinforcementMaximumTroopOffset = 7,
         ReinforcementThresholdDays = 1 // FIXME: this is deflated, revert to 50
     },
     Procedures =
@@ -528,13 +528,13 @@
         local agitationState = _lair.getFlags().get("Agitation");
         local lairName = _lair.getName();
 
-        if (agitationState > this.AgitationDescriptors.Desperate || agitationState < this.AgitationDescriptors.Relaxed)
+        if (agitationState > this.AgitationDescriptors.Militant || agitationState < this.AgitationDescriptors.Relaxed)
         {
             this.logWrapper(format("Agitation for %s occupies an out-of-bounds value.", lairName), true);
             return false;
         }
 
-        if (_procedure == this.Procedures.Increment && agitationState >= this.AgitationDescriptors.Desperate)
+        if (_procedure == this.Procedures.Increment && agitationState >= this.AgitationDescriptors.Militant)
         {
             this.logWrapper(format("Agitation for %s is capped, aborting procedure.", lairName));
             return false;
