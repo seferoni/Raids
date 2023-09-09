@@ -28,7 +28,7 @@
     {
         AssignmentMaximumTroopOffset = 7,
         AssignmentResourceThreshold = 6,
-        AssignmentResourceThresholdPercentage = 50.0,
+        AssignmentVanguardThresholdPercentage = 50.0,
         CaravanNamedItemChance = 50, // FIXME: this is inflated, revert to 5
         GlobalProximityTiles = 9,
         LairNamedItemChance = 30,
@@ -394,27 +394,6 @@
         return tableEntry;
     }
 
-    function getAssignmentFactionModifier( _faction )
-    {
-        local eligibleFactions =
-        [
-            ::Const.FactionType.Orcs,
-            ::Const.FactionType.Goblins
-        ];
-        local naiveModifier = 1;
-        local adjustedModifier = 0.35 * naiveModifier;
-
-        foreach( faction in eligibleFactions )
-        {
-            if (_faction.getType() == faction)
-            {
-                return adjustedModifier;
-            }
-        }
-
-        return naiveModifier;
-    }
-
     function getDescriptor( _valueToMatch, _referenceTable )
     {
         foreach( descriptor, value in _referenceTable )
@@ -586,8 +565,13 @@
         local exclusionList =
         [
             ::Const.World.Spawn.Troops.BarbarianBeastmaster,
+            ::Const.World.Spawn.Troops.BarbarianDrummer,
             ::Const.World.Spawn.Troops.BarbarianUnhold,
-            ::Const.World.Spawn.Troops.Warhound
+            ::Const.World.Spawn.Troops.Necromancer,
+            ::Const.World.Spawn.Troops.Warhound,
+            ::Const.World.Spawn.Troops.ZombieKnightBodyguard,
+            ::Const.World.Spawn.Troops.ZombieNomadBodyguard,
+            ::Const.World.Spawn.Troops.ZombieYeomanBodyguard
         ]
 
         foreach( excludedTroop in exclusionList )

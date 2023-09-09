@@ -57,7 +57,8 @@
         }
 
         local lairResources = lair.getResources();
-        local resourceDifference = ::RPGR_Raids.getAssignmentFactionModifier(this) * (::RPGR_Raids.Mod.ModSettings.getSetting("RoamerResourceModifier").getValue() / 100.0) * (lairResources - _resources);
+        local baseResourceModifier = lair.getFlags().get("BaseResources") >= 350 ? 0.5 : 1.0;
+        local resourceDifference = baseResourceModifier * (::RPGR_Raids.Mod.ModSettings.getSetting("RoamerResourceModifier").getValue() / 100.0) * (lairResources - _resources);
 
         if (lairResources - _resources <= ::RPGR_Raids.CampaignModifiers.AssignmentResourceThreshold)
         {
@@ -67,9 +68,15 @@
 
         ::RPGR_Raids.logWrapper(format("%s with troop count %i is eligible for reinforcement.", _name, party.getTroops().len()));
         local isReinforced = ::RPGR_Raids.assignTroops(party, _template, resourceDifference);
+
+        if (!isReinforced)
+        {
+            ::RPGR_Raids.logWrapper("Could not find a suitable party template for roamer reinforcement within alloted execution time, aborting procedure.")
+        }
+
         ::RPGR_Raids.logWrapper(format("%s with new troop count %i has been reinforced with resource count %g.", _name, party.getTroops().len(), resourceDifference));
 
-        if (isReinforced && (resourceDifference / _resources) * 100 >= ::RPGR_Raids.CampaignModifiers.AssignmentResourceThresholdPercentage)
+        if ((resourceDifference / _resources) * 100 >= ::RPGR_Raids.CampaignModifiers.AssignmentVanguardThresholdPercentage)
         {
             ::RPGR_Raids.logWrapper(format("%s are eligible for Vanguard status.", _name));
             party.setName(format("Vanguard %s", _name));
