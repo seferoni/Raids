@@ -407,8 +407,7 @@
 
     function getNamedLootChance( _lair )
     {
-        local resources = _lair.getResources();
-        /*local nearestSettlementDistance = 9000;
+        local nearestSettlementDistance = 9000;
 		local lairTile = _lair.getTile();
 
 		foreach( settlement in ::World.EntityManager.getSettlements() ) // TODO: find a more efficient way of doing this
@@ -421,7 +420,7 @@
 			}
 		}
 
-		return (_lair.getResources() + nearestSettlementDistance * 4) / 5.0 - 37.0;*/
+		return (_lair.getResources() + nearestSettlementDistance * 4) / 5.0 - 37.0;
     }
 
     function logWrapper( _string, _isError = false )
@@ -485,7 +484,7 @@
             return false;
         }
 
-        if (activeContract.m.Destination.get() == _lair)
+        if (activeContract.m.Destination.get() == _lair) // TODO: test this again
         {
             this.logWrapper(format("%s was found to be an active contract location, aborting.", lair.getName()));
             return true;
