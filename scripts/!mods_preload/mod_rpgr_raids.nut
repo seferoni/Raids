@@ -32,7 +32,6 @@
         CaravanNamedItemChance = 50, // FIXME: this is inflated, revert to 5
         GlobalProximityTiles = 9,
         LairNamedItemChance = 30,
-        LairResourceSoftCeiling = 500.0,
         ReinforcementMaximumTroopOffset = 7,
         ReinforcementThresholdDays = 1 // FIXME: this is deflated, revert to 50
     },
