@@ -739,7 +739,7 @@
 
         flags.set("LastAgitationUpdate", ::World.getTime().Days);
         local baseResources = flags.get("BaseResources");
-        local resourceModifier = baseResources > this.CampaignModifiers.LairResourceSoftCeiling ? 0.1 : 0.4;
+        local resourceModifier = -0.0006 * baseResources + 0.4;
         local agitationResourceOffset = resourceModifier * baseResources * (flags.get("Agitation") - 1) * (this.Mod.ModSettings.getSetting("AgitationResourceModifier").getValue() / 100.0);
         _lair.m.Resources = baseResources + agitationResourceOffset;
         ::RPGR_Raids.logWrapper("Refreshing lair defender roster on agitation update.");
