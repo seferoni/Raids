@@ -18,7 +18,7 @@
 
         if (::RPGR_Raids.Mod.ModSettings.getSetting("DepopulateLairLootOnSpawn").getValue())
         {
-            ::RPGR_Raids.depopulateLairNamedLoot(this, ::RPGR_Raids.CampaignModifiers.LairNamedItemChance);
+            ::RPGR_Raids.depopulateLairNamedLoot(this, ::RPGR_Raids.CampaignModifiers.LairNaiveNamedItemChance);
         }
 
         return vanilla_onSpawned;

@@ -31,7 +31,7 @@
         AssignmentVanguardThresholdPercentage = 50.0,
         CaravanNamedItemChance = 50, // FIXME: this is inflated, revert to 5
         GlobalProximityTiles = 9,
-        LairNamedItemChance = 30,
+        LairNaiveNamedItemChance = 30,
         ReinforcementMaximumTroopOffset = 7,
         ReinforcementThresholdDays = 1 // FIXME: this is deflated, revert to 50
     },
@@ -324,7 +324,7 @@
         return namedLoot;
     }
 
-    function depopulateLairNamedLoot( _lair, _chance = null )
+    function depopulateLairNamedLoot( _lair, _chance = null ) // FIXME: this removes all named items at once
     {
         if (_lair.getLoot().isEmpty())
         {
@@ -332,29 +332,40 @@
         }
 
         local namedLootChance = _chance == null ? this.getNamedLootChance(_lair) : _chance;
+        //local garbage = [];
+        local items = _lair.getLoot().getItems();
 
         if (::Math.rand(1, 100) <= namedLootChance)
         {
             return;
         }
 
-        local garbage = [];
-        local items = _lair.getLoot().getItems();
-
-        foreach( item in items )
+        foreach( itemIndex, item in items )
         {
             if (item.isItemType(::Const.Items.ItemType.Named))
             {
-                garbage.push(item);
+                items.remove(itemIndex);
+                this.logWrapper(format("depopulateLairNamedLoot removed %s from the inventory of lair %s.", item.getName(), _lair.getName()));
+                break;
             }
+        }
+
+        /*if (garbage.len() == 0)
+        {
+            return;
         }
 
         foreach( item in garbage )
         {
+            if (::Math.rand(1, 100) <= namedLootChance)
+            {
+                continue;
+            }
+
             local index = items.find(item);
             items.remove(index);
             this.logWrapper(format("Removed %s at index %i.", item.getName(), index));
-        }
+        }*/
     }
 
     function findLairCandidates( _faction )
@@ -804,7 +815,7 @@
     local roamerResourceModifier = pageLairs.addRangeSetting("RoamerResourceModifier", 70, 70, 100, 10, "Roamer Resource Modifier"); //
     roamerResourceModifier.setDescription("Controls how resource calculation is handled for roaming parties. Higher percentage values result in greater resources, and therefore more powerful roaming troops. Does nothing if roamer scale chance is set to zero.");
 
-    local depopulateLairLootOnSpawn = pageLairs.addBooleanSetting("DepopulateLairLootOnSpawn", false, "Depopulate Lair Loot On Spawn");
+    local depopulateLairLootOnSpawn = pageLairs.addBooleanSetting("DepopulateLairLootOnSpawn", true, "Depopulate Lair Loot On Spawn");
     depopulateLairLootOnSpawn.setDescription("Determines whether Raids should depopulate newly spawned lairs of named loot. This is recommended to compensate for the additional named loot brought about by the introduction of agitation as a game mechanic.");
 
     local roamerScaleAgitationRequirement = pageLairs.addBooleanSetting("RoamerScaleAgitationRequirement", false, "Roamer Scale Agitation Requirement");
