@@ -57,7 +57,6 @@
         }
 
         local lairResources = lair.getResources();
-        //local baseResourceModifier = lair.getFlags().get("BaseResources") >= 350 ? 0.5 : 1.0;
         local baseResourceModifier = -0.0014 * lair.getFlags().get("BaseResources") + 1.0;
         local resourceDifference = baseResourceModifier * (::RPGR_Raids.Mod.ModSettings.getSetting("RoamerResourceModifier").getValue() / 100.0) * (lairResources - _resources);
 

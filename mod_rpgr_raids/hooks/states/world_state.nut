@@ -8,6 +8,12 @@
         local vanilla_onCombatFinished = oCF_nullCheck == null ? this[parentName].onCombatFinished() : oCF_nullCheck();
         local worldFlags = ::World.Statistics.getFlags();
 
+        if (!worldFlags.get("LastFoeWasParty"))
+        {
+            ::RPGR_Raids.logWrapper("Last combat encounter was not against a party, aborting lair agitation procedure.");
+            return vanilla_onCombatFinished;
+        }
+
         if (worldFlags.get("LastCombatWasArena"))
         {
             ::RPGR_Raids.logWrapper("Last combat encounter was flagged as an arena battle, aborting lair agitation procedure.");
@@ -20,6 +26,7 @@
             return vanilla_onCombatFinished;
         }
 
+        ::MSU.Log.printData(worldFlags.get("LastCombatFaction")); // TODO: remove this
         local faction = ::World.FactionManager.getFaction(worldFlags.get("LastCombatFaction"));
 
         if (!::RPGR_Raids.isFactionViable(faction))
@@ -52,8 +59,9 @@
             return vanilla_onCombatFinished;
         }
 
-        local iterations = worldFlags.get("LastCombatVanguardParty") == false ? 1 : 2;
+        local iterations = worldFlags.get("LastFoeWasVanguardParty") == false ? 1 : 2;
         ::RPGR_Raids.agitateViableLairs(lairs, iterations);
+        ::RPGR_Raids.updateCombatStatistics([false, false]);
         return vanilla_onCombatFinished;
     }
 });

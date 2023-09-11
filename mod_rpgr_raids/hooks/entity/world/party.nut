@@ -12,7 +12,7 @@
             return vanilla_onCombatStarted;
         }
 
-        ::World.Statistics.getFlags().set("LastCombatVanguardParty", this.getFlags().get("IsVanguard"));
+        ::RPGR_Raids.updateCombatStatistics([this.getFlags().get("IsVanguard"), true]);
         return vanilla_onCombatStarted;
     }
 
