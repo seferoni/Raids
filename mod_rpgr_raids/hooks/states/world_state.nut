@@ -20,18 +20,23 @@
             return vanilla_onCombatFinished;
         }
 
-        if (worldFlags.get("LastCombatFaction") == false)
+        if (typeof worldFlags.get("LastCombatFaction") != "integer")
         {
-            ::RPGR_Raids.logWrapper("Last encountered faction flag not initialised, aborting lair agitation procedure.", true);
+            ::RPGR_Raids.logWrapper("Last encountered faction flag was a non-integer data type container, aborting lair agitation procedure.", true);
             return vanilla_onCombatFinished;
         }
 
-        ::MSU.Log.printData(worldFlags.get("LastCombatFaction")); // TODO: remove this
+        if (worldFlags.get("LastCombatFaction") > ::World.FactionManager.m.Factions.len() - 1)
+        {
+            ::RPGR_Raids.logWrapper("Retrieved faction index was out of bounds for master factions array length, aborting lair agitation procedure.", true);
+            return vanilla_onCombatFinished;
+        }
+
         local faction = ::World.FactionManager.getFaction(worldFlags.get("LastCombatFaction"));
 
         if (!::RPGR_Raids.isFactionViable(faction))
         {
-            ::RPGR_Raids.logWrapper("findLairCandidates took on a non-viable faction as an argument, aborting procedure.");
+            ::RPGR_Raids.logWrapper("findLairCandidates took on a non-viable faction as an argument, aborting lair agitation procedure.");
             return vanilla_onCombatFinished;
         }
 

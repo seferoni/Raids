@@ -751,7 +751,7 @@
         local baseResources = flags.get("BaseResources");
         local resourceModifier = -0.0006 * baseResources + 0.4;
         local agitationResourceOffset = resourceModifier * baseResources * (flags.get("Agitation") - 1) * (this.Mod.ModSettings.getSetting("AgitationResourceModifier").getValue() / 100.0);
-        _lair.m.Resources = baseResources + agitationResourceOffset;
+        _lair.m.Resources = ::Math.floor(baseResources + agitationResourceOffset);
         ::RPGR_Raids.logWrapper("Refreshing lair defender roster on agitation update.");
         _lair.createDefenders();
         _lair.setLootScaleBasedOnResources(_lair.getResources());
