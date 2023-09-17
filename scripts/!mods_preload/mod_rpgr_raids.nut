@@ -28,10 +28,11 @@
     {
         AssignmentMaximumTroopOffset = 7,
         AssignmentResourceThreshold = 6,
-        AssignmentVanguardThresholdPercentage = 50.0,
+        AssignmentVanguardThresholdPercentage = 75.0,
         CaravanNamedItemChance = 50, // FIXME: this is inflated, revert to 5
         GlobalProximityTiles = 9,
-        LairNaiveNamedItemChance = 30,
+        LairNamedItemChanceOnSpawn = 30,
+        LairFactionSpecificNamedLootChance = 33,
         ReinforcementMaximumTroopOffset = 7,
         ReinforcementThresholdDays = 1 // FIXME: this is deflated, revert to 50
     },
@@ -42,7 +43,7 @@
         Reset = 3
     },
 
-    function addToCaravanInventory( _caravan, _goodsPool )
+    /* function addToCaravanInventory( _caravan, _goodsPool )
     {
         local iterations = ::Math.rand(1, _caravan.getFlags().get("CaravanWealth") - 1);
 
@@ -51,6 +52,18 @@
             local good = _goodsPool[::Math.rand(0, _goodsPool.len() - 1)];
             this.logWrapper(format("Added item with filepath %s to caravan inventory.", good));
             _caravan.addToInventory(good);
+        }
+    }*/
+
+    function addToInventory( _party, _goodsPool, _isCaravan = false )
+    {
+        local iterations = _isCaravan == true ? ::Math.rand(1, _party.getFlags().get("CaravanWealth") - 1) : ::Math.rand(1, 2);
+
+        for( local i = 0; i < iterations; i++ )
+        {
+            local good = _goodsPool[::Math.rand(0, _goodsPool.len() - 1)];
+            this.logWrapper(format("Added item with filepath %s to inventory of %s.", good, _party.getName()));
+            _party.addToInventory(good);
         }
     }
 
@@ -154,18 +167,16 @@
 
             if (newCargoType == this.CaravanCargoDescriptors.Assortment)
             {
-                this.createNaiveCaravanCargo(_caravan);
-                return;
+                return this.createNaivePartyLoot(_caravan);
             }
 
-            this.addToCaravanInventory(_caravan, produce);
-            return;
+            return produce;
         }
 
-        this.addToCaravanInventory(_caravan, actualProduce);
+        return actualProduce;
     }
 
-    function createNaiveCaravanCargo( _caravan )
+    function createNaivePartyLoot( _party, _includeSupplies = true ) // TODO: integrate this
     {
         local exclusionList =
         [
@@ -184,16 +195,27 @@
             "trade/spices_item",
             "trade/incense_item"
         ];
+        local southernFactions =
+        [
+            ::Const.FactionType.OrientalBandits,
+            ::Const.FactionType.OrientalCityState
+        ];
 
-        if (::World.FactionManager.getFaction(_caravan.getFaction()).getType() == ::Const.FactionType.OrientalCityState)
+        foreach( factionType in southernFactions )
         {
-            this.addToCaravanInventory(_caravan, southernGoods);
-            return;
+            if (::World.FactionManager.getFaction(_party.getFaction()).getType() == factionType)
+            {
+                return southernGoods;
+            }
         }
 
         exclusionList.extend(southernGoods);
-        local scriptFiles = ::IO.enumerateFiles("scripts/items/supplies");
-        scriptFiles.extend(::IO.enumerateFiles("scripts/items/trade"));
+        local scriptFiles = ::IO.enumerateFiles("scripts/items/trade");
+
+        if (_includeSupplies)
+        {
+            scriptFiles.extend(::IO.enumerateFiles("scripts/items/supplies"));
+        }
 
         foreach( excludedFile in exclusionList )
         {
@@ -206,11 +228,11 @@
         }
 
         local culledString = "scripts/items/";
-        local goods = scriptFiles.map(function( stringPath )
+        local goods = scriptFiles.map(function( _stringPath )
         {
-            return stringPath.slice(culledString.len());
+            return _stringPath.slice(culledString.len());
         });
-        this.addToCaravanInventory(_caravan, goods);
+        return goods;
     }
 
     function createCaravanTroops( _wealth, _factionType )
@@ -306,6 +328,12 @@
             return this.createNaiveNamedLoot(namedItemKeys);
         }
 
+        if (::Math.rand(1, 100) > this.CampaignModifiers.LairFactionSpecificNamedLootChance)
+        {
+            this.logWrapper(format("Returning naive named loot tables for %s.", _lair.getName()));
+            return this.createNaiveNamedLoot(namedItemKeys);
+        }
+
         local namedLoot = [];
 
         foreach( key in namedItemKeys )
@@ -318,13 +346,14 @@
 
         if (namedLoot.len() == 0)
         {
+            this.logWrapper(format("%s has no non-empty named loot tables.", _lair.getName()));
             return this.createNaiveNamedLoot(namedItemKeys);
         }
 
         return namedLoot;
     }
 
-    function depopulateLairNamedLoot( _lair, _chance = null ) // FIXME: this removes all named items at once
+    function depopulateLairNamedLoot( _lair, _chance = null )
     {
         if (_lair.getLoot().isEmpty())
         {
@@ -332,7 +361,6 @@
         }
 
         local namedLootChance = _chance == null ? this.getNamedLootChance(_lair) : _chance;
-        //local garbage = [];
         local items = _lair.getLoot().getItems();
 
         if (::Math.rand(1, 100) <= namedLootChance)
@@ -349,23 +377,6 @@
                 break;
             }
         }
-
-        /*if (garbage.len() == 0)
-        {
-            return;
-        }
-
-        foreach( item in garbage )
-        {
-            if (::Math.rand(1, 100) <= namedLootChance)
-            {
-                continue;
-            }
-
-            local index = items.find(item);
-            items.remove(index);
-            this.logWrapper(format("Removed %s at index %i.", item.getName(), index));
-        }*/
     }
 
     function findLairCandidates( _faction )
@@ -415,12 +426,12 @@
         }
     }
 
-    function getNamedLootChance( _lair )
+    function getNaiveNamedLootChance( _lair )
     {
         local nearestSettlementDistance = 9000;
 		local lairTile = _lair.getTile();
 
-		foreach( settlement in ::World.EntityManager.getSettlements() ) // TODO: find a more efficient way of doing this
+		foreach( settlement in ::World.EntityManager.getSettlements() )
 		{
 			local distance = lairTile.getDistanceTo(settlement.getTile());
 
@@ -431,6 +442,12 @@
 		}
 
 		return (_lair.getResources() + nearestSettlementDistance * 4) / 5.0 - 37.0;
+    }
+
+    function getNamedLootChance( _lair )
+    {
+        local flags = _lair.getFlags();
+        return flags.get("BaseNamedItemChance") + _lair.getResources() / 10;
     }
 
     function logWrapper( _string, _isError = false )
@@ -478,6 +495,23 @@
         {
             this.reinforceCaravanTroops(_caravan, _settlement);
         }
+    }
+
+    function initialiseLairParameters( _lair )
+    {
+        local flags = _lair.getFlags();
+        flags.set("BaseResources", _lair.m.Resources);
+        flags.set("Agitation", this.AgitationDescriptors.Relaxed);
+        flags.set("BaseNamedItemChance", this.getNaiveNamedLootChance(_lair))
+    }
+
+    function initialiseVanguardParameters( _party )
+    {
+        local partyName = _party.getName();
+        ::RPGR_Raids.logWrapper(format("%s are eligible for Vanguard status.", partyName));
+        _party.setName(format("Vanguard %s", partyName));
+        _party.getFlags().set("IsVanguard", true);
+        ::RPGR_Raids.addToInventory(_party, ::RPGR_Raids.createNaivePartyLoot(_party, false));
     }
 
     function isActiveContractLocation( _lair )
@@ -579,7 +613,7 @@
             ::Const.World.Spawn.Troops.BarbarianUnhold,
             ::Const.World.Spawn.Troops.Necromancer,
             ::Const.World.Spawn.Troops.Warhound,
-            ::Const.World.Spawn.Troops.ZombieKnightBodyguard,
+            ::Const.World.Spawn.Troops.ZombieKnightBodyguard, // TODO: revise the inclusion of bodyguard archetypes
             ::Const.World.Spawn.Troops.ZombieNomadBodyguard,
             ::Const.World.Spawn.Troops.ZombieYeomanBodyguard
         ]
@@ -610,7 +644,8 @@
             return;
         }
 
-        this.createCaravanCargo(_caravan, _settlement);
+        local goods = this.createCaravanCargo(_caravan, _settlement);
+        this.addToInventory(_caravan, goods, true);
     }
 
     function reinforceCaravanTroops( _caravan, _settlement )
@@ -652,15 +687,32 @@
     function repopulateLairNamedLoot( _lair )
     {
         local namedLootChance = this.getNamedLootChance(_lair);
+        local iterations = 0;
         this.logWrapper(format("namedLootChance is %g for lair %s.", namedLootChance, _lair.getName()));
 
-        if (::Math.rand(1, 100) > namedLootChance)
+        if (namedLootChance > 100)
+        {
+            iterations += ::Math.floor(namedLootChance / 100);
+        }
+
+        if (::Math.rand(1, 100) <= namedLootChance - (iterations * 100))
+        {
+            iterations += 1;
+        }
+
+        if (iterations == 0)
         {
             return;
         }
 
         local namedLoot = this.createNamedLoot(_lair);
-        _lair.getLoot().add(::new("scripts/items/" + namedLoot[::Math.rand(0, namedLoot.len() - 1)]));
+
+        for ( local i = 0; i < iterations ; i++ )
+        {
+            local namedItem = namedLoot[::Math.rand(0, namedLoot.len() - 1)];
+            _lair.getLoot().add(::new("scripts/items/" + namedItem));
+            this.logWrapper(format("Added item with filepath %s to the inventory of %s.", namedItem, _lair.getName()));
+        }
     }
 
     function retrieveCaravanCargoIconPath( _cargoValue )
@@ -692,6 +744,7 @@
         this.logWrapper(format("Added %s to the loot table.", namedItem.getName()));
         _lootTable.push(namedItem);
     }
+
 
     function selectRandomPartyTemplate( _party, _partyList, _resources )
     {
@@ -730,21 +783,19 @@
         {
             case (this.Procedures.Increment):
                 flags.increment("Agitation");
-                this.repopulateLairNamedLoot(_lair);
                 break;
 
             case (this.Procedures.Decrement):
                 flags.increment("Agitation", -1);
-                this.depopulateLairNamedLoot(_lair);
                 break;
 
             case (this.Procedures.Reset):
                 flags.set("Agitation", this.AgitationDescriptors.Relaxed);
-                this.depopulateLairNamedLoot(_lair);
                 break;
 
             default:
                 this.logWrapper("setLairAgitation was called with an invalid procedure value.", true);
+                return;
         }
 
         flags.set("LastAgitationUpdate", ::World.getTime().Days);
@@ -752,6 +803,16 @@
         local resourceModifier = -0.0006 * baseResources + 0.4;
         local agitationResourceOffset = resourceModifier * baseResources * (flags.get("Agitation") - 1) * (this.Mod.ModSettings.getSetting("AgitationResourceModifier").getValue() / 100.0);
         _lair.m.Resources = ::Math.floor(baseResources + agitationResourceOffset);
+
+        if (_procedure = this.Procedures.Increment)
+        {
+            this.repopulateLairNamedLoot(_lair);
+        }
+        else
+        {
+            this.depopulateLairNamedLoot(_lair);
+        }
+
         ::RPGR_Raids.logWrapper("Refreshing lair defender roster on agitation update.");
         _lair.createDefenders();
         _lair.setLootScaleBasedOnResources(_lair.getResources());

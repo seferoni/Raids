@@ -12,13 +12,11 @@
             return vanilla_onSpawned;
         }
 
-        local flags = this.getFlags();
-        flags.set("BaseResources", this.m.Resources);
-        flags.set("Agitation", ::RPGR_Raids.AgitationDescriptors.Relaxed);
+        ::RPGR_Raids.initialiseLairParameters(this);
 
         if (::RPGR_Raids.Mod.ModSettings.getSetting("DepopulateLairLootOnSpawn").getValue())
         {
-            ::RPGR_Raids.depopulateLairNamedLoot(this, ::RPGR_Raids.CampaignModifiers.LairNaiveNamedItemChance);
+            ::RPGR_Raids.depopulateLairNamedLoot(this, ::RPGR_Raids.CampaignModifiers.LairNamedItemChanceOnSpawn);
         }
 
         return vanilla_onSpawned;
