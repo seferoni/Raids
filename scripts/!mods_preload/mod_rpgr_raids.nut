@@ -32,6 +32,7 @@
         CaravanNamedItemChance = 50, // FIXME: this is inflated, revert to 5
         GlobalProximityTiles = 9,
         LairNamedItemChanceOnSpawn = 30,
+        LairNamedLootRefreshChance = 50, // TODO: balance this
         LairFactionSpecificNamedLootChance = 33,
         ReinforcementMaximumTroopOffset = 7,
         ReinforcementThresholdDays = 1 // FIXME: this is deflated, revert to 50
@@ -176,7 +177,7 @@
         return actualProduce;
     }
 
-    function createNaivePartyLoot( _party, _includeSupplies = true ) // TODO: integrate this
+    function createNaivePartyLoot( _party, _includeSupplies = true )
     {
         local exclusionList =
         [
@@ -379,7 +380,7 @@
         }
     }
 
-    function findLairCandidates( _faction )
+    function findLairCandidates( _faction ) // TODO: standardise this
     {
         if (_faction.getSettlements().len() == 0)
         {
@@ -398,6 +399,27 @@
             this.logWrapper("findLairCandidates could not find any lairs within proximity of the player.");
             return null;
         }
+
+        return lairs;
+    }
+
+    function findLairCandidatesAtPosition( _position, _radius )
+    {
+        local entities = ::World.getAllEntitiesAndOneLocationAtPos(_position, _radius);
+        local lairs = entities.filter(function( _entityIndex, _entity )
+        {
+            if (!::isKindOf(_entity, "location"))
+            {
+                return false;
+            }
+            else if (!::RPGR_Raids.isLocationTypeViable(_entity.getLocationType()))
+            {
+                ::RPGR_Raids.logWrapper(format("%s is not an eligible lair.", _entity.getName()));
+                return false;
+            }
+
+            return true;
+        });
 
         return lairs;
     }
@@ -612,10 +634,7 @@
             ::Const.World.Spawn.Troops.BarbarianDrummer,
             ::Const.World.Spawn.Troops.BarbarianUnhold,
             ::Const.World.Spawn.Troops.Necromancer,
-            ::Const.World.Spawn.Troops.Warhound,
-            ::Const.World.Spawn.Troops.ZombieKnightBodyguard, // TODO: revise the inclusion of bodyguard archetypes
-            ::Const.World.Spawn.Troops.ZombieNomadBodyguard,
-            ::Const.World.Spawn.Troops.ZombieYeomanBodyguard
+            ::Const.World.Spawn.Troops.Warhound
         ]
 
         foreach( excludedTroop in exclusionList )
@@ -803,19 +822,23 @@
         local resourceModifier = -0.0006 * baseResources + 0.4;
         local agitationResourceOffset = resourceModifier * baseResources * (flags.get("Agitation") - 1) * (this.Mod.ModSettings.getSetting("AgitationResourceModifier").getValue() / 100.0);
         _lair.m.Resources = ::Math.floor(baseResources + agitationResourceOffset);
-
-        if (_procedure = this.Procedures.Increment)
-        {
-            this.repopulateLairNamedLoot(_lair);
-        }
-        else
-        {
-            this.depopulateLairNamedLoot(_lair);
-        }
-
-        ::RPGR_Raids.logWrapper("Refreshing lair defender roster on agitation update.");
+        this.logWrapper("Refreshing lair defender roster on agitation update.");
         _lair.createDefenders();
         _lair.setLootScaleBasedOnResources(_lair.getResources());
+
+        if (_procedure != this.Procedures.Increment)
+        {
+            this.depopulateLairNamedLoot(_lair);
+            return;
+        }
+
+        if (::Math.rand(1, 100) > this.CampaignModifiers.LairNamedLootRefreshChance && flags.get("Agitation") != this.AgitationDescriptors.Militant)
+        {
+            this.logWrapper(format("Skipping named loot refresh procedure within this agitation cycle for lair %s.", _lair.getName()));
+            return;
+        }
+
+        this.repopulateLairNamedLoot(_lair);
     }
 
     function updateCombatStatistics( _flagStates )

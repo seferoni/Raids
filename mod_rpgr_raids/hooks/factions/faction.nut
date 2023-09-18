@@ -22,7 +22,7 @@
             return party;
         }
 
-        local entities = ::World.getAllEntitiesAndOneLocationAtPos(party.getPos(), 1.0);
+        /*local entities = ::World.getAllEntitiesAndOneLocationAtPos(party.getPos(), 1.0);
         local lairs = entities.filter(function( entityIndex, entity )
         {
             if (!::isKindOf(entity, "location"))
@@ -36,7 +36,9 @@
             }
 
             return true;
-        });
+        })*/
+
+        local lairs = ::RPGR_Raids.findLairCandidatesAtPosition(party.getPos(), 1.0);
 
         if (lairs.len() == 0)
         {
