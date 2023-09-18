@@ -66,7 +66,9 @@
             return party;
         }
 
-        local baseResourceModifier = 1.0 + (-0.0014 * lair.getFlags().get("BaseResources"));
+        local baseResources = lair.getFlags().get("BaseResources");
+        //local baseResourceModifier = 1.0 + (-0.0014 * lair.getFlags().get("BaseResources"));
+        local baseResourceModifier = baseResources >= 200 ? (baseResources <= 350 ? -0.005 * baseResources + 2.0 : 0.25) : 1.0;
         local resourceDifference = baseResourceModifier * (::RPGR_Raids.Mod.ModSettings.getSetting("RoamerResourceModifier").getValue() / 100.0) * (lairResources - _resources);
         ::RPGR_Raids.logWrapper(format("%s with troop count %i is eligible for reinforcement.", _name, party.getTroops().len()));
         local isReinforced = ::RPGR_Raids.assignTroops(party, _template, resourceDifference);
