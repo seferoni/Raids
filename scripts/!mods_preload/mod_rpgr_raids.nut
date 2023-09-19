@@ -654,7 +654,7 @@
 
         if (flags.get("CaravanCargo") == this.CaravanCargoDescriptors.Assortment)
         {
-            this.createNaiveCaravanCargo(_caravan);
+            this.createNaivePartyLoot(_caravan);
             return;
         }
 
