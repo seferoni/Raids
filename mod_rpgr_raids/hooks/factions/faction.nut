@@ -42,7 +42,8 @@
             return party;
         }
 
-        local lairResources = lair.getResources();
+        local timeModifier = 0.9 + ::Math.minf(2.0, ::World.getTime().Days * 0.014) * ::Const.Difficulty.EnemyMult[::World.Assets.getCombatDifficulty()];
+        local lairResources = lair.getResources() * timeModifier;
 
         if (lairResources - _resources <= ::RPGR_Raids.CampaignModifiers.AssignmentResourceThreshold)
         {
@@ -51,7 +52,6 @@
         }
 
         local baseResources = lair.getFlags().get("BaseResources");
-        //local baseResourceModifier = 1.0 + (-0.0014 * lair.getFlags().get("BaseResources"));
         local baseResourceModifier = baseResources >= 200 ? (baseResources <= 350 ? -0.005 * baseResources + 2.0 : 0.25) : 1.0;
         local resourceDifference = baseResourceModifier * (::RPGR_Raids.Mod.ModSettings.getSetting("RoamerResourceModifier").getValue() / 100.0) * (lairResources - _resources);
         ::RPGR_Raids.logWrapper(format("%s with troop count %i is eligible for reinforcement.", _name, party.getTroops().len()));
@@ -60,6 +60,7 @@
         if (!isReinforced)
         {
             ::RPGR_Raids.logWrapper("Could not find a suitable party template for roamer reinforcement within alloted execution time, aborting procedure.");
+            return party;
         }
 
         ::RPGR_Raids.logWrapper(format("%s with new troop count %i has been reinforced with resource count %g.", _name, party.getTroops().len(), resourceDifference));
