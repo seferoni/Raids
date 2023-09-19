@@ -59,8 +59,9 @@
 
         local lairs = ::RPGR_Raids.findLairCandidates(faction);
 
-        if (lairs == null)
+        if (lairs.len() == 0)
         {
+            ::RPGR_Raids.logWrapper("findLairCandidates could not find any eligible lairs within proximity of the player.");
             return vanilla_onCombatFinished;
         }
 

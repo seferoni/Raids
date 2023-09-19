@@ -22,22 +22,6 @@
             return party;
         }
 
-        /*local entities = ::World.getAllEntitiesAndOneLocationAtPos(party.getPos(), 1.0);
-        local lairs = entities.filter(function( entityIndex, entity )
-        {
-            if (!::isKindOf(entity, "location"))
-            {
-                return false;
-            }
-            else if (!::RPGR_Raids.isLocationTypeViable(entity.getLocationType()))
-            {
-                ::RPGR_Raids.logWrapper(format("%s is not an eligible lair.", entity.getName()));
-                return false;
-            }
-
-            return true;
-        })*/
-
         local lairs = ::RPGR_Raids.findLairCandidatesAtPosition(party.getPos(), 1.0);
 
         if (lairs.len() == 0)

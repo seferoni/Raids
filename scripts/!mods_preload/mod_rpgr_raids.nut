@@ -380,25 +380,21 @@
         }
     }
 
-    function findLairCandidates( _faction ) // TODO: standardise this
+    function findLairCandidates( _faction )
     {
+        local lairs = [];
+
         if (_faction.getSettlements().len() == 0)
         {
             this.logWrapper("findLairCandidates was passed a viable faction as an argument, but this faction has no settlements at present.");
-            return null;
+            return lairs;
         }
 
         this.logWrapper("Proceeding to lair candidate selection.");
-        local lairs = _faction.getSettlements().filter(function( _locationIndex, _location )
+        lairs.extend(_faction.getSettlements().filter(function( _locationIndex, _location )
         {
             return ::RPGR_Raids.isLocationTypeViable(_location.getLocationType()) && ::RPGR_Raids.isPlayerInProximityTo(_location.getTile());
-        });
-
-        if (lairs.len() == 0)
-        {
-            this.logWrapper("findLairCandidates could not find any lairs within proximity of the player.");
-            return null;
-        }
+        }));
 
         return lairs;
     }
@@ -468,8 +464,7 @@
 
     function getNamedLootChance( _lair )
     {
-        local flags = _lair.getFlags();
-        return flags.get("BaseNamedItemChance") + _lair.getResources() / 10;
+        return _lair.getFlags().get("BaseNamedItemChance") + _lair.getResources() / 10;
     }
 
     function logWrapper( _string, _isError = false )
