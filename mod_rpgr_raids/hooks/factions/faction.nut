@@ -47,7 +47,7 @@
 
         if (lairResources - _resources <= ::RPGR_Raids.CampaignModifiers.AssignmentResourceThreshold)
         {
-            ::RPGR_Raids.logWrapper(format("Lair resource count for %s with %g resources is insufficient compared to the initial value of %g.", lair.getName(), lairResources, _resources));
+            ::RPGR_Raids.logWrapper(format("Lair resource count for %s with %.2f resources is insufficient compared to the initial value of %.2f.", lair.getName(), lairResources, _resources));
             return party;
         }
 
@@ -63,7 +63,7 @@
             return party;
         }
 
-        ::RPGR_Raids.logWrapper(format("%s with new troop count %i has been reinforced with resource count %g.", _name, party.getTroops().len(), resourceDifference));
+        ::RPGR_Raids.logWrapper(format("%s with new troop count %i has been reinforced with resource count %.2f.", _name, party.getTroops().len(), resourceDifference));
 
         if ((resourceDifference / _resources) * 100 >= ::RPGR_Raids.CampaignModifiers.AssignmentVanguardThresholdPercentage)
         {

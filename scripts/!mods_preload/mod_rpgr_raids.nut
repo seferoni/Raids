@@ -32,7 +32,7 @@
         CaravanNamedItemChance = 50, // FIXME: this is inflated, revert to 5
         GlobalProximityTiles = 9,
         LairNamedItemChanceOnSpawn = 30,
-        LairNamedLootRefreshChance = 50, // TODO: balance this
+        LairNamedLootRefreshChance = 60, // TODO: balance this
         LairFactionSpecificNamedLootChance = 33,
         ReinforcementMaximumTroopOffset = 7,
         ReinforcementThresholdDays = 1 // FIXME: this is deflated, revert to 50
@@ -42,19 +42,7 @@
         Increment = 1,
         Decrement = 2,
         Reset = 3
-    },
-
-    /* function addToCaravanInventory( _caravan, _goodsPool )
-    {
-        local iterations = ::Math.rand(1, _caravan.getFlags().get("CaravanWealth") - 1);
-
-        for( local i = 0; i < iterations; i++ )
-        {
-            local good = _goodsPool[::Math.rand(0, _goodsPool.len() - 1)];
-            this.logWrapper(format("Added item with filepath %s to caravan inventory.", good));
-            _caravan.addToInventory(good);
-        }
-    }*/
+    }
 
     function addToInventory( _party, _goodsPool, _isCaravan = false )
     {
@@ -63,7 +51,7 @@
         for( local i = 0; i < iterations; i++ )
         {
             local good = _goodsPool[::Math.rand(0, _goodsPool.len() - 1)];
-            this.logWrapper(format("Added item with filepath %s to inventory of %s.", good, _party.getName()));
+            this.logWrapper(format("Added item with filepath %s to the inventory of %s.", good, _party.getName()));
             _party.addToInventory(good);
         }
     }
@@ -347,7 +335,7 @@
 
         if (namedLoot.len() == 0)
         {
-            this.logWrapper(format("%s has no non-empty named loot tables.", _lair.getName()));
+            this.logWrapper(format("%s has no non-empty named loot tables, returning naive named loot tables.", _lair.getName()));
             return this.createNaiveNamedLoot(namedItemKeys);
         }
 
@@ -464,7 +452,8 @@
 
     function getNamedLootChance( _lair )
     {
-        return _lair.getFlags().get("BaseNamedItemChance") + _lair.getResources() / 10;
+        local flags = _lair.getFlags();
+        return flags.get("BaseNamedItemChance") + (flags.get("Agitation") - 1) * 13.33;
     }
 
     function logWrapper( _string, _isError = false )
@@ -702,7 +691,7 @@
     {
         local namedLootChance = this.getNamedLootChance(_lair);
         local iterations = 0;
-        this.logWrapper(format("namedLootChance is %g for lair %s.", namedLootChance, _lair.getName()));
+        this.logWrapper(format("namedLootChance is %.2f for lair %s.", namedLootChance, _lair.getName()));
 
         if (namedLootChance > 100)
         {
@@ -784,7 +773,7 @@
         return troopsTemplate;
     }
 
-    function setLairAgitation( _lair, _procedure )
+    function setLairAgitation( _lair, _procedure ) // TODO: separate defender roster update and resource scaling from agitation update
     {
         if (!this.isLairEligibleForProcedure(_lair, _procedure))
         {
