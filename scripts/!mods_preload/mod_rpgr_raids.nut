@@ -60,16 +60,27 @@
     {
         local viableLairs = _lairs.filter(function( _lairIndex, _lair )
         {
-            return !::RPGR_Raids.isActiveContractLocation(_lair);
+            return !::RPGR_Raids.isActiveContractLocation(_lair) && _lair.getFlags().get("Agitation") != this.AgitationDescriptors.Militant;
         });
+
+        if (viableLairs.len() == 0)
+        {
+            this.logWrapper("agitateViableLairs could not find any viable lairs within proximity of the player.");
+            return;
+        }
 
         for( local i = 0; i < _iterations; i++ )
         {
             foreach( lair in viableLairs )
             {
-                this.logWrapper("Found lair candidate.");
-                this.setLairAgitation(lair, this.Procedures.Increment);
+                this.logWrapper(format("Performing agitation increment procedure on %s.", lair.getName()));
+                this.setLairAgitation(lair, this.Procedures.Increment, false);
             }
+        }
+
+        foreach( lair in viableLairs )
+        {
+            this.updateLairProperties(lair, this.Procedures.Increment);
         }
     }
 
@@ -398,7 +409,7 @@
             }
             else if (!::RPGR_Raids.isLocationTypeViable(_entity.getLocationType()))
             {
-                ::RPGR_Raids.logWrapper(format("%s is not an eligible lair.", _entity.getName()));
+                ::RPGR_Raids.logWrapper(format("%s is not an viable lair.", _entity.getName()));
                 return false;
             }
 
@@ -573,7 +584,7 @@
         return _locationType == ::Const.World.LocationType.Lair || _locationType == (::Const.World.LocationType.Lair | ::Const.World.LocationType.Mobile);
     }
 
-    function isLairEligibleForProcedure( _lair, _procedure )
+    function isLairViableForProcedure( _lair, _procedure )
     {
         local agitationState = _lair.getFlags().get("Agitation");
         local lairName = _lair.getName();
@@ -596,7 +607,7 @@
             return false;
         }
 
-        this.logWrapper(format("Lair %s is eligible for agitation state change procedures.", lairName));
+        this.logWrapper(format("Lair %s is viable for agitation state change procedures.", lairName));
         return true;
     }
 
@@ -773,9 +784,9 @@
         return troopsTemplate;
     }
 
-    function setLairAgitation( _lair, _procedure ) // TODO: separate defender roster update and resource scaling from agitation update
+    function setLairAgitation( _lair, _procedure, _updateProperties = true )
     {
-        if (!this.isLairEligibleForProcedure(_lair, _procedure))
+        if (!this.isLairViableForProcedure(_lair, _procedure))
         {
             return;
         }
@@ -802,27 +813,11 @@
         }
 
         flags.set("LastAgitationUpdate", ::World.getTime().Days);
-        local baseResources = flags.get("BaseResources");
-        local resourceModifier = -0.0006 * baseResources + 0.4;
-        local agitationResourceOffset = resourceModifier * baseResources * (flags.get("Agitation") - 1) * (this.Mod.ModSettings.getSetting("AgitationResourceModifier").getValue() / 100.0);
-        _lair.m.Resources = ::Math.floor(baseResources + agitationResourceOffset);
-        this.logWrapper("Refreshing lair defender roster on agitation update.");
-        _lair.createDefenders();
-        _lair.setLootScaleBasedOnResources(_lair.getResources());
 
-        if (_procedure != this.Procedures.Increment)
+        if (_updateProperties)
         {
-            this.depopulateLairNamedLoot(_lair);
-            return;
+            this.updateLairProperties(_lair, _procedure);
         }
-
-        if (::Math.rand(1, 100) > this.CampaignModifiers.LairNamedLootRefreshChance && flags.get("Agitation") != this.AgitationDescriptors.Militant)
-        {
-            this.logWrapper(format("Skipping named loot refresh procedure within this agitation cycle for lair %s.", _lair.getName()));
-            return;
-        }
-
-        this.repopulateLairNamedLoot(_lair);
     }
 
     function updateCombatStatistics( _flagStates )
@@ -863,6 +858,33 @@
                 break;
             }
         }
+    }
+
+    function updateLairProperties( _lair, _procedure )
+    {
+        local flags = _lair.getFlags();
+        local baseResources = flags.get("BaseResources");
+        local resourceModifier = -0.0006 * baseResources + 0.4;
+        local naiveModifier = this.Mod.ModSettings.getSetting("AgitationResourceModifier").getValue() / 100.0;
+        local agitationResourceOffset = resourceModifier * baseResources * (flags.get("Agitation") - 1) * naiveModifier;
+        _lair.m.Resources = ::Math.floor(baseResources + agitationResourceOffset);
+        this.logWrapper("Refreshing lair defender roster on agitation update.");
+        _lair.createDefenders();
+        _lair.setLootScaleBasedOnResources(_lair.getResources());
+
+        if (_procedure != this.Procedures.Increment)
+        {
+            this.depopulateLairNamedLoot(_lair);
+            return;
+        }
+
+        if (::Math.rand(1, 100) > this.CampaignModifiers.LairNamedLootRefreshChance && flags.get("Agitation") != this.AgitationDescriptors.Militant)
+        {
+            this.logWrapper(format("Skipping named loot refresh procedure within this agitation cycle for lair %s.", _lair.getName()));
+            return;
+        }
+
+        this.repopulateLairNamedLoot(_lair);
     }
 };
 
