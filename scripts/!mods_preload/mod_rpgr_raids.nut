@@ -17,7 +17,7 @@
         Plentiful = 3,
         Abundant = 4
     },
-    CaravanCargoDescriptors =
+    CaravanCargoDescriptors = // FIXME: these needn't be ordered, consider different approach
     {
         Supplies = 1,
         Trade = 2,
@@ -129,10 +129,7 @@
             "situation.greenskins",
             "situation.raided"
         ];
-        local settlementSituations = _settlement.getSituations().map(function( _situation )
-        {
-            return _situation.getID();
-        });
+        local settlementSituations = _settlement.getSituations().map(@(_situation) _situation.getID());
 
         foreach( situation in settlementSituations )
         {
@@ -154,10 +151,7 @@
         local produce = _settlement.getProduce();
         local flags = _caravan.getFlags();
         local descriptor = this.getDescriptor(flags.get("CaravanCargo"), this.CaravanCargoDescriptors).tolower();
-        local actualProduce = produce.filter(function( _index, _value )
-        {
-            return _value.find(descriptor) != null;
-        });
+        local actualProduce = produce.filter(@(_index,_value) _value.find(descriptor) != null);
 
         if (actualProduce.len() == 0)
         {
@@ -228,10 +222,7 @@
         }
 
         local culledString = "scripts/items/";
-        local goods = scriptFiles.map(function( _stringPath )
-        {
-            return _stringPath.slice(culledString.len());
-        });
+        local goods = scriptFiles.map(@(_stringPath) _stringPath.slice(culledString.len()));
         return goods;
     }
 
