@@ -267,7 +267,7 @@
             local orderedArray = this.generateOrderedArray(_function, originalMethod, _procedure);
             local arguments = clone vargv;
             arguments.insert(0, this);
-            return this.orderedCall(orderedArray, arguments, _procedure, _returnOverride);
+            return ::RPGR_Raids.Standard.orderedCall(orderedArray, arguments, _procedure, _returnOverride);
         }
     }
 };
