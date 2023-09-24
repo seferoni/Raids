@@ -16,6 +16,17 @@
         return vanilla_onCombatStarted;
     }
 
+    ::RPGR_Raids.Standard.wrap(this, "onCombatStarted", function()
+    {
+        if (!::RPGR_Raids.Shared.isPlayerInProximityTo(this.getTile()))
+        {
+            return;
+        }
+
+        ::RPGR_Raids.Lairs.updateCombatStatistics([this.getFlags().get("IsVanguard"), true]);
+    });
+
+    ##############################
     local oDLFP_nullCheck = "onDropLootForPlayer" in object ? object.onDropLootForPlayer : null;
     object.onDropLootForPlayer = function( _lootTable )
     {
