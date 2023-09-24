@@ -5,37 +5,6 @@
         GlobalProximityTiles = 9
     },
 
-    /*function acall( _function, _argumentsArray )
-    {
-        switch(_argumentsArray.len())
-        {
-            case(0):
-            {
-                return _function();
-            }
-
-            case(1):
-            {
-                return _function(_argumentsArray[0]);
-            }
-
-            case(2):
-            {
-                return _function(_argumentsArray[0], _argumentsArray[1]);
-            }
-
-            case(3):
-            {
-                return _function(_argumentsArray[0], _argumentsArray[1], _argumentsArray[2]);
-            }
-
-            case(4):
-            {
-                return _function(_argumentsArray[0], _argumentsArray[1], _argumentsArray[2], _argumentsArray[3]);
-            }
-        }
-    }*/
-
     function addToInventory( _party, _goodsPool, _isCaravan = false ) // TODO: this doesn't need the isCaravan argument, rewrite
     {
         local iterations = _party.getFlags().get("CaravanWealth") != false ? ::Math.rand(1, _party.getFlags().get("CaravanWealth") - 1) : ::Math.rand(1, 2);
