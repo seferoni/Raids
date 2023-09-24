@@ -244,13 +244,13 @@
         ::logInfo(format("[Raids] %s", _string));
     }
 
-    function orderedCall( _object, _functions, _argumentsArray, _procedure, _returnOverride = null )
+    function orderedCall( _functions, _argumentsArray, _procedure, _returnOverride = null )
     {
         local returnValues = [];
 
         foreach( functionDef in _functions )
         {
-            returnValues.push(functionDef.acall([_object, _argumentsArray])); // TODO: see what context object we need to be in
+            returnValues.push(functionDef.acall(_argumentsArray)); // TODO: see what context object we need to be in
         }
 
         return _procedure[1] == "returnFirst" ? returnValues[0] : _procedure[1] == "returnSecond" ? returnValue[1] : _returnOverride;
@@ -265,7 +265,9 @@
         {
             local originalMethod = cachedMethod == null ? this[parentName][_functionName] : cachedMethod;
             local orderedArray = this.generateOrderedArray(_function, originalMethod, _procedure);
-            return this.orderedCall(_object, orderedArray, vargv, _procedure, _returnOverride);
+            local arguments = clone vargv;
+            arguments.insert(0, this);
+            return this.orderedCall(orderedArray, arguments, _procedure, _returnOverride);
         }
     }
 };
