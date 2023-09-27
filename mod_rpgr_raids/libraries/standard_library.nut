@@ -1,26 +1,14 @@
-::RPGR_Raids.Standard <-
+local Raids = ::RPGR_Raids;
+Raids.Standard <-
 {
     Parameters =
     {
         GlobalProximityTiles = 9
     },
 
-    function addToInventory( _party, _goodsPool, _isCaravan = false ) // TODO: this doesn't need the isCaravan argument, rewrite
-    {
-        local iterations = _party.getFlags().get("CaravanWealth") != false ? ::Math.rand(1, _party.getFlags().get("CaravanWealth") - 1) : ::Math.rand(1, 2);
-
-        for( local i = 0; i < iterations; i++ )
-        {
-            local good = _goodsPool[::Math.rand(0, _goodsPool.len() - 1)];
-            this.logWrapper(format("Added item with filepath %s to the inventory of %s.", good, _party.getName()));
-            _party.addToInventory(good);
-        }
-    }
-
     function cacheHookedMethod( _object, _functionName )
     {
         local naiveMethod = null;
-        local parentName = _object.SuperName;
 
         if (_functionName in _object)
         {
@@ -30,131 +18,9 @@
         return naiveMethod;
     }
 
-    function createNaivePartyLoot( _party, _includeSupplies = true )
+    function colourWrap( _string, _colour )
     {
-        local exclusionList =
-        [
-            "supplies/food_item",
-            "supplies/money_item",
-            "trade/trading_good_item",
-            "supplies/strange_meat_item",
-            "supplies/fermented_unhold_heart_item",
-            "supplies/black_marsh_stew_item"
-        ];
-        local southernGoods =
-        [
-            "supplies/dates_item",
-            "supplies/rice_item",
-            "trade/silk_item",
-            "trade/spices_item",
-            "trade/incense_item"
-        ];
-        local southernFactions =
-        [
-            ::Const.FactionType.OrientalBandits,
-            ::Const.FactionType.OrientalCityState
-        ];
-
-        foreach( factionType in southernFactions )
-        {
-            if (::World.FactionManager.getFaction(_party.getFaction()).getType() == factionType)
-            {
-                return southernGoods;
-            }
-        }
-
-        exclusionList.extend(southernGoods);
-        local scriptFiles = ::IO.enumerateFiles("scripts/items/trade");
-
-        if (_includeSupplies)
-        {
-            scriptFiles.extend(::IO.enumerateFiles("scripts/items/supplies"));
-        }
-
-        foreach( excludedFile in exclusionList )
-        {
-            local index = scriptFiles.find("scripts/items/" + excludedFile);
-
-            if (index != null)
-            {
-                scriptFiles.remove(index);
-            }
-        }
-
-        local culledString = "scripts/items/";
-        local goods = scriptFiles.map(@(_stringPath) _stringPath.slice(culledString.len()));
-        return goods;
-    }
-
-    function createNaiveNamedLoot( _namedItemKeys )
-    {
-        local namedLoot = [];
-
-        foreach( key in _namedItemKeys )
-        {
-            namedLoot.extend(::Const.Items[key]);
-        }
-
-        return namedLoot;
-    }
-
-    function createNamedLoot( _lair = null )
-    {
-        local namedItemKeys = ["NamedArmors", "NamedWeapons", "NamedHelmets", "NamedShields"];
-
-        if (_lair == null)
-        {
-            return this.createNaiveNamedLoot(namedItemKeys);
-        }
-
-        if (::Math.rand(1, 100) > ::RPGR_Raids.Lairs.Parameters.FactionSpecificNamedLootChance)
-        {
-            this.logWrapper(format("Returning naive named loot tables for %s.", _lair.getName()));
-            return this.createNaiveNamedLoot(namedItemKeys);
-        }
-
-        local namedLoot = [];
-
-        foreach( key in namedItemKeys )
-        {
-            if (_lair.m[key + "List"] != null)
-            {
-                namedLoot.extend(_lair.m[key + "List"]);
-            }
-        }
-
-        if (namedLoot.len() == 0)
-        {
-            this.logWrapper(format("%s has no non-empty named loot tables, returning naive named loot tables.", _lair.getName()));
-            return this.createNaiveNamedLoot(namedItemKeys);
-        }
-
-        return namedLoot;
-    }
-
-    function generateTooltipTableEntry( _id, _type, _icon, _text )
-    {
-        local tableEntry =
-        {
-            id = _id,
-            type = _type,
-            icon = _icon,
-            text = _text
-        }
-
-        return tableEntry;
-    }
-
-    function generateOrderedArray( _firstEntry, _secondEntry, _procedure )
-    {
-        local orderedArray = [_firstEntry, _secondEntry];
-
-        if (_procedure[0] == "reverse")
-        {
-            orderedArray.reverse();
-        }
-
-        return orderedArray;
+        return format("[color=%x] %s [/color]", ::Const.UI.Color[_colour], _string)
     }
 
     function getDescriptor( _valueToMatch, _referenceTable )
@@ -168,20 +34,25 @@
         }
     }
 
+    function getOriginalResult( _argumentsArray )
+    {
+        return _argumentsArray[0];
+    }
+
     function getSetting( _settingID )
     {
-        if (::RPGR_Raids.MSUFound)
+        if (Raids.Internal.MSUFound)
         {
-            return ::RPGR_Raids.Mod.ModSettings.getSetting(_settingID).getValue();
+            return Raids.Mod.ModSettings.getSetting(_settingID).getValue();
         }
 
-        if (!(_settingID in ::RPGR_Raids.Defaults))
+        if (!(_settingID in Raids.Defaults))
         {
-            this.logWrapper(format("Invalid settingID %s passed to getSetting, returning null.", _settingID), true);
+            this.log(format("Invalid settingID %s passed to getSetting, returning null.", _settingID), true);
             return null;
         }
 
-        return ::RPGR_Raids.Defaults[_settingID];
+        return Raids.Defaults[_settingID];
     }
 
     function includeFiles( _path )
@@ -192,12 +63,7 @@
         }
     }
 
-    function isPlayerInProximityTo( _targetTile )
-    {
-        return ::World.State.getPlayer().getTile().getDistanceTo(_targetTile) <= this.Parameters.GlobalProximityTiles;
-    }
-
-    function logWrapper( _string, _isError = false )
+    function log( _string, _isError = false )
     {
         if (_isError)
         {
@@ -213,30 +79,70 @@
         ::logInfo(format("[Raids] %s", _string));
     }
 
-    function orderedCall( _functions, _argumentsArray, _procedure, _returnOverride = null )
+    function makeTooltip( _id, _type, _icon, _text )
     {
-        local returnValues = [];
-
-        foreach( functionDef in _functions )
+        local tableEntry =
         {
-            returnValues.push(functionDef.acall(_argumentsArray)); // TODO: see what context object we need to be in
+            id = _id,
+            type = _type,
+            icon = format("ui/icons/%s", _icon),
+            text = _text
         }
 
-        return _procedure[1] == "returnFirst" ? returnValues[0] : _procedure[1] == "returnSecond" ? returnValue[1] : _returnOverride;
+        return tableEntry;
     }
 
-    function wrap( _object, _functionName, _function, _procedure = [null, "returnFirst"], _returnOverride = null )
-    {
-        local cachedMethod = this.cacheHookedMethod(_object, _functionName);
-        local parentName = _object.SuperName;
+    function overrideArguments( _object, _function, _originalMethod, _argumentsArray )
+    {   # Calls new method and passes result onto original method; if null, calls original method with original arguments.
+        # It is the responsibility of the overriding function to return appropriate arguments.
+        local returnValue = _function.acall(_argumentsArray);
+        local newArguments = returnValue == null ? _argumentsArray : this.prependContextObject(_object, returnValue);
+        return _originalMethod.acall(newArguments);
+    }
 
-        _object[_functionName] = function( ... )
+    function overrideMethod( _object, _function, _originalMethod, _argumentsArray )
+    {   # Calls and returns new method; if return value is null, calls and returns original method.
+        local returnValue = _function.acall(_argumentsArray);
+        return returnValue == null ? _originalMethod.acall(_argumentsArray) : (returnValue == ::RPGR_Raids.Internal.TERMINATE ? null : returnValue);
+    }
+
+    function overrideReturn( _object, _function, _originalMethod, _argumentsArray )
+    {   # Calls original method and passes result onto new method, returns new result. Ideal for tooltips.
+        # It is the responsibility of the overriding function to ensure it takes on the appropriate arguments and returns appropriate values.
+        local originalValue = _originalMethod.acall(_argumentsArray);
+        _argumentsArray.insert(1, originalValue);
+        local returnValue = _function.acall(_argumentsArray);
+        return returnValue == null ? _originalValue : (returnValue == ::RPGR_Raids.Internal.TERMINATE ? null : returnValue);
+    }
+
+    function prependContextObject( _object, _arguments )
+    {
+        local array = [_object];
+
+        if (typeof _arguments != "array")
         {
-            local originalMethod = cachedMethod == null ? this[parentName][_functionName] : cachedMethod;
-            local orderedArray = this.generateOrderedArray(_function, originalMethod, _procedure);
-            local arguments = clone vargv;
-            arguments.insert(0, this);
-            return ::RPGR_Raids.Standard.orderedCall(orderedArray, arguments, _procedure, _returnOverride);
+            array.push(_arguments);
+            return array;
         }
+
+        foreach( entry in _arguments )
+        {
+            array.push(entry);
+        }
+
+        return array;
+    }
+
+    function wrap( _object, _functionName, _function, _procedure )
+    {
+        local cachedMethod = this.cacheHookedMethod(_object, _functionName),
+        parentName = _object.SuperName;
+
+        _object.rawset(_functionName, function( ... ) // TODO: check if rawset is the right procedure here
+        {
+            local originalMethod = cachedMethod == null ? this[parentName][_functionName] : cachedMethod,
+            argumentsArray = ::RPGR_Raids.Standard.prependContextObject(this, vargv);
+            return ::RPGR_Raids.Standard[_procedure](this, _function, originalMethod, argumentsArray);
+        });
     }
 };

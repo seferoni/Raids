@@ -3,6 +3,10 @@
     ID = "mod_rpgr_raids",
     Name = "RPG Rebalance - Raids",
     Version = "1.0.0",
+    Internal =
+    {
+        TERMINATE = "__end"
+    }
     Defaults =
     {
         AgitationDecayInterval = 7,
@@ -18,21 +22,22 @@
     }
 }
 
-::mods_registerMod(::RPGR_Raids.ID, ::RPGR_Raids.Version, ::RPGR_Raids.Name);
-::mods_queue(::RPGR_Raids.ID, ">mod_msu(>=1.2.6)", function() // TODO: check if functional with latest MSU
+local Raids = ::RPGR_Raids;
+::mods_registerMod(Raids.ID, Raids.Version, Raids.Name);
+::mods_queue(Raids.ID, ">mod_msu(>=1.2.6)", function() // TODO: check if functional with latest MSU
 {
-    ::RPGR_Raids.MSUFound <- ::mods_getRegisteredMod("mod_msu");
+    Raids.Internal.MSUFound <- ::mods_getRegisteredMod("mod_msu") != null;
 
-    if (!::RPGR_Raids.MSUFound)
+    if (!Raids.Internal.MSUFound)
     {
         return;
     }
 
-    ::RPGR_Raids.Mod <- ::MSU.Class.Mod(::RPGR_Raids.ID, ::RPGR_Raids.Version, ::RPGR_Raids.Name);
+    Raids.Mod <- ::MSU.Class.Mod(Raids.ID, Raids.Version, Raids.Name);
 
-    local pageGeneral = ::RPGR_Raids.Mod.ModSettings.addPage("General");
-    local pageLairs = ::RPGR_Raids.Mod.ModSettings.addPage("Lairs");
-    local pageCaravans = ::RPGR_Raids.Mod.ModSettings.addPage("Caravans");
+    local pageGeneral = Raids.Mod.ModSettings.addPage("General");
+    local pageLairs = Raids.Mod.ModSettings.addPage("Lairs");
+    local pageCaravans = Raids.Mod.ModSettings.addPage("Caravans");
 
     local agitationDecayInterval = pageLairs.addRangeSetting("AgitationDecayInterval", 7, 1, 50, 1, "Agitation Decay Interval");
     agitationDecayInterval.setDescription("Determines the time interval in days after which a location's agitation value drops by one tier.");
