@@ -32,7 +32,7 @@
 
         if (viableLairs.len() == 0)
         {
-            this.logWrapper("agitateViableLairs could not find any viable lairs within proximity of the player.");
+            this.log("agitateViableLairs could not find any viable lairs within proximity of the player.");
             return;
         }
 
@@ -40,7 +40,7 @@
         {
             foreach( lair in viableLairs )
             {
-                this.logWrapper(format("Performing agitation increment procedure on %s.", lair.getName()));
+                this.log(format("Performing agitation increment procedure on %s.", lair.getName()));
                 this.setLairAgitation(lair, this.Procedures.Increment, false);
             }
         }
@@ -94,7 +94,7 @@
             if (item.isItemType(::Const.Items.ItemType.Named))
             {
                 items.remove(itemIndex);
-                this.logWrapper(format("depopulateLairNamedLoot removed %s from the inventory of lair %s.", item.getName(), _lair.getName()));
+                this.log(format("depopulateLairNamedLoot removed %s from the inventory of lair %s.", item.getName(), _lair.getName()));
                 break;
             }
         }
@@ -106,11 +106,11 @@
 
         if (_faction.getSettlements().len() == 0)
         {
-            this.logWrapper("findLairCandidates was passed a viable faction as an argument, but this faction has no settlements at present.");
+            this.log("findLairCandidates was passed a viable faction as an argument, but this faction has no settlements at present.");
             return lairs;
         }
 
-        this.logWrapper("Proceeding to lair candidate selection.");
+        this.log("Proceeding to lair candidate selection.");
         lairs.extend(_faction.getSettlements().filter(function( _locationIndex, _location )
         {
             return ::RPGR_Raids.isLocationTypeViable(_location.getLocationType()) && ::RPGR_Raids.isPlayerInProximityTo(_location.getTile());
@@ -130,7 +130,7 @@
             }
             else if (!::RPGR_Raids.isLocationTypeViable(_entity.getLocationType()))
             {
-                ::RPGR_Raids.logWrapper(format("%s is not an viable lair.", _entity.getName()));
+                ::RPGR_Raids.log(format("%s is not an viable lair.", _entity.getName()));
                 return false;
             }
 
@@ -175,7 +175,7 @@
     function initialiseVanguardParameters( _party )
     {
         local partyName = _party.getName();
-        ::RPGR_Raids.logWrapper(format("%s are eligible for Vanguard status.", partyName));
+        ::RPGR_Raids.log(format("%s are eligible for Vanguard status.", partyName));
         _party.setName(format("Vanguard %s", partyName));
         _party.getFlags().set("IsVanguard", true);
         ::RPGR_Raids.addToInventory(_party, ::RPGR_Raids.createNaivePartyLoot(_party, false));
@@ -197,7 +197,7 @@
 
         if (activeContract.m.Destination.get() == _lair) // TODO: test this again
         {
-            this.logWrapper(format("%s was found to be an active contract location, aborting.", lair.getName()));
+            this.log(format("%s was found to be an active contract location, aborting.", lair.getName()));
             return true;
         }
 
@@ -241,23 +241,23 @@
 
         if (agitationState > this.AgitationDescriptors.Militant || agitationState < this.AgitationDescriptors.Relaxed)
         {
-            this.logWrapper(format("Agitation for %s occupies an out-of-bounds value.", lairName), true);
+            this.log(format("Agitation for %s occupies an out-of-bounds value.", lairName), true);
             return false;
         }
 
         if (_procedure == this.Procedures.Increment && agitationState >= this.AgitationDescriptors.Militant)
         {
-            this.logWrapper(format("Agitation for %s is capped, aborting procedure.", lairName));
+            this.log(format("Agitation for %s is capped, aborting procedure.", lairName));
             return false;
         }
 
         if (_procedure == this.Procedures.Decrement && agitationState <= this.AgitationDescriptors.Relaxed)
         {
-            this.logWrapper(format("Agitation for %s is already at its minimum value, aborting procedure.", lairName));
+            this.log(format("Agitation for %s is already at its minimum value, aborting procedure.", lairName));
             return false;
         }
 
-        this.logWrapper(format("Lair %s is viable for agitation state change procedures.", lairName));
+        this.log(format("Lair %s is viable for agitation state change procedures.", lairName));
         return true;
     }
 
@@ -287,7 +287,7 @@
     {
         local namedLootChance = this.getNamedLootChance(_lair);
         local iterations = 0;
-        this.logWrapper(format("namedLootChance is %.2f for lair %s.", namedLootChance, _lair.getName()));
+        this.log(format("namedLootChance is %.2f for lair %s.", namedLootChance, _lair.getName()));
 
         if (namedLootChance > 100)
         {
@@ -310,7 +310,7 @@
         {
             local namedItem = namedLoot[::Math.rand(0, namedLoot.len() - 1)];
             _lair.getLoot().add(::new("scripts/items/" + namedItem));
-            this.logWrapper(format("Added item with filepath %s to the inventory of %s.", namedItem, _lair.getName()));
+            this.log(format("Added item with filepath %s to the inventory of %s.", namedItem, _lair.getName()));
         }
     }
 
@@ -331,7 +331,7 @@
 
         if (bailOut == maximumIterations)
         {
-            this.logWrapper(format("Exceeded maximum iterations for troop assignment for party %s.", _party.getName()));
+            this.log(format("Exceeded maximum iterations for troop assignment for party %s.", _party.getName()));
         }
 
         return troopsTemplate;
@@ -361,7 +361,7 @@
                 break;
 
             default:
-                this.logWrapper("setLairAgitation was called with an invalid procedure value.", true);
+                this.log("setLairAgitation was called with an invalid procedure value.", true);
                 return;
         }
 
@@ -397,7 +397,7 @@
             return;
         }
 
-        this.logWrapper(format("Last agitation update occurred %i days ago.", timeDifference));
+        this.log(format("Last agitation update occurred %i days ago.", timeDifference));
         local decrementIterations = ::Math.floor(timeDifference / decayInterval);
 
         for( local i = 0; i != decrementIterations; i = ++i )
@@ -418,7 +418,7 @@
         local naiveModifier = this.Mod.ModSettings.getSetting("AgitationResourceModifier").getValue() / 100.0;
         local agitationResourceOffset = resourceModifier * baseResources * (flags.get("Agitation") - 1) * naiveModifier;
         _lair.m.Resources = ::Math.floor(baseResources + agitationResourceOffset);
-        this.logWrapper("Refreshing lair defender roster on agitation update.");
+        this.log("Refreshing lair defender roster on agitation update.");
         _lair.createDefenders();
         _lair.setLootScaleBasedOnResources(_lair.getResources());
 
@@ -430,7 +430,7 @@
 
         if (::Math.rand(1, 100) > this.Parameters.LairNamedLootRefreshChance && flags.get("Agitation") != this.AgitationDescriptors.Militant)
         {
-            this.logWrapper(format("Skipping named loot refresh procedure within this agitation cycle for lair %s.", _lair.getName()));
+            this.log(format("Skipping named loot refresh procedure within this agitation cycle for lair %s.", _lair.getName()));
             return;
         }
 

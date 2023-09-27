@@ -68,7 +68,7 @@
 
         if (actualProduce.len() == 0)
         {
-            this.logWrapper(format("%s has no produce corresponding to caravan cargo type.", _settlement.getName()));
+            this.log(format("%s has no produce corresponding to caravan cargo type.", _settlement.getName()));
             local newCargoType = ::Math.rand(1, 100) <= 50 ? this.CaravanCargoDescriptors.Assortment : this.CaravanCargoDescriptors.Unassorted;
             flags.set("CaravanCargo", newCargoType);
 
@@ -177,7 +177,7 @@
         local randomNumber = ::Math.rand(1, 100);
         local cargoType = (randomNumber <= distributions.Assortment || _settlement.getProduce().len() == 0) ? "Assortment" : randomNumber <= distributions.Supplies ? "Supplies" : "Trade";
         flags.set("CaravanCargo", this.CaravanCargoDescriptors[cargoType]);
-        this.logWrapper(format("Rolled %i for caravan cargo assignment for caravan from %s of the newly assigned cargo type %s.", randomNumber, _settlement.getName(), this.getDescriptor(flags.get("CaravanCargo"), this.CaravanCargoDescriptors)));
+        this.log(format("Rolled %i for caravan cargo assignment for caravan from %s of the newly assigned cargo type %s.", randomNumber, _settlement.getName(), this.getDescriptor(flags.get("CaravanCargo"), this.CaravanCargoDescriptors)));
         this.populateCaravanInventory(_caravan, _settlement);
 
         if (::Math.rand(1, 100) <= this.Mod.ModSettings.getSetting("CaravanReinforcementChance").getValue() || flags.get("CaravanWealth") >= this.CaravanWealthDescriptors.Plentiful)
@@ -263,7 +263,7 @@
                 return "asset_food.png"
 
             default:
-                this.logWrapper("Invalid caravan cargo value, unable to retrieve icon.", true);
+                this.log("Invalid caravan cargo value, unable to retrieve icon.", true);
         }
     }
 
@@ -272,7 +272,7 @@
         local namedCargo = this.createNamedLoot();
         local namedItem = ::new("scripts/items/" + namedCargo[::Math.rand(0, namedCargo.len() - 1)]);
         namedItem.onAddedToStash(null);
-        this.logWrapper(format("Added %s to the loot table.", namedItem.getName()));
+        this.log(format("Added %s to the loot table.", namedItem.getName()));
         _lootTable.push(namedItem);
     }
 };

@@ -8,7 +8,7 @@ local Raids = ::RPGR_Raids;
         for( local i = 0; i < iterations; i++ )
         {
             local good = _goodsPool[::Math.rand(0, _goodsPool.len() - 1)];
-            this.logWrapper(format("Added item with filepath %s to the inventory of %s.", good, _party.getName()));
+            this.log(format("Added item with filepath %s to the inventory of %s.", good, _party.getName()));
             _party.addToInventory(good);
         }
     }
@@ -92,7 +92,7 @@ local Raids = ::RPGR_Raids;
 
         if (::Math.rand(1, 100) > ::RPGR_Raids.Lairs.Parameters.FactionSpecificNamedLootChance)
         {
-            this.logWrapper(format("Returning naive named loot tables for %s.", _lair.getName()));
+            this.log(format("Returning naive named loot tables for %s.", _lair.getName()));
             return this.createNaiveNamedLoot(namedItemKeys);
         }
 
@@ -108,7 +108,7 @@ local Raids = ::RPGR_Raids;
 
         if (namedLoot.len() == 0)
         {
-            this.logWrapper(format("%s has no non-empty named loot tables, returning naive named loot tables.", _lair.getName()));
+            this.log(format("%s has no non-empty named loot tables, returning naive named loot tables.", _lair.getName()));
             return this.createNaiveNamedLoot(namedItemKeys);
         }
 

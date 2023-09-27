@@ -39,7 +39,7 @@
 
         if (::RPGR_Raids.isActiveContractLocation(this))
         {
-            ::RPGR_Raids.logWrapper(format("%s was found to be an active contract location, aborting.", this.getName()));
+            ::RPGR_Raids.log(format("%s was found to be an active contract location, aborting.", this.getName()));
             return tooltipArray;
         }
 
