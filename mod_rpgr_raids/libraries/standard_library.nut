@@ -142,7 +142,7 @@ Raids.Standard <-
 
     function validateParameters( _originalFunction, _newParameters )
     {
-        local oldParameters = _originalFunction.getInfos().parameters;
+        local oldParameters = _originalFunction.getinfos().parameters;
 
         if (oldParameters[oldParameters.len() - 1] == "...")
         {
