@@ -160,10 +160,10 @@ Raids.Standard <-
     function wrap( _object, _functionName, _function, _procedure )
     {
         local cachedMethod = this.cacheHookedMethod(_object, _functionName),
-        Raids = ::RPGR_Raids;
+        Raids = ::RPGR_Raids,
         parentName = _object.SuperName;
 
-        _object.rawset(_functionName, function( ... ) // TODO: check if rawset is the right procedure here
+        _object.rawset(_functionName, function( ... )
         {
             local originalMethod = cachedMethod == null ? this[parentName][_functionName] : cachedMethod;
 
