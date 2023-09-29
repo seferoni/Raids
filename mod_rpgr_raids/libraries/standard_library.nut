@@ -1,11 +1,6 @@
 local Raids = ::RPGR_Raids;
 Raids.Standard <-
 {
-    Parameters =
-    {
-        GlobalProximityTiles = 9
-    },
-
     function cacheHookedMethod( _object, _functionName )
     {
         local naiveMethod = null;
@@ -18,9 +13,16 @@ Raids.Standard <-
         return naiveMethod;
     }
 
-    function colourWrap( _string, _colour )
+    function colourWrap( _text, _colour )
     {
-        return format("[color=%x] %s [/color]", ::Const.UI.Color[_colour], _string)
+        local string = _text;
+
+        if (typeof _text != "string")
+        {
+            string = _text.tostring();
+        }
+
+        return format("[color=%s] %s [/color]", ::Const.UI.Color[_colour], string)
     }
 
     function getDescriptor( _valueToMatch, _referenceTable )
@@ -53,6 +55,11 @@ Raids.Standard <-
         }
 
         return Raids.Defaults[_settingID];
+    }
+
+    function getPercentageSetting( _settingID )
+    {
+        return (this.getSetting(_settingID) / 100.0)
     }
 
     function includeFiles( _path )
@@ -107,12 +114,12 @@ Raids.Standard <-
     }
 
     function overrideReturn( _object, _function, _originalMethod, _argumentsArray )
-    {   # Calls original method and passes result onto new method, returns new result. Ideal for tooltips.
+    {   # Calls original method and passes result onto new method, returns new result.
         # It is the responsibility of the overriding function to ensure it takes on the appropriate arguments and returns appropriate values.
         local originalValue = _originalMethod.acall(_argumentsArray);
         _argumentsArray.insert(1, originalValue);
         local returnValue = _function.acall(_argumentsArray);
-        return returnValue == null ? _originalValue : (returnValue == ::RPGR_Raids.Internal.TERMINATE ? null : returnValue);
+        return returnValue == null ? originalValue : (returnValue == ::RPGR_Raids.Internal.TERMINATE ? null : returnValue);
     }
 
     function prependContextObject( _object, _arguments )
@@ -133,16 +140,41 @@ Raids.Standard <-
         return array;
     }
 
+    function validateParameters( _originalFunction, _newParameters )
+    {
+        local oldParameters = _originalFunction.getInfos().parameters;
+
+        if (oldParameters[oldParameters.len() - 1] == "...")
+        {
+            return true;
+        }
+
+        if (_newParameters.len() + 1 == oldParameters.len())
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     function wrap( _object, _functionName, _function, _procedure )
     {
         local cachedMethod = this.cacheHookedMethod(_object, _functionName),
+        Raids = ::RPGR_Raids;
         parentName = _object.SuperName;
 
         _object.rawset(_functionName, function( ... ) // TODO: check if rawset is the right procedure here
         {
-            local originalMethod = cachedMethod == null ? this[parentName][_functionName] : cachedMethod,
-            argumentsArray = ::RPGR_Raids.Standard.prependContextObject(this, vargv);
-            return ::RPGR_Raids.Standard[_procedure](this, _function, originalMethod, argumentsArray);
+            local originalMethod = cachedMethod == null ? this[parentName][_functionName] : cachedMethod;
+
+            if (!Raids.Standard.validateParameters(originalMethod, vargv))
+            {
+                Raids.Standard.log(format("An invalid number of parameters were passed to %s, aborting wrap procedure.", _functionName), true);
+                return;
+            }
+
+            local argumentsArray = Raids.Standard.prependContextObject(this, vargv);
+            return Raids.Standard[_procedure](this, _function, originalMethod, argumentsArray);
         });
     }
 };

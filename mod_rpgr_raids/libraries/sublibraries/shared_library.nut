@@ -1,14 +1,19 @@
 local Raids = ::RPGR_Raids;
-::RPGR_Raids.Shared <-
+Raids.Shared <-
 {
-    function addToInventory( _party, _goodsPool, _isCaravan = false ) // TODO: this doesn't need the isCaravan argument, rewrite
+    Parameters =
+    {
+        GlobalProximityTiles = 9
+    },
+
+    function addToInventory( _party, _goodsPool )
     {
         local iterations = _party.getFlags().get("CaravanWealth") != false ? ::Math.rand(1, _party.getFlags().get("CaravanWealth") - 1) : ::Math.rand(1, 2);
 
         for( local i = 0; i < iterations; i++ )
         {
             local good = _goodsPool[::Math.rand(0, _goodsPool.len() - 1)];
-            this.log(format("Added item with filepath %s to the inventory of %s.", good, _party.getName()));
+            Raids.Standard.log(format("Added item with filepath %s to the inventory of %s.", good, _party.getName()));
             _party.addToInventory(good);
         }
     }
@@ -92,7 +97,7 @@ local Raids = ::RPGR_Raids;
 
         if (::Math.rand(1, 100) > ::RPGR_Raids.Lairs.Parameters.FactionSpecificNamedLootChance)
         {
-            this.log(format("Returning naive named loot tables for %s.", _lair.getName()));
+            Raids.Standard.log(format("Returning naive named loot tables for %s.", _lair.getName()));
             return this.createNaiveNamedLoot(namedItemKeys);
         }
 
@@ -108,7 +113,7 @@ local Raids = ::RPGR_Raids;
 
         if (namedLoot.len() == 0)
         {
-            this.log(format("%s has no non-empty named loot tables, returning naive named loot tables.", _lair.getName()));
+            Raids.Standard.log(format("%s has no non-empty named loot tables, returning naive named loot tables.", _lair.getName()));
             return this.createNaiveNamedLoot(namedItemKeys);
         }
 

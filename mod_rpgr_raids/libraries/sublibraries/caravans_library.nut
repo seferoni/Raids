@@ -1,4 +1,5 @@
-::RPGR_Raids.Caravans <-
+local Raids = ::RPGR_Raids;
+Raids.Caravans <-
 {
     CargoDescriptors =
     {
@@ -28,21 +29,21 @@
 
     function calculateSettlementSituationModifier( _settlement )
     {
-        local modifier = 0, smallestIncrement = 1.0;
-        local synergisticSituations =
+        local modifier = 0, smallestIncrement = 1.0,
+        synergisticSituations =
         [
             "situation.well_supplied",
             "situation.good_harvest",
             "situation.safe_roads"
-        ];
-        local antagonisticSituations =
+        ],
+        antagonisticSituations =
         [
             "situation.ambushed_trade_routes",
             "situation.disappearing_villagers",
             "situation.greenskins",
             "situation.raided"
-        ];
-        local settlementSituations = _settlement.getSituations().map(@(_situation) _situation.getID());
+        ],
+        settlementSituations = _settlement.getSituations().map(@(_situation) _situation.getID());
 
         foreach( situation in settlementSituations )
         {
@@ -61,20 +62,19 @@
 
     function createCaravanCargo( _caravan, _settlement )
     {
-        local produce = _settlement.getProduce();
-        local flags = _caravan.getFlags();
-        local descriptor = this.getDescriptor(flags.get("CaravanCargo"), this.CaravanCargoDescriptors).tolower();
-        local actualProduce = produce.filter(@(_index,_value) _value.find(descriptor) != null);
+        local produce = _settlement.getProduce(), flags = _caravan.getFlags(),
+        descriptor = Raids.Standard.getDescriptor(flags.get("CaravanCargo"), this.CargoDescriptors).tolower(),
+        actualProduce = produce.filter(@(_index,_value) _value.find(descriptor) != null);
 
         if (actualProduce.len() == 0)
         {
-            this.log(format("%s has no produce corresponding to caravan cargo type.", _settlement.getName()));
-            local newCargoType = ::Math.rand(1, 100) <= 50 ? this.CaravanCargoDescriptors.Assortment : this.CaravanCargoDescriptors.Unassorted;
+            Raids.Standard.log(format("%s has no produce corresponding to caravan cargo type.", _settlement.getName()));
+            local newCargoType = ::Math.rand(1, 100) <= 50 ? this.CargoDescriptors.Assortment : this.CargoDescriptors.Unassorted;
             flags.set("CaravanCargo", newCargoType);
 
-            if (newCargoType == this.CaravanCargoDescriptors.Assortment)
+            if (newCargoType == this.CargoDescriptors.Assortment)
             {
-                return this.createNaivePartyLoot(_caravan);
+                return Raids.Shared.createNaivePartyLoot(_caravan);
             }
 
             return produce;
@@ -99,7 +99,7 @@
             return troops;
         }
 
-        if (_wealth >= this.CaravanWealthDescriptors.Plentiful)
+        if (_wealth >= this.WealthDescriptors.Plentiful)
         {
             troops.extend([
                 ::Const.World.Spawn.Troops.MercenaryLOW,
@@ -157,52 +157,51 @@
 
     function initialiseCaravanParameters( _caravan, _settlement )
     {
-        local flags = _caravan.getFlags();
-        local typeModifier = (_settlement.isMilitary() || _settlement.isSouthern()) ? 1 : 0;
-        local sizeModifier = _settlement.getSize() >= 3 ? 1 : 0;
-        local situationModifier = this.calculateSettlementSituationModifier(_settlement) > 0 ? 1 : 0;
-        local distributions =
+        local flags = _caravan.getFlags(),
+        typeModifier = (_settlement.isMilitary() || _settlement.isSouthern()) ? 1 : 0, sizeModifier = _settlement.getSize() >= 3 ? 1 : 0,
+        situationModifier = this.calculateSettlementSituationModifier(_settlement) > 0 ? 1 : 0,
+        distributions =
         {
             Supplies = 50,
             Trade = 100,
             Assortment = 20
         };
-        flags.set("CaravanWealth", ::Math.min(this.CaravanWealthDescriptors.Abundant, ::Math.rand(1, 2) + typeModifier + sizeModifier + situationModifier));
+        flags.set("CaravanWealth", ::Math.min(this.WealthDescriptors.Abundant, ::Math.rand(1, 2) + typeModifier + sizeModifier + situationModifier));
 
-        if (::Math.rand(1, 100) <= this.Parameters.CaravanNamedItemChance && flags.get("CaravanWealth") == this.CaravanWealthDescriptors.Abundant && ::World.getTime().Days >= this.Parameters.ReinforcementThresholdDays)
+        if (::Math.rand(1, 100) <= this.Parameters.NamedItemChance && flags.get("CaravanWealth") == this.WealthDescriptors.Abundant && ::World.getTime().Days >= this.Parameters.ReinforcementThresholdDays)
         {
             flags.set("CaravanHasNamedItems", true);
         }
 
-        local randomNumber = ::Math.rand(1, 100);
-        local cargoType = (randomNumber <= distributions.Assortment || _settlement.getProduce().len() == 0) ? "Assortment" : randomNumber <= distributions.Supplies ? "Supplies" : "Trade";
-        flags.set("CaravanCargo", this.CaravanCargoDescriptors[cargoType]);
-        this.log(format("Rolled %i for caravan cargo assignment for caravan from %s of the newly assigned cargo type %s.", randomNumber, _settlement.getName(), this.getDescriptor(flags.get("CaravanCargo"), this.CaravanCargoDescriptors)));
+        local randomNumber = ::Math.rand(1, 100),
+        cargoType = (randomNumber <= distributions.Assortment || _settlement.getProduce().len() == 0) ? "Assortment" : randomNumber <= distributions.Supplies ? "Supplies" : "Trade";
+        flags.set("CaravanCargo", this.CargoDescriptors[cargoType]);
+        Raids.Standard.log(format("Rolled %i for caravan cargo assignment for caravan from %s of the newly assigned cargo type %s.", randomNumber, _settlement.getName(), Raids.Standard.getDescriptor(flags.get("CaravanCargo"), this.CargoDescriptors)));
         this.populateCaravanInventory(_caravan, _settlement);
 
-        if (::Math.rand(1, 100) <= this.Mod.ModSettings.getSetting("CaravanReinforcementChance").getValue() || flags.get("CaravanWealth") >= this.CaravanWealthDescriptors.Plentiful)
+        if (::Math.rand(1, 100) <= Raids.Standard.getSetting("CaravanReinforcementChance") || flags.get("CaravanWealth") >= this.WealthDescriptors.Plentiful)
         {
             this.reinforceCaravanTroops(_caravan, _settlement);
         }
     }
 
-    function isPartyViable( _flags )
+    function isPartyViable( _party )
     {
-        return _flags.get("IsCaravan");
+        return _party.getFlags().get("IsCaravan");
     }
 
     function populateCaravanInventory( _caravan, _settlement )
     {
         local flags = _caravan.getFlags();
 
-        if (flags.get("CaravanWealth") == this.CaravanWealthDescriptors.Light)
+        if (flags.get("CaravanWealth") == this.WealthDescriptors.Light)
         {
             return;
         }
 
-        if (flags.get("CaravanCargo") == this.CaravanCargoDescriptors.Assortment)
+        if (flags.get("CaravanCargo") == this.CargoDescriptors.Assortment)
         {
-            this.createNaivePartyLoot(_caravan);
+            Raids.Shared.createNaivePartyLoot(_caravan);
             return;
         }
 
@@ -212,27 +211,24 @@
 
     function reinforceCaravanTroops( _caravan, _settlement )
     {
-        local flags = _caravan.getFlags();
-        local wealth = flags.get("CaravanWealth");
+        local flags = _caravan.getFlags(), wealth = flags.get("CaravanWealth");
 
-        if (wealth == this.CaravanWealthDescriptors.Light)
+        if (wealth == this.WealthDescriptors.Light)
         {
             return;
         }
 
-        local currentTimeDays = ::World.getTime().Days;
-        local timeModifier = ::Math.floor(currentTimeDays / this.Parameters.ReinforcementThresholdDays);
-        local naiveIterations = ::Math.rand(1, wealth * 2) + timeModifier;
-        local iterations = naiveIterations > this.Parameters.ReinforcementMaximumTroopOffset ? this.Parameters.ReinforcementMaximumTroopOffset : naiveIterations;
-        local factionType = ::World.FactionManager.getFaction(_caravan.getFaction()).getType();
-        local mundaneTroops = this.createCaravanTroops(wealth, factionType);
+        local currentTimeDays = ::World.getTime().Days, timeModifier = ::Math.floor(currentTimeDays / this.Parameters.ReinforcementThresholdDays);
+        naiveIterations = ::Math.rand(1, wealth * 2) + timeModifier,
+        iterations = naiveIterations > this.Parameters.MaximumTroopOffset ? this.Parameters.MaximumTroopOffset : naiveIterations,
+        factionType = ::World.FactionManager.getFaction(_caravan.getFaction()).getType(), mundaneTroops = this.createCaravanTroops(wealth, factionType);
 
         for( local i = 0; i <= iterations; i = ++i )
         {
             ::Const.World.Common.addTroop(_caravan, {Type = mundaneTroops[::Math.rand(0, mundaneTroops.len() - 1)]}, true);
         }
 
-        if (!(wealth == this.CaravanWealthDescriptors.Abundant && flags.get("CaravanHasNamedItems")))
+        if (!(wealth == this.WealthDescriptors.Abundant && flags.get("CaravanHasNamedItems")))
         {
             return;
         }
@@ -250,29 +246,28 @@
     {
         switch (_cargoValue)
         {
-            case (this.CaravanCargoDescriptors.Unassorted):
+            case (this.CargoDescriptors.Unassorted):
                 return "bag.png";
 
-            case (this.CaravanCargoDescriptors.Assortment):
+            case (this.CargoDescriptors.Assortment):
                 return "asset_money.png";
 
-            case(this.CaravanCargoDescriptors.Trade):
+            case(this.CargoDescriptors.Trade):
                 return "money.png";
 
-            case(this.CaravanCargoDescriptors.Supplies):
+            case(this.CargoDescriptors.Supplies):
                 return "asset_food.png"
 
             default:
-                this.log("Invalid caravan cargo value, unable to retrieve icon.", true);
+                Raids.Standard.log("Invalid caravan cargo value, unable to retrieve icon.", true);
         }
     }
 
     function retrieveNamedCaravanCargo( _lootTable )
     {
-        local namedCargo = this.createNamedLoot();
-        local namedItem = ::new("scripts/items/" + namedCargo[::Math.rand(0, namedCargo.len() - 1)]);
+        local namedCargo = Raids.Shared.createNamedLoot(), namedItem = ::new("scripts/items/" + namedCargo[::Math.rand(0, namedCargo.len() - 1)]);
         namedItem.onAddedToStash(null);
-        this.log(format("Added %s to the loot table.", namedItem.getName()));
+        Raids.Standard.log(format("Added %s to the loot table.", namedItem.getName()));
         _lootTable.push(namedItem);
     }
 };

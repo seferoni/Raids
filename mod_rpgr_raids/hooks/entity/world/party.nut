@@ -1,6 +1,7 @@
+local Raids = ::RPGR_Raids;
 ::mods_hookExactClass("entity/world/party", function( object )
 {
-    local parentName = object.SuperName;
+    /*local parentName = object.SuperName;
 
     local oCS_nullCheck = "onCombatStarted" in object ? object.onCombatStarted : null;
     object.onCombatStarted = function()
@@ -14,20 +15,19 @@
 
         ::RPGR_Raids.updateCombatStatistics([this.getFlags().get("IsVanguard"), true]);
         return vanilla_onCombatStarted;
-    }
+    }*/
 
-    ::RPGR_Raids.Standard.wrap(this, "onCombatStarted", function()
+    Raids.Standard.wrap(object, "onCombatStarted", function( ... )
     {
-        if (!::RPGR_Raids.Shared.isPlayerInProximityTo(this.getTile()))
+        if (!Raids.Shared.isPlayerInProximityTo(this.getTile()))
         {
             return;
         }
 
-        ::RPGR_Raids.Lairs.updateCombatStatistics([this.getFlags().get("IsVanguard"), true]);
-    });
+        Raids.Lairs.updateCombatStatistics(this.getFlags().get("IsVanguard"), true);
+    }, "overrideReturn");
 
-    ##############################
-    local oDLFP_nullCheck = "onDropLootForPlayer" in object ? object.onDropLootForPlayer : null;
+    /*local oDLFP_nullCheck = "onDropLootForPlayer" in object ? object.onDropLootForPlayer : null;
     object.onDropLootForPlayer = function( _lootTable )
     {
         local vanilla_onDropLootForPlayer = oDLFP_nullCheck == null ? this[parentName].onDropLootForPlayer : oDLFP_nullCheck;
@@ -50,9 +50,32 @@
 
         ::RPGR_Raids.retrieveNamedCaravanCargo(_lootTable);
         return vanilla_onDropLootForPlayer(_lootTable);
-    }
+    }*/
 
-    local gT_nullCheck = "getTooltip" in object ? object.getTooltip : null;
+    Raids.Standard.wrap(object, "onDropLootForPlayer", function( _lootTable )
+    {
+        local flags = this.getFlags();
+
+        if (!Raids.Caravans.isPartyViable(this))
+        {
+            return;
+        }
+
+        if (!Raids.Caravans.areCaravanFlagsInitialised(flags))
+        {
+            return;
+        }
+
+        if (!flags.get("CaravanHasNamedItems"))
+        {
+            return;
+        }
+
+        Raids.Caravans.retrieveNamedCaravanCargo(_lootTable);
+        return _lootTable;
+    }, "overrideArguments");
+
+    /*local gT_nullCheck = "getTooltip" in object ? object.getTooltip : null;
     object.getTooltip = function()
     {
         local tooltipArray = gT_nullCheck == null ? this[parentName].getTooltip() : gT_nullCheck();
@@ -90,5 +113,40 @@
         }
 
         return tooltipArray;
-    }
+    }*/
+
+    Raids.Standard.wrap(object, "getTooltip", function( ... )
+    {
+        local tooltipArray = Raids.Standard.getOriginalResult(vargv), flags = this.getFlags();
+
+        if (!Raids.Caravans.isPartyViable(this))
+        {
+            return;
+        }
+
+        if (!Raids.Caravans.areCaravanFlagsInitialised(flags))
+        {
+            return;
+        }
+
+        local caravanCargo = flags.get("CaravanCargo"), cargoIconPath = Raids.Caravans.retrieveCaravanCargoIconPath(caravanCargo);
+
+        if (cargoIconPath == null)
+        {
+            return;
+        }
+
+        local id = 2, type = "hint";
+        tooltipArray.extend([
+            Raids.Standard.generateTooltipTableEntry(id, type, format("ui/icons/%s", cargoIconPath), Raids.Standard.getDescriptor(caravanCargo, Raids.Caravans.CargoDescriptors)),
+            Raids.Standard.generateTooltipTableEntry(id, type, "ui/icons/money2.png", Raids.Standard.getDescriptor(flags.get("CaravanWealth"), Raids.Caravans.WealthDescriptors))
+        ]);
+
+        if (flags.get("CaravanHasNamedItems"))
+        {
+            tooltipArray.append(Raids.Standard.generateTooltipTableEntry(id, type, "ui/icons/special.png", "Famed"));
+        }
+
+        return tooltipArray;
+    }, "overrideReturn")
 });
