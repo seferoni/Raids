@@ -1,15 +1,13 @@
 ::mods_hookExactClass("factions/actions/send_caravan_action", function( object )
 {
-    Raids.Standard.wrap(object, "onExecute", function( _originalResult, _faction )
+    Raids.Standard.wrap(object, "onExecute", function( _faction )
     {
         local grossEntities = ::World.getAllEntitiesAtPos(this.m.Start.getPos(), 1.0);
         local caravan = null;
 
         foreach( entity in grossEntities )
         {
-            local flags = entity.getFlags();
-
-            if (Raids.Caravans.isPartyViable(entity) && !Raids.Caravans.areCaravanFlagsInitialised(flags))
+            if (Raids.Caravans.isPartyViable(entity) && !Raids.Caravans.areCaravanFlagsInitialised(entity.getFlags()))
             {
                 caravan = entity;
             }

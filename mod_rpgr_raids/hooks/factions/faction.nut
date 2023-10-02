@@ -57,7 +57,7 @@ local Raids = ::RPGR_Raids;
             return _party;
         }
 
-        Raids.Standard.log(format("%s with new troop count %i has been reinforced with resource count %.2f.", _name, party.getTroops().len(), resourceDifference));
+        Raids.Standard.log(format("%s with new troop count %i has been reinforced with resource count %.2f.", _name, _party.getTroops().len(), resourceDifference));
 
         if ((resourceDifference / _resources) * 100 >= Raids.Lairs.Parameters.VanguardThresholdPercentage)
         {

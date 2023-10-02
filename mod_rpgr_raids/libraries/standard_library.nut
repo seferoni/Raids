@@ -41,6 +41,11 @@ Raids.Standard <-
         return _argumentsArray[0];
     }
 
+    function getPercentageSetting( _settingID )
+    {
+        return (this.getSetting(_settingID) / 100.0)
+    }
+
     function getSetting( _settingID )
     {
         if (Raids.Internal.MSUFound)
@@ -55,11 +60,6 @@ Raids.Standard <-
         }
 
         return Raids.Defaults[_settingID];
-    }
-
-    function getPercentageSetting( _settingID )
-    {
-        return (this.getSetting(_settingID) / 100.0)
     }
 
     function includeFiles( _path )
@@ -110,16 +110,16 @@ Raids.Standard <-
     function overrideMethod( _object, _function, _originalMethod, _argumentsArray )
     {   # Calls and returns new method; if return value is null, calls and returns original method.
         local returnValue = _function.acall(_argumentsArray);
-        return returnValue == null ? _originalMethod.acall(_argumentsArray) : (returnValue == ::RPGR_Raids.Internal.TERMINATE ? null : returnValue);
+        return returnValue == null ? _originalMethod.acall(_argumentsArray) : (returnValue == Raids.Internal.TERMINATE ? null : returnValue);
     }
 
     function overrideReturn( _object, _function, _originalMethod, _argumentsArray )
     {   # Calls original method and passes result onto new method, returns new result.
         # It is the responsibility of the overriding function to ensure it takes on the appropriate arguments and returns appropriate values.
         local originalValue = _originalMethod.acall(_argumentsArray);
-        _argumentsArray.insert(1, originalValue);
+        if (originalValue != null) _argumentsArray.insert(1, originalValue);
         local returnValue = _function.acall(_argumentsArray);
-        return returnValue == null ? originalValue : (returnValue == ::RPGR_Raids.Internal.TERMINATE ? null : returnValue);
+        return returnValue == null ? originalValue : (returnValue == Raids.Internal.TERMINATE ? null : returnValue);
     }
 
     function prependContextObject( _object, _arguments )
@@ -142,14 +142,16 @@ Raids.Standard <-
 
     function validateParameters( _originalFunction, _newParameters )
     {
-        local oldParameters = _originalFunction.getinfos().parameters;
+        local originalInfo = _originalFunction.getinfos(), originalParameters = originalInfo.parameters;
 
-        if (oldParameters[oldParameters.len() - 1] == "...")
+        if (originalParameters[originalParameters.len() - 1] == "...") // TODO: revise this
         {
             return true;
         }
 
-        if (_newParameters.len() + 1 == oldParameters.len())
+        local newLength = _newParameters.len() + 1;
+
+        if (newLength <= originalParameters.len() && newLength >= oldParameters.len() - originalInfo.defparams.len())
         {
             return true;
         }

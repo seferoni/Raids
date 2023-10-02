@@ -1,24 +1,16 @@
 ::mods_hookExactClass("states/world_state", function( object )
 {
-    Raids.Standard.wrap(object, "onCombatFinished", function( _originalResult )
+    Raids.Standard.wrap(object, "onCombatFinished", function()
     {
         local worldFlags = ::World.Statistics.getFlags();
 
         if (!worldFlags.get("LastFoeWasParty"))
         {
-            Raids.Standard.log("Last combat encounter was not against a party, aborting lair agitation procedure.");
             return;
         }
 
         if (worldFlags.get("LastCombatWasArena"))
         {
-            Raids.Standard.log("Last combat encounter was flagged as an arena battle, aborting lair agitation procedure.");
-            return;
-        }
-
-        if (typeof worldFlags.get("LastCombatFaction") != "integer")
-        {
-            Raids.Standard.log("Last encountered faction flag was a non-integer data type container, aborting lair agitation procedure.", true);
             return;
         }
 
@@ -32,16 +24,10 @@
 
         if (!Raids.Lairs.isFactionViable(faction))
         {
-            Raids.Standard.log("findLairCandidates took on a non-viable faction as an argument, aborting lair agitation procedure.");
             return;
         }
 
-        if (::World.getPlayerRoster().getSize() == 0 || !::World.Assets.getOrigin().onCombatFinished())
-        {
-            return;
-        }
-
-        if (worldFlags.getAsInt("LastCombatResult") != 1)
+        if (::World.getPlayerRoster().getSize() == 0 || !::World.Assets.getOrigin().onCombatFinished() || worldFlags.getAsInt("LastCombatResult") != 1)
         {
             Raids.Standard.log("Last combat result was flagged as defeat, aborting lair agitation procedure.");
             return;
