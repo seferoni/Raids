@@ -36,11 +36,6 @@ Raids.Standard <-
         }
     }
 
-    function getOriginalResult( _argumentsArray )
-    {
-        return _argumentsArray[0];
-    }
-
     function getPercentageSetting( _settingID )
     {
         return (this.getSetting(_settingID) / 100.0)
@@ -84,19 +79,6 @@ Raids.Standard <-
         }
 
         ::logInfo(format("[Raids] %s", _string));
-    }
-
-    function makeTooltip( _id, _type, _icon, _text )
-    {
-        local tableEntry =
-        {
-            id = _id,
-            type = _type,
-            icon = format("ui/icons/%s", _icon),
-            text = _text
-        }
-
-        return tableEntry;
     }
 
     function overrideArguments( _object, _function, _originalMethod, _argumentsArray )
