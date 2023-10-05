@@ -8,6 +8,12 @@ Raids.Caravans <-
         Assortment = 3,
         Unassorted = 4
     },
+    CargoDistribution =
+    {
+        Supplies = 50,
+        Trade = 100,
+        Assortment = 20
+    }
     Parameters =
     {
         NamedItemChance = 50, // FIXME: this is inflated, revert to 5
@@ -133,33 +139,32 @@ Raids.Caravans <-
             }
         }
 
-        return modifier;
+        return modifier <= 0 ? 0 : modifier;
     }
 
     function initialiseCaravanParameters( _caravan, _settlement )
     {
-        local flags = _caravan.getFlags(),
-        typeModifier = (_settlement.isMilitary() || _settlement.isSouthern()) ? 1 : 0,
-        sizeModifier = _settlement.getSize() >= 3 ? 1 : 0,
-        situationModifier = this.getSituationModifier(_settlement) > 0 ? 1 : 0,
-        distributions = {Supplies = 50, Trade = 100, Assortment = 20};
-        flags.set("CaravanWealth", ::Math.min(this.WealthDescriptors.Abundant, ::Math.rand(1, 2) + typeModifier + sizeModifier + situationModifier));
+        local flags = _caravan.getFlags(), randomNumber = ::Math.rand(1, 100), diceRoll = @(_value) randomNumber <= _value;
+        this.setCaravanWealth(_caravan, _settlement);
+        this.setCaravanCargo(_caravan, _settlement);
+        this.populateInventory(_caravan, _settlement);
 
-        if (::Math.rand(1, 100) <= this.Parameters.NamedItemChance && flags.get("CaravanWealth") == this.WealthDescriptors.Abundant && ::World.getTime().Days >= this.Parameters.ReinforcementThresholdDays)
+        if (flags.get("CaravanWealth") < this.WealthDescriptors.Plentiful)
+        {
+            return;
+        }
+
+        if (!diceRoll(Raids.Standard.getSetting("CaravanReinforcementChance")))
+        {
+            return;
+        }
+
+        if (diceRoll(this.Parameters.NamedItemChance) && flags.get("CaravanWealth") == this.WealthDescriptors.Abundant && ::World.getTime().Days >= this.Parameters.ReinforcementThresholdDays)
         {
             flags.set("CaravanHasNamedItems", true);
         }
 
-        local randomNumber = ::Math.rand(1, 100),
-        cargoType = (randomNumber <= distributions.Assortment || _settlement.getProduce().len() == 0) ? "Assortment" : randomNumber <= distributions.Supplies ? "Supplies" : "Trade";
-        flags.set("CaravanCargo", this.CargoDescriptors[cargoType]);
-        Raids.Standard.log(format("Rolled %i for caravan cargo assignment for caravan from %s of the newly assigned cargo type %s.", randomNumber, _settlement.getName(), Raids.Standard.getDescriptor(flags.get("CaravanCargo"), this.CargoDescriptors)));
-        this.populateInventory(_caravan, _settlement);
-
-        if (::Math.rand(1, 100) <= Raids.Standard.getSetting("CaravanReinforcementChance") || flags.get("CaravanWealth") >= this.WealthDescriptors.Plentiful)
-        {
-            this.reinforceTroops(_caravan, _settlement);
-        }
+        this.reinforceTroops(_caravan, _settlement);
     }
 
     function isPartyViable( _party )
@@ -217,5 +222,40 @@ Raids.Caravans <-
 
         local eliteTroops = this.createEliteCaravanTroops(factionType);
         ::Const.World.Common.addTroop(_caravan, {Type = eliteTroops[::Math.rand(0, eliteTroops.len() - 1)]}, true);
+    }
+
+    function setCaravanWealth( _caravan, _settlement )
+    {
+        local caravanCargo = ::Math.rand(1, 2);
+
+        if (_settlement.isMilitary() || _settlement.isSouthern())
+        {
+            caravanCargo += 1;
+        }
+
+        if (_settlement.getSize() >= 3)
+        {
+            caravanCargo += 1;
+        }
+
+        caravanCargo += ::Math.ceil(this.getSituationModifier(_settlement))
+        _caravan.getFlags().set("CaravanWealth", ::Math.min(this.WealthDescriptors.Abundant, caravanCargo));
+    }
+
+    function setCaravanCargo( _caravan, _settlement )
+    {
+        local randomNumber = ::Math.rand(1, 100), diceRoll = @(_value) randomNumber <= _value;
+        cargoType = this.CargoDescriptors.Trade;
+
+        if (diceRoll(this.CargoDistribution.Assortment) || _settlement.getProduce().len() == 0)
+        {
+            cargoType = this.CargoDescriptors.Assortment;
+        }
+        else if (diceRoll(this.CargoDistribution.Supplies))
+        {
+            cargoType = this.CargoDescriptors.Supplies;
+        }
+
+        flags.set("CaravanCargo", cargoType);
     }
 };
