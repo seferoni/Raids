@@ -1,7 +1,7 @@
 local Raids = ::RPGR_Raids;
-::mods_hookBaseClass("contracts/contract", function( object )
+::mods_hookBaseClass("contracts/contract", function( _object )
 {
-    Raids.Standard.wrap(object, "start", function()
+    Raids.Standard.wrap(_object, "start", function()
     {
         if (!("Destination" in this.m))
         {
@@ -18,9 +18,7 @@ local Raids = ::RPGR_Raids;
         if (Raids.Lairs.isLocationTypeViable(destination.getLocationType()))
         {
             Raids.Standard.log(format("%s has been set as current contract destination, performing agitation reset procedure.", destination.getName()));
-            Raids.Lairs.setLairAgitation(destination, Raids.Procedures.Reset);
+            Raids.Lairs.setAgitation(destination, Raids.Lairs.Procedures.Reset);
         }
-
-        return;
     }, "overrideReturn");
 });

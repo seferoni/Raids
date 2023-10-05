@@ -1,7 +1,7 @@
 local Raids = ::RPGR_Raids;
-::mods_hookExactClass("entity/world/location", function( object )
+::mods_hookExactClass("entity/world/location", function( _object )
 {
-    Raids.Standard.wrap(object, "onSpawned", function()
+    Raids.Standard.wrap(_object, "onSpawned", function()
     {
         if (!Raids.Lairs.isLocationTypeViable(this.getLocationType()))
         {
@@ -14,11 +14,9 @@ local Raids = ::RPGR_Raids;
         {
             Raids.Lairs.depopulateLairNamedLoot(this, Raids.Lairs.Parameters.NamedItemChanceOnSpawn);
         }
-
-        return;
     }, "overrideReturn");
 
-    Raids.Standard.wrap(object, "getTooltip", function( _tooltipArray )
+    Raids.Standard.wrap(_object, "getTooltip", function( _tooltipArray )
     {
         if (!Raids.Lairs.isLocationTypeViable(this.getLocationType()))
         {
@@ -36,14 +34,14 @@ local Raids = ::RPGR_Raids;
             return;
         }
 
-        Raids.Lairs.updateCumulativeLairAgitation(this);
-        local agitationState = this.getFlags().get("Agitation"), id = 20, type = "text",
-        textColour = agitationState == Raids.Lairs.AgitationDescriptors.Relaxed ? ::Const.UI.Color.PositiveValue : ::Const.UI.Color.NegativeValue,
-        iconPath = agitationState == Raids.Lairs.AgitationDescriptors.Relaxed ? "vision.png" : "miniboss.png";
+        Raids.Lairs.updateAgitation(this);
+        local agitationState = this.getFlags().get("Agitation"),
+        textColour = "PositiveValue", iconPath = "vision.png";
+        if (agitationState != Raids.Lairs.AgitationDescriptors.Relaxed) textColour = "NegativeValue", iconPath = "miniboss.png";
 
         _tooltipArray.extend([
-            Raids.Standard.makeTooltip(id, type, "ui/icons/asset_money.png", "[color=" + ::Const.UI.Color.PositiveValue + "]" + this.m.Resources + "[/color] resource units"), // TODO: colour wrap these
-            Raids.Standard.makeTooltip(id, type, format("ui/icons/%s", iconPath), "[color=" + textColour + "]" + Raids.getDescriptor(agitationState, Raids.AgitationDescriptors) + "[/color]")
+            {id = 20, type = "text", icon = "ui/icons/asset_money.png", text = format("%s resource units", Raids.Standard.colourWrap(format("%i", this.m.Resources), "PositiveValue"))},
+            {id = 20, type = "text", icon = format("ui/icons/%s", iconPath), text = format("%s", Raids.Standard.colourWrap(format("%s", Raids.Standard.getDescriptor(agitationState, Raids.Lairs.AgitationDescriptors)), textColour))}
         ]);
 
         return _tooltipArray;

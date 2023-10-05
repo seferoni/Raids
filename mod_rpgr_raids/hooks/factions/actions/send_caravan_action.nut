@@ -7,7 +7,7 @@
 
         foreach( entity in grossEntities )
         {
-            if (Raids.Caravans.isPartyViable(entity) && !Raids.Caravans.areCaravanFlagsInitialised(entity.getFlags()))
+            if (Raids.Caravans.isPartyViable(entity) && !Raids.Caravans.areFlagsInitialised(entity.getFlags()))
             {
                 caravan = entity;
             }

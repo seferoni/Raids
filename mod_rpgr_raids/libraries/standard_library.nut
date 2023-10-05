@@ -122,11 +122,17 @@ Raids.Standard <-
         return array;
     }
 
+    function setCase( _string, _case )
+    {
+        local character = _string[0].tochar()[_case]()
+        return format("%s%s", character, _string.slice(1, str.len() - 1));
+    }
+
     function validateParameters( _originalFunction, _newParameters )
     {
         local originalInfo = _originalFunction.getinfos(), originalParameters = originalInfo.parameters;
 
-        if (originalParameters[originalParameters.len() - 1] == "...") // TODO: revise this
+        if (originalParameters[originalParameters.len() - 1] == "...")
         {
             return true;
         }

@@ -1,7 +1,7 @@
 local Raids = ::RPGR_Raids;
-::mods_hookBaseClass("factions/faction", function( object )
+::mods_hookBaseClass("factions/faction", function( _object )
 {
-    Raids.Standard.wrap(object, "spawnEntity", function( _party, _tile, _name, _uniqueName, _template, _resources )
+    Raids.Standard.wrap(_object, "spawnEntity", function( _party, _tile, _name, _uniqueName, _template, _resources )
     {
         if (::Math.rand(1, 100) > Raids.Standard.getSetting("RoamerScaleChance"))
         {
@@ -46,14 +46,13 @@ local Raids = ::RPGR_Raids;
             return;
         }
 
-        local baseResourceModifier = Raids.Standard.getBaseResourceModifier(lair.getFlags().get("BaseResources"));
-        local resourceDifference = baseResourceModifier * Raids.Standard.getPercentageSetting("RoamerResourceModifier") * (lairResources - _resources);
         Raids.Standard.log(format("%s with troop count %i is eligible for reinforcement.", _name, _party.getTroops().len()));
-        local isReinforced = Raids.Lairs.assignTroops(_party, _template, resourceDifference);
+        local resourceDifference = Raids.Lairs.getResourceDifference(lair, lairResources, _resources),
+        isReinforced = Raids.Lairs.assignTroops(_party, _template, resourceDifference);
 
         if (!isReinforced)
         {
-            Raids.Standard.log("Could not find a suitable party template for roamer reinforcement within alloted execution time, aborting procedure.");
+            Raids.Standard.log(format("Could not find a suitable party template for %s, aborting procedure.", _name));
             return _party;
         }
 

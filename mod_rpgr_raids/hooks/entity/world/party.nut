@@ -1,7 +1,7 @@
 local Raids = ::RPGR_Raids;
-::mods_hookExactClass("entity/world/party", function( object )
+::mods_hookExactClass("entity/world/party", function( _object )
 {
-    Raids.Standard.wrap(object, "onCombatStarted", function()
+    Raids.Standard.wrap(_object, "onCombatStarted", function()
     {
         if (!Raids.Shared.isPlayerInProximityTo(this.getTile()))
         {
@@ -11,7 +11,7 @@ local Raids = ::RPGR_Raids;
         Raids.Lairs.updateCombatStatistics(this.getFlags().get("IsVanguard"), true);
     }, "overrideReturn");
 
-    Raids.Standard.wrap(object, "onDropLootForPlayer", function( _lootTable )
+    Raids.Standard.wrap(_object, "onDropLootForPlayer", function( _lootTable )
     {
         local flags = this.getFlags();
 
@@ -20,7 +20,7 @@ local Raids = ::RPGR_Raids;
             return;
         }
 
-        if (!Raids.Caravans.areCaravanFlagsInitialised(flags))
+        if (!Raids.Caravans.areFlagsInitialised(flags))
         {
             return;
         }
@@ -30,38 +30,30 @@ local Raids = ::RPGR_Raids;
             return;
         }
 
-        Raids.Caravans.retrieveNamedCaravanCargo(_lootTable);
+        Raids.Caravans.addNamedCargo(_lootTable);
         return _lootTable;
     }, "overrideArguments");
 
-    Raids.Standard.wrap(object, "getTooltip", function( _tooltipArray )
+    Raids.Standard.wrap(_object, "getTooltip", function( _tooltipArray )
     {
         if (!Raids.Caravans.isPartyViable(this))
         {
             return;
         }
 
-        if (!Raids.Caravans.areCaravanFlagsInitialised(flags))
+        if (!Raids.Caravans.areFlagsInitialised(flags))
         {
             return;
         }
 
-        local caravanCargo = flags.get("CaravanCargo"), cargoIconPath = Raids.Caravans.retrieveCaravanCargoIconPath(caravanCargo);
-
-        if (cargoIconPath == null)
-        {
-            return;
-        }
-
-        local id = 2, type = "hint";
         _tooltipArray.extend([
-            Raids.Standard.makeTooltip(id, type, format("ui/icons/%s", cargoIconPath), Raids.Standard.getDescriptor(caravanCargo, Raids.Caravans.CargoDescriptors)),
-            Raids.Standard.makeTooltip(id, type, "ui/icons/money2.png", Raids.Standard.getDescriptor(flags.get("CaravanWealth"), Raids.Caravans.WealthDescriptors))
+            {id = 2, type = "hint", icon = format("ui/icons/%s", Raids.Caravans.getCargoIcon(caravanCargo)), text = Raids.Standard.getDescriptor(flags.get("CaravanCargo"), Raids.Caravans.CargoDescriptors)},
+            {id = 2, type = "hint", icon = "ui/icons/money2.png", text = Raids.Standard.getDescriptor(flags.get("CaravanWealth"), Raids.Caravans.WealthDescriptors)}
         ]);
 
         if (flags.get("CaravanHasNamedItems"))
         {
-            _tooltipArray.append(Raids.Standard.makeTooltip(id, type, "ui/icons/special.png", "Famed"));
+            _tooltipArray.push({id = 2, type = "hint", icon = "ui/icons/special.png", text = "Famed"});
         }
 
         return _tooltipArray;
