@@ -1,6 +1,6 @@
-::mods_hookExactClass("states/world_state", function( object )
+::mods_hookExactClass("states/world_state", function( _object )
 {
-    Raids.Standard.wrap(object, "onCombatFinished", function()
+    Raids.Standard.wrap(_object, "onCombatFinished", function()
     {
         local worldFlags = ::World.Statistics.getFlags();
 
@@ -16,7 +16,7 @@
 
         if (worldFlags.get("LastCombatFaction") > ::World.FactionManager.m.Factions.len() - 1)
         {
-            Raids.Standard.log("Retrieved faction index was out of bounds for master factions array length, aborting lair agitation procedure.", true);
+            Raids.Standard.log("Retrieved faction index was out of bounds, aborting lair agitation procedure.", true);
             return;
         }
 
