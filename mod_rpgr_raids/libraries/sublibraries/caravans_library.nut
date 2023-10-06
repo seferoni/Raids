@@ -1,6 +1,13 @@
 local Raids = ::RPGR_Raids;
 Raids.Caravans <-
 {
+    AntagonisticSituations =
+    [
+        "situation.ambushed_trade_routes",
+        "situation.disappearing_villagers",
+        "situation.greenskins",
+        "situation.raided"
+    ],
     CargoDescriptors =
     {
         Supplies = 1,
@@ -20,9 +27,15 @@ Raids.Caravans <-
         MaximumTroopOffset = 7,
         ReinforcementThresholdDays = 1 // FIXME: this is deflated, revert to 50
     },
+    SynergisticSituations =
+    [
+        "situation.well_supplied",
+        "situation.good_harvest",
+        "situation.safe_roads"
+    ],
     WealthDescriptors =
     {
-        Light = 1, // TODO: revise this
+        Meager = 1,
         Moderate = 2,
         Plentiful = 3,
         Abundant = 4
@@ -30,10 +43,11 @@ Raids.Caravans <-
 
     function addNamedCargo( _lootTable )
     {
-        local namedCargo = Raids.Shared.createNamedLoot(), namedItem = ::new("scripts/items/" + namedCargo[::Math.rand(0, namedCargo.len() - 1)]);
+        local namedCargo = Raids.Shared.createNamedLoot(),
+        namedItem = ::new("scripts/items/" + namedCargo[::Math.rand(0, namedCargo.len() - 1)]);
         namedItem.onAddedToStash(null);
-        Raids.Standard.log(format("Added %s to the loot table.", namedItem.getName()));
         _lootTable.push(namedItem);
+        Raids.Standard.log(format("Added %s to the loot table.", namedItem.getName()));
     }
 
     function areFlagsInitialised( _flags )
@@ -43,25 +57,25 @@ Raids.Caravans <-
 
     function createCaravanCargo( _caravan, _settlement )
     {
-        local produce = _settlement.getProduce(), flags = _caravan.getFlags(),
+        local flags = _caravan.getFlags(), produce = _settlement.getProduce(),
         descriptor = Raids.Standard.getDescriptor(flags.get("CaravanCargo"), this.CargoDescriptors).tolower(),
         actualProduce = produce.filter(@(_index,_value) _value.find(descriptor) != null);
 
-        if (actualProduce.len() == 0)
+        if (actualProduce.len() != 0)
         {
-            Raids.Standard.log(format("%s has no produce corresponding to caravan cargo type.", _settlement.getName()));
-            local newCargoType = ::Math.rand(1, 100) <= 50 ? this.CargoDescriptors.Assortment : this.CargoDescriptors.Unassorted;
-            flags.set("CaravanCargo", newCargoType);
-
-            if (newCargoType == this.CargoDescriptors.Assortment)
-            {
-                return Raids.Shared.createNaivePartyLoot(_caravan);
-            }
-
-            return produce;
+            return actualProduce;
         }
 
-        return actualProduce;
+        Raids.Standard.log(format("%s has no produce corresponding to caravan cargo type.", _settlement.getName()));
+        local newCargoType = ::Math.rand(1, 100) <= 50 ? this.CargoDescriptors.Assortment : this.CargoDescriptors.Unassorted;
+        flags.set("CaravanCargo", newCargoType);
+
+        if (newCargoType == this.CargoDescriptors.Assortment)
+        {
+            return Raids.Shared.createNaivePartyLoot(_caravan);
+        }
+
+        return produce;
     }
 
     function createCaravanTroops( _wealth, _factionType )
@@ -74,14 +88,11 @@ Raids.Caravans <-
             return troops;
         }
 
-        if (_wealth >= this.WealthDescriptors.Plentiful)
-        {
-            troops.push(::Const.World.Spawn.Troops.MercenaryLOW);
+        troops.push(::Const.World.Spawn.Troops.MercenaryLOW);
 
-            if (::World.getTime().Days >= this.Parameters.ReinforcementThresholdDays)
-            {
-                troops.extend([::Const.World.Spawn.Troops.Mercenary, ::Const.World.Spawn.Troops.MercenaryRanged]);
-            }
+        if (::World.getTime().Days >= this.Parameters.ReinforcementThresholdDays)
+        {
+            troops.extend([::Const.World.Spawn.Troops.Mercenary, ::Const.World.Spawn.Troops.MercenaryRanged]);
         }
 
         if (_factionType == ::Const.FactionType.OrientalCityState)
@@ -101,10 +112,12 @@ Raids.Caravans <-
         if (_factionType == ::Const.FactionType.NobleHouse)
         {
             troops.extend([::Const.World.Spawn.Troops.MasterArcher, ::Const.World.Spawn.Troops.Greatsword, ::Const.World.Spawn.Troops.Knight]);
-            return troops;
+        }
+        else
+        {
+            troops.extend([::Const.World.Spawn.Troops.HedgeKnight, ::Const.World.Spawn.Troops.Swordmaster]);
         }
 
-        troops.extend([::Const.World.Spawn.Troops.HedgeKnight, ::Const.World.Spawn.Troops.Swordmaster]);
         return troops;
     }
 
@@ -120,26 +133,31 @@ Raids.Caravans <-
         }
     }
 
+    function getReinforcementCount( _caravanWealth )
+    {
+        local timeModifier = ::Math.floor(::World.getTime().Days / this.Parameters.ReinforcementThresholdDays),
+        naiveIterations = ::Math.rand(1, _caravanWealth * 2) + timeModifier;
+        return ::Math.min(this.Parameters.MaximumTroopOffset, naiveIterations);
+    }
+
     function getSituationModifier( _settlement )
     {
         local modifier = 0, smallestIncrement = 1.0,
-        synergisticSituations = ["situation.well_supplied", "situation.good_harvest", "situation.safe_roads"],
-        antagonisticSituations = ["situation.ambushed_trade_routes", "situation.disappearing_villagers", "situation.greenskins", "situation.raided"],
         settlementSituations = _settlement.getSituations().map(@(_situation) _situation.getID());
 
         foreach( situation in settlementSituations )
         {
-            if (synergisticSituations.find(situation) != null)
+            if (this.SynergisticSituations.find(situation) != null)
             {
                 modifier += smallestIncrement;
             }
-            else if (antagonisticSituations.find(situation) != null)
+            else if (this.AntagonisticSituations.find(situation) != null)
             {
                 modifier -= smallestIncrement;
             }
         }
 
-        return modifier <= 0 ? 0 : modifier;
+        return ::Math.max(0, modifier);
     }
 
     function initialiseCaravanParameters( _caravan, _settlement )
@@ -176,7 +194,7 @@ Raids.Caravans <-
     {
         local flags = _caravan.getFlags();
 
-        if (flags.get("CaravanWealth") == this.WealthDescriptors.Light)
+        if (flags.get("CaravanWealth") == this.WealthDescriptors.Meager)
         {
             return;
         }
@@ -187,23 +205,21 @@ Raids.Caravans <-
             return;
         }
 
-        local goods = this.createCaravanCargo(_caravan, _settlement);
-        this.addToInventory(_caravan, goods, true);
+        Raids.Shared.addToInventory(_caravan, this.createCaravanCargo(_caravan, _settlement));
     }
 
     function reinforceTroops( _caravan, _settlement )
     {
         local flags = _caravan.getFlags(), wealth = flags.get("CaravanWealth");
 
-        if (wealth == this.WealthDescriptors.Light)
+        if (wealth == this.WealthDescriptors.Meager)
         {
             return;
         }
 
-        local currentTimeDays = ::World.getTime().Days, timeModifier = ::Math.floor(currentTimeDays / this.Parameters.ReinforcementThresholdDays);
-        naiveIterations = ::Math.rand(1, wealth * 2) + timeModifier,
-        iterations = naiveIterations > this.Parameters.MaximumTroopOffset ? this.Parameters.MaximumTroopOffset : naiveIterations,
-        factionType = ::World.FactionManager.getFaction(_caravan.getFaction()).getType(), mundaneTroops = this.createCaravanTroops(wealth, factionType);
+        local iterations = this.getReinforcementCount(wealth),
+        factionType = ::World.FactionManager.getFaction(_caravan.getFaction()).getType(),
+        mundaneTroops = this.createCaravanTroops(wealth, factionType);
 
         for( local i = 0; i <= iterations; i = ++i )
         {

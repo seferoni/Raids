@@ -10,13 +10,15 @@ Raids.Lairs <-
     },
     Parameters =
     {
+        FactionSpecificNamedLootChance = 33,
         MaximumTroopOffset = 7,
-        ResourceThreshold = 6,
-        VanguardThresholdPercentage = 75.0,
         NamedItemChanceOnSpawn = 30,
         NamedItemChancePerAgitationTier = 13.33,
         NamedLootRefreshChance = 60,
-        FactionSpecificNamedLootChance = 33,
+        ResourceModifierLowerBound = 200,
+        ResourceModifierUpperBound = 350,
+        VanguardResourceThreshold = 6,
+        VanguardThresholdPercentage = 75.0
     },
     Procedures =
     {
@@ -104,7 +106,7 @@ Raids.Lairs <-
 
     function findLairCandidates( _faction )
     {
-        local lairs = [];
+        local lairs = [], Raids = ::RPGR_Raids;
 
         if (_faction.getSettlements().len() == 0)
         {
@@ -115,24 +117,45 @@ Raids.Lairs <-
         Raids.Standard.log("Proceeding to lair candidate selection.");
         lairs.extend(_faction.getSettlements().filter(function( _locationIndex, _location )
         {
-            return ::RPGR_Raids.Lairs.isLocationTypeViable(_location.getLocationType()) && ::RPGR_Raids.Shared.isPlayerInProximityTo(_location.getTile());
+            return Raids.Lairs.isLocationTypeViable(_location.getLocationType()) && Raids.Shared.isPlayerInProximityTo(_location.getTile());
         }));
 
         return lairs;
     }
 
-    function findLairCandidatesAtPosition( _position, _radius )
+    function getBaseResourceModifier( _resources )
     {
-        local entities = ::World.getAllEntitiesAndOneLocationAtPos(_position, _radius);
-        local lairs = entities.filter(function( _entityIndex, _entity )
+        local modifier = 1.0;
+
+        if (_resources <= this.Parameters.ResourceModifierLowerBound)
+        {
+            return modifier;
+        }
+
+        if (_resources <= this.Parameters.ResourceModifierUpperBound)
+        {
+            modifier = -0.005 * _resources + 2.0;
+        }
+        else
+        {
+            modifier = 0.25;
+        }
+
+        return modifier;
+    }
+
+    function getCandidatesAtPosition( _position, _radius )
+    {
+        local Raids = ::RPGR_Raids, entities = ::World.getAllEntitiesAndOneLocationAtPos(_position, _radius),
+        lairs = entities.filter(function( _entityIndex, _entity )
         {
             if (!::isKindOf(_entity, "location"))
             {
                 return false;
             }
-            else if (!::RPGR_Raids.Lairs.isLocationTypeViable(_entity.getLocationType()))
+            else if (!Raids.Lairs.isLocationTypeViable(_entity.getLocationType()))
             {
-                ::RPGR_Raids.Standard.log(format("%s is not an viable lair.", _entity.getName()));
+                Raids.Standard.log(format("%s is not an viable lair.", _entity.getName()));
                 return false;
             }
 
@@ -140,11 +163,6 @@ Raids.Lairs <-
         });
 
         return lairs;
-    }
-
-    function getBaseResourceModifier( _resources )
-    {
-        return _resources >= 200 ? (_resources <= 350 ? -0.005 * _resources + 2.0 : 0.25) : 1.0;
     }
 
     function getNaiveNamedLootChance( _lair )
@@ -299,7 +317,7 @@ Raids.Lairs <-
         return true;
     }
 
-    function repopulateLairNamedLoot( _lair )
+    function repopulateNamedLoot( _lair )
     {
         local namedLootChance = this.getNamedLootChance(_lair), iterations = 0;
         Raids.Standard.log(format("namedLootChance is %.2f for lair %s.", namedLootChance, _lair.getName()));
@@ -376,6 +394,12 @@ Raids.Lairs <-
         }
     }
 
+    function setResourcesByAgitation( _lair )
+    {
+        local flags = _lair.getFlags(), baseResources = flags.get("BaseResources"), interpolatedModifier = -0.0006 * baseResources + 0.4;
+        _lair.m.Resources = ::Math.floor(baseResources + (interpolatedModifier * baseResources * (flags.get("Agitation") - 1) * Raids.Standard.getPercentageSetting("AgitationResourceModifier")));
+    }
+
     function updateCombatStatistics( _isVanguard, _isParty )
     {
         local worldFlags = ::World.Statistics.getFlags();
@@ -421,14 +445,10 @@ Raids.Lairs <-
 
     function updateLairProperties( _lair, _procedure )
     {
-        local flags = _lair.getFlags(), baseResources = flags.get("BaseResources"),
-        interpolatedModifier = -0.0006 * baseResources + 0.4,
-        configurableModifier = Raids.Standard.getPercentageSetting("AgitationResourceModifier");
-        _lair.m.Resources = ::Math.floor(baseResources + (interpolatedModifier * baseResources * (flags.get("Agitation") - 1) * configurableModifier));
-
+        this.setResourcesByAgitation(_lair);
         Raids.Standard.log("Refreshing lair defender roster on agitation update.");
         _lair.createDefenders();
-        _lair.setLootScaleBasedOnResources(_lair.getResources());
+        _lair.setLootScaleBasedOnResources(_lair.getResources()); // TODO: investigate if this depopulates loot
 
         if (_procedure != this.Procedures.Increment)
         {
@@ -442,6 +462,6 @@ Raids.Lairs <-
             return;
         }
 
-        this.repopulateLairNamedLoot(_lair);
+        this.repopulateNamedLoot(_lair);
     }
 };

@@ -18,7 +18,7 @@ local Raids = ::RPGR_Raids;
             return;
         }
 
-        local lairs = Raids.Lairs.findLairCandidatesAtPosition(_party.getPos(), 1.0);
+        local lairs = Raids.Lairs.getCandidatesAtPosition(_party.getPos(), 1.0);
 
         if (lairs.len() == 0)
         {
@@ -40,7 +40,7 @@ local Raids = ::RPGR_Raids;
 
         local lairResources = lair.getResources() * Raids.Lairs.getTimeModifier();
 
-        if (lairResources - _resources <= Raids.Lairs.Parameters.ResourceThreshold)
+        if (lairResources - _resources <= Raids.Lairs.Parameters.VanguardResourceThreshold)
         {
             Raids.Standard.log(format("Lair resource count for %s with %.2f resources is insufficient compared to the initial value of %.2f.", lair.getName(), lairResources, _resources));
             return;

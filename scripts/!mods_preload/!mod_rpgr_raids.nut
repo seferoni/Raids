@@ -2,7 +2,7 @@
 {
     ID = "mod_rpgr_raids",
     Name = "RPG Rebalance - Raids",
-    Version = "1.0.0",
+    Version = 1.0.0,
     Internal =
     {
         TERMINATE = "__end"
@@ -24,7 +24,7 @@
 
 local Raids = ::RPGR_Raids;
 ::mods_registerMod(Raids.ID, Raids.Version, Raids.Name);
-::mods_queue(Raids.ID, ">mod_msu(>=1.2.6)", function() // TODO: check if functional with latest MSU
+::mods_queue(Raids.ID, ">mod_msu", function() // TODO: check if functional with latest MSU
 {
     Raids.Internal.MSUFound <- ::mods_getRegisteredMod("mod_msu") != null;
 
