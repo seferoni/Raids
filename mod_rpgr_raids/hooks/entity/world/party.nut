@@ -3,13 +3,13 @@ local Raids = ::RPGR_Raids;
 {
     Raids.Standard.wrap(_object, "onCombatStarted", function()
     {
-        if (!Raids.Shared.isPlayerInProximityTo(this.getTile()))
+        if (!Raids.Shared.isPlayerInProximityTo(this.getTile(), 1))
         {
             return;
         }
 
         Raids.Lairs.updateCombatStatistics(this.getFlags().get("IsVanguard"), true);
-    }, "overrideReturn");
+    });
 
     Raids.Standard.wrap(_object, "onDropLootForPlayer", function( _lootTable )
     {
@@ -36,6 +36,8 @@ local Raids = ::RPGR_Raids;
 
     Raids.Standard.wrap(_object, "getTooltip", function( _tooltipArray )
     {
+        local flags = this.getFlags();
+
         if (!Raids.Caravans.isPartyViable(this))
         {
             return;
@@ -47,7 +49,7 @@ local Raids = ::RPGR_Raids;
         }
 
         _tooltipArray.extend([
-            {id = 2, type = "hint", icon = format("ui/icons/%s", Raids.Caravans.getCargoIcon(caravanCargo)), text = Raids.Standard.getDescriptor(flags.get("CaravanCargo"), Raids.Caravans.CargoDescriptors)},
+            {id = 2, type = "hint", icon = format("ui/icons/%s", Raids.Caravans.getCargoIcon(flags.get("CaravanCargo"))), text = Raids.Standard.getDescriptor(flags.get("CaravanCargo"), Raids.Caravans.CargoDescriptors)},
             {id = 2, type = "hint", icon = "ui/icons/money2.png", text = Raids.Standard.getDescriptor(flags.get("CaravanWealth"), Raids.Caravans.WealthDescriptors)}
         ]);
 
@@ -57,5 +59,5 @@ local Raids = ::RPGR_Raids;
         }
 
         return _tooltipArray;
-    }, "overrideReturn")
+    });
 });

@@ -20,5 +20,5 @@ local Raids = ::RPGR_Raids;
             Raids.Standard.log(format("%s has been set as current contract destination, performing agitation reset procedure.", destination.getName()));
             Raids.Lairs.setAgitation(destination, Raids.Lairs.Procedures.Reset);
         }
-    }, "overrideReturn");
+    });
 });

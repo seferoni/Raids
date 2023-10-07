@@ -120,8 +120,8 @@ Raids.Shared <-
         return namedLoot;
     }
 
-    function isPlayerInProximityTo( _targetTile )
+    function isPlayerInProximityTo( _targetTile, _maximumProximity = this.Parameters.GlobalProximityTiles )
     {
-        return ::World.State.getPlayer().getTile().getDistanceTo(_targetTile) <= this.Parameters.GlobalProximityTiles;
+        return ::World.State.getPlayer().getTile().getDistanceTo(_targetTile) <= _maximumProximity;
     }
 };

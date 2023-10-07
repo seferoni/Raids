@@ -1,7 +1,7 @@
 local Raids = ::RPGR_Raids;
-::mods_hookExactClass("factions/actions/send_supplies_action", function( object )
+::mods_hookExactClass("factions/actions/send_supplies_action", function( _object )
 {
-    Raids.Standard.wrap(object, "onExecute", function( _faction )
+    Raids.Standard.wrap(_object, "onExecute", function( _faction )
     {
         if (!Raids.Standard.getSetting("HandleSupplyCaravans"))
         {
@@ -27,5 +27,5 @@ local Raids = ::RPGR_Raids;
 
         Raids.Standard.log("Assigning caravan parameters.");
         Raids.Caravans.initialiseCaravanParameters(caravan, this.m.Start);
-    }, "overrideReturn");
+    });
 })

@@ -1,6 +1,16 @@
 local Raids = ::RPGR_Raids;
 ::mods_hookExactClass("entity/world/location", function( _object )
 {
+    Raids.Standard.wrap(_object, "onCombatStarted", function()
+    {
+        if (!Raids.Shared.isPlayerInProximityTo(this.getTile(), 1))
+        {
+            return;
+        }
+
+        Raids.Lairs.updateCombatStatistics(false, false);
+    });
+
     Raids.Standard.wrap(_object, "onSpawned", function()
     {
         if (!Raids.Lairs.isLocationTypeViable(this.getLocationType()))
@@ -14,7 +24,7 @@ local Raids = ::RPGR_Raids;
         {
             Raids.Lairs.depopulateLairNamedLoot(this, Raids.Lairs.Parameters.NamedItemChanceOnSpawn);
         }
-    }, "overrideReturn");
+    });
 
     Raids.Standard.wrap(_object, "getTooltip", function( _tooltipArray )
     {
@@ -45,5 +55,5 @@ local Raids = ::RPGR_Raids;
         ]);
 
         return _tooltipArray;
-    }, "overrideReturn");
+    });
 });

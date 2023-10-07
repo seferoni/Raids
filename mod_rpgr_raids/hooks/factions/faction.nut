@@ -64,5 +64,5 @@ local Raids = ::RPGR_Raids;
         }
 
         return _party;
-    }, "overrideReturn");
+    });
 });

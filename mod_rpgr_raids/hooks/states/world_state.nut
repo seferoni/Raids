@@ -1,3 +1,4 @@
+local Raids = ::RPGR_Raids;
 ::mods_hookExactClass("states/world_state", function( _object )
 {
     Raids.Standard.wrap(_object, "onCombatFinished", function()
@@ -50,5 +51,5 @@
         local iterations = worldFlags.get("LastFoeWasVanguardParty") == false ? 1 : 2;
         Raids.Lairs.agitateViableLairs(lairs, iterations);
         Raids.Lairs.updateCombatStatistics(false, false);
-    }, "overrideReturn");
+    });
 });

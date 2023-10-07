@@ -139,7 +139,7 @@ Raids.Standard <-
 
         local newLength = _newParameters.len() + 1;
 
-        if (newLength <= originalParameters.len() && newLength >= oldParameters.len() - originalInfo.defparams.len())
+        if (newLength <= originalParameters.len() && newLength >= originalParameters.len() - originalInfo.defparams.len())
         {
             return true;
         }
@@ -147,7 +147,7 @@ Raids.Standard <-
         return false;
     }
 
-    function wrap( _object, _functionName, _function, _procedure )
+    function wrap( _object, _functionName, _function, _procedure = "overrideReturn" )
     {
         local cachedMethod = this.cacheHookedMethod(_object, _functionName),
         Raids = ::RPGR_Raids,

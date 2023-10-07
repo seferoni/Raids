@@ -260,7 +260,7 @@ Raids.Caravans <-
 
     function setCaravanCargo( _caravan, _settlement )
     {
-        local randomNumber = ::Math.rand(1, 100), diceRoll = @(_value) randomNumber <= _value;
+        local randomNumber = ::Math.rand(1, 100), diceRoll = @(_value) randomNumber <= _value,
         cargoType = this.CargoDescriptors.Trade;
 
         if (diceRoll(this.CargoDistribution.Assortment) || _settlement.getProduce().len() == 0)
@@ -272,6 +272,6 @@ Raids.Caravans <-
             cargoType = this.CargoDescriptors.Supplies;
         }
 
-        flags.set("CaravanCargo", cargoType);
+        _caravan.getFlags().set("CaravanCargo", cargoType);
     }
 };

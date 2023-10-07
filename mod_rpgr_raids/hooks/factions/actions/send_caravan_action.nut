@@ -1,6 +1,7 @@
-::mods_hookExactClass("factions/actions/send_caravan_action", function( object )
+local Raids = ::RPGR_Raids;
+::mods_hookExactClass("factions/actions/send_caravan_action", function( _object )
 {
-    Raids.Standard.wrap(object, "onExecute", function( _faction )
+    Raids.Standard.wrap(_object, "onExecute", function( _faction )
     {
         local grossEntities = ::World.getAllEntitiesAtPos(this.m.Start.getPos(), 1.0);
         local caravan = null;
@@ -21,5 +22,5 @@
 
         Raids.Standard.log("Assigning caravan parameters.");
         Raids.Caravans.initialiseCaravanParameters(caravan, this.m.Start);
-    },"overrideReturn");
+    });
 });

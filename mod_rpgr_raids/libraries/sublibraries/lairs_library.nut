@@ -66,7 +66,7 @@ Raids.Lairs <-
 
         local bailOut = 0;
 
-        while (_resources >= 0 && bailOut < this.Parameters.AssignmentMaximumTroopOffset)
+        while (_resources >= 0 && bailOut < this.Parameters.MaximumTroopOffset)
         {
             local troop = troopsTemplate[::Math.rand(0, troopsTemplate.len() - 1)];
             ::Const.World.Common.addTroop(_party, troop, false);
