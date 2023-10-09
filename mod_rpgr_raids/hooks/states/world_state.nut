@@ -3,32 +3,30 @@ local Raids = ::RPGR_Raids;
 {
     Raids.Standard.wrap(_object, "onCombatFinished", function()
     {
-        local worldFlags = ::World.Statistics.getFlags();
-
-        if (!worldFlags.get("LastFoeWasParty"))
+        if (!Raids.Standard.getFlag("LastFoeWasParty", ::World.Statistics))
         {
             return;
         }
 
-        if (worldFlags.get("LastCombatWasArena"))
+        if (Raids.Standard.getFlag("LastCombatWasArena", ::World.Statistics))
         {
             return;
         }
 
-        if (worldFlags.get("LastCombatFaction") > ::World.FactionManager.m.Factions.len() - 1)
+        if (Raids.Standard.getFlag("LastCombatFaction", ::World.Statistics) > ::World.FactionManager.m.Factions.len() - 1)
         {
             Raids.Standard.log("Retrieved faction index was out of bounds, aborting lair agitation procedure.", true);
             return;
         }
 
-        local faction = ::World.FactionManager.getFaction(worldFlags.get("LastCombatFaction"));
+        local faction = ::World.FactionManager.getFaction(Raids.Standard.getFlag("LastCombatFaction", ::World.Statistics));
 
         if (!Raids.Lairs.isFactionViable(faction))
         {
             return;
         }
 
-        if (::World.getPlayerRoster().getSize() == 0 || !::World.Assets.getOrigin().onCombatFinished() || worldFlags.getAsInt("LastCombatResult") != 1)
+        if (::World.getPlayerRoster().getSize() == 0 || !::World.Assets.getOrigin().onCombatFinished() || Raids.Standard.getFlagAsInt("LastCombatResult", ::World.Statistics) != 1)
         {
             Raids.Standard.log("Last combat result was flagged as defeat, aborting lair agitation procedure.");
             return;
@@ -48,7 +46,7 @@ local Raids = ::RPGR_Raids;
             return;
         }
 
-        local iterations = worldFlags.get("LastFoeWasVanguardParty") == false ? 1 : 2;
+        local iterations = Raids.Standard.getFlag("LastFoeWasVanguardParty", ::World.Statistics) == false ? 1 : 2;
         Raids.Lairs.agitateViableLairs(lairs, iterations);
         Raids.Lairs.updateCombatStatistics(false, false);
     });

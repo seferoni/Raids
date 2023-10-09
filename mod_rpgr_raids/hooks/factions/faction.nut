@@ -28,7 +28,7 @@ local Raids = ::RPGR_Raids;
 
         local lair = lairs[0];
 
-        if (Raids.Standard.getSetting("RoamerScaleAgitationRequirement") && lair.getFlags().get("Agitation") == Raids.Lairs.AgitationDescriptors.Relaxed)
+        if (Raids.Standard.getSetting("RoamerScaleAgitationRequirement") && Raids.Standard.getFlag("Agitation", lair) == Raids.Lairs.AgitationDescriptors.Relaxed)
         {
             return;
         }

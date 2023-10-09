@@ -20,7 +20,7 @@ Raids.Caravans <-
         Supplies = 50,
         Trade = 100,
         Assortment = 20
-    }
+    },
     Parameters =
     {
         NamedItemChance = 50, // FIXME: this is inflated, revert to 5
@@ -50,15 +50,15 @@ Raids.Caravans <-
         Raids.Standard.log(format("Added %s to the loot table.", namedItem.getName()));
     }
 
-    function areFlagsInitialised( _flags )
+    function isPartyInitialised( _party )
     {
-        return _flags.get("CaravanWealth") != false && _flags.get("CaravanCargo") != false;
+        return Raids.Standard.getFlag("CaravanWealth", _party) != false && Raids.Standard.getFlag("CaravanCargo", _party) != false;
     }
 
     function createCaravanCargo( _caravan, _settlement )
     {
-        local flags = _caravan.getFlags(), produce = _settlement.getProduce(),
-        descriptor = Raids.Standard.getDescriptor(flags.get("CaravanCargo"), this.CargoDescriptors).tolower(),
+        local produce = _settlement.getProduce(),
+        descriptor = Raids.Standard.getDescriptor(Raids.Standard.getFlag("CaravanCargo", _caravan), this.CargoDescriptors).tolower(),
         actualProduce = produce.filter(@(_index,_value) _value.find(descriptor) != null);
 
         if (actualProduce.len() != 0)
@@ -68,7 +68,7 @@ Raids.Caravans <-
 
         Raids.Standard.log(format("%s has no produce corresponding to caravan cargo type.", _settlement.getName()));
         local newCargoType = ::Math.rand(1, 100) <= 50 ? this.CargoDescriptors.Assortment : this.CargoDescriptors.Unassorted;
-        flags.set("CaravanCargo", newCargoType);
+        Raids.Standard.setFlag("CaravanCargo", newCargoType, _caravan);
 
         if (newCargoType == this.CargoDescriptors.Assortment)
         {
@@ -162,12 +162,12 @@ Raids.Caravans <-
 
     function initialiseCaravanParameters( _caravan, _settlement )
     {
-        local flags = _caravan.getFlags(), randomNumber = ::Math.rand(1, 100), diceRoll = @(_value) randomNumber <= _value;
+        local randomNumber = ::Math.rand(1, 100), diceRoll = @(_value) randomNumber <= _value;
         this.setCaravanWealth(_caravan, _settlement);
         this.setCaravanCargo(_caravan, _settlement);
         this.populateInventory(_caravan, _settlement);
 
-        if (flags.get("CaravanWealth") < this.WealthDescriptors.Plentiful)
+        if (Raids.Standard.getFlag("CaravanWealth", _caravan) < this.WealthDescriptors.Plentiful)
         {
             return;
         }
@@ -177,9 +177,9 @@ Raids.Caravans <-
             return;
         }
 
-        if (diceRoll(this.Parameters.NamedItemChance) && flags.get("CaravanWealth") == this.WealthDescriptors.Abundant && ::World.getTime().Days >= this.Parameters.ReinforcementThresholdDays)
+        if (diceRoll(this.Parameters.NamedItemChance) && Raids.Standard.getFlag("CaravanWealth", _caravan) == this.WealthDescriptors.Abundant && ::World.getTime().Days >= this.Parameters.ReinforcementThresholdDays)
         {
-            flags.set("CaravanHasNamedItems", true);
+            Raids.Standard.setFlag("CaravanHasNamedItems", true, _caravan);
         }
 
         this.reinforceTroops(_caravan, _settlement);
@@ -187,19 +187,17 @@ Raids.Caravans <-
 
     function isPartyViable( _party )
     {
-        return _party.getFlags().get("IsCaravan");
+        return Raids.Standard.getFlag("IsCaravan", _party);
     }
 
     function populateInventory( _caravan, _settlement )
     {
-        local flags = _caravan.getFlags();
-
-        if (flags.get("CaravanWealth") == this.WealthDescriptors.Meager)
+        if (Raids.Standard.getFlag("CaravanWealth", _caravan) == this.WealthDescriptors.Meager)
         {
             return;
         }
 
-        if (flags.get("CaravanCargo") == this.CargoDescriptors.Assortment)
+        if (Raids.Standard.getFlag("CaravanCargo", _caravan) == this.CargoDescriptors.Assortment)
         {
             Raids.Shared.createNaivePartyLoot(_caravan);
             return;
@@ -210,7 +208,7 @@ Raids.Caravans <-
 
     function reinforceTroops( _caravan, _settlement )
     {
-        local flags = _caravan.getFlags(), wealth = flags.get("CaravanWealth");
+        local wealth = Raids.Standard.getFlag("CaravanWealth", _caravan);
 
         if (wealth == this.WealthDescriptors.Meager)
         {
@@ -221,12 +219,12 @@ Raids.Caravans <-
         factionType = ::World.FactionManager.getFaction(_caravan.getFaction()).getType(),
         mundaneTroops = this.createCaravanTroops(wealth, factionType);
 
-        for( local i = 0; i <= iterations; i = ++i )
+        for( local i = 1; i <= iterations; i = i++ )
         {
             ::Const.World.Common.addTroop(_caravan, {Type = mundaneTroops[::Math.rand(0, mundaneTroops.len() - 1)]}, true);
         }
 
-        if (!(wealth == this.WealthDescriptors.Abundant && flags.get("CaravanHasNamedItems")))
+        if (!(wealth == this.WealthDescriptors.Abundant && Raids.Standard.getFlag("CaravanHasNamedItems", _caravan)))
         {
             return;
         }
@@ -255,7 +253,7 @@ Raids.Caravans <-
         }
 
         caravanCargo += ::Math.ceil(this.getSituationModifier(_settlement))
-        _caravan.getFlags().set("CaravanWealth", ::Math.min(this.WealthDescriptors.Abundant, caravanCargo));
+        Raids.Standard.setFlag("CaravanWealth", ::Math.min(this.WealthDescriptors.Abundant, caravanCargo), _caravan);
     }
 
     function setCaravanCargo( _caravan, _settlement )
@@ -272,6 +270,6 @@ Raids.Caravans <-
             cargoType = this.CargoDescriptors.Supplies;
         }
 
-        _caravan.getFlags().set("CaravanCargo", cargoType);
+        Raids.Standard.setFlag("CaravanCargo", cargoType, _caravan);
     }
 };

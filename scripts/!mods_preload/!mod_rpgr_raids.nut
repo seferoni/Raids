@@ -24,7 +24,7 @@
 
 local Raids = ::RPGR_Raids;
 ::mods_registerMod(Raids.ID, Raids.Version, Raids.Name);
-::mods_queue(Raids.ID, ">mod_msu", function() // TODO: check if functional with latest MSU
+::mods_queue(Raids.ID, ">mod_msu", function()
 {
     Raids.Internal.MSUFound <- ::mods_getRegisteredMod("mod_msu") != null;
 

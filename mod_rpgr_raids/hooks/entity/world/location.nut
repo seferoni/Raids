@@ -45,7 +45,7 @@ local Raids = ::RPGR_Raids;
         }
 
         Raids.Lairs.updateAgitation(this);
-        local agitationState = this.getFlags().get("Agitation"),
+        local agitationState = Raids.Standard.getFlag("Agitation", this),
         textColour = "PositiveValue", iconPath = "vision.png";
         if (agitationState != Raids.Lairs.AgitationDescriptors.Relaxed) textColour = "NegativeValue", iconPath = "miniboss.png";
 

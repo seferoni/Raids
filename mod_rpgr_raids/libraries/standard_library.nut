@@ -36,6 +36,30 @@ Raids.Standard <-
         }
     }
 
+    function getFlag( _string, _object )
+    {
+        local flagValue = _object.getFlags().get(format("mod_rpgr_raids.%s", _string));
+
+        if (flagValue == false)
+        {
+            flagValue = _object.getFlags().get(format("%s", _string));
+        }
+
+        return flagValue;
+    }
+
+    function getFlagAsInt( _string, _object )
+    {
+        return _object.getFlags().getAsInt(format("mod_rpgr_raids.%s", _string));
+
+        if (flagValue == false)
+        {
+            flagValue = _object.getFlags().getAsInt(format("%s", _string));
+        }
+
+        return flagValue;
+    }
+
     function getPercentageSetting( _settingID )
     {
         return (this.getSetting(_settingID) / 100.0)
@@ -63,6 +87,12 @@ Raids.Standard <-
         {
             ::include(file);
         }
+    }
+
+    function incrementFlag( _string, _value, _object, _isNative = false )
+    {
+        local flag = _isNative ? format("%s", _string) : format("mod_rpgr_raids.%s", _string);
+        _object.getFlags().increment(flag, _value);
     }
 
     function log( _string, _isError = false )
@@ -124,8 +154,14 @@ Raids.Standard <-
 
     function setCase( _string, _case )
     {
-        local character = _string[0].tochar()[_case]()
+        local character = _string[0].tochar()[_case]();
         return format("%s%s", character, _string.slice(1, str.len() - 1));
+    }
+
+    function setFlag( _string, _value, _object, _isNative = false )
+    {
+        local flag = _isNative ? format("%s", _string) : format("mod_rpgr_raids.%s", _string);
+        _object.getFlags().set(flag, _value);
     }
 
     function validateParameters( _originalFunction, _newParameters )

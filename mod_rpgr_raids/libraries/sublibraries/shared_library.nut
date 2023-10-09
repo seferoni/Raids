@@ -8,7 +8,7 @@ Raids.Shared <-
 
     function addToInventory( _party, _goodsPool )
     {
-        local iterations = _party.getFlags().get("CaravanWealth") != false ? ::Math.rand(1, _party.getFlags().get("CaravanWealth") - 1) : ::Math.rand(1, 2);
+        local iterations = Raids.Caravans.isPartyInitialised(_party) ? ::Math.rand(1, Raids.Standard.getFlag("CaravanWealth", _party) - 1) : ::Math.rand(1, 2);
 
         for( local i = 0; i < iterations; i++ )
         {
@@ -28,16 +28,16 @@ Raids.Shared <-
             "supplies/strange_meat_item",
             "supplies/fermented_unhold_heart_item",
             "supplies/black_marsh_stew_item"
-        ];
-        local southernGoods =
+        ],
+        southernGoods =
         [
             "supplies/dates_item",
             "supplies/rice_item",
             "trade/silk_item",
             "trade/spices_item",
             "trade/incense_item"
-        ];
-        local southernFactions =
+        ],
+        southernFactions =
         [
             ::Const.FactionType.OrientalBandits,
             ::Const.FactionType.OrientalCityState
@@ -120,7 +120,7 @@ Raids.Shared <-
         return namedLoot;
     }
 
-    function isPlayerInProximityTo( _targetTile, _maximumProximity = this.Parameters.GlobalProximityTiles )
+    function isPlayerInProximityTo( _targetTile, _maximumProximity = 9 )
     {
         return ::World.State.getPlayer().getTile().getDistanceTo(_targetTile) <= _maximumProximity;
     }
