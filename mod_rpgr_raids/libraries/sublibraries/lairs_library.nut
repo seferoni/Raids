@@ -25,6 +25,13 @@ Raids.Lairs <-
         Increment = 1,
         Decrement = 2,
         Reset = 3
+    },
+
+    function addEdict( _party )
+    {
+        local culledString = "scripts/items/",
+        edicts = ::IO.enumerateFiles("scripts/items/misc/edicts").map(@(_stringPath) _stringPath.slice(culledString.len()));
+        _party.addToInventory(edicts[::Math.rand(0, edicts.len() - 1)]);
     }
 
     function agitateViableLairs( _lairs, _iterations = 1 )
@@ -105,25 +112,6 @@ Raids.Lairs <-
         }
     }
 
-    function findLairCandidates( _faction )
-    {
-        local lairs = [], Raids = ::RPGR_Raids;
-
-        if (_faction.getSettlements().len() == 0)
-        {
-            Raids.Standard.log("findLairCandidates was passed a viable faction as an argument, but this faction has no settlements at present.");
-            return lairs;
-        }
-
-        Raids.Standard.log("Proceeding to lair candidate selection.");
-        lairs.extend(_faction.getSettlements().filter(function( _locationIndex, _location )
-        {
-            return Raids.Lairs.isLocationTypeViable(_location.getLocationType()) && Raids.Shared.isPlayerInProximityTo(_location.getTile());
-        }));
-
-        return lairs;
-    }
-
     function getBaseResourceModifier( _resources )
     {
         local modifier = 1.0;
@@ -166,6 +154,25 @@ Raids.Lairs <-
         return lairs;
     }
 
+    function getCandidatesByFaction( _faction )
+    {
+        local lairs = [], Raids = ::RPGR_Raids;
+
+        if (_faction.getSettlements().len() == 0)
+        {
+            Raids.Standard.log("getCandidatesByFaction was passed a faction that has no settlements at present.");
+            return lairs;
+        }
+
+        Raids.Standard.log("Proceeding to lair candidate selection.");
+        lairs.extend(_faction.getSettlements().filter(function( _locationIndex, _location )
+        {
+            return Raids.Lairs.isLocationTypeViable(_location.getLocationType()) && Raids.Shared.isPlayerInProximityTo(_location.getTile());
+        }));
+
+        return lairs;
+    }
+
     function getNaiveNamedLootChance( _lair )
     {
         local nearestSettlementDistance = 9000, lairTile = _lair.getTile();
@@ -201,6 +208,11 @@ Raids.Lairs <-
         return (0.9 + ::Math.minf(2.0, ::World.getTime().Days * 0.014) * ::Const.Difficulty.EnemyMult[::World.Assets.getCombatDifficulty()]);
     }
 
+    function getWorldFaction( _factionIndex )
+    {
+        return ::World.FactionManager.getFaction(_factionIndex);
+    }
+
     function initialiseLairParameters( _lair )
     {
         Raids.Standard.setFlag("BaseResources", _lair.getResources(), _lair);
@@ -212,6 +224,7 @@ Raids.Lairs <-
     {
         _party.setName(format("Vanguard %s", _party.getName()));
         Raids.Standard.setFlag("IsVanguard", true, _party);
+        this.addEdict(_party);
         Raids.Shared.addToInventory(_party, Raids.Shared.createNaivePartyLoot(_party, false));
     }
 

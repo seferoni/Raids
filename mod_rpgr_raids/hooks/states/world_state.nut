@@ -13,13 +13,15 @@ local Raids = ::RPGR_Raids;
             return;
         }
 
-        if (Raids.Standard.getFlag("LastCombatFaction", ::World.Statistics) > ::World.FactionManager.m.Factions.len() - 1)
+        local factionIndex = Raids.Standard.getFlag("LastCombatFaction", ::World.Statistics);
+
+        if (!(factionIndex in ::World.FactionManager.m.Factions))
         {
             Raids.Standard.log("Retrieved faction index was out of bounds, aborting lair agitation procedure.", true);
             return;
         }
 
-        local faction = ::World.FactionManager.getFaction(Raids.Standard.getFlag("LastCombatFaction", ::World.Statistics));
+        local faction = ::World.FactionManager.getFaction(factionIndex);
 
         if (!Raids.Lairs.isFactionViable(faction))
         {
@@ -38,11 +40,11 @@ local Raids = ::RPGR_Raids;
             return;
         }
 
-        local lairs = Raids.Lairs.findLairCandidates(faction);
+        local lairs = Raids.Lairs.getCandidatesByFaction(faction);
 
         if (lairs.len() == 0)
         {
-            Raids.Standard.log("findLairCandidates could not find any eligible lairs within proximity of the player.");
+            Raids.Standard.log("getCandidatesByFaction could not find any eligible lairs within proximity of the player.");
             return;
         }
 
