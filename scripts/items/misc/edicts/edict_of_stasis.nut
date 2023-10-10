@@ -7,7 +7,7 @@ this.edict_of_stasis <- ::inherit("scripts/items/item/misc/edict",
 		this.edict.create();
         this.m.ID = "misc.edict_of_stasis";
 		this.m.Name = "Edict of Stasis";
-		this.m.Description = "A thoroughly illegal facsimile of official correspondence. It specifies the date, time, and mustered strength of a scheduled raid.";
+		this.m.Description = "A thoroughly illegal facsimile of official correspondence. It outlines a novel long-term strategy that involves targeted, small-scale attacks and coordinated ambushes.";
 		this.m.Icon = "consumables/.png";
 		this.m.Value = 50;
 	}
