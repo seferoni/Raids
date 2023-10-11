@@ -18,17 +18,8 @@ this.edict_of_agitation <- ::inherit("scripts/items/item/misc/edict",
         return tooltipArray;
 	}
 
-    function onUse( _actor, _item = null )
-	{
-        local lairs = Raids.Lairs.getCandidatesAtPosition(::World.State.getPlayer().getPos(), 50.0);
-
-        if (lairs.len() == 0)
-        {
-            Raids.Standard.log("No eligible lair in proximity of the player.");
-            return false;
-        }
-
-        Raids.Lairs.agitateViableLairs(lairs);
-        return true;
-	}
+    function executeEdictProcedure( _lairs )
+    {
+        Raids.Lairs.agitateViableLairs(_lairs);
+    }
 });

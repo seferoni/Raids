@@ -10,7 +10,6 @@ this.edict <- ::inherit("scripts/items/item",
 		this.m.IsDroppedAsLoot = true;
 		this.m.IsAllowedInBag = false;
 		this.m.IsUsable = true;
-		this.m.Value = 20;
 	}
 
     function getTooltip()
@@ -37,5 +36,19 @@ this.edict <- ::inherit("scripts/items/item",
     function playInventorySound( _eventType )
 	{
 		::Sound.play("sounds/.wav", ::Const.Sound.Volume.Inventory);
+	}
+
+	function onUse( _actor, _item = null )
+	{
+        local lairs = Raids.Lairs.getCandidatesAtPosition(::World.State.getPlayer().getPos(), 50.0);
+
+        if (lairs.len() == 0)
+        {
+            Raids.Standard.log("No eligible lair in proximity of the player.");
+            return false;
+        }
+
+        this.executeEdictProcedure(lairs);
+        return true;
 	}
 });
