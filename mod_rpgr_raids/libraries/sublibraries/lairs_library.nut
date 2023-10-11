@@ -214,7 +214,7 @@ Raids.Lairs <-
 
         if (edictContainer != null)
         {
-            edictModifier = 2.0;
+            edictModifier = 2.5;
             Raids.Standard.setFlag(edictContainer, false, _lair);
         }
 

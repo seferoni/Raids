@@ -63,7 +63,7 @@ local Raids = ::RPGR_Raids;
             Raids.Lairs.initialiseProvokedParameters(_party);
             return _party;
         }
-        
+
         if ((resourceDifference / _resources) * 100 >= Raids.Lairs.Parameters.VanguardThresholdPercentage)
         {
             Raids.Lairs.initialiseVanguardParameters(_party);
