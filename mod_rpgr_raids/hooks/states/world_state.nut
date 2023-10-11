@@ -48,7 +48,7 @@ local Raids = ::RPGR_Raids;
             return;
         }
 
-        local iterations = Raids.Standard.getFlag("LastFoeWasVanguardParty", ::World.Statistics) == false ? 1 : 2;
+        local iterations = Raids.Standard.getFlag("LastFoeWasProvokedParty", ::World.Statistics) == false ? 1 : 2;
         Raids.Lairs.agitateViableLairs(lairs, iterations);
         Raids.Lairs.updateCombatStatistics(false, false);
     });

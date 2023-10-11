@@ -112,6 +112,18 @@ Raids.Lairs <-
         }
     }
 
+    function findEdict( _lair, _ID )
+    {
+        local containers = ["EdictContainerA", "EdictContainerB"];
+
+        foreach( container in containers )
+        {
+            if (Raids.Standard.getFlag(container, _lair) == _ID) return container;
+        }
+
+        return null;
+    }
+
     function getBaseResourceModifier( _resources )
     {
         local modifier = 1.0;
@@ -197,10 +209,18 @@ Raids.Lairs <-
 
     function getResourceDifference( _lair, _lairResources, _partyResources )
     {
+        local naiveDifference = (_lairResources - _partyResources),
+        edictContainer = this.findEdict(_lair, "misc.edict_of_provocation"), edictModifier = 1.0;
+
+        if (edictContainer != null)
+        {
+            edictModifier = 2.0;
+            Raids.Standard.setFlag(edictContainer, false, _lair);
+        }
+
         local baseResourceModifier = this.getBaseResourceModifier(Raids.Standard.getFlag("BaseResources", _lair)),
-        naiveDifference = (_lairResources - _partyResources),
         configurableModifier = Raids.Standard.getPercentageSetting("RoamerResourceModifier");
-        return baseResourceModifier * configurableModifier * naiveDifference;
+        return baseResourceModifier * edictModifier * configurableModifier * naiveDifference;
     }
 
     function getTimeModifier()
@@ -218,6 +238,17 @@ Raids.Lairs <-
         Raids.Standard.setFlag("BaseResources", _lair.getResources(), _lair);
         Raids.Standard.setFlag("Agitation", this.AgitationDescriptors.Relaxed, _lair);
         Raids.Standard.setFlag("BaseNamedItemChance", this.getNaiveNamedLootChance(_lair), _lair);
+    }
+
+    function initialiseVanguardParameters( _party )
+    {
+        _party.setName(format("Provoked %s", _party.getName()));
+        Raids.Standard.setFlag("IsProvoked", true, _party);
+
+        for( local i = 0; i < 2; i = i++ )
+        {
+            Raids.Shared.addToInventory(_party, Raids.Shared.createNaivePartyLoot(_party, false));
+        }
     }
 
     function initialiseVanguardParameters( _party )
@@ -410,9 +441,9 @@ Raids.Lairs <-
         _lair.m.Resources = ::Math.floor(baseResources + (interpolatedModifier * baseResources * (Raids.Standard.getFlag("Agitation", _lair) - 1) * Raids.Standard.getPercentageSetting("AgitationResourceModifier")));
     }
 
-    function updateCombatStatistics( _isVanguard, _isParty )
+    function updateCombatStatistics( _isProvoked, _isParty )
     {
-        Raids.Standard.setFlag("LastFoeWasVanguardParty", _isVanguard, ::World.Statistics);
+        Raids.Standard.setFlag("LastFoeWasProvokedParty", _isProvoked, ::World.Statistics);
         Raids.Standard.setFlag("LastFoeWasParty", _isParty, ::World.Statistics);
     }
 

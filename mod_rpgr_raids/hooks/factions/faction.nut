@@ -58,6 +58,12 @@ local Raids = ::RPGR_Raids;
 
         Raids.Standard.log(format("%s with new troop count %i has been reinforced with resource count %.2f.", _name, _party.getTroops().len(), resourceDifference));
 
+        if (Raids.Lairs.findEdict("misc.edict_of_provocation", lair) != null)
+        {
+            Raids.Lairs.initialiseProvokedParameters(_party);
+            return _party;
+        }
+        
         if ((resourceDifference / _resources) * 100 >= Raids.Lairs.Parameters.VanguardThresholdPercentage)
         {
             Raids.Lairs.initialiseVanguardParameters(_party);

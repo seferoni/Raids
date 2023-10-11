@@ -10,6 +10,7 @@ this.edict_of_agitation <- ::inherit("scripts/items/item/misc/edict",
 		this.m.Description = "A thoroughly illegal facsimile of official correspondence. It specifies the date, time, and mustered strength of a scheduled raid.";
 		this.m.Icon = "consumables/.png";
 		this.m.Value = 0;
+		this.m.EffectText = "Will agitate all nearby lairs.";
 	}
 
     function getTooltip()
@@ -20,6 +21,7 @@ this.edict_of_agitation <- ::inherit("scripts/items/item/misc/edict",
 
     function executeEdictProcedure( _lairs )
     {
+		this.edict.executeEdictProcedure(_lairs);
         Raids.Lairs.agitateViableLairs(_lairs);
     }
 });

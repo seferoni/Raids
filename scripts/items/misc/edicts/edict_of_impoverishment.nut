@@ -7,9 +7,10 @@ this.edict_of_impoverishment <- ::inherit("scripts/items/item/misc/edict",
 		this.edict.create();
         this.m.ID = "misc.edict_of_impoverishment";
 		this.m.Name = "Edict of Impoverishment";
-		this.m.Description = "A thoroughly illegal facsimile of official correspondence. It details the locations of supposedly long-abandoned spoils of war about the realm.";
+		this.m.Description = "A thoroughly illegal facsimile of official correspondence. It maps far-flung locations of supposedly long-abandoned spoils of war littered about the realm.";
 		this.m.Icon = "consumables/.png";
 		this.m.Value = 350;
+        this.m.EffectText = "Will induce nearby lairs to lose resources while preserving the contents of their inventories.";
 	}
 
     function getTooltip()
@@ -20,9 +21,12 @@ this.edict_of_impoverishment <- ::inherit("scripts/items/item/misc/edict",
 
     function executeEdictProcedure( _lairs )
     {
+        this.edict.executeEdictProcedure(_lairs);
+
         foreach( lair in lairs )
         {
-            lair.m.Resources -= (0.25 * lair.getResources());
+            lair.m.Resources -= ::Math.floor(0.25 * lair.getResources());
+            lair.createDefenders();
         }
     }
 });
