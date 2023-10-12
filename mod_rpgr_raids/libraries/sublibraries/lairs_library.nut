@@ -30,7 +30,7 @@ Raids.Lairs <-
     function addEdict( _party )
     {
         local culledString = "scripts/items/",
-        edicts = ::IO.enumerateFiles("scripts/items/misc/edicts").map(@(_stringPath) _stringPath.slice(culledString.len()));
+        edicts = ::IO.enumerateFiles("scripts/items/special/edicts").map(@(_stringPath) _stringPath.slice(culledString.len()));
         _party.addToInventory(edicts[::Math.rand(0, edicts.len() - 1)]);
     }
 
@@ -112,7 +112,7 @@ Raids.Lairs <-
         }
     }
 
-    function findEdict( _lair, _ID )
+    function findEdict( _ID, _lair )
     {
         local containers = ["EdictContainerA", "EdictContainerB"];
 
@@ -210,7 +210,7 @@ Raids.Lairs <-
     function getResourceDifference( _lair, _lairResources, _partyResources )
     {
         local naiveDifference = (_lairResources - _partyResources),
-        edictContainer = this.findEdict(_lair, "misc.edict_of_provocation"), edictModifier = 1.0;
+        edictContainer = this.findEdict("special.edict_of_provocation", _lair), edictModifier = 1.0;
 
         if (edictContainer != null)
         {
@@ -380,7 +380,7 @@ Raids.Lairs <-
             return;
         }
 
-        local namedLoot = this.createNamedLoot(_lair);
+        local namedLoot = Raids.Shared.createNamedLoot(_lair);
 
         for ( local i = 0; i < iterations ; i++ )
         {

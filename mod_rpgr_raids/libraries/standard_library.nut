@@ -50,9 +50,9 @@ Raids.Standard <-
 
     function getFlagAsInt( _string, _object )
     {
-        return _object.getFlags().getAsInt(format("mod_rpgr_raids.%s", _string));
+        local flagValue = _object.getFlags().getAsInt(format("mod_rpgr_raids.%s", _string));
 
-        if (flagValue == false)
+        if (flagValue == 0)
         {
             flagValue = _object.getFlags().getAsInt(format("%s", _string));
         }

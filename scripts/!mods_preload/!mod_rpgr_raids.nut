@@ -18,7 +18,7 @@
         RoamerScaleAgitationRequirement = false,
         CaravanReinforcementChance = 100,
         HandleSupplyCaravans = false,
-        VerboseLogging = false
+        VerboseLogging = true
     }
 }
 

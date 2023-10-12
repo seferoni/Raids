@@ -1,16 +1,17 @@
 local Raids = ::RPGR_Raids;
-this.edict <- ::inherit("scripts/items/item",
+this.edict_item <- ::inherit("scripts/items/item",
 {
     m = {},
 	function create()
 	{
 		this.item.create();
+		this.m.Icon = "special/edict_item.png";
 		this.m.SlotType = ::Const.ItemSlot.None;
 		this.m.ItemType = ::Const.Items.ItemType.Usable;
 		this.m.IsDroppedAsLoot = true;
 		this.m.IsAllowedInBag = false;
 		this.m.IsUsable = true;
-		this.m.InstructionText = "Right-click to dispatch within proximity of a lair(s). This edict will be consumed in the process.";
+		this.m.InstructionText <- "Right-click to dispatch within proximity of a lair. This edict will be consumed in the process.";
 	}
 
 	function executeEdictProcedure( _lairs )
@@ -77,12 +78,12 @@ this.edict <- ::inherit("scripts/items/item",
 
     function playInventorySound( _eventType )
 	{
-		::Sound.play("sounds/.wav", ::Const.Sound.Volume.Inventory);
+		::Sound.play("sounds/cloth_01.wav", ::Const.Sound.Volume.Inventory);
 	}
 
 	function onUse( _actor, _item = null )
 	{
-        local lairs = Raids.Lairs.getCandidatesAtPosition(::World.State.getPlayer().getPos(), 50.0);
+        local lairs = Raids.Lairs.getCandidatesAtPosition(::World.State.getPlayer().getPos(), 1000.0);
 
         if (lairs.len() == 0)
         {
@@ -90,7 +91,8 @@ this.edict <- ::inherit("scripts/items/item",
             return false;
         }
 
-        this.executeEdictProcedure(lairs);
+		::Sound.play("sounds/scribble.wav", ::Const.Sound.Volume.Inventory);
+		this.executeEdictProcedure(lairs);
         return true;
 	}
 });
