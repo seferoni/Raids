@@ -30,7 +30,6 @@ local Raids = ::RPGR_Raids;
 
         if (::World.getPlayerRoster().getSize() == 0 || !::World.Assets.getOrigin().onCombatFinished() || Raids.Standard.getFlagAsInt("LastCombatResult", ::World.Statistics) != 1)
         {
-            ::logInfo(format("%i", ::World.Statistics.getFlags().getAsInt("LastCombatResult")));
             Raids.Standard.log("Last combat result was flagged as defeat, aborting lair agitation procedure.");
             return;
         }
