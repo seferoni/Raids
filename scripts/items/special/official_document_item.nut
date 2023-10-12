@@ -1,40 +1,38 @@
 local Raids = ::RPGR_Raids;
-this.edict_item <- ::inherit("scripts/items/item",
+this.official_document_item <- ::inherit("scripts/items/item",
 {
     m = {},
 	function create()
 	{
 		this.item.create();
-		this.m.Icon = "special/edict_item.png";
+        this.m.ID = "special.official_document_item";
+		this.m.Name = "Official Document";
+		this.m.Description = "A sealed document. The materials used in its fabrication are rare indeed, but rarer still would be a pair of literate hands to pen its contents.";
+		this.m.Value = 150;
+		this.m.Icon = "special/official_document_item.png";
 		this.m.SlotType = ::Const.ItemSlot.None;
 		this.m.ItemType = ::Const.Items.ItemType.Usable;
 		this.m.IsDroppedAsLoot = true;
 		this.m.IsAllowedInBag = false;
 		this.m.IsUsable = true;
-		this.m.InstructionText <- "Right-click to dispatch within proximity of a lair. This edict will be consumed in the process.";
+        this.m.EffectText <- "Will produce a counterfeit edict, but only if a counterfeiter's tools are present.";
+        this.m.InstructionText <- "Right-click to modify its contents.";
 	}
 
-	function executeEdictProcedure( _lair )
-	{
-		local flag = null,
-		isFlagOccupied = @(_flag, _lair) Raids.Standard.getFlag(_flag, _lair) != false;
+    function findCounterfeitingTools()
+    {
+        local stash = ::World.Assets.getStash().getItems();
 
-		if (!isFlagOccupied("EdictContainerA", lair))
-		{
-			flag = "EdictContainerA";
-		}
-		else if (!isFlagOccupied("EdictContainerB", lair))
-		{
-			flag = "EdictContainerB";
-		}
+        foreach( item in stash )
+        {
+            if (item.getID() == "special.counterfeiting_tools_item")
+            {
+                return true;
+            }
+        }
 
-		if (flag == null)
-		{
-			return;
-		}
-
-		Raids.Standard.setFlag(flag, this.getID(), lair);
-	}
+        return false;
+    }
 
 	function getEffect()
     {
@@ -79,16 +77,13 @@ this.edict_item <- ::inherit("scripts/items/item",
 
 	function onUse( _actor, _item = null )
 	{
-        local lair = Raids.Lairs.getCandidateAtPosition(::World.State.getPlayer().getPos(), 4000.0);
-
-        if (lair == null)
+        if (!this.findCounterfeitingTools())
         {
-            Raids.Standard.log("No eligible lair in proximity of the player.");
             return false;
         }
 
-		::Sound.play("sounds/cloth_01.wav", ::Const.Sound.Volume.Inventory);
-		this.executeEdictProcedure(lair);
+        ::Sound.play("sounds/scribble.wav", ::Const.Sound.Volume.Inventory);
+        ::World.getStash().add(Raids.Shared.getEdict());
         return true;
 	}
 });

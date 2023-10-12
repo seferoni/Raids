@@ -11,14 +11,4 @@ this.edict_of_opportunism <- ::inherit("scripts/items/special/edict_item",
 		this.m.Value = 50;
         this.m.EffectText <- "Will force the closest lair to reassess their inventories and potentially keep more Famed items on hand.";
 	}
-
-    function executeEdictProcedure( _lairs )
-    {
-        this.edict_item.executeEdictProcedure(_lairs);
-
-        foreach( lair in _lairs )
-        {
-            Raids.Lairs.repopulateLairNamedLoot(lair);
-        }
-    }
 });

@@ -11,10 +11,4 @@ this.edict_of_agitation <- ::inherit("scripts/items/special/edict_item",
 		this.m.Value = 20;
 		this.m.EffectText <- "Will agitate the closest nearby lair.";
 	}
-
-    function executeEdictProcedure( _lairs )
-    {
-		this.edict_item.executeEdictProcedure(_lairs);
-        Raids.Lairs.agitateViableLairs(_lairs);
-    }
 });

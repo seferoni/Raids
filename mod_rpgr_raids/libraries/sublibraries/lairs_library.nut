@@ -11,14 +11,11 @@ Raids.Lairs <-
     Parameters =
     {
         FactionSpecificNamedLootChance = 33,
-        MaximumTroopOffset = 7,
         NamedItemChanceOnSpawn = 30,
         NamedItemChancePerAgitationTier = 13.33,
         NamedLootRefreshChance = 60,
         ResourceModifierLowerBound = 200,
         ResourceModifierUpperBound = 350,
-        VanguardResourceThreshold = 6,
-        VanguardThresholdPercentage = 75.0
     },
     Procedures =
     {
@@ -26,13 +23,6 @@ Raids.Lairs <-
         Decrement = 2,
         Reset = 3
     },
-
-    function addEdict( _party )
-    {
-        local culledString = "scripts/items/",
-        edicts = ::IO.enumerateFiles("scripts/items/special/edicts").map(@(_stringPath) _stringPath.slice(culledString.len()));
-        _party.addToInventory(edicts[::Math.rand(0, edicts.len() - 1)]);
-    }
 
     function agitateViableLairs( _lairs, _iterations = 1 )
     {
@@ -61,29 +51,6 @@ Raids.Lairs <-
         {
             this.updateLairProperties(lair, this.Procedures.Increment);
         }
-    }
-
-    function assignTroops( _party, _partyList, _resources )
-    {
-        local troopsTemplate = this.selectRandomPartyTemplate(_party, _partyList, _resources);
-
-        if (troopsTemplate.len() == 0)
-        {
-            return false;
-        }
-
-        local bailOut = 0;
-
-        while (_resources >= 0 && bailOut < this.Parameters.MaximumTroopOffset)
-        {
-            local troop = troopsTemplate[::Math.rand(0, troopsTemplate.len() - 1)];
-            ::Const.World.Common.addTroop(_party, troop, false);
-            _resources -= troop.Type.Cost;
-            bailOut += 1;
-        }
-
-        _party.updateStrength();
-        return true;
     }
 
     function depopulateLairNamedLoot( _lair, _chance = null )
@@ -145,7 +112,7 @@ Raids.Lairs <-
         return modifier;
     }
 
-    function getCandidatesAtPosition( _position, _radius )
+    function getCandidateAtPosition( _position, _radius )
     {
         local Raids = ::RPGR_Raids, entities = ::World.getAllEntitiesAndOneLocationAtPos(_position, _radius),
         lairs = entities.filter(function( _entityIndex, _entity )
@@ -163,7 +130,12 @@ Raids.Lairs <-
             return true;
         });
 
-        return lairs;
+        if (lairs.len() == 0)
+        {
+            return null;
+        }
+
+        return lairs[0];
     }
 
     function getCandidatesByFaction( _faction )
@@ -238,25 +210,6 @@ Raids.Lairs <-
         Raids.Standard.setFlag("BaseResources", _lair.getResources(), _lair);
         Raids.Standard.setFlag("Agitation", this.AgitationDescriptors.Relaxed, _lair);
         Raids.Standard.setFlag("BaseNamedItemChance", this.getNaiveNamedLootChance(_lair), _lair);
-    }
-
-    function initialiseVanguardParameters( _party )
-    {
-        _party.setName(format("Provoked %s", _party.getName()));
-        Raids.Standard.setFlag("IsProvoked", true, _party);
-
-        for( local i = 0; i < 2; i = i++ )
-        {
-            Raids.Shared.addToInventory(_party, Raids.Shared.createNaivePartyLoot(_party, false));
-        }
-    }
-
-    function initialiseVanguardParameters( _party )
-    {
-        _party.setName(format("Vanguard %s", _party.getName()));
-        Raids.Standard.setFlag("IsVanguard", true, _party);
-        this.addEdict(_party);
-        Raids.Shared.addToInventory(_party, Raids.Shared.createNaivePartyLoot(_party, false));
     }
 
     function isActiveContractLocation( _lair )
@@ -338,28 +291,6 @@ Raids.Lairs <-
         return true;
     }
 
-    function isTroopViable( _troop )
-    {
-        local exclusionList =
-        [
-            ::Const.World.Spawn.Troops.BarbarianBeastmaster,
-            ::Const.World.Spawn.Troops.BarbarianDrummer,
-            ::Const.World.Spawn.Troops.BarbarianUnhold,
-            ::Const.World.Spawn.Troops.Necromancer,
-            ::Const.World.Spawn.Troops.Warhound
-        ]
-
-        foreach( excludedTroop in exclusionList )
-        {
-            if (_troop.Type == excludedTroop)
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
     function repopulateNamedLoot( _lair )
     {
         local namedLootChance = this.getNamedLootChance(_lair), iterations = 0;
@@ -388,28 +319,6 @@ Raids.Lairs <-
             _lair.getLoot().add(::new("scripts/items/" + namedItem));
             Raids.Standard.log(format("Added item with filepath %s to the inventory of %s.", namedItem, _lair.getName()));
         }
-    }
-
-    function selectRandomPartyTemplate( _party, _partyList, _resources )
-    {
-        local troopsTemplate = [], bailOut = 0, maximumIterations = 10, Raids = ::RPGR_Raids;
-
-        while (troopsTemplate.len() < 1 && bailOut < maximumIterations)
-        {
-            local partyTemplateCandidate = _partyList[::Math.rand(0, _partyList.len() - 1)];
-            troopsTemplate.extend(partyTemplateCandidate.Troops.filter(function( _troopIndex, _troop )
-            {
-                return _troop.Type.Cost <= _resources && Raids.Lairs.isTroopViable(_troop);
-            }));
-            bailOut += 1;
-        }
-
-        if (bailOut == maximumIterations)
-        {
-            Raids.Standard.log(format("Exceeded maximum iterations for troop assignment for party %s.", _party.getName()));
-        }
-
-        return troopsTemplate;
     }
 
     function setAgitation( _lair, _procedure, _updateProperties = true )
@@ -441,9 +350,8 @@ Raids.Lairs <-
         _lair.m.Resources = ::Math.floor(baseResources + (interpolatedModifier * baseResources * (Raids.Standard.getFlag("Agitation", _lair) - 1) * Raids.Standard.getPercentageSetting("AgitationResourceModifier")));
     }
 
-    function updateCombatStatistics( _isProvoked, _isParty )
+    function updateCombatStatistics( _isParty )
     {
-        Raids.Standard.setFlag("LastFoeWasProvokedParty", _isProvoked, ::World.Statistics);
         Raids.Standard.setFlag("LastFoeWasParty", _isParty, ::World.Statistics);
     }
 

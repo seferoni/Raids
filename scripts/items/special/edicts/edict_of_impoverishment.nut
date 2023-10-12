@@ -11,15 +11,4 @@ this.edict_of_impoverishment <- ::inherit("scripts/items/special/edict_item",
 		this.m.Value = 100;
         this.m.EffectText <- "Will induce the closest lair to lose resources while preserving the contents of their inventories.";
 	}
-
-    function executeEdictProcedure( _lairs )
-    {
-        this.edict_item.executeEdictProcedure(_lairs);
-
-        foreach( lair in _lairs )
-        {
-            lair.m.Resources -= ::Math.floor(0.25 * lair.getResources());
-            lair.createDefenders();
-        }
-    }
 });

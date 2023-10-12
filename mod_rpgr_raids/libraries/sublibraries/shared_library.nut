@@ -1,11 +1,6 @@
 local Raids = ::RPGR_Raids;
 Raids.Shared <-
 {
-    Parameters =
-    {
-        GlobalProximityTiles = 9
-    },
-
     function addToInventory( _party, _goodsPool )
     {
         local iterations = Raids.Caravans.isPartyInitialised(_party) ? ::Math.rand(1, Raids.Standard.getFlag("CaravanWealth", _party) - 1) : ::Math.rand(1, 2);
@@ -118,6 +113,12 @@ Raids.Shared <-
         }
 
         return namedLoot;
+    }
+
+    function getEdict()
+    {
+        local edicts = ::IO.enumerateFiles("scripts/items/special/edicts");
+        return ::new(edicts[::Math.rand(0, edicts.len() - 1)]);
     }
 
     function isPlayerInProximityTo( _targetTile, _maximumProximity = 9 )

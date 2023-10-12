@@ -3,11 +3,6 @@ local Raids = ::RPGR_Raids;
 {
     Raids.Standard.wrap(_object, "onExecute", function( _faction )
     {
-        if (!Raids.Standard.getSetting("HandleSupplyCaravans"))
-        {
-            return;
-        }
-
         local grossEntities = ::World.getAllEntitiesAtPos(this.m.Start.getPos(), 1.0);
         local caravan = null;
 
@@ -26,6 +21,6 @@ local Raids = ::RPGR_Raids;
         }
 
         Raids.Standard.log("Assigning caravan parameters.");
-        Raids.Caravans.initialiseCaravanParameters(caravan, this.m.Start);
+        Raids.Caravans.initialiseSupplyCaravanParameters(caravan);
     });
 })

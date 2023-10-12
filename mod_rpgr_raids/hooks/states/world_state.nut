@@ -48,8 +48,7 @@ local Raids = ::RPGR_Raids;
             return;
         }
 
-        local iterations = Raids.Standard.getFlag("LastFoeWasProvokedParty", ::World.Statistics) == false ? 1 : 2;
-        Raids.Lairs.agitateViableLairs(lairs, iterations);
-        Raids.Lairs.updateCombatStatistics(false, false);
+        Raids.Lairs.agitateViableLairs(lairs);
+        Raids.Lairs.updateCombatStatistics(false);
     });
 });

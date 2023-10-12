@@ -8,7 +8,7 @@ local Raids = ::RPGR_Raids;
             return;
         }
 
-        Raids.Lairs.updateCombatStatistics(false, false);
+        Raids.Lairs.updateCombatStatistics(false);
     });
 
     Raids.Standard.wrap(_object, "onSpawned", function()
@@ -45,15 +45,17 @@ local Raids = ::RPGR_Raids;
         }
 
         Raids.Lairs.updateAgitation(this);
-        local agitationState = Raids.Standard.getFlag("Agitation", this),
+        Raids.Edicts.updateEdicts(this);
+        local agitation = Raids.Standard.getFlag("Agitation", this),
         textColour = "PositiveValue", iconPath = "vision.png";
-        if (agitationState != Raids.Lairs.AgitationDescriptors.Relaxed) textColour = "NegativeValue", iconPath = "miniboss.png";
+        if (agitation != Raids.Lairs.AgitationDescriptors.Relaxed) textColour = "NegativeValue", iconPath = "miniboss.png";
 
         _tooltipArray.extend([
             {id = 20, type = "text", icon = "ui/icons/asset_money.png", text = format("%s resource units", Raids.Standard.colourWrap(format("%i", this.m.Resources), "PositiveValue"))},
-            {id = 20, type = "text", icon = format("ui/icons/%s", iconPath), text = format("%s", Raids.Standard.colourWrap(format("%s", Raids.Standard.getDescriptor(agitationState, Raids.Lairs.AgitationDescriptors)), textColour))}
+            {id = 20, type = "text", icon = format("ui/icons/%s", iconPath), text = format("%s", Raids.Standard.colourWrap(format("%s", Raids.Standard.getDescriptor(agitation, Raids.Lairs.AgitationDescriptors)), textColour))}
         ]);
 
+        tooltipArray.extend(Raids.Edicts.getEdictEntries(this));
         return _tooltipArray;
     });
 });

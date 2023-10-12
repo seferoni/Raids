@@ -8,7 +8,7 @@ local Raids = ::RPGR_Raids;
             return;
         }
 
-        Raids.Lairs.updateCombatStatistics(Raids.Standard.getFlag("IsProvoked", this), true);
+        Raids.Lairs.updateCombatStatistics(true);
     });
 
     Raids.Standard.wrap(_object, "onDropLootForPlayer", function( _lootTable )

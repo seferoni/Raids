@@ -185,6 +185,11 @@ Raids.Caravans <-
         this.reinforceTroops(_caravan, _settlement);
     }
 
+    function initialiseSupplyCaravanParameters( _caravan )
+    {
+        _caravan.addToInventory("special/official_document_item");
+    }
+
     function isPartyViable( _party )
     {
         return Raids.Standard.getFlag("IsCaravan", _party);
