@@ -19,21 +19,24 @@ this.edict_item <- ::inherit("scripts/items/item",
 		local flag = null,
 		isFlagOccupied = @(_flag, _lair) Raids.Standard.getFlag(_flag, _lair) != false;
 
-		if (!isFlagOccupied("EdictContainerA", lair))
+		if (!isFlagOccupied("EdictContainerA", _lair))
 		{
 			flag = "EdictContainerA";
 		}
-		else if (!isFlagOccupied("EdictContainerB", lair))
+		else if (!isFlagOccupied("EdictContainerB", _lair))
 		{
 			flag = "EdictContainerB";
 		}
 
 		if (flag == null)
 		{
-			return;
+			return false;
 		}
 
-		Raids.Standard.setFlag(flag, this.getID(), lair);
+		::Sound.play("sounds/cloth_01.wav", ::Const.Sound.Volume.Inventory);
+		Raids.Standard.setFlag(flag, this.getID(), _lair);
+		Raids.Standard.setFlag(format("%sTime", flag), ::World.getTime().Days, _lair);
+		return true;
 	}
 
 	function getEffect()
@@ -87,8 +90,6 @@ this.edict_item <- ::inherit("scripts/items/item",
             return false;
         }
 
-		::Sound.play("sounds/cloth_01.wav", ::Const.Sound.Volume.Inventory);
-		this.executeEdictProcedure(lair);
-        return true;
+		return this.executeEdictProcedure(lair);
 	}
 });

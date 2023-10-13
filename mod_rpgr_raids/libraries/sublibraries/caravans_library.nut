@@ -224,7 +224,7 @@ Raids.Caravans <-
         factionType = ::World.FactionManager.getFaction(_caravan.getFaction()).getType(),
         mundaneTroops = this.createCaravanTroops(wealth, factionType);
 
-        for( local i = 1; i <= iterations; i = i++ )
+        for( local i = 0; i < iterations; i++ )
         {
             ::Const.World.Common.addTroop(_caravan, {Type = mundaneTroops[::Math.rand(0, mundaneTroops.len() - 1)]}, true);
         }

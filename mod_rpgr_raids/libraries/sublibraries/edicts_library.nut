@@ -6,6 +6,12 @@ Raids.Edicts <-
         DurationDays = 2,
     }
 
+    function createEdict()
+    {
+        local edicts = ::IO.enumerateFiles("scripts/items/special/edicts");
+        return ::new(edicts[::Math.rand(0, edicts.len() - 1)]);
+    }
+
     function executeAgitationProcedure( _lair )
     {
         Raids.Lairs.agitateViableLairs([_lair]);
@@ -20,13 +26,25 @@ Raids.Edicts <-
 
     function executeImpoverishmentProcedure( _lair )
     {
-        lair.m.Resources -= ::Math.floor(0.25 * lair.getResources());
-        lair.createDefenders();
+        _lair.m.Resources -= ::Math.floor(0.25 * _lair.getResources());
+        _lair.createDefenders();
     }
 
     function executeOpportunistProcedure( _lair )
     {
-        Raids.Lairs.repopulateLairNamedLoot(lair);
+        Raids.Lairs.repopulateLairNamedLoot(_lair);
+    }
+
+    function findEdict( _ID, _lair )
+    {
+        local containers = ["EdictContainerA", "EdictContainerB"];
+
+        foreach( container in containers )
+        {
+            if (Raids.Standard.getFlag(container, _lair) == _ID) return container;
+        }
+
+        return null;
     }
 
     function getEdictEntries( _lair )
@@ -37,7 +55,7 @@ Raids.Edicts <-
         if (filledEdictContainers.len() == 0)
         {
             local entry = clone entryTemplate;
-            entry.icon = "", entry.text = "Edict: Vacant";
+            entry.icon = "ui/icons/unknown_traits.png", entry.text = "Edict: Vacant";
             return [entry, entry];
         }
 
@@ -47,7 +65,7 @@ Raids.Edicts <-
         foreach( edict in edicts )
         {
             local entry = clone entryTemplate;
-            entry.icon = "", entry.text = format("Edict: %s", edict);
+            entry.icon = "ui/icons/scroll_01_b.png", entry.text = format("Edict: %s", edict);
             entries.push(entry);
         }
 
@@ -70,9 +88,9 @@ Raids.Edicts <-
             return;
         }
 
-        local edictDates = validContainers.map(@(_flag) Raids.Standard.getFlag(format("%sTime", _flag)));
+        local edictDates = validContainers.map(@(_flag) Raids.Standard.getFlag(format("%sTime", _flag), _lair));
 
-        for( local i = 0; i < validContainers.len() - 1; i = i++ )
+        for( local i = 0; i < validContainers.len(); i++ )
         {
             if (::World.getTime().Days - edictDates[i] >= this.Parameters.DurationDays) this.executeEdictProcedure(validContainers[i], _lair);
         }

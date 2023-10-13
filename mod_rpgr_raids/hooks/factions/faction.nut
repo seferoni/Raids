@@ -39,5 +39,5 @@ local Raids = ::RPGR_Raids;
         local resourceDifference = Raids.Lairs.getResourceDifference(lair, lair.getResources() * Raids.Lairs.getTimeModifier(), _resources);
         Raids.Standard.log(format("%s has been reinforced with resource count %.2f.", resourceDifference));
         return [_tile, _name, _uniqueName, _template, _resources + resourceDifference];
-    });
-}, "overrideArguments");
+    }, "overrideArguments");
+});

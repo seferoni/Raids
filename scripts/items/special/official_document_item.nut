@@ -25,7 +25,7 @@ this.official_document_item <- ::inherit("scripts/items/item",
 
         foreach( item in stash )
         {
-            if (item.getID() == "special.counterfeiting_tools_item")
+            if (item != null && item.getID() == "special.counterfeiting_tools_item")
             {
                 return true;
             }
@@ -83,7 +83,8 @@ this.official_document_item <- ::inherit("scripts/items/item",
         }
 
         ::Sound.play("sounds/scribble.wav", ::Const.Sound.Volume.Inventory);
-        ::World.getStash().add(Raids.Shared.getEdict());
+        ::World.Assets.getStash().add(Raids.Edicts.createEdict());
+		::World.Assets.getStash().removeByID("special.counterfeiting_tools_item");
         return true;
 	}
 });

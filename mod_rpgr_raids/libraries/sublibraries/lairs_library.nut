@@ -79,18 +79,6 @@ Raids.Lairs <-
         }
     }
 
-    function findEdict( _ID, _lair )
-    {
-        local containers = ["EdictContainerA", "EdictContainerB"];
-
-        foreach( container in containers )
-        {
-            if (Raids.Standard.getFlag(container, _lair) == _ID) return container;
-        }
-
-        return null;
-    }
-
     function getBaseResourceModifier( _resources )
     {
         local modifier = 1.0;
@@ -181,16 +169,9 @@ Raids.Lairs <-
 
     function getResourceDifference( _lair, _lairResources, _partyResources )
     {
-        local naiveDifference = (_lairResources - _partyResources),
-        edictContainer = this.findEdict("special.edict_of_provocation", _lair), edictModifier = 1.0;
-
-        if (edictContainer != null)
-        {
-            edictModifier = 2.5;
-            Raids.Standard.setFlag(edictContainer, false, _lair);
-        }
-
-        local baseResourceModifier = this.getBaseResourceModifier(Raids.Standard.getFlag("BaseResources", _lair)),
+        local naiveDifference = _lairResources - _partyResources,
+        edictModifier = Raids.Edicts.findEdict("special.edict_of_provocation", _lair) != null ? 2.5 : 1.0,
+        baseResourceModifier = this.getBaseResourceModifier(Raids.Standard.getFlag("BaseResources", _lair)),
         configurableModifier = Raids.Standard.getPercentageSetting("RoamerResourceModifier");
         return baseResourceModifier * edictModifier * configurableModifier * naiveDifference;
     }
@@ -380,7 +361,7 @@ Raids.Lairs <-
             return;
         }
 
-        for( local i = 0; i != decrementIterations; i = ++i )
+        for( local i = 0; i < decrementIterations; i++ )
         {
             this.setAgitation(_lair, this.Procedures.Decrement);
 

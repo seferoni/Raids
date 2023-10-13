@@ -115,12 +115,6 @@ Raids.Shared <-
         return namedLoot;
     }
 
-    function getEdict()
-    {
-        local edicts = ::IO.enumerateFiles("scripts/items/special/edicts");
-        return ::new(edicts[::Math.rand(0, edicts.len() - 1)]);
-    }
-
     function isPlayerInProximityTo( _targetTile, _maximumProximity = 9 )
     {
         return ::World.State.getPlayer().getTile().getDistanceTo(_targetTile) <= _maximumProximity;

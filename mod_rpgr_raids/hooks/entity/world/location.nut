@@ -55,7 +55,7 @@ local Raids = ::RPGR_Raids;
             {id = 20, type = "text", icon = format("ui/icons/%s", iconPath), text = format("%s", Raids.Standard.colourWrap(format("%s", Raids.Standard.getDescriptor(agitation, Raids.Lairs.AgitationDescriptors)), textColour))}
         ]);
 
-        tooltipArray.extend(Raids.Edicts.getEdictEntries(this));
+        _tooltipArray.extend(Raids.Edicts.getEdictEntries(this));
         return _tooltipArray;
     });
 });
