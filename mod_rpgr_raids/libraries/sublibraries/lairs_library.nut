@@ -176,11 +176,11 @@ Raids.Lairs <-
 
     function getNaiveNamedLootChance( _lair )
     {
-        local nearestSettlementDistance = 9000, lairTile = _lair.getTile();
+        local nearestSettlementDistance = 9000, tile = _lair.getTile();
 
 		foreach( settlement in ::World.EntityManager.getSettlements() )
 		{
-			local settlementDistance = lairTile.getDistanceTo(settlement.getTile());
+			local settlementDistance = tile.getDistanceTo(settlement.getTile());
 
 			if (settlementDistance < nearestSettlementDistance)
 			{
@@ -295,7 +295,7 @@ Raids.Lairs <-
         return true;
     }
 
-    function repopulateNamedLoot( _lair )
+    function repopulateLairNamedLoot( _lair )
     {
         local namedLootChance = this.getNamedLootChance(_lair), iterations = 0;
         Raids.Standard.log(format("namedLootChance is %.2f for lair %s.", namedLootChance, _lair.getName()));
@@ -344,7 +344,7 @@ Raids.Lairs <-
 
         if (_updateProperties)
         {
-            this.updateLairProperties(_lair, _procedure);
+            this.updateProperties(_lair, _procedure);
         }
     }
 
@@ -395,7 +395,7 @@ Raids.Lairs <-
         }
     }
 
-    function updateLairProperties( _lair, _procedure )
+    function updateProperties( _lair, _procedure )
     {
         this.setResourcesByAgitation(_lair);
         Raids.Standard.log("Refreshing lair defender roster on agitation update.");
@@ -414,6 +414,6 @@ Raids.Lairs <-
             return;
         }
 
-        this.repopulateNamedLoot(_lair);
+        this.repopulateLairNamedLoot(_lair);
     }
 };
