@@ -39,9 +39,9 @@ Raids.Edicts <-
     {
         local containers = ["EdictContainerA", "EdictContainerB"];
 
-        foreach( container in containers )
+        foreach( flag in containers )
         {
-            if (Raids.Standard.getFlag(container, _lair) == _ID) return container;
+            if (Raids.Standard.getFlag(flag, _lair) == _ID) return flag;
         }
 
         return null;
@@ -49,26 +49,30 @@ Raids.Edicts <-
 
     function getEdictEntries( _lair )
     {
-        local entryTemplate = {id = 20, type = "text", icon = "", text = ""},
-        filledEdictContainers = this.getValidContainers(_lair);
+        local entryTemplate = {id = 20, type = "text", icon = "ui/icons/unknown_traits.png", text = "Edict: Vacant"},
+        validContainers = this.getValidContainers(_lair);
 
-        if (filledEdictContainers.len() == 0)
+        if (validContainers.len() == 0)
         {
-            local entry = clone entryTemplate;
-            entry.icon = "ui/icons/unknown_traits.png", entry.text = "Edict: Vacant";
-            return [entry, entry];
+            return [entryTemplate, entryTemplate];
         }
 
-        local entries = [], Edicts = ::RPGR_Raids.Edicts,
-        edicts = filledEdictContainers.map(@(_flag) Edicts.getEdictName(_flag));
+        local entries = [];
 
-        foreach( edict in edicts )
+        foreach( flag in validContainers )
         {
             local entry = clone entryTemplate;
-            entry.icon = "ui/icons/scroll_01_b.png", entry.text = format("Edict: %s", edict);
+            entry.icon = "ui/icons/scroll_01_b.png";
+            entry.text = format("Edict: %s (%s)", Raids.Edicts.getEdictName(flag), Raids.Standard.getFlag(format("%sTime", flag)) != false ? "Discovery" : "Active");
             entries.push(entry);
         }
 
+        if (entries.len() == 2)
+        {
+            return entries;
+        }
+
+        entries.push(entryTemplate);
         return entries;
     }
 

@@ -18,7 +18,7 @@ local Raids = ::RPGR_Raids;
             return;
         }
 
-        local lair = Raids.Lairs.getCandidateAtPosition(_tile.Coords, 1.0);
+        local lair = Raids.Lairs.getCandidateAtPosition(_tile.Coords);
 
         if (lair == null)
         {

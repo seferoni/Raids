@@ -14,28 +14,33 @@ this.edict_item <- ::inherit("scripts/items/item",
 		this.m.InstructionText <- "Right-click to dispatch within proximity of a lair. This edict will be consumed in the process.";
 	}
 
-	function executeEdictProcedure( _lair )
+	function executeEdictProcedure( _lairs )
 	{
-		local flag = null,
-		isFlagOccupied = @(_flag, _lair) Raids.Standard.getFlag(_flag, _lair) != false;
+		local isFlagOccupied = @(_flag, _lair) Raids.Standard.getFlag(_flag, _lair) != false;
 
-		if (!isFlagOccupied("EdictContainerA", _lair))
+		foreach( lair in _lairs )
 		{
-			flag = "EdictContainerA";
-		}
-		else if (!isFlagOccupied("EdictContainerB", _lair))
-		{
-			flag = "EdictContainerB";
-		}
+			local flag = null;
 
-		if (flag == null)
-		{
-			return false;
+			if (!isFlagOccupied("EdictContainerA", lair))
+			{
+				flag = "EdictContainerA";
+			}
+			else if (!isFlagOccupied("EdictContainerB", lair))
+			{
+				flag = "EdictContainerB";
+			}
+
+			if (flag == null)
+			{
+				continue;
+			}
+
+			Raids.Standard.setFlag(flag, this.getID(), lair);
+			Raids.Standard.setFlag(format("%sTime", flag), ::World.getTime().Days, lair);
 		}
 
 		::Sound.play("sounds/cloth_01.wav", ::Const.Sound.Volume.Inventory);
-		Raids.Standard.setFlag(flag, this.getID(), _lair);
-		Raids.Standard.setFlag(format("%sTime", flag), ::World.getTime().Days, _lair);
 		return true;
 	}
 
@@ -82,14 +87,15 @@ this.edict_item <- ::inherit("scripts/items/item",
 
 	function onUse( _actor, _item = null )
 	{
-        local lair = Raids.Lairs.getCandidateAtPosition(::World.State.getPlayer().getPos(), 4000.0);
+        local Lairs = ::RPGR_Raids.Lairs,
+		lairs = Lairs.getCandidatesWithin(::World.State.getPlayer().getPos(), 4);
 
-        if (lair == null)
+        if (lairs.len() == 0)
         {
             Raids.Standard.log("No eligible lair in proximity of the player.");
             return false;
         }
 
-		return this.executeEdictProcedure(lair);
+		return this.executeEdictProcedure(Lairs.findViableLairsFrom(lairs));
 	}
 });

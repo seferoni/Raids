@@ -24,32 +24,12 @@ Raids.Lairs <-
         Reset = 3
     },
 
-    function agitateViableLairs( _lairs, _iterations = 1 )
+    function agitateLairs( _lairs )
     {
-        local Raids = ::RPGR_Raids,
-        viableLairs = _lairs.filter(function( _lairIndex, _lair )
-        {
-            return !Raids.Lairs.isActiveContractLocation(_lair) && Raids.Standard.getFlag("Agitation", _lair) != Raids.Lairs.AgitationDescriptors.Militant;
-        });
-
-        if (viableLairs.len() == 0)
-        {
-            Raids.Standard.log("agitateViableLairs could not find any viable lairs within proximity of the player.");
-            return;
-        }
-
-        for( local i = 0; i < _iterations; i++ )
-        {
-            foreach( lair in viableLairs )
-            {
-                Raids.Standard.log(format("Performing agitation increment procedure on %s.", lair.getName()));
-                this.setAgitation(lair, this.Procedures.Increment, false);
-            }
-        }
-
         foreach( lair in viableLairs )
         {
-            this.updateLairProperties(lair, this.Procedures.Increment);
+            Raids.Standard.log(format("Performing agitation increment procedure on %s.", lair.getName()));
+            this.setAgitation(lair, this.Procedures.Increment, true);
         }
     }
 
@@ -79,6 +59,34 @@ Raids.Lairs <-
         }
     }
 
+    function findViableLairsFrom( _lairs )
+    {
+        local activeContract = ::World.Contracts.getActiveContract();
+
+		if (activeContract == null || !("Destination" in activeContract.m))
+		{
+			return _lairs;
+		}
+
+        return _lairs.filter(@(_index, _lair) activeContract.m.Destination.get() != _lair);
+    }
+
+    function getAgitationEntries( _lair )
+    {
+        local agitation = Raids.Standard.getFlag("Agitation", _lair),
+        textColour = "PositiveValue", iconPath = "vision.png";
+
+        if (agitation != this.AgitationDescriptors.Relaxed)
+        {
+            textColour = "NegativeValue", iconPath = "miniboss.png";
+        }
+
+        return [
+            {id = 20, type = "text", icon = "ui/icons/asset_money.png", text = format("%s resource units", Raids.Standard.colourWrap(format("%i", _lair.m.Resources), "PositiveValue"))},
+            {id = 20, type = "text", icon = format("ui/icons/%s", iconPath), text = format("%s", Raids.Standard.colourWrap(format("%s", Raids.Standard.getDescriptor(agitation, this.AgitationDescriptors)), textColour))}
+        ];
+    }
+
     function getBaseResourceModifier( _resources )
     {
         local modifier = 1.0;
@@ -100,9 +108,30 @@ Raids.Lairs <-
         return modifier;
     }
 
-    function getCandidateAtPosition( _position, _radius )
+    function getCandidatesWithin( _tile, _distance )
     {
-        local Raids = ::RPGR_Raids, entities = ::World.getAllEntitiesAndOneLocationAtPos(_position, _radius),
+        local Lairs = ::RPGR_Raids.Lairs,
+        lairs = ::World.EntityManager.getLocations().filter(function( _index, _location )
+        {
+            if (!Lairs.isLocationTypeViable(_location.getLocationType()))
+            {
+                return false;
+            }
+
+            if (_tile.getDistanceTo(_location.getTile()) > _distance)
+            {
+                return false;
+            }
+
+            return true;
+        });
+
+        return lairs;
+    }
+
+    function getCandidateAtPosition( _position )
+    {
+        local Raids = ::RPGR_Raids, entities = ::World.getAllEntitiesAndOneLocationAtPos(_position, 1.0),
         lairs = entities.filter(function( _entityIndex, _entity )
         {
             if (!::isKindOf(_entity, "location"))
@@ -246,23 +275,17 @@ Raids.Lairs <-
         return _locationType == ::Const.World.LocationType.Lair || _locationType == (::Const.World.LocationType.Lair | ::Const.World.LocationType.Mobile);
     }
 
-    function isLairViable( _lair, _procedure )
+    function isLairViableForProcedure( _lair, _procedure )
     {
-        local agitationState = Raids.Standard.getFlag("Agitation", _lair);
+        local agitation = Raids.Standard.getFlag("Agitation", _lair);
 
-        if (agitationState > this.AgitationDescriptors.Militant || agitationState < this.AgitationDescriptors.Relaxed)
-        {
-            Raids.Standard.log(format("Agitation for %s occupies an out-of-bounds value.", _lair.getName()), true);
-            return false;
-        }
-
-        if (_procedure == this.Procedures.Increment && agitationState >= this.AgitationDescriptors.Militant)
+        if (_procedure == this.Procedures.Increment && agitation >= this.AgitationDescriptors.Militant)
         {
             Raids.Standard.log(format("Agitation for %s is capped, aborting procedure.", _lair.getName()));
             return false;
         }
 
-        if (_procedure == this.Procedures.Decrement && agitationState <= this.AgitationDescriptors.Relaxed)
+        if (_procedure == this.Procedures.Decrement && agitation <= this.AgitationDescriptors.Relaxed)
         {
             Raids.Standard.log(format("Agitation for %s is already at its minimum value, aborting procedure.", _lair.getName()));
             return false;
@@ -304,7 +327,7 @@ Raids.Lairs <-
 
     function setAgitation( _lair, _procedure, _updateProperties = true )
     {
-        if (!this.isLairViable(_lair, _procedure))
+        if (!this.isLairViableForProcedure(_lair, _procedure))
         {
             return;
         }

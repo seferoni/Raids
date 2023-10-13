@@ -40,15 +40,15 @@ local Raids = ::RPGR_Raids;
             return;
         }
 
-        local lairs = Raids.Lairs.getCandidatesByFaction(faction);
+        local naiveLairs = Raids.Lairs.getCandidatesByFaction(faction);
 
-        if (lairs.len() == 0)
+        if (naiveLairs.len() == 0)
         {
             Raids.Standard.log("getCandidatesByFaction could not find any eligible lairs within proximity of the player.");
             return;
         }
 
-        Raids.Lairs.agitateViableLairs(lairs);
+        Raids.Lairs.agitateViableLairs(Raids.Lairs.findViableLairsFrom(lairs));
         Raids.Lairs.updateCombatStatistics(false);
     });
 });

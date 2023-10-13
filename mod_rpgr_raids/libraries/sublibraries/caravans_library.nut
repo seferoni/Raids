@@ -186,7 +186,7 @@ Raids.Caravans <-
     }
 
     function initialiseSupplyCaravanParameters( _caravan )
-    {
+    {   // TODO: revise number for balancing
         _caravan.addToInventory("special/official_document_item");
     }
 
