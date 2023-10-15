@@ -44,16 +44,7 @@ local Raids = ::RPGR_Raids;
             return;
         }
 
-        _tooltipArray.extend([
-            {id = 2, type = "hint", icon = format("ui/icons/%s", Raids.Caravans.getCargoIcon(Raids.Standard.getFlag("CaravanCargo", this))), text = Raids.Standard.getDescriptor(Raids.Standard.getFlag("CaravanCargo", this), Raids.Caravans.CargoDescriptors)},
-            {id = 2, type = "hint", icon = "ui/icons/money2.png", text = Raids.Standard.getDescriptor(Raids.Standard.getFlag("CaravanWealth", this), Raids.Caravans.WealthDescriptors)}
-        ]);
-
-        if (Raids.Standard.getFlag("CaravanCargo", this))
-        {
-            _tooltipArray.push({id = 2, type = "hint", icon = "ui/icons/special.png", text = "Famed"});
-        }
-
+        _tooltipArray.extend(Raids.Caravans.getCaravanEntries(this));
         return _tooltipArray;
     });
 });

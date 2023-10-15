@@ -46,7 +46,7 @@ local Raids = ::RPGR_Raids;
 
         Raids.Lairs.updateAgitation(this);
         Raids.Edicts.updateEdicts(this);
-        _tooltipArray.extend(Raids.Lairs.getAgitationEntries(this));
+        _tooltipArray.extend(Raids.Lairs.getLairEntries(this));
         _tooltipArray.extend(Raids.Edicts.getEdictEntries(this));
         return _tooltipArray;
     });

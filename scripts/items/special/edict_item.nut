@@ -88,7 +88,7 @@ this.edict_item <- ::inherit("scripts/items/item",
 	function onUse( _actor, _item = null )
 	{
         local Lairs = ::RPGR_Raids.Lairs,
-		lairs = Lairs.getCandidatesWithin(::World.State.getPlayer().getPos(), 4);
+		lairs = Lairs.getCandidatesWithin(::World.State.getPlayer().getTile());
 
         if (lairs.len() == 0)
         {
@@ -96,6 +96,6 @@ this.edict_item <- ::inherit("scripts/items/item",
             return false;
         }
 
-		return this.executeEdictProcedure(Lairs.findViableLairsFrom(lairs));
+		return this.executeEdictProcedure(Lairs.filterActiveContractLocations(lairs));
 	}
 });

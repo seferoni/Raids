@@ -44,7 +44,7 @@ Raids.Caravans <-
     function addNamedCargo( _lootTable )
     {
         local namedCargo = Raids.Shared.createNamedLoot(),
-        namedItem = ::new("scripts/items/" + namedCargo[::Math.rand(0, namedCargo.len() - 1)]);
+        namedItem = ::new(format("scripts/items/%s", namedCargo[::Math.rand(0, namedCargo.len() - 1)]));
         namedItem.onAddedToStash(null);
         _lootTable.push(namedItem);
         Raids.Standard.log(format("Added %s to the loot table.", namedItem.getName()));
@@ -119,6 +119,26 @@ Raids.Caravans <-
         }
 
         return troops;
+    }
+
+    function getCaravanEntries( _caravan )
+    {
+        local cargoEntry = {id = 2, type = "hint"}, wealthEntry = clone cargoEntry,
+        caravanWealth = Raids.Standard.getFlag("CaravanCargo", _caravan), caravanCargo = Raids.Standard.getFlag("CaravanCargo", _caravan);
+        cargoEntry.icon <- format("ui/icons/%s", this.getCargoIcon(caravanCargo));
+        wealthEntry.icon <- "ui/icons/money2.png";
+        cargoEntry.text <- format("%s", Raids.Standard.getDescriptor(caravanCargo, this.CargoDescriptors));
+        wealthEntry.text <- format("%s (%i)", Raids.Standard.getDescriptor(caravanWealth, this.WealthDescriptors), caravanWealth);
+        
+        if (!Raids.Standard.getFlag("CaravanHasNamedItems", _caravan))
+        {
+            return [cargoEntry, wealthEntry];
+        }
+
+        local famedItemEntry = clone cargoEntry;
+        famedItemEntry.icon = "ui/icons/special.png";
+        famedItemEntry.text = "Famed";
+        return [cargoEntry, wealthEntry, famedItemEntry];
     }
 
     function getCargoIcon( _cargoValue )
@@ -234,7 +254,7 @@ Raids.Caravans <-
             return;
         }
 
-        if (currentTimeDays < this.Parameters.ReinforcementThresholdDays)
+        if (::World.getTime().Days < this.Parameters.ReinforcementThresholdDays)
         {
             return;
         }
@@ -245,20 +265,20 @@ Raids.Caravans <-
 
     function setCaravanWealth( _caravan, _settlement )
     {
-        local caravanCargo = ::Math.rand(1, 2);
+        local caravanWealth = ::Math.rand(1, 2);
 
         if (_settlement.isMilitary() || _settlement.isSouthern())
         {
-            caravanCargo += 1;
+            caravanWealth += 1;
         }
 
         if (_settlement.getSize() >= 3)
         {
-            caravanCargo += 1;
+            caravanWealth += 1;
         }
 
-        caravanCargo += ::Math.ceil(this.getSituationModifier(_settlement))
-        Raids.Standard.setFlag("CaravanWealth", ::Math.min(this.WealthDescriptors.Abundant, caravanCargo), _caravan);
+        caravanWealth += ::Math.ceil(this.getSituationModifier(_settlement));
+        Raids.Standard.setFlag("CaravanWealth", ::Math.min(this.WealthDescriptors.Abundant, caravanWealth), _caravan);
     }
 
     function setCaravanCargo( _caravan, _settlement )

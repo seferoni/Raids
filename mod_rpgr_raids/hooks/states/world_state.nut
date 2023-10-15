@@ -36,7 +36,6 @@ local Raids = ::RPGR_Raids;
 
         if (::Math.rand(1, 100) > Raids.Standard.getSetting("AgitationIncrementChance"))
         {
-            Raids.Standard.log("Dice roll result exceeds threshold for agitation increment chance, aborting lair agitation procedure.");
             return;
         }
 
@@ -44,11 +43,19 @@ local Raids = ::RPGR_Raids;
 
         if (naiveLairs.len() == 0)
         {
-            Raids.Standard.log("getCandidatesByFaction could not find any eligible lairs within proximity of the player.");
             return;
         }
 
-        Raids.Lairs.agitateViableLairs(Raids.Lairs.findViableLairsFrom(lairs));
-        Raids.Lairs.updateCombatStatistics(false);
+        local lairs = Raids.Lairs.filterActiveContractLocations(naiveLairs);
+
+        if (lairs.len() == 0)
+        {
+            return;
+        }
+
+        foreach( lair in lairs )
+        {
+            Raids.Lairs.setAgitation(lair, Raids.Lairs.Procedures.Increment);
+        } 
     });
 });

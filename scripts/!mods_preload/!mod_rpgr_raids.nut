@@ -17,7 +17,6 @@
         DepopulateLairLootOnSpawn = true,
         RoamerScaleAgitationRequirement = false,
         CaravanReinforcementChance = 100,
-        HandleSupplyCaravans = false,
         VerboseLogging = false
     }
 }
@@ -62,9 +61,6 @@ local Raids = ::RPGR_Raids;
 
     local caravanReinforcementChance = pageCaravans.addRangeSetting("CaravanReinforcementChance", 100, 1, 100, 1, "Caravan Reinforcement Chance");
     caravanReinforcementChance.setDescription("Determines the percentage change for caravan troop count and composition reinforcement based on caravan wealth, and in special cases, cargo type. If certain conditions obtain, this will also result in the addition of special troops with powerful end-game gear to wealthy caravans, independent of player progression.");
-
-    local handleSupplyCaravans = pageCaravans.addBooleanSetting("HandleSupplyCaravans", false, "Handle Supply Caravans");
-    handleSupplyCaravans.setDescription("Determines whether Raids should handle supply caravans in the same manner as trading caravans, or if they should behave as in the base game.");
 
     local verboseLogging = pageGeneral.addBooleanSetting("VerboseLogging", true, "Verbose Logging"); // TODO: set this to false when done
     verboseLogging.setDescription("Enables verbose logging. Recommended for testing purposes only, as the volume of logged messages can make parsing the log more difficult for general use and debugging.");

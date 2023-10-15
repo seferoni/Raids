@@ -22,15 +22,6 @@ Raids.Lairs <-
         Increment = 1,
         Decrement = 2,
         Reset = 3
-    },
-
-    function agitateLairs( _lairs )
-    {
-        foreach( lair in viableLairs )
-        {
-            Raids.Standard.log(format("Performing agitation increment procedure on %s.", lair.getName()));
-            this.setAgitation(lair, this.Procedures.Increment, true);
-        }
     }
 
     function depopulateLairNamedLoot( _lair, _chance = null )
@@ -59,32 +50,28 @@ Raids.Lairs <-
         }
     }
 
-    function findViableLairsFrom( _lairs )
+    function filterActiveContractLocations( _lairs )
+    {
+        local activeContract = this.getActiveContract();
+
+        if (activeContract == null)
+        {
+            return _lairs;
+        }
+
+        return _lairs.filter(@(_index, _lair) activeContract.m.Destination.get() != _lair);
+    }
+
+    function getActiveContract()
     {
         local activeContract = ::World.Contracts.getActiveContract();
 
 		if (activeContract == null || !("Destination" in activeContract.m))
 		{
-			return _lairs;
+			return null;
 		}
 
-        return _lairs.filter(@(_index, _lair) activeContract.m.Destination.get() != _lair);
-    }
-
-    function getAgitationEntries( _lair )
-    {
-        local agitation = Raids.Standard.getFlag("Agitation", _lair),
-        textColour = "PositiveValue", iconPath = "vision.png";
-
-        if (agitation != this.AgitationDescriptors.Relaxed)
-        {
-            textColour = "NegativeValue", iconPath = "miniboss.png";
-        }
-
-        return [
-            {id = 20, type = "text", icon = "ui/icons/asset_money.png", text = format("%s resource units", Raids.Standard.colourWrap(format("%i", _lair.m.Resources), "PositiveValue"))},
-            {id = 20, type = "text", icon = format("ui/icons/%s", iconPath), text = format("%s", Raids.Standard.colourWrap(format("%s", Raids.Standard.getDescriptor(agitation, this.AgitationDescriptors)), textColour))}
-        ];
+        return activeContract;
     }
 
     function getBaseResourceModifier( _resources )
@@ -106,27 +93,6 @@ Raids.Lairs <-
         }
 
         return modifier;
-    }
-
-    function getCandidatesWithin( _tile, _distance )
-    {
-        local Lairs = ::RPGR_Raids.Lairs,
-        lairs = ::World.EntityManager.getLocations().filter(function( _index, _location )
-        {
-            if (!Lairs.isLocationTypeViable(_location.getLocationType()))
-            {
-                return false;
-            }
-
-            if (_tile.getDistanceTo(_location.getTile()) > _distance)
-            {
-                return false;
-            }
-
-            return true;
-        });
-
-        return lairs;
     }
 
     function getCandidateAtPosition( _position )
@@ -155,6 +121,27 @@ Raids.Lairs <-
         return lairs[0];
     }
 
+    function getCandidatesWithin( _tile, _distance = 6 )
+    {
+        local Lairs = ::RPGR_Raids.Lairs,
+        lairs = ::World.EntityManager.getLocations().filter(function( _index, _location )
+        {
+            if (!Lairs.isLocationTypeViable(_location.getLocationType()))
+            {
+                return false;
+            }
+
+            if (_tile.getDistanceTo(_location.getTile()) > _distance)
+            {
+                return false;
+            }
+
+            return true;
+        });
+
+        return lairs;
+    }
+
     function getCandidatesByFaction( _faction )
     {
         local lairs = [], Raids = ::RPGR_Raids;
@@ -172,6 +159,25 @@ Raids.Lairs <-
         }));
 
         return lairs;
+    }
+
+    function getLairEntries( _lair )
+    {
+        local agitation = Raids.Standard.getFlag("Agitation", _lair),
+        textColour = "PositiveValue", iconPath = "vision.png";
+
+        if (agitation != this.AgitationDescriptors.Relaxed)
+        {
+            textColour = "NegativeValue", iconPath = "miniboss.png";
+        }
+
+        local resourcesEntry = {id = 20, type = "text"}, agitationEntry = clone resourcesEntry;
+        resourcesEntry.icon <- "ui/icons/asset_money.png";
+        agitationEntry.icon <- format("ui/icons/%s", iconPath);
+        resourcesEntry.text <- format("%s resource units", Raids.Standard.colourWrap(format("%i", _lair.m.Resources), "PositiveValue"));
+        agitationEntry.text <- format("%s", Raids.Standard.colourWrap(format("%s (%i)", Raids.Standard.getDescriptor(agitation, this.AgitationDescriptors), agitation), textColour));
+
+        return [resourcesEntry, agitationEntry];
     }
 
     function getNaiveNamedLootChance( _lair )
@@ -193,7 +199,7 @@ Raids.Lairs <-
 
     function getNamedLootChance( _lair )
     {
-        return Raids.Standard.getFlag("BaseNamedItemChance", _lair) + (Raids.Standard.getFlag("Agitation", _lair) - 1) * this.Parameters.NamedItemChancePerAgitationTier;
+        return Raids.Standard.getFlag("BaseNamedItemChance", _lair) + ((Raids.Standard.getFlag("Agitation", _lair) - 1) * this.Parameters.NamedItemChancePerAgitationTier);
     }
 
     function getResourceDifference( _lair, _lairResources, _partyResources )
@@ -210,11 +216,6 @@ Raids.Lairs <-
         return (0.9 + ::Math.minf(2.0, ::World.getTime().Days * 0.014) * ::Const.Difficulty.EnemyMult[::World.Assets.getCombatDifficulty()]);
     }
 
-    function getWorldFaction( _factionIndex )
-    {
-        return ::World.FactionManager.getFaction(_factionIndex);
-    }
-
     function initialiseLairParameters( _lair )
     {
         Raids.Standard.setFlag("BaseResources", _lair.getResources(), _lair);
@@ -224,14 +225,9 @@ Raids.Lairs <-
 
     function isActiveContractLocation( _lair )
     {
-        local activeContract = ::World.Contracts.getActiveContract();
+        local activeContract = this.getActiveContract();
 
         if (activeContract == null)
-        {
-            return false;
-        }
-
-        if (!("Destination" in activeContract.m))
         {
             return false;
         }
@@ -320,12 +316,12 @@ Raids.Lairs <-
         for ( local i = 0; i < iterations ; i++ )
         {
             local namedItem = namedLoot[::Math.rand(0, namedLoot.len() - 1)];
-            _lair.getLoot().add(::new("scripts/items/" + namedItem));
+            _lair.getLoot().add(::new(format("scripts/items/%s", namedItem)));
             Raids.Standard.log(format("Added item with filepath %s to the inventory of %s.", namedItem, _lair.getName()));
         }
     }
 
-    function setAgitation( _lair, _procedure, _updateProperties = true )
+    function setAgitation( _lair, _procedure )
     {
         if (!this.isLairViableForProcedure(_lair, _procedure))
         {
@@ -341,17 +337,16 @@ Raids.Lairs <-
         }
 
         Raids.Standard.setFlag("LastAgitationUpdate", ::World.getTime().Days, _lair);
-
-        if (_updateProperties)
-        {
-            this.updateProperties(_lair, _procedure);
-        }
+        this.updateProperties(_lair, _procedure);
     }
 
     function setResourcesByAgitation( _lair )
     {
-        local baseResources = Raids.Standard.getFlag("BaseResources", _lair), interpolatedModifier = -0.0006 * baseResources + 0.4;
-        _lair.m.Resources = ::Math.floor(baseResources + (interpolatedModifier * baseResources * (Raids.Standard.getFlag("Agitation", _lair) - 1) * Raids.Standard.getPercentageSetting("AgitationResourceModifier")));
+        local agitation = Raids.Standard.getFlag("Agitation", _lair),
+        baseResources = Raids.Standard.getFlag("BaseResources", _lair),
+        interpolatedModifier = -0.0006 * baseResources + 0.4,
+        configurableModifier = Raids.Standard.getPercentageSetting("AgitationResourceModifier");
+        _lair.m.Resources = ::Math.floor(baseResources + (interpolatedModifier * (agitation - 1) * configurableModifier * baseResources));
     }
 
     function updateCombatStatistics( _isParty )
@@ -398,9 +393,9 @@ Raids.Lairs <-
     function updateProperties( _lair, _procedure )
     {
         this.setResourcesByAgitation(_lair);
-        Raids.Standard.log("Refreshing lair defender roster on agitation update.");
+        Raids.Edicts.cycleEdicts(_lair);
         _lair.createDefenders();
-        _lair.setLootScaleBasedOnResources(_lair.getResources()); // TODO: investigate if this depopulates loot
+        _lair.setLootScaleBasedOnResources(_lair.getResources());
 
         if (_procedure != this.Procedures.Increment)
         {

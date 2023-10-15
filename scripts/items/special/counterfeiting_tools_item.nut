@@ -7,7 +7,7 @@ this.counterfeiting_tools_item <- ::inherit("scripts/items/item",
 		this.item.create();
         this.m.ID = "special.counterfeiting_tools_item";
 		this.m.Name = "Official Document";
-		this.m.Description = "An assortment of tools specialised for use in the forgery of noble house seals. Included is a quarter of a quire of vellum, a quill pen fashioned from goose feathers, a filled inkwell, some beeswax, and an imitation wax seal.";
+		this.m.Description = "An assortment of tools specialised for use in the forgery of noble house seals. Included is a quarter of a quire of gossamer paper, a quill pen fashioned from goose feathers, a filled inkwell, some beeswax, and an imitation wax seal.";
 		this.m.Value = 300;
 		this.m.Icon = "special/counterfeiting_tools_item.png";
 		this.m.SlotType = ::Const.ItemSlot.None;
