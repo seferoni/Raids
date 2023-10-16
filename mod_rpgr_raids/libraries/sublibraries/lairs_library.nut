@@ -161,25 +161,6 @@ Raids.Lairs <-
         return lairs;
     }
 
-    function getLairEntries( _lair )
-    {
-        local agitation = Raids.Standard.getFlag("Agitation", _lair),
-        textColour = "PositiveValue", iconPath = "vision.png";
-
-        if (agitation != this.AgitationDescriptors.Relaxed)
-        {
-            textColour = "NegativeValue", iconPath = "miniboss.png";
-        }
-
-        local resourcesEntry = {id = 20, type = "text"}, agitationEntry = clone resourcesEntry;
-        resourcesEntry.icon <- "ui/icons/asset_money.png";
-        agitationEntry.icon <- format("ui/icons/%s", iconPath);
-        resourcesEntry.text <- format("%s resource units", Raids.Standard.colourWrap(format("%i", _lair.m.Resources), "PositiveValue"));
-        agitationEntry.text <- format("%s", Raids.Standard.colourWrap(format("%s (%i)", Raids.Standard.getDescriptor(agitation, this.AgitationDescriptors), agitation), textColour));
-
-        return [resourcesEntry, agitationEntry];
-    }
-
     function getNaiveNamedLootChance( _lair )
     {
         local nearestSettlementDistance = 9000, tile = _lair.getTile();
@@ -214,6 +195,25 @@ Raids.Lairs <-
     function getTimeModifier()
     {
         return (0.9 + ::Math.minf(2.0, ::World.getTime().Days * 0.014) * ::Const.Difficulty.EnemyMult[::World.Assets.getCombatDifficulty()]);
+    }
+
+    function getTooltipEntries( _lair )
+    {
+        local agitation = Raids.Standard.getFlag("Agitation", _lair),
+        textColour = "PositiveValue", iconPath = "vision.png";
+
+        if (agitation != this.AgitationDescriptors.Relaxed)
+        {
+            textColour = "NegativeValue", iconPath = "miniboss.png";
+        }
+
+        local resourcesEntry = {id = 20, type = "text"}, agitationEntry = clone resourcesEntry;
+        resourcesEntry.icon <- "ui/icons/asset_money.png";
+        agitationEntry.icon <- format("ui/icons/%s", iconPath);
+        resourcesEntry.text <- format("%s resource units", Raids.Standard.colourWrap(format("%i", _lair.m.Resources), "PositiveValue"));
+        agitationEntry.text <- format("%s", Raids.Standard.colourWrap(format("%s (%i)", Raids.Standard.getDescriptor(agitation, this.AgitationDescriptors), agitation), textColour));
+
+        return [resourcesEntry, agitationEntry];
     }
 
     function initialiseLairParameters( _lair )

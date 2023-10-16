@@ -71,7 +71,14 @@ Raids.Edicts <-
         return null;
     }
 
-    function getEdictEntries( _lair )
+    function getEdictName( _flag, _lair )
+    {
+        local culledString = "special.edict_of_", edictID = Raids.Standard.getFlag(_flag, _lair),
+        edict = Raids.Standard.setCase(edictID.slice(culledString.len()), "toupper");
+        return edict;
+    }
+
+    function getTooltipEntries( _lair )
     {
         local entryTemplate = {id = 20, type = "text", icon = "ui/icons/unknown_traits.png", text = "Edict: Vacant"},
         validContainers = this.getValidContainers(_lair);
@@ -99,13 +106,6 @@ Raids.Edicts <-
 
         entries.push(entryTemplate);
         return entries;
-    }
-
-    function getEdictName( _flag, _lair )
-    {
-        local culledString = "special.edict_of_", edictID = Raids.Standard.getFlag(_flag, _lair),
-        edict = Raids.Standard.setCase(edictID.slice(culledString.len()), "toupper");
-        return edict;
     }
 
     function getValidContainers( _lair )
