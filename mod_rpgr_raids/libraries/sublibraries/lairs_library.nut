@@ -392,8 +392,16 @@ Raids.Lairs <-
 
     function updateProperties( _lair, _procedure )
     {
+        if (_procedure == this.Procedures.Reset) 
+        {
+            Raids.Edicts.clearEdicts(_lair);
+        }  
+        else 
+        {
+            Raids.Edicts.cycleEdicts(_lair);
+        }
+        
         this.setResourcesByAgitation(_lair);
-        Raids.Edicts.cycleEdicts(_lair);
         _lair.createDefenders();
         _lair.setLootScaleBasedOnResources(_lair.getResources());
 

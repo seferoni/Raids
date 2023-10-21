@@ -85,6 +85,11 @@ this.edict_item <- ::inherit("scripts/items/item",
 		::Sound.play("sounds/cloth_01.wav", ::Const.Sound.Volume.Inventory);
 	}
 
+	function setDescription( _string )
+	{
+		this.m.Description = format("A thoroughly illegal facsimile of official correspondence. %s", _string);
+	}
+
 	function onUse( _actor, _item = null )
 	{
         local Lairs = ::RPGR_Raids.Lairs,

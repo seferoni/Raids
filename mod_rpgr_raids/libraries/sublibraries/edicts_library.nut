@@ -18,6 +18,17 @@ Raids.Edicts <-
         local edicts = ::IO.enumerateFiles("scripts/items/special/edicts");
         return ::new(edicts[::Math.rand(0, edicts.len() - 1)]);
     }
+
+    function clearEdicts( _lair )
+    {
+        local containers = ["EdictContainerA", "EdictContainerB"];
+
+        foreach( container in containers )
+        {
+            Raids.Standard.setFlag(container, false, _lair);
+            Raids.Standard.setFlag(format("%sTime", container), false, _lair);
+        }
+    }
     
     function cycleEdicts( _lair )
     {
