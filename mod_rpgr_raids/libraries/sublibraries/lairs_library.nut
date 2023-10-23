@@ -1,4 +1,4 @@
-local Raids = ::RPGR_Raids;
+local Raids = ::RPGR_Raids; // FIXME: use setResources where applicable
 Raids.Lairs <-
 {
     AgitationDescriptors =
@@ -186,7 +186,7 @@ Raids.Lairs <-
     function getResourceDifference( _lair, _lairResources, _partyResources )
     {
         local naiveDifference = _lairResources - _partyResources,
-        edictModifier = Raids.Edicts.findEdict("special.edict_of_provocation", _lair) != null ? 2.5 : 1.0,
+        edictModifier = Raids.Edicts.findEdict("special.edict_of_provocation", _lair, true) != false ? 2.5 : 1.0,
         baseResourceModifier = this.getBaseResourceModifier(Raids.Standard.getFlag("BaseResources", _lair)),
         configurableModifier = Raids.Standard.getPercentageSetting("RoamerResourceModifier");
         return baseResourceModifier * edictModifier * configurableModifier * naiveDifference;

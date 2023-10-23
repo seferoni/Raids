@@ -14,13 +14,18 @@ this.edict_item <- ::inherit("scripts/items/item",
 		this.m.InstructionText <- "Right-click to dispatch within proximity of a lair. This edict will be consumed in the process.";
 	}
 
-	function executeEdictProcedure( _lairs )
+	function executeEdictProcedure( _lairs ) 
 	{
 		local isFlagOccupied = @(_flag, _lair) Raids.Standard.getFlag(_flag, _lair) != false;
 
 		foreach( lair in _lairs )
 		{
 			local flag = null;
+
+			if (Raids.Edicts.findEdict(this.getID(), lair) != false) // FIXME: prevent duplicate edicts
+			{
+				continue;
+			}
 
 			if (!isFlagOccupied("EdictContainerA", lair))
 			{
@@ -94,13 +99,9 @@ this.edict_item <- ::inherit("scripts/items/item",
 	{
         local Lairs = ::RPGR_Raids.Lairs,
 		lairs = Lairs.getCandidatesWithin(::World.State.getPlayer().getTile());
-
-        if (lairs.len() == 0)
-        {
-            Raids.Standard.log("No eligible lair in proximity of the player.");
-            return false;
-        }
-
-		return this.executeEdictProcedure(Lairs.filterActiveContractLocations(lairs));
+		if (lairs.len() == 0) return false; // TODO: integrate contract location filter into all getCandidate methods
+		local filteredLairs = Lairs.filterActiveContractLocations(lairs);
+		if (filteredLairs.len() == 0) return false;
+		return this.executeEdictProcedure(filteredLairs);
 	}
 });

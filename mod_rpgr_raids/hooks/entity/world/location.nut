@@ -1,8 +1,32 @@
 local Raids = ::RPGR_Raids;
 ::mods_hookExactClass("entity/world/location", function( _object )
 {
+    Raids.Standard.wrap(_object, "dropFood", function( _num, _items, _lootTable )
+    {
+        if (!Raids.Lairs.isLocationTypeViable(this.getLocationType()))
+        {
+            return;
+        }
+        
+        local quantity = _num;
+
+        if (!Raids.Edicts.findEdict("special.edict_of_abundance", this, true))
+        {
+            return;
+        }
+
+        quantity += Raids.Edicts.Parameters.AbundanceOffset;
+        return [quantity, _items, _lootTable];
+    }, "overrideArguments");
+
+
     Raids.Standard.wrap(_object, "onCombatStarted", function()
     {
+        if (!Raids.Lairs.isLocationTypeViable(this.getLocationType()))
+        {
+            return;
+        }
+
         if (!Raids.Shared.isPlayerInProximityTo(this.getTile(), 1))
         {
             return;

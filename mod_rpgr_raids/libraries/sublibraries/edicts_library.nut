@@ -39,7 +39,7 @@ Raids.Edicts <-
     {
         local container = this.findEdict(_edict, _lair);
 
-        if (container == null)
+        if (!container)
         {
             return;
         }
@@ -54,14 +54,21 @@ Raids.Edicts <-
 
     function executeEdictProcedure( _flag, _lair )
     {
-        local edict = this.getEdictName(_flag, _lair);
-        this[format("execute%sProcedure", edict)](_lair);
+        local edict = this.getEdictName(_flag, _lair), procedure = format("execute%sProcedure", edict);
+
+        if (!(procedure in this))
+        {
+            return;
+        }
+
+        this[procedure](_lair);
         Raids.Standard.setFlag(format("%sTime", _flag), false, _lair);
     }
 
-    function executeImpoverishmentProcedure( _lair )
+    function executeDiminutionProcedure( _lair )
     {
-        _lair.m.Resources -= ::Math.floor(0.25 * _lair.getResources());
+        local resources = _lair.getResources(), newResources = resources - ::Math.floor(0.25 * resources);
+        _lair.setResources(newResources);
         _lair.createDefenders();
     }
 
@@ -70,16 +77,25 @@ Raids.Edicts <-
         Raids.Lairs.repopulateLairNamedLoot(_lair);
     }
 
-    function findEdict( _ID, _lair )
+    function findEdict( _ID, _lair, _filterActive = false )
     {
-        local containers = ["EdictContainerA", "EdictContainerB"];
+        local containers = ["EdictContainerA", "EdictContainerB"], container = false;
 
         foreach( flag in containers )
         {
-            if (Raids.Standard.getFlag(flag, _lair) == _ID) return flag;
+            if (Raids.Standard.getFlag(flag, _lair) == _ID)
+            {
+                container = flag; 
+                break;
+            } 
+        }
+        
+        if (!_filterActive || !Raids.Standard.getFlag(format("%sTime", container), _lair))
+        {
+            return container;
         }
 
-        return null;
+        return false;
     }
 
     function getEdictName( _flag, _lair )

@@ -114,8 +114,8 @@ Raids.Standard <-
     function overrideArguments( _object, _function, _originalMethod, _argumentsArray )
     {   # Calls new method and passes result onto original method; if null, calls original method with original arguments.
         # It is the responsibility of the overriding function to return appropriate arguments.
-        local returnValue = _function.acall(_argumentsArray);
-        local newArguments = returnValue == null ? _argumentsArray : this.prependContextObject(_object, returnValue);
+        local returnValue = _function.acall(_argumentsArray),
+        newArguments = returnValue == null ? _argumentsArray : this.prependContextObject(_object, returnValue);
         return _originalMethod.acall(newArguments);
     }
 
@@ -186,21 +186,21 @@ Raids.Standard <-
     function wrap( _object, _functionName, _function, _procedure = "overrideReturn" )
     {
         local cachedMethod = this.cacheHookedMethod(_object, _functionName),
-        Raids = ::RPGR_Raids,
+        Standard = ::RPGR_Raids.Standard,
         parentName = _object.SuperName;
 
         _object.rawset(_functionName, function( ... )
         {
             local originalMethod = cachedMethod == null ? this[parentName][_functionName] : cachedMethod;
 
-            if (!Raids.Standard.validateParameters(originalMethod, vargv))
+            if (!Standard.validateParameters(originalMethod, vargv))
             {
-                Raids.Standard.log(format("An invalid number of parameters were passed to %s, aborting wrap procedure.", _functionName), true);
+                Standard.log(format("An invalid number of parameters were passed to %s, aborting wrap procedure.", _functionName), true);
                 return;
             }
 
-            local argumentsArray = Raids.Standard.prependContextObject(this, vargv);
-            return Raids.Standard[_procedure](this, _function, originalMethod, argumentsArray);
+            local argumentsArray = Standard.prependContextObject(this, vargv);
+            return Standard[_procedure](this, _function, originalMethod, argumentsArray);
         });
     }
 };
