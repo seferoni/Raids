@@ -8,6 +8,16 @@ Raids.Lairs <-
         Vigilant = 3,
         Militant = 4
     },
+    Factions =
+    [
+        ::Const.FactionType.Zombies,
+        ::Const.FactionType.Undead,
+        ::Const.FactionType.Orcs,
+        ::Const.FactionType.Bandits,
+        ::Const.FactionType.Goblins,
+        ::Const.FactionType.Barbarians,
+        ::Const.FactionType.OrientalBandits
+    ],
     Parameters =
     {
         FactionSpecificNamedLootChance = 33,
@@ -252,21 +262,11 @@ Raids.Lairs <-
 
     function isFactionViable( _faction )
     {
-        local inclusionList =
-        [
-            ::Const.FactionType.Zombies,
-            ::Const.FactionType.Undead,
-            ::Const.FactionType.Orcs,
-            ::Const.FactionType.Bandits,
-            ::Const.FactionType.Goblins,
-            ::Const.FactionType.Barbarians,
-            ::Const.FactionType.OrientalBandits
-        ],
-        factionType = _faction.getType();
+        local factionType = _faction.getType();
 
-        foreach( includedFaction in inclusionList )
+        foreach( viableFaction in this.Factions )
         {
-            if (factionType == includedFaction)
+            if (factionType == viableFaction)
             {
                 return true;
             }

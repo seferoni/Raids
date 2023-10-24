@@ -6,8 +6,15 @@ Raids.Edicts <-
         "special.edict_of_agitation",
         "special.edict_of_impoverishment",
         "special.edict_of_opportunism"
-    ]
-
+    ],
+    Factions =
+    [
+        ::Const.FactionType.Orcs,
+        ::Const.FactionType.Bandits,
+        ::Const.FactionType.Goblins,
+        ::Const.FactionType.Barbarians,
+        ::Const.FactionType.OrientalBandits
+    ],
     Parameters =
     {
         DurationDays = 2,

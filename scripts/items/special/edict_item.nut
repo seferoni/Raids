@@ -14,7 +14,7 @@ this.edict_item <- ::inherit("scripts/items/item",
 		this.m.InstructionText <- "Right-click to dispatch within proximity of a lair. This edict will be consumed in the process.";
 	}
 
-	function executeEdictProcedure( _lairs ) 
+	function executeEdictProcedure( _lairs )
 	{
 		local isFlagOccupied = @(_flag, _lair) Raids.Standard.getFlag(_flag, _lair) != false;
 
@@ -22,7 +22,14 @@ this.edict_item <- ::inherit("scripts/items/item",
 		{
 			local flag = null;
 
-			if (Raids.Edicts.findEdict(this.getID(), lair) != false)
+			if (Raids.Edicts.findEdict(this.getID(), lair) != false) // TODO: restructure this
+			{
+				continue;
+			}
+
+			local factionType = this.World.FactionManager.getFaction(_location.getFaction()).getType();
+
+			if (Raids.Edicts.Factions.find(factionType) == null)
 			{
 				continue;
 			}
@@ -86,8 +93,26 @@ this.edict_item <- ::inherit("scripts/items/item",
 
 	function onUse( _actor, _item = null )
 	{
-        local lairs = Raids.Lairs.getCandidatesWithin(::World.State.getPlayer().getTile());
-		if (lairs.len() == 0) return false;
+        local naiveLairs = Raids.Lairs.getCandidatesWithin(::World.State.getPlayer().getTile());
+
+		if (lairs.len() == 0)
+		{
+			return false;
+		}
+
+		local ID = this.getID(),
+		lairs = naiveLairs.filter(function( _index, _lair ) // TODO: check, rewrite
+		{
+			local factionType = ::World.FactionManager.getFaction(_lair.getFaction()).getType();
+
+			if (Raids.Edicts.Factions.find(factionType) == null)
+			{
+				return false;
+			}
+
+			return true;
+		})
+
 		return this.executeEdictProcedure(lairs);
 	}
 });

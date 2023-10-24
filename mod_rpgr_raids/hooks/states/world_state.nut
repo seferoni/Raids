@@ -23,7 +23,7 @@ local Raids = ::RPGR_Raids;
 
         local faction = ::World.FactionManager.getFaction(factionIndex);
 
-        if (!Raids.Lairs.isFactionViable(faction))
+        if (Raids.Lairs.Factions.find(faction.getType()) == null)
         {
             return;
         }
@@ -49,6 +49,6 @@ local Raids = ::RPGR_Raids;
         foreach( lair in lairs )
         {
             Raids.Lairs.setAgitation(lair, Raids.Lairs.Procedures.Increment);
-        } 
+        }
     });
 });
