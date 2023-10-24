@@ -1,7 +1,7 @@
 local Raids = ::RPGR_Raids;
 Raids.Edicts <-
 {
-    CycledEdicts = 
+    CycledEdicts =
     [
         "special.edict_of_agitation",
         "special.edict_of_impoverishment",
@@ -29,7 +29,7 @@ Raids.Edicts <-
             Raids.Standard.setFlag(format("%sTime", container), false, _lair);
         }
     }
-    
+
     function cycleEdicts( _lair )
     {
         foreach( edict in this.CycledEdicts ) this.emptyContainer(edict, _lair);
@@ -79,17 +79,22 @@ Raids.Edicts <-
 
     function findEdict( _ID, _lair, _filterActive = false )
     {
+        if (_ID != "special.edict_of_agitation" && Raids.Standard.getFlag("Agitation", _lair) == Raids.Lairs.AgitationDescriptors.Relaxed) // TODO: functionalise this?
+        {
+            return false;
+        }
+
         local containers = ["EdictContainerA", "EdictContainerB"], container = false;
 
         foreach( flag in containers )
         {
             if (Raids.Standard.getFlag(flag, _lair) == _ID)
             {
-                container = flag; 
+                container = flag;
                 break;
-            } 
+            }
         }
-        
+
         if (!_filterActive || !Raids.Standard.getFlag(format("%sTime", container), _lair))
         {
             return container;
@@ -110,19 +115,20 @@ Raids.Edicts <-
         local entryTemplate = {id = 20, type = "text", icon = "ui/icons/unknown_traits.png", text = "Edict: Vacant"},
         validContainers = this.getValidContainers(_lair);
 
-        if (validContainers.len() == 0) 
+        if (validContainers.len() == 0)
         {
             return [entryTemplate, entryTemplate];
         }
 
-        local entries = [];
+        local entries = [], isAgitated = Raids.Standard.getFlags("Agitation", _lair) != Raids.Lairs.AgitationDescriptors.Relaxed;
 
         foreach( flag in validContainers )
         {
             local entry = clone entryTemplate,
-            edictTime = Raids.Standard.getFlag(format("%sTime", flag), _lair);
-            entry.icon = edictTime != false ? "ui/icons/scroll_01_sw.png" : "ui/icons/scroll_01_b.png";
-            entry.text = format("Edict: %s (%s)", this.getEdictName(flag, _lair), edictTime != false ? "Discovery" : "Active");
+            edictTime = Raids.Standard.getFlag(format("%sTime", flag), _lair),
+            isActive = (!edictTime || !isAgitated);
+            entry.icon = isActive ? "ui/icons/scroll_01_b.png" : "ui/icons/scroll_01_sw.png";
+            entry.text = format("Edict: %s (%s)", this.getEdictName(flag, _lair), isActive ? "Active" : isAgitated ? "Discovery" : "Inert");
             entries.push(entry);
         }
 
