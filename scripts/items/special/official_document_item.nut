@@ -7,7 +7,7 @@ this.official_document_item <- ::inherit("scripts/items/item",
 		this.item.create();
         this.m.ID = "special.official_document_item";
 		this.m.Name = "Official Document";
-		this.m.Description = "A sealed document. The materials used in its fabrication are rare indeed, but rarer still would be a pair of literate hands to pen its contents.";
+		this.m.Description = "A sealed document. The materials used in its fabrication are fairly rare, but rarer still would be a pair of literate hands to pen its contents.";
 		this.m.Value = 150;
 		this.m.Icon = "special/official_document_item.png";
 		this.m.SlotType = ::Const.ItemSlot.None;
@@ -50,22 +50,11 @@ this.official_document_item <- ::inherit("scripts/items/item",
 		[
 			{id = 1, type = "title", text = this.getName()},
 			{id = 2, type = "description", text = this.getDescription()},
-			{id = 66, type = "text", text = this.getValueString()}
-		];
-
-		if (this.getIconLarge() != null)
-		{
-			tooltipArray.push({id = 3, type = "image", image = this.getIconLarge(), isLarge = true});
-		}
-		else
-		{
-			tooltipArray.push({id = 3, type = "image", image = this.getIcon()});
-		}
-
-		tooltipArray.extend([
+			{id = 66, type = "text", text = this.getValueString()},
+			{id = 3, type = "image", image = this.getIcon()},
 			{id = 6, type = "text", icon = "ui/icons/special.png", text = this.getEffect()},
 			{id = 65, type = "text", text = this.getInstruction()}
-		]);
+		];
 
 		return tooltipArray;
 	}

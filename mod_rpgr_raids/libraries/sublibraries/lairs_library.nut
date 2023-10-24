@@ -1,4 +1,4 @@
-local Raids = ::RPGR_Raids; // FIXME: use setResources where applicable
+local Raids = ::RPGR_Raids;
 Raids.Lairs <-
 {
     AgitationDescriptors =
@@ -50,30 +50,6 @@ Raids.Lairs <-
         }
     }
 
-    function filterActiveContractLocations( _lairs )
-    {
-        local activeContract = this.getActiveContract();
-
-        if (activeContract == null)
-        {
-            return _lairs;
-        }
-
-        return _lairs.filter(@(_index, _lair) activeContract.m.Destination.get() != _lair);
-    }
-
-    function getActiveContract()
-    {
-        local activeContract = ::World.Contracts.getActiveContract();
-
-		if (activeContract == null || !("Destination" in activeContract.m))
-		{
-			return null;
-		}
-
-        return activeContract;
-    }
-
     function getBaseResourceModifier( _resources )
     {
         local modifier = 1.0;
@@ -110,6 +86,11 @@ Raids.Lairs <-
                 return false;
             }
 
+            if (Raids.Lairs.isActiveContractLocation(_entity))
+            {
+                return false;
+            }
+
             return true;
         });
 
@@ -136,6 +117,11 @@ Raids.Lairs <-
                 return false;
             }
 
+            if (Lairs.isActiveContractLocation(_location))
+            {
+                return false;
+            }
+
             return true;
         });
 
@@ -155,7 +141,22 @@ Raids.Lairs <-
         Raids.Standard.log("Proceeding to lair candidate selection.");
         lairs.extend(_faction.getSettlements().filter(function( _locationIndex, _location )
         {
-            return Raids.Lairs.isLocationTypeViable(_location.getLocationType()) && Raids.Shared.isPlayerInProximityTo(_location.getTile());
+            if (!Raids.Lairs.isLocationTypeViable(_location.getLocationType()))
+            {
+                return false;
+            }
+
+            if (Raids.Shared.isPlayerInProximityTo(_location.getTile()))
+            {
+                return false;
+            }
+
+            if (Raids.Lairs.isActiveContractLocation(_location))
+            {
+                return false;
+            }
+
+            return true;
         }));
 
         return lairs;
@@ -210,7 +211,7 @@ Raids.Lairs <-
         local resourcesEntry = {id = 20, type = "text"}, agitationEntry = clone resourcesEntry;
         resourcesEntry.icon <- "ui/icons/asset_money.png";
         agitationEntry.icon <- format("ui/icons/%s", iconPath);
-        resourcesEntry.text <- format("%s resource units", Raids.Standard.colourWrap(format("%i", _lair.m.Resources), "PositiveValue"));
+        resourcesEntry.text <- format("%s resource units", Raids.Standard.colourWrap(format("%i", _lair.getResources()), "PositiveValue"));
         agitationEntry.text <- format("%s", Raids.Standard.colourWrap(format("%s (%i)", Raids.Standard.getDescriptor(agitation, this.AgitationDescriptors), agitation), textColour));
 
         return [resourcesEntry, agitationEntry];
@@ -225,12 +226,12 @@ Raids.Lairs <-
 
     function isActiveContractLocation( _lair )
     {
-        local activeContract = this.getActiveContract();
+        local activeContract = ::World.Contracts.getActiveContract();
 
-        if (activeContract == null)
-        {
-            return false;
-        }
+		if (activeContract == null || !("Destination" in activeContract.m))
+		{
+			return false;
+		}
 
         if (activeContract.m.Destination.get() == _lair)
         {
@@ -346,7 +347,7 @@ Raids.Lairs <-
         baseResources = Raids.Standard.getFlag("BaseResources", _lair),
         interpolatedModifier = -0.0006 * baseResources + 0.4,
         configurableModifier = Raids.Standard.getPercentageSetting("AgitationResourceModifier");
-        _lair.m.Resources = ::Math.floor(baseResources + (interpolatedModifier * (agitation - 1) * configurableModifier * baseResources));
+        _lair.setResources(::Math.floor(baseResources + (interpolatedModifier * (agitation - 1) * configurableModifier * baseResources)));
     }
 
     function updateCombatStatistics( _isParty )

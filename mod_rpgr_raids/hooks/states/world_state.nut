@@ -39,14 +39,7 @@ local Raids = ::RPGR_Raids;
             return;
         }
 
-        local naiveLairs = Raids.Lairs.getCandidatesByFaction(faction);
-
-        if (naiveLairs.len() == 0)
-        {
-            return;
-        }
-
-        local lairs = Raids.Lairs.filterActiveContractLocations(naiveLairs);
+        local lairs = Raids.Lairs.getCandidatesByFaction(faction);
 
         if (lairs.len() == 0)
         {

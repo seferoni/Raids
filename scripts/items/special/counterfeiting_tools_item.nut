@@ -23,17 +23,9 @@ this.counterfeiting_tools_item <- ::inherit("scripts/items/item",
 		[
 			{id = 1, type = "title", text = this.getName()},
 			{id = 2, type = "description", text = this.getDescription()},
-			{id = 66, type = "text", text = this.getValueString()}
+			{id = 66, type = "text", text = this.getValueString()},
+			{id = 3, type = "image", image = this.getIcon()}
 		];
-
-		if (this.getIconLarge() != null)
-		{
-			tooltipArray.push({id = 3, type = "image", image = this.getIconLarge(), isLarge = true});
-		}
-		else
-		{
-			tooltipArray.push({id = 3, type = "image", image = this.getIcon()});
-		}
 
 		return tooltipArray;
 	}

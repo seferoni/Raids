@@ -22,7 +22,7 @@ this.edict_item <- ::inherit("scripts/items/item",
 		{
 			local flag = null;
 
-			if (Raids.Edicts.findEdict(this.getID(), lair) != false) // FIXME: prevent duplicate edicts
+			if (Raids.Edicts.findEdict(this.getID(), lair) != false)
 			{
 				continue;
 			}
@@ -65,22 +65,11 @@ this.edict_item <- ::inherit("scripts/items/item",
 		[
 			{id = 1, type = "title", text = this.getName()},
 			{id = 2, type = "description", text = this.getDescription()},
-			{id = 66, type = "text", text = this.getValueString()}
-		];
-
-		if (this.getIconLarge() != null)
-		{
-			tooltipArray.push({id = 3, type = "image", image = this.getIconLarge(), isLarge = true});
-		}
-		else
-		{
-			tooltipArray.push({id = 3, type = "image", image = this.getIcon()});
-		}
-
-		tooltipArray.extend([
+			{id = 66, type = "text", text = this.getValueString()},
+			{id = 3, type = "image", image = this.getIcon()},
 			{id = 6, type = "text", icon = "ui/icons/special.png", text = this.getEffect()},
 			{id = 65, type = "text", text = this.getInstruction()}
-		]);
+		];
 
 		return tooltipArray;
 	}
@@ -97,11 +86,8 @@ this.edict_item <- ::inherit("scripts/items/item",
 
 	function onUse( _actor, _item = null )
 	{
-        local Lairs = ::RPGR_Raids.Lairs,
-		lairs = Lairs.getCandidatesWithin(::World.State.getPlayer().getTile());
-		if (lairs.len() == 0) return false; // TODO: integrate contract location filter into all getCandidate methods
-		local filteredLairs = Lairs.filterActiveContractLocations(lairs);
-		if (filteredLairs.len() == 0) return false;
-		return this.executeEdictProcedure(filteredLairs);
+        local lairs = Raids.Lairs.getCandidatesWithin(::World.State.getPlayer().getTile());
+		if (lairs.len() == 0) return false;
+		return this.executeEdictProcedure(lairs);
 	}
 });

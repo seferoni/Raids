@@ -32,10 +32,10 @@ Raids.Edicts <-
     
     function cycleEdicts( _lair )
     {
-        foreach( edict in this.CycledEdicts ) this.emptyEdictContainer(edict, _lair);
+        foreach( edict in this.CycledEdicts ) this.emptyContainer(edict, _lair);
     }
 
-    function emptyEdictContainer( _edict, _lair )
+    function emptyContainer( _edict, _lair )
     {
         local container = this.findEdict(_edict, _lair);
 
