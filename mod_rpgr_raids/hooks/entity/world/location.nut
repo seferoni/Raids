@@ -1,6 +1,26 @@
 local Raids = ::RPGR_Raids;
 ::mods_hookExactClass("entity/world/location", function( _object )
 {
+    local stackables = ["Ammo", "ArmorParts", "Medicine"];
+
+    foreach( stackable in stackables )
+    {
+        Raids.Standard.wrap(_object, format("drop%s", stackable), function( _num, _lootTable )
+        {
+            if (!Raids.Lairs.isLocationTypeViable(this.getLocationType()))
+            {
+                return;
+            }
+
+            if (Raids.Lairs.isActiveContractLocation(this))
+            {
+                return;
+            }
+
+            return [Raids.Lairs.getScaledLootCount(this, _num, null, _lootTable, true), _lootTable];
+        }, "overrideArguments");
+    }
+
     Raids.Standard.wrap(_object, "onCombatStarted", function()
     {
         if (!Raids.Lairs.isLocationTypeViable(this.getLocationType()))

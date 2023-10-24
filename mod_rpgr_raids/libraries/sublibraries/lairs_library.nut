@@ -50,6 +50,14 @@ Raids.Lairs <-
         }
     }
 
+    function getScaledLootCount( _lair, _num, _items, _lootTable, _isStackable )
+    {
+        if (Raids.Edicts.findEdict("special.edict_of_abundance", lair, true) != false)
+        {
+            _num += Raids.Edicts.Parameters.AbundanceOffset;
+        }
+    }
+
     function getBaseResourceModifier( _resources )
     {
         local modifier = 1.0;
@@ -393,15 +401,15 @@ Raids.Lairs <-
 
     function updateProperties( _lair, _procedure )
     {
-        if (_procedure == this.Procedures.Reset) 
+        if (_procedure == this.Procedures.Reset)
         {
             Raids.Edicts.clearEdicts(_lair);
-        }  
-        else 
+        }
+        else
         {
             Raids.Edicts.cycleEdicts(_lair);
         }
-        
+
         this.setResourcesByAgitation(_lair);
         _lair.createDefenders();
         _lair.setLootScaleBasedOnResources(_lair.getResources());
