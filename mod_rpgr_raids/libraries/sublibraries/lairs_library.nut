@@ -405,10 +405,6 @@ Raids.Lairs <-
         {
             Raids.Edicts.clearEdicts(_lair);
         }
-        else
-        {
-            Raids.Edicts.cycleEdicts(_lair);
-        }
 
         this.setResourcesByAgitation(_lair);
         _lair.createDefenders();

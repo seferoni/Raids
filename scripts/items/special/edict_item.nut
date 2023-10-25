@@ -16,24 +16,13 @@ this.edict_item <- ::inherit("scripts/items/item",
 
 	function executeEdictProcedure( _lairs )
 	{
-		local isFlagOccupied = @(_flag, _lair) Raids.Standard.getFlag(_flag, _lair) != false;
+		local isFlagOccupied = @(_flag, _lair) Raids.Standard.getFlag(_flag, _lair) != false, 
+		isValid = false;
 
 		foreach( lair in _lairs )
 		{
 			local flag = null;
-
-			if (Raids.Edicts.findEdict(this.getID(), lair) != false) // TODO: restructure this
-			{
-				continue;
-			}
-
-			local factionType = this.World.FactionManager.getFaction(_location.getFaction()).getType();
-
-			if (Raids.Edicts.Factions.find(factionType) == null)
-			{
-				continue;
-			}
-
+			
 			if (!isFlagOccupied("EdictContainerA", lair))
 			{
 				flag = "EdictContainerA";
@@ -50,8 +39,10 @@ this.edict_item <- ::inherit("scripts/items/item",
 
 			Raids.Standard.setFlag(flag, this.getID(), lair);
 			Raids.Standard.setFlag(format("%sTime", flag), ::World.getTime().Days, lair);
+			if (!isValid) isValid = true;
 		}
 
+		if (!isValid) return false;
 		::Sound.play("sounds/cloth_01.wav", ::Const.Sound.Volume.Inventory);
 		return true;
 	}
@@ -81,6 +72,36 @@ this.edict_item <- ::inherit("scripts/items/item",
 		return tooltipArray;
 	}
 
+	function getViableLairs()
+	{
+		local naiveLairs = Raids.Lairs.getCandidatesWithin(::World.State.getPlayer().getTile());
+
+		if (naiveLairs.len() == 0)
+		{
+			return naiveLairs;
+		}
+
+		local ID = this.getID(), 
+		lairs = naiveLairs.filter(function( _index, _lair ) 
+		{
+			local factionType = ::World.FactionManager.getFaction(_lair.getFaction()).getType();
+
+			if (Raids.Edicts.Factions.find(factionType) == null)
+			{
+				return false;
+			}
+
+			if (Raids.Edicts.findEdict(ID, _lair) != false)
+			{
+				return false;
+			}
+
+			return true;
+		});
+
+		return lairs;
+	}
+
     function playInventorySound( _eventType )
 	{
 		::Sound.play("sounds/cloth_01.wav", ::Const.Sound.Volume.Inventory);
@@ -93,25 +114,12 @@ this.edict_item <- ::inherit("scripts/items/item",
 
 	function onUse( _actor, _item = null )
 	{
-        local naiveLairs = Raids.Lairs.getCandidatesWithin(::World.State.getPlayer().getTile());
+		local lairs = this.getViableLairs();
 
 		if (lairs.len() == 0)
 		{
 			return false;
-		}
-
-		local ID = this.getID(),
-		lairs = naiveLairs.filter(function( _index, _lair ) // TODO: check, rewrite
-		{
-			local factionType = ::World.FactionManager.getFaction(_lair.getFaction()).getType();
-
-			if (Raids.Edicts.Factions.find(factionType) == null)
-			{
-				return false;
-			}
-
-			return true;
-		})
+		} 
 
 		return this.executeEdictProcedure(lairs);
 	}

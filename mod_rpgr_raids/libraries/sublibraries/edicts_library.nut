@@ -9,9 +9,7 @@ Raids.Edicts <-
     ],
     Factions =
     [
-        ::Const.FactionType.Orcs,
         ::Const.FactionType.Bandits,
-        ::Const.FactionType.Goblins,
         ::Const.FactionType.Barbarians,
         ::Const.FactionType.OrientalBandits
     ],
@@ -39,14 +37,19 @@ Raids.Edicts <-
 
     function cycleEdicts( _lair )
     {
-        foreach( edict in this.CycledEdicts ) this.emptyContainer(edict, _lair);
+        foreach( edict in this.CycledEdicts ) this.emptyContainer(edict, _lair, true);
     }
 
-    function emptyContainer( _edict, _lair )
+    function emptyContainer( _edict, _lair, _filterActive = false )
     {
         local container = this.findEdict(_edict, _lair);
 
         if (!container)
+        {
+            return;
+        }
+
+        if (_filterActive && Raids.Standard.getFlag(format("%sTime", container)) != false)
         {
             return;
         }
@@ -70,6 +73,7 @@ Raids.Edicts <-
 
         this[procedure](_lair);
         Raids.Standard.setFlag(format("%sTime", _flag), false, _lair);
+        this.cycleEdicts(_lair);
     }
 
     function executeDiminutionProcedure( _lair )
@@ -82,11 +86,12 @@ Raids.Edicts <-
     function executeOpportunistProcedure( _lair )
     {
         Raids.Lairs.repopulateLairNamedLoot(_lair);
+        this.cycleEdicts(_lair);
     }
 
     function findEdict( _ID, _lair, _filterActive = false )
     {
-        if (_ID != "special.edict_of_agitation" && Raids.Standard.getFlag("Agitation", _lair) == Raids.Lairs.AgitationDescriptors.Relaxed) // TODO: functionalise this?
+        if (_ID != "special.edict_of_agitation" && Raids.Standard.getFlag("Agitation", _lair) == Raids.Lairs.AgitationDescriptors.Relaxed)
         {
             return false;
         }
