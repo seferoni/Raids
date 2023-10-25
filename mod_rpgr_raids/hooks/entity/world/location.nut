@@ -3,32 +3,21 @@ local Raids = ::RPGR_Raids;
 {
     local stackables = ["Ammo", "ArmorParts", "Medicine"];
 
-    foreach( stackable in stackables )
+    foreach( stackable in stackables ) // TODO: revise this
     {
         Raids.Standard.wrap(_object, format("drop%s", stackable), function( _num, _lootTable )
         {
-            if (!Raids.Lairs.isLocationTypeViable(this.getLocationType()))
+            if (!Raids.Lairs.isLairViable(this))
             {
                 return;
             }
 
-            if (Raids.Lairs.isActiveContractLocation(this))
-            {
-                return;
-            }
-
-            return [Raids.Lairs.getScaledLootCount(this, _num, null, _lootTable, true), _lootTable];
         }, "overrideArguments");
     }
 
     Raids.Standard.wrap(_object, "onCombatStarted", function()
     {
-        if (!Raids.Lairs.isLocationTypeViable(this.getLocationType()))
-        {
-            return;
-        }
-
-        if (!Raids.Shared.isPlayerInProximityTo(this.getTile(), 1))
+        if (!Raids.Lairs.isLairViable(this, false, true))
         {
             return;
         }
@@ -38,7 +27,7 @@ local Raids = ::RPGR_Raids;
 
     Raids.Standard.wrap(_object, "onSpawned", function()
     {
-        if (!Raids.Lairs.isLocationTypeViable(this.getLocationType()))
+        if (!Raids.Lairs.isLairViable(this))
         {
             return;
         }
@@ -53,19 +42,8 @@ local Raids = ::RPGR_Raids;
 
     Raids.Standard.wrap(_object, "getTooltip", function( _tooltipArray )
     {
-        if (!Raids.Lairs.isLocationTypeViable(this.getLocationType()))
+        if (!Raids.Lairs.isLairViable(this, true, true))
         {
-            return;
-        }
-
-        if (!Raids.Shared.isPlayerInProximityTo(this.getTile()))
-        {
-            return;
-        }
-
-        if (Raids.Lairs.isActiveContractLocation(this))
-        {
-            Raids.Standard.log(format("%s was found to be an active contract location, aborting.", this.getName()));
             return;
         }
 

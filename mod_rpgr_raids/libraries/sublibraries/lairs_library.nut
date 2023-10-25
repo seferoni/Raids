@@ -21,6 +21,7 @@ Raids.Lairs <-
     Parameters =
     {
         FactionSpecificNamedLootChance = 33,
+        MaximumLootOffset = 3,
         NamedItemChanceOnSpawn = 30,
         NamedItemChancePerAgitationTier = 13.33,
         NamedLootRefreshChance = 60,
@@ -60,12 +61,17 @@ Raids.Lairs <-
         }
     }
 
-    function getScaledLootCount( _lair, _num, _items, _lootTable, _isStackable )
-    {
-        if (Raids.Edicts.findEdict("special.edict_of_abundance", lair, true) != false)
+    function getScaledLootCount( _lair )
+    {   // TODO: this should take into account resources and edicts
+        local resources = _lair.getResources(),
+        quantity = ::Math.ceil(resources / 100);
+
+        if (Raids.Edicts.findEdict("special.edict_of_abundance", _lair, true) != false)
         {
-            _num += Raids.Edicts.Parameters.AbundanceOffset;
+            quantity += Raids.Edicts.Parameters.AbundanceOffset;
         }
+
+        return ::Math.min(this.Parameters.MaximumLootOffset, quantity); // FIXME: this should check if stackable
     }
 
     function getBaseResourceModifier( _resources )
@@ -164,7 +170,7 @@ Raids.Lairs <-
                 return false;
             }
 
-            if (Raids.Shared.isPlayerInProximityTo(_location.getTile()))
+            if (!Raids.Shared.isPlayerInProximityTo(_location.getTile()))
             {
                 return false;
             }
@@ -182,19 +188,15 @@ Raids.Lairs <-
 
     function getNaiveNamedLootChance( _lair )
     {
-        local nearestSettlementDistance = 9000, tile = _lair.getTile();
+        local tile = _lair.getTile(), closestDistance = 9000;
 
 		foreach( settlement in ::World.EntityManager.getSettlements() )
 		{
-			local settlementDistance = tile.getDistanceTo(settlement.getTile());
-
-			if (settlementDistance < nearestSettlementDistance)
-			{
-				nearestSettlementDistance = settlementDistance;
-			}
+			local distance = tile.getDistanceTo(settlement.getTile());
+			if (distance < closestDistance) closestDistance = distance;
 		}
 
-		return (_lair.getResources() + nearestSettlementDistance * 4) / 5.0 - 37.0;
+		return (_lair.getResources() + closestDistance * 4) / 5.0 - 37.0;
     }
 
     function getNamedLootChance( _lair )
@@ -275,9 +277,24 @@ Raids.Lairs <-
         return false;
     }
 
-    function isLocationTypeViable( _locationType )
+    function isLairViable( _lair, _checkContract = true, _checkProximity = false )
     {
-        return _locationType == ::Const.World.LocationType.Lair || _locationType == (::Const.World.LocationType.Lair | ::Const.World.LocationType.Mobile);
+        if (!this.isLocationTypeViable(_lair.getLocationType()))
+        {
+            return false;
+        }
+
+        if (this.isActiveContractLocation(_lair))
+        {
+            return false;
+        }
+
+        if (_checkProximity && !Raids.Shared.isPlayerInProximityTo(_lair.getTile(), 1))
+        {
+            return false;
+        }
+
+        return true;
     }
 
     function isLairViableForProcedure( _lair, _procedure )
@@ -298,6 +315,12 @@ Raids.Lairs <-
 
         Raids.Standard.log(format("Lair %s is viable for agitation state change procedures.", _lair.getName()));
         return true;
+    }
+
+
+    function isLocationTypeViable( _locationType )
+    {
+        return _locationType == ::Const.World.LocationType.Lair || _locationType == (::Const.World.LocationType.Lair | ::Const.World.LocationType.Mobile);
     }
 
     function repopulateLairNamedLoot( _lair )

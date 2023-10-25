@@ -3,8 +3,9 @@ Raids.Edicts <-
 {
     CycledEdicts =
     [
+        "special.edict_of_abstention",
         "special.edict_of_agitation",
-        "special.edict_of_impoverishment",
+        "special.edict_of_diminution",
         "special.edict_of_opportunism"
     ],
     Factions =
@@ -15,7 +16,9 @@ Raids.Edicts <-
     ],
     Parameters =
     {
+        AbundanceOffset = 1,
         DurationDays = 2,
+        DiminutionModifier = 0.75
     }
 
     function createEdict()
@@ -57,6 +60,21 @@ Raids.Edicts <-
         Raids.Standard.setFlag(container, false, _lair);
     }
 
+    function executeAbstentionProcedure( _lair )
+    {
+        _lair.setLastSpawnTimeToNow();
+        local tile = _lair.getTile(),
+        closestSettlement = null, closestDistance = 9000;
+
+        foreach( settlement in ::World.EntityManager.getSettlements() )
+        {
+            local distance = tile.getDistanceTo(_settlement.getTile());
+            if (distance < closestDistance) closestDistance = distance, closestSettlement = settlement;
+        }
+
+        closestSettlement.addSituation(::new("scripts/entity/world/settlements/situations/safe_roads_situation"));
+    }
+
     function executeAgitationProcedure( _lair )
     {
         Raids.Lairs.setAgitation(_lair, Raids.Lairs.Procedures.Increment);
@@ -78,15 +96,13 @@ Raids.Edicts <-
 
     function executeDiminutionProcedure( _lair )
     {
-        local resources = _lair.getResources(), newResources = resources - ::Math.floor(0.25 * resources);
-        _lair.setResources(newResources);
+        _lair.setResources(this.Parameters.DiminutionModifier * _lair.getResources());
         _lair.createDefenders();
     }
 
     function executeOpportunistProcedure( _lair )
     {
         Raids.Lairs.repopulateLairNamedLoot(_lair);
-        this.cycleEdicts(_lair);
     }
 
     function findEdict( _ID, _lair, _filterActive = false )
