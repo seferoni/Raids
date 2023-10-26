@@ -121,7 +121,7 @@ Raids.Caravans <-
         return troops;
     }
 
-    function getCaravanEntries( _caravan )
+    function getTooltipEntries( _caravan )
     {
         local cargoEntry = {id = 2, type = "hint"}, wealthEntry = clone cargoEntry,
         caravanWealth = Raids.Standard.getFlag("CaravanCargo", _caravan), caravanCargo = Raids.Standard.getFlag("CaravanCargo", _caravan);

@@ -192,18 +192,6 @@ Raids.Lairs <-
 		return (_lair.getResources() + tile.getDistanceTo(settlement.getTile()) * 4) / 5.0 - 37.0;
     }
 
-    function getNamedLootCount( _lair )
-    {   
-        local count = 0;
-
-        foreach( item in _lair.getLoot() )
-        {
-            if (item != null && item.isItemType(::Const.Items.ItemType.Named)) count++;
-        }
-
-        return count;
-    }
-
     function getNamedLootChance( _lair )
     {
         return Raids.Standard.getFlag("BaseNamedItemChance", _lair) + ((Raids.Standard.getFlag("Agitation", _lair) - 1) * this.Parameters.NamedItemChancePerAgitationTier);

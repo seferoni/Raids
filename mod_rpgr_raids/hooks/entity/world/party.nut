@@ -44,7 +44,7 @@ local Raids = ::RPGR_Raids;
             return;
         }
 
-        _tooltipArray.extend(Raids.Caravans.getCaravanEntries(this));
+        _tooltipArray.extend(Raids.Caravans.getTooltipEntries(this));
         return _tooltipArray;
     });
 });

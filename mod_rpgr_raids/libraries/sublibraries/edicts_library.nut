@@ -130,7 +130,22 @@ Raids.Edicts <-
         return edict;
     }
 
-    function getTooltipEntries( _lair ) // TODO: add named loot tooltip
+    function getPerspicuityEntry( _lair )
+    {
+        local entry = {id = 20, type = "text"},
+        count = 0;
+
+        foreach( item in _lair.getLoot() )
+        {
+            if (item != null && item.isItemType(::Const.Items.ItemType.Named)) count++;
+        }
+
+        entry.icon <- format("ui/icons/%s", count == 0 ? "cancel.png" : "special.png");
+        entry.text <- format("Famed (%i)", count);
+        return entry;
+    }
+
+    function getTooltipEntries( _lair )
     {
         local entryTemplate = {id = 20, type = "text", icon = "ui/icons/unknown_traits.png", text = "Edict: Vacant"},
         validContainers = this.getValidContainers(_lair);
@@ -146,18 +161,22 @@ Raids.Edicts <-
         {
             local entry = clone entryTemplate,
             edictTime = Raids.Standard.getFlag(format("%sTime", flag), _lair),
-            isActive = (!edictTime || !isAgitated);
-            entry.icon = isActive ? "ui/icons/scroll_01_b.png" : "ui/icons/scroll_01_sw.png";
+            isActive = (!edictTime || isAgitated);
+            entry.icon = format("ui/icons/%s", isActive ? "scroll_01_b.png" : isAgitated ? "scroll_02_sw.png" : "scroll_01_sw.png");
             entry.text = format("Edict: %s (%s)", this.getEdictName(flag, _lair), isActive ? "Active" : isAgitated ? "Discovery" : "Inert");
             entries.push(entry);
         }
 
-        if (entries.len() == 2)
+        if (entries.len() < 2)
         {
-            return entries;
+            entries.push(entryTemplate);
         }
 
-        entries.push(entryTemplate);
+        if (this.findEdict("special.edict_of_perspicuity", _lair, true) != false)
+        {
+            entries.push(this.getPerspicuityEntry(_lair));
+        }
+
         return entries;
     }
 
