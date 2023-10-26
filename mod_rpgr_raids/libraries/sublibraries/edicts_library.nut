@@ -8,7 +8,7 @@ Raids.Edicts <-
         "special.edict_of_diminution",
         "special.edict_of_opportunism"
     ],
-    Factions =
+    Factions = // TODO: needs revision
     [
         ::Const.FactionType.Bandits,
         ::Const.FactionType.Barbarians,
@@ -63,15 +63,7 @@ Raids.Edicts <-
     function executeAbstentionProcedure( _lair )
     {
         _lair.setLastSpawnTimeToNow();
-        local tile = _lair.getTile(),
-        closestSettlement = null, closestDistance = 9000;
-
-        foreach( settlement in ::World.EntityManager.getSettlements() )
-        {
-            local distance = tile.getDistanceTo(_settlement.getTile());
-            if (distance < closestDistance) closestDistance = distance, closestSettlement = settlement;
-        }
-
+        local settlement = Raids.Shared.getSettlementClosestTo(_lair.getTile());
         closestSettlement.addSituation(::new("scripts/entity/world/settlements/situations/safe_roads_situation"));
     }
 
@@ -138,7 +130,7 @@ Raids.Edicts <-
         return edict;
     }
 
-    function getTooltipEntries( _lair )
+    function getTooltipEntries( _lair ) // TODO: add named loot tooltip
     {
         local entryTemplate = {id = 20, type = "text", icon = "ui/icons/unknown_traits.png", text = "Edict: Vacant"},
         validContainers = this.getValidContainers(_lair);

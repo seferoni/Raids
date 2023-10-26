@@ -1,9 +1,7 @@
 local Raids = ::RPGR_Raids;
 ::mods_hookExactClass("entity/world/location", function( _object )
 {
-    local stackables = ["Ammo", "ArmorParts", "Medicine"];
-
-    foreach( stackable in stackables ) // TODO: revise this
+    foreach( stackable in ["Ammo", "ArmorParts", "Medicine"] ) // TODO: revise this
     {
         Raids.Standard.wrap(_object, format("drop%s", stackable), function( _num, _lootTable )
         {

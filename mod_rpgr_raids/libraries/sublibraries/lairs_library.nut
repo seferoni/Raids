@@ -187,16 +187,21 @@ Raids.Lairs <-
     }
 
     function getNaiveNamedLootChance( _lair )
-    {
-        local tile = _lair.getTile(), closestDistance = 9000;
+    {   // The arbitrary coefficients and constants used here are taken verbatim from the vanilla codebase.
+        local tile = _lair.getTile(), settlement = Raids.Shared.getSettlementClosestTo(tile);
+		return (_lair.getResources() + tile.getDistanceTo(settlement.getTile()) * 4) / 5.0 - 37.0;
+    }
 
-		foreach( settlement in ::World.EntityManager.getSettlements() )
-		{
-			local distance = tile.getDistanceTo(settlement.getTile());
-			if (distance < closestDistance) closestDistance = distance;
-		}
+    function getNamedLootCount( _lair )
+    {   
+        local count = 0;
 
-		return (_lair.getResources() + closestDistance * 4) / 5.0 - 37.0;
+        foreach( item in _lair.getLoot() )
+        {
+            if (item != null && item.isItemType(::Const.Items.ItemType.Named)) count++;
+        }
+
+        return count;
     }
 
     function getNamedLootChance( _lair )
@@ -348,7 +353,7 @@ Raids.Lairs <-
         for ( local i = 0; i < iterations ; i++ )
         {
             local namedItem = namedLoot[::Math.rand(0, namedLoot.len() - 1)];
-            _lair.getLoot().add(::new(format("scripts/items/%s", namedItem)));
+            _lair.getLoot().add(::new(format("scripts/items/%s", namedItem))); // TODO: add named loot counter to tooltip
             Raids.Standard.log(format("Added item with filepath %s to the inventory of %s.", namedItem, _lair.getName()));
         }
     }
@@ -433,7 +438,7 @@ Raids.Lairs <-
         _lair.createDefenders();
         _lair.setLootScaleBasedOnResources(_lair.getResources());
 
-        if (_procedure != this.Procedures.Increment)
+        if (_procedure == this.Procedures.Decrement)
         {
             this.depopulateLairNamedLoot(_lair);
             return;

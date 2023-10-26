@@ -115,8 +115,22 @@ Raids.Shared <-
         return namedLoot;
     }
 
-    function isPlayerInProximityTo( _targetTile, _maximumProximity = 6 )
+    function getSettlementClosestTo( _tile )
     {
-        return ::World.State.getPlayer().getTile().getDistanceTo(_targetTile) <= _maximumProximity;
+        local closestSettlement = null,
+        closestDistance = 9000;
+
+		foreach( settlement in ::World.EntityManager.getSettlements() )
+		{
+			local distance = _tile.getDistanceTo(settlement.getTile());
+			if (distance < closestDistance) closestDistance = distance, closestSettlement = settlement;
+		}
+
+        return closestSettlement;
+    }
+
+    function isPlayerInProximityTo( _tile, _threshold = 6 )
+    {
+        return ::World.State.getPlayer().getTile().getDistanceTo(_tile) <= _threshold;
     }
 };
