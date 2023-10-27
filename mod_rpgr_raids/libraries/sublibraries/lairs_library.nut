@@ -35,7 +35,7 @@ Raids.Lairs <-
         Reset = 3
     }
 
-    function depopulateLairNamedLoot( _lair, _chance = null )
+    function depopulateNamedLoot( _lair, _chance = null )
     {
         if (_lair.getLoot().isEmpty())
         {
@@ -55,23 +55,10 @@ Raids.Lairs <-
             if (item.isItemType(::Const.Items.ItemType.Named))
             {
                 items.remove(itemIndex);
-                Raids.Standard.log(format("depopulateLairNamedLoot removed %s from the inventory of lair %s.", item.getName(), _lair.getName()));
+                Raids.Standard.log(format("depopulateNamedLoot removed %s from the inventory of lair %s.", item.getName(), _lair.getName()));
                 break;
             }
         }
-    }
-
-    function getScaledLootCount( _lair )
-    {   // TODO: this should take into account resources and edicts
-        local resources = _lair.getResources(),
-        quantity = ::Math.ceil(resources / 100);
-
-        if (Raids.Edicts.findEdict("special.edict_of_abundance", _lair, true) != false)
-        {
-            quantity += Raids.Edicts.Parameters.AbundanceOffset;
-        }
-
-        return ::Math.min(this.Parameters.MaximumLootOffset, quantity); // FIXME: this should check if stackable
     }
 
     function getBaseResourceModifier( _resources )
@@ -194,13 +181,16 @@ Raids.Lairs <-
 
     function getNamedLootChance( _lair )
     {
-        return Raids.Standard.getFlag("BaseNamedItemChance", _lair) + ((Raids.Standard.getFlag("Agitation", _lair) - 1) * this.Parameters.NamedItemChancePerAgitationTier);
+        local baseChance = Raids.Standard.getFlag("BaseNamedItemChance", _lair),
+        agitation = Raids.Standard.getFlag("Agitation", _lair),
+        edictOffset = Raids.Edicts.getNamedLootChanceOffset(_lair);
+        return baseChance + edictOffset + ((agitation - 1) * this.Parameters.NamedItemChancePerAgitation);
     }
 
     function getResourceDifference( _lair, _lairResources, _partyResources )
     {
         local naiveDifference = _lairResources - _partyResources,
-        edictModifier = Raids.Edicts.findEdict("special.edict_of_provocation", _lair, true) != false ? 2.5 : 1.0,
+        edictModifier = Raids.Edicts.getResourceModifier(_lair),
         baseResourceModifier = this.getBaseResourceModifier(Raids.Standard.getFlag("BaseResources", _lair)),
         configurableModifier = Raids.Standard.getPercentageSetting("RoamerResourceModifier");
         return baseResourceModifier * edictModifier * configurableModifier * naiveDifference;
@@ -310,13 +300,12 @@ Raids.Lairs <-
         return true;
     }
 
-
     function isLocationTypeViable( _locationType )
     {
         return _locationType == ::Const.World.LocationType.Lair || _locationType == (::Const.World.LocationType.Lair | ::Const.World.LocationType.Mobile);
     }
 
-    function repopulateLairNamedLoot( _lair )
+    function repopulateNamedLoot( _lair )
     {
         local namedLootChance = this.getNamedLootChance(_lair), iterations = 0;
         Raids.Standard.log(format("namedLootChance is %.2f for lair %s.", namedLootChance, _lair.getName()));
@@ -428,7 +417,7 @@ Raids.Lairs <-
 
         if (_procedure == this.Procedures.Decrement)
         {
-            this.depopulateLairNamedLoot(_lair);
+            this.depopulateNamedLoot(_lair);
             return;
         }
 
@@ -438,6 +427,6 @@ Raids.Lairs <-
             return;
         }
 
-        this.repopulateLairNamedLoot(_lair);
+        this.repopulateNamedLoot(_lair);
     }
 };

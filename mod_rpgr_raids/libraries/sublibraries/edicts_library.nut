@@ -1,7 +1,7 @@
 local Raids = ::RPGR_Raids;
 Raids.Edicts <-
 {
-    AgnosticEdicts = 
+    AgnosticEdicts =
     [
         "special.edict_of_agitation",
         "special.edict_of_nullification"
@@ -21,9 +21,15 @@ Raids.Edicts <-
     ],
     Parameters =
     {
-        AbundanceOffset = 1,
+        AbundanceOffset = 0.25,
         DurationDays = 2,
-        DiminutionModifier = 0.75
+        DiminutionModifier = 0.75,
+        ProvocationModifier = 2.5
+    }
+    Properties =
+    {
+        LootScale = "Abundance",
+        NamedLootChance = ""
     }
 
     function createEdict()
@@ -72,6 +78,11 @@ Raids.Edicts <-
         settlement.addSituation(::new("scripts/entity/world/settlements/situations/safe_roads_situation")); // TODO: this should pick from a pool of situations
     }
 
+    function executeAbundanceProcedure( _lair )
+    {
+        _lair.m.LootScale = ::Math.max(1.0, _lair.m.LootScale + this.Parameters.AbundanceOffset);
+    }
+
     function executeAgitationProcedure( _lair )
     {
         Raids.Lairs.setAgitation(_lair, Raids.Lairs.Procedures.Increment);
@@ -97,12 +108,6 @@ Raids.Edicts <-
         _lair.createDefenders();
     }
 
-    function executeMaliceProcedure( _lair )
-    {
-        local settlement = Raids.Shared.getSettlementClosestTo(_lair.getTile());
-        settlement.addSituation(::new("scripts/entity/world/settlements/situations/raided_situation")); // TODO: this should pick from a pool of situations
-    }
-
     function executeNullificationProcedure( _lair )
     {
         this.clearEdicts(_lair);
@@ -110,7 +115,7 @@ Raids.Edicts <-
 
     function executeOpportunistProcedure( _lair )
     {
-        Raids.Lairs.repopulateLairNamedLoot(_lair);
+        Raids.Lairs.repopulateNamedLoot(_lair);
     }
 
     function findEdict( _ID, _lair, _filterActive = false )
@@ -146,6 +151,26 @@ Raids.Edicts <-
         return edict;
     }
 
+    function getModifier( _property, _lair )
+    {
+
+    }
+
+    function getOffset( _property, _lair )
+    {
+
+    }
+
+    function getLootScaleOffset( _lair )
+    {
+        return this.findEdict("special.edict_of_abundance", _lair, true) != false ? this.Parameters.AbundanceOffset;
+    }
+
+    function getNamedLootChanceOffset( _lair )
+    {
+        return this.findEdict("special.edict_of_", _lair, true) != false ? 0.10 : 0.0; // FIXME: fill in edict name
+    }
+
     function getPerspicuityEntry( _lair )
     {
         local entry = {id = 20, type = "text"},
@@ -159,6 +184,11 @@ Raids.Edicts <-
         entry.icon <- format("ui/icons/%s", count == 0 ? "cancel.png" : "special.png");
         entry.text <- Raids.Standard.colourWrap(format("Famed (%i)", count), format("%sValue", count == 0 ? "Negative" : "Positive"));
         return entry;
+    }
+
+    function getResourceModifier( _lair )
+    {
+        return this.findEdict("special.edict_of_provocation", _lair, true) != false ? this.Parameters.ProvocationModifier : 1.0;
     }
 
     function getTooltipEntries( _lair )

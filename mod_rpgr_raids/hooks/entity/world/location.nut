@@ -1,18 +1,6 @@
 local Raids = ::RPGR_Raids;
 ::mods_hookExactClass("entity/world/location", function( _object )
 {
-    foreach( stackable in ["Ammo", "ArmorParts", "Medicine"] ) // TODO: revise this
-    {
-        Raids.Standard.wrap(_object, format("drop%s", stackable), function( _num, _lootTable )
-        {
-            if (!Raids.Lairs.isLairViable(this))
-            {
-                return;
-            }
-
-        }, "overrideArguments");
-    }
-
     Raids.Standard.wrap(_object, "onCombatStarted", function()
     {
         if (!Raids.Lairs.isLairViable(this, false, true))
@@ -34,7 +22,7 @@ local Raids = ::RPGR_Raids;
 
         if (Raids.Standard.getSetting("DepopulateLairLootOnSpawn"))
         {
-            Raids.Lairs.depopulateLairNamedLoot(this, Raids.Lairs.Parameters.NamedItemChanceOnSpawn);
+            Raids.Lairs.depopulateNamedLoot(this, Raids.Lairs.Parameters.NamedItemChanceOnSpawn);
         }
     });
 
@@ -46,7 +34,7 @@ local Raids = ::RPGR_Raids;
         }
 
         Raids.Lairs.updateAgitation(this);
-        Raids.Edicts.updateEdicts(this); // TODO: is this the right order?
+        Raids.Edicts.updateEdicts(this);
         _tooltipArray.extend(Raids.Lairs.getTooltipEntries(this));
         _tooltipArray.extend(Raids.Edicts.getTooltipEntries(this));
         return _tooltipArray;
