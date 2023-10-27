@@ -20,7 +20,6 @@ local Raids = ::RPGR_Raids;
             return;
         }
 
-        Raids.Standard.log("Assigning caravan parameters.");
         Raids.Caravans.initialiseCaravanParameters(caravan, this.m.Start);
     });
 });

@@ -1,6 +1,11 @@
 local Raids = ::RPGR_Raids;
 Raids.Edicts <-
 {
+    AgnosticEdicts = 
+    [
+        "special.edict_of_agitation",
+        "special.edict_of_nullification"
+    ],
     CycledEdicts =
     [
         "special.edict_of_abstention",
@@ -64,7 +69,7 @@ Raids.Edicts <-
     {
         _lair.setLastSpawnTimeToNow();
         local settlement = Raids.Shared.getSettlementClosestTo(_lair.getTile());
-        closestSettlement.addSituation(::new("scripts/entity/world/settlements/situations/safe_roads_situation"));
+        settlement.addSituation(::new("scripts/entity/world/settlements/situations/safe_roads_situation")); // TODO: this should pick from a pool of situations
     }
 
     function executeAgitationProcedure( _lair )
@@ -92,6 +97,17 @@ Raids.Edicts <-
         _lair.createDefenders();
     }
 
+    function executeMaliceProcedure( _lair )
+    {
+        local settlement = Raids.Shared.getSettlementClosestTo(_lair.getTile());
+        settlement.addSituation(::new("scripts/entity/world/settlements/situations/raided_situation")); // TODO: this should pick from a pool of situations
+    }
+
+    function executeNullificationProcedure( _lair )
+    {
+        this.clearEdicts(_lair);
+    }
+
     function executeOpportunistProcedure( _lair )
     {
         Raids.Lairs.repopulateLairNamedLoot(_lair);
@@ -99,7 +115,7 @@ Raids.Edicts <-
 
     function findEdict( _ID, _lair, _filterActive = false )
     {
-        if (_ID != "special.edict_of_agitation" && Raids.Standard.getFlag("Agitation", _lair) == Raids.Lairs.AgitationDescriptors.Relaxed)
+        if (this.AgnosticEdicts.find(_ID) == null && Raids.Standard.getFlag("Agitation", _lair) == Raids.Lairs.AgitationDescriptors.Relaxed)
         {
             return false;
         }
@@ -141,7 +157,7 @@ Raids.Edicts <-
         }
 
         entry.icon <- format("ui/icons/%s", count == 0 ? "cancel.png" : "special.png");
-        entry.text <- format("Famed (%i)", count);
+        entry.text <- Raids.Standard.colourWrap(format("Famed (%i)", count), format("%sValue", count == 0 ? "Negative" : "Positive"));
         return entry;
     }
 

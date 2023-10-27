@@ -80,15 +80,7 @@ Raids.Caravans <-
 
     function createCaravanTroops( _wealth, _factionType )
     {
-        local troops = [];
-
-        if (_factionType == ::Const.FactionType.NobleHouse)
-        {
-            troops.extend([::Const.World.Spawn.Troops.Billman, ::Const.World.Spawn.Troops.Footman, ::Const.World.Spawn.Troops.Arbalester, ::Const.World.Spawn.Troops.ArmoredWardog]);
-            return troops;
-        }
-
-        troops.push(::Const.World.Spawn.Troops.MercenaryLOW);
+        local troops = [::Const.World.Spawn.Troops.MercenaryLOW];
 
         if (::World.getTime().Days >= this.Parameters.ReinforcementThresholdDays)
         {
@@ -105,26 +97,23 @@ Raids.Caravans <-
         return troops;
     }
 
-    function createEliteCaravanTroops( _factionType )
+    function createEliteCaravanTroops( _factionType ) // TODO: revise this as there are powerful southern troops as well
     {
         local troops = [];
 
-        if (_factionType == ::Const.FactionType.NobleHouse)
+        if (_factionType == ::Const.FactionType.OrientalCityState)
         {
-            troops.extend([::Const.World.Spawn.Troops.MasterArcher, ::Const.World.Spawn.Troops.Greatsword, ::Const.World.Spawn.Troops.Knight]);
+            troops.extend([::Const.World.Spawn.Troops.Assassin, ::Const.World.Spawn.Troops.DesertDevil, ::Const.World.Spawn.Troops.DesertStalker]);
         }
-        else
-        {
-            troops.extend([::Const.World.Spawn.Troops.HedgeKnight, ::Const.World.Spawn.Troops.Swordmaster]);
-        }
-
+        
+        troops.extend([::Const.World.Spawn.Troops.HedgeKnight, ::Const.World.Spawn.Troops.MasterArcher, ::Const.World.Spawn.Troops.Swordmaster]);
         return troops;
     }
 
     function getTooltipEntries( _caravan )
     {
         local cargoEntry = {id = 2, type = "hint"}, wealthEntry = clone cargoEntry,
-        caravanWealth = Raids.Standard.getFlag("CaravanCargo", _caravan), caravanCargo = Raids.Standard.getFlag("CaravanCargo", _caravan);
+        caravanWealth = Raids.Standard.getFlag("CaravanWealth", _caravan), caravanCargo = Raids.Standard.getFlag("CaravanCargo", _caravan);
         cargoEntry.icon <- format("ui/icons/%s", this.getCargoIcon(caravanCargo));
         wealthEntry.icon <- "ui/icons/money2.png";
         cargoEntry.text <- format("%s", Raids.Standard.getDescriptor(caravanCargo, this.CargoDescriptors));
@@ -149,7 +138,6 @@ Raids.Caravans <-
             case (this.CargoDescriptors.Assortment): return "asset_money.png";
             case (this.CargoDescriptors.Trade): return "money.png";
             case (this.CargoDescriptors.Supplies): return "asset_food.png"
-            default: Raids.Standard.log("Invalid caravan cargo value, unable to retrieve icon.", true);
         }
     }
 
@@ -205,7 +193,7 @@ Raids.Caravans <-
         this.reinforceTroops(_caravan, _settlement);
     }
 
-    function initialiseSupplyCaravanParameters( _caravan )
+    function initialiseSupplyCaravanParameters( _caravan, _settlement )
     {   // TODO: revise number for balancing
         _caravan.addToInventory("special/official_document_item");
     }

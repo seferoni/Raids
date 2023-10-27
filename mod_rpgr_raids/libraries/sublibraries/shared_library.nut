@@ -56,16 +56,12 @@ Raids.Shared <-
 
         foreach( excludedFile in exclusionList )
         {
-            local index = scriptFiles.find("scripts/items/" + excludedFile);
-
-            if (index != null)
-            {
-                scriptFiles.remove(index);
-            }
+            local index = scriptFiles.find(format("scripts/items/%s", excludedFile));
+            if (index != null) scriptFiles.remove(index);
         }
 
-        local culledString = "scripts/items/";
-        local goods = scriptFiles.map(@(_stringPath) _stringPath.slice(culledString.len()));
+        local culledString = "scripts/items/",
+        goods = scriptFiles.map(@(_stringPath) _stringPath.slice(culledString.len()));
         return goods;
     }
 
@@ -100,9 +96,9 @@ Raids.Shared <-
 
         foreach( key in namedItemKeys )
         {
-            if (_lair.m[key + "List"] != null)
+            if (_lair.m[format("%sList", key)] != null)
             {
-                namedLoot.extend(_lair.m[key + "List"]);
+                namedLoot.extend(_lair.m[format("%sList", key)]);
             }
         }
 

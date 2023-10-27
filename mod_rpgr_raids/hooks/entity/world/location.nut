@@ -46,7 +46,7 @@ local Raids = ::RPGR_Raids;
         }
 
         Raids.Lairs.updateAgitation(this);
-        Raids.Edicts.updateEdicts(this);
+        Raids.Edicts.updateEdicts(this); // TODO: is this the right order?
         _tooltipArray.extend(Raids.Lairs.getTooltipEntries(this));
         _tooltipArray.extend(Raids.Edicts.getTooltipEntries(this));
         return _tooltipArray;
