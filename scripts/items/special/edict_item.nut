@@ -16,13 +16,13 @@ this.edict_item <- ::inherit("scripts/items/item",
 
 	function executeEdictProcedure( _lairs )
 	{
-		local isFlagOccupied = @(_flag, _lair) Raids.Standard.getFlag(_flag, _lair) != false, 
+		local isFlagOccupied = @(_flag, _lair) Raids.Standard.getFlag(_flag, _lair) != false,
 		isValid = false;
 
 		foreach( lair in _lairs )
 		{
 			local flag = null;
-			
+
 			if (!isFlagOccupied("EdictContainerA", lair))
 			{
 				flag = "EdictContainerA";
@@ -81,17 +81,17 @@ this.edict_item <- ::inherit("scripts/items/item",
 			return naiveLairs;
 		}
 
-		local ID = this.getID(), 
-		lairs = naiveLairs.filter(function( _index, _lair ) 
+		local ID = this.getID(), Edicts = Raids.Edicts;
+		lairs = naiveLairs.filter(function( _index, _lair )
 		{
-			local factionType = ::World.FactionManager.getFaction(_lair.getFaction()).getType();
+			local faction = ::World.FactionManager.getFaction(_lair.getFaction());
 
-			if (Raids.Edicts.Factions.find(factionType) == null)
+			if (Edicts.isFactionViable(faction))
 			{
 				return false;
 			}
 
-			if (Raids.Edicts.findEdict(ID, _lair) != false)
+			if (Edicts.findEdict(ID, _lair) != false)
 			{
 				return false;
 			}
@@ -119,7 +119,7 @@ this.edict_item <- ::inherit("scripts/items/item",
 		if (lairs.len() == 0)
 		{
 			return false;
-		} 
+		}
 
 		return this.executeEdictProcedure(lairs);
 	}

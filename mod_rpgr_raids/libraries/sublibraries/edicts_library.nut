@@ -16,7 +16,6 @@ Raids.Edicts <-
     Factions = // TODO: needs revision
     [
         ::Const.FactionType.Bandits,
-        ::Const.FactionType.Barbarians,
         ::Const.FactionType.OrientalBandits
     ],
     Parameters =
@@ -154,7 +153,7 @@ Raids.Edicts <-
     }
 
     function getNamedLootChanceOffset( _lair, _depopulate = false )
-    {  
+    {
         if (_depopulate && this.findEdict("special.edict_of_abeyance", _lair, true) != false)
         {
             return this.Parameters.AbeyanceOffset;
@@ -230,6 +229,33 @@ Raids.Edicts <-
         if (validityCheck("EdictContainerA")) validContainers.push("EdictContainerA");
         if (validityCheck("EdictContainerB")) validContainers.push("EdictContainerB");
         return validContainers;
+    }
+
+    function isFactionViable( _faction )
+    {
+        local factionType = _faction.getType(),
+        factions = clone this.Factions;
+
+        if (this.findEdict("special.edict_of_legibility", _lair, true) != false)
+        {
+            local expandedFactions =
+            [
+                ::Const.FactionType.Zombies,
+                ::Const.FactionType.Undead,
+                ::Const.FactionType.Orcs,
+                ::Const.FactionType.Goblins,
+                ::Const.FactionType.Barbarians,
+                ::Const.FactionType.OrientalBandits
+            ];
+            factions.extend(expandedFactions);
+        }
+
+        if (factions.find(factionType) != null)
+        {
+            return true;
+        }
+
+        return false;
     }
 
     function updateEdicts( _lair )
