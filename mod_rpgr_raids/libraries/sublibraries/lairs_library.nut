@@ -42,7 +42,13 @@ Raids.Lairs <-
             return;
         }
 
-        local namedLootChance = _chance == null ? this.getNamedLootChance(_lair) : _chance;
+        local namedLootChance = _chance;
+
+        if (_chance == null)
+        {
+            namedLootChance = ::Math.max(0, this.getNamedLootChance(_lair) + Raids.Edicts.getNamedLootChanceOffset(_lair, true));
+        }
+
         local items = _lair.getLoot().getItems();
 
         if (::Math.rand(1, 100) <= namedLootChance)
@@ -182,9 +188,8 @@ Raids.Lairs <-
     function getNamedLootChance( _lair )
     {
         local baseChance = Raids.Standard.getFlag("BaseNamedItemChance", _lair),
-        agitation = Raids.Standard.getFlag("Agitation", _lair),
-        edictOffset = Raids.Edicts.getNamedLootChanceOffset(_lair);
-        return baseChance + edictOffset + ((agitation - 1) * this.Parameters.NamedItemChancePerAgitation);
+        agitation = Raids.Standard.getFlag("Agitation", _lair);
+        return baseChance + ((agitation - 1) * this.Parameters.NamedItemChancePerAgitation);
     }
 
     function getResourceDifference( _lair, _lairResources, _partyResources )
@@ -267,7 +272,7 @@ Raids.Lairs <-
             return false;
         }
 
-        if (this.isActiveContractLocation(_lair))
+        if (_checkContract && this.isActiveContractLocation(_lair))
         {
             return false;
         }
@@ -286,17 +291,14 @@ Raids.Lairs <-
 
         if (_procedure == this.Procedures.Increment && agitation >= this.AgitationDescriptors.Militant)
         {
-            Raids.Standard.log(format("Agitation for %s is capped, aborting procedure.", _lair.getName()));
             return false;
         }
 
         if (_procedure == this.Procedures.Decrement && agitation <= this.AgitationDescriptors.Relaxed)
         {
-            Raids.Standard.log(format("Agitation for %s is already at its minimum value, aborting procedure.", _lair.getName()));
             return false;
         }
 
-        Raids.Standard.log(format("Lair %s is viable for agitation state change procedures.", _lair.getName()));
         return true;
     }
 
@@ -307,7 +309,7 @@ Raids.Lairs <-
 
     function repopulateNamedLoot( _lair )
     {
-        local namedLootChance = this.getNamedLootChance(_lair), iterations = 0;
+        local namedLootChance = this.getNamedLootChance(_lair) + Raids.Edicts.getNamedLootChanceOffset(_lair), iterations = 0;
         Raids.Standard.log(format("namedLootChance is %.2f for lair %s.", namedLootChance, _lair.getName()));
 
         if (namedLootChance > 100)
@@ -330,7 +332,7 @@ Raids.Lairs <-
         for ( local i = 0; i < iterations ; i++ )
         {
             local namedItem = namedLoot[::Math.rand(0, namedLoot.len() - 1)];
-            _lair.getLoot().add(::new(format("scripts/items/%s", namedItem))); // TODO: add named loot counter to tooltip
+            _lair.getLoot().add(::new(format("scripts/items/%s", namedItem)));
             Raids.Standard.log(format("Added item with filepath %s to the inventory of %s.", namedItem, _lair.getName()));
         }
     }

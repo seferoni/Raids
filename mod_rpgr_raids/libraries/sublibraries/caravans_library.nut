@@ -97,7 +97,7 @@ Raids.Caravans <-
         return troops;
     }
 
-    function createEliteCaravanTroops( _factionType ) // TODO: revise this as there are powerful southern troops as well
+    function createEliteCaravanTroops( _factionType )
     {
         local troops = [];
 
@@ -105,8 +105,11 @@ Raids.Caravans <-
         {
             troops.extend([::Const.World.Spawn.Troops.Assassin, ::Const.World.Spawn.Troops.DesertDevil, ::Const.World.Spawn.Troops.DesertStalker]);
         }
+        else
+        {
+            troops.extend([::Const.World.Spawn.Troops.HedgeKnight, ::Const.World.Spawn.Troops.MasterArcher, ::Const.World.Spawn.Troops.Swordmaster]);
+        }
         
-        troops.extend([::Const.World.Spawn.Troops.HedgeKnight, ::Const.World.Spawn.Troops.MasterArcher, ::Const.World.Spawn.Troops.Swordmaster]);
         return troops;
     }
 

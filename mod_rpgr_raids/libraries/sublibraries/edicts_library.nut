@@ -21,15 +21,12 @@ Raids.Edicts <-
     ],
     Parameters =
     {
+        AbeyanceOffset = -20,
         AbundanceOffset = 0.25,
         DurationDays = 2,
         DiminutionModifier = 0.75,
+        ProspectingOffset = 10,
         ProvocationModifier = 2.5
-    }
-    Properties =
-    {
-        LootScale = "Abundance",
-        NamedLootChance = ""
     }
 
     function createEdict()
@@ -151,24 +148,24 @@ Raids.Edicts <-
         return edict;
     }
 
-    function getModifier( _property, _lair )
-    {
-
-    }
-
-    function getOffset( _property, _lair )
-    {
-
-    }
-
     function getLootScaleOffset( _lair )
     {
-        return this.findEdict("special.edict_of_abundance", _lair, true) != false ? this.Parameters.AbundanceOffset;
+        return this.findEdict("special.edict_of_abundance", _lair, true) != false ? this.Parameters.AbundanceOffset : 0.0;
     }
 
-    function getNamedLootChanceOffset( _lair )
-    {
-        return this.findEdict("special.edict_of_", _lair, true) != false ? 0.10 : 0.0; // FIXME: fill in edict name
+    function getNamedLootChanceOffset( _lair, _depopulate = false )
+    {  
+        if (_depopulate && this.findEdict("special.edict_of_abeyance", _lair, true) != false)
+        {
+            return this.Parameters.AbeyanceOffset;
+        }
+
+        if (this.findEdict("special_edict_of_prospecting", _lair, true) != false)
+        {
+            return this.Parameters.ProspectingOffset;
+        }
+
+        return 0.0;
     }
 
     function getPerspicuityEntry( _lair )
