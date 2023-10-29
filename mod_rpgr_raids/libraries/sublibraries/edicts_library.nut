@@ -13,7 +13,7 @@ Raids.Edicts <-
         "special.edict_of_diminution",
         "special.edict_of_opportunism"
     ],
-    Factions = // TODO: needs revision
+    Factions =
     [
         ::Const.FactionType.Bandits,
         ::Const.FactionType.OrientalBandits
@@ -71,12 +71,16 @@ Raids.Edicts <-
     {
         _lair.setLastSpawnTimeToNow();
         local settlement = Raids.Shared.getSettlementClosestTo(_lair.getTile());
-        settlement.addSituation(::new("scripts/entity/world/settlements/situations/safe_roads_situation")); // TODO: this should pick from a pool of situations
+
+        if (settlement.getSituationByID("situation.safe_roads") == null) 
+        {
+            settlement.addSituation(::new("scripts/entity/world/settlements/situations/safe_roads_situation"));
+        }
     }
 
     function executeAbundanceProcedure( _lair )
     {
-        _lair.m.LootScale = ::Math.max(1.0, _lair.m.LootScale + this.Parameters.AbundanceOffset);
+        _lair.m.LootScale = ::Math.min(1.0, _lair.m.LootScale + this.Parameters.AbundanceOffset);
     }
 
     function executeAgitationProcedure( _lair )
@@ -130,6 +134,11 @@ Raids.Edicts <-
                 container = flag;
                 break;
             }
+        }
+
+        if (!container)
+        {
+            return false;
         }
 
         if (!_filterActive || !Raids.Standard.getFlag(format("%sTime", container), _lair))
@@ -231,24 +240,10 @@ Raids.Edicts <-
         return validContainers;
     }
 
-    function isFactionViable( _faction )
+    function isLairViable( _lair )
     {
-        local factionType = _faction.getType(),
-        factions = clone this.Factions;
-
-        if (this.findEdict("special.edict_of_legibility", _lair, true) != false)
-        {
-            local expandedFactions =
-            [
-                ::Const.FactionType.Zombies,
-                ::Const.FactionType.Undead,
-                ::Const.FactionType.Orcs,
-                ::Const.FactionType.Goblins,
-                ::Const.FactionType.Barbarians,
-                ::Const.FactionType.OrientalBandits
-            ];
-            factions.extend(expandedFactions);
-        }
+        local factionType = ::World.FactionManager.getFaction(_lair.getFaction()).getType(),
+        factions = this.findEdict("special.edict_of_legibility", _lair, true) != false ? Raids.Lairs.Factions : this.Factions;
 
         if (factions.find(factionType) != null)
         {

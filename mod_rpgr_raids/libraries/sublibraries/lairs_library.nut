@@ -189,7 +189,7 @@ Raids.Lairs <-
     {
         local baseChance = Raids.Standard.getFlag("BaseNamedItemChance", _lair),
         agitation = Raids.Standard.getFlag("Agitation", _lair);
-        return baseChance + ((agitation - 1) * this.Parameters.NamedItemChancePerAgitation);
+        return baseChance + ((agitation - 1) * this.Parameters.NamedItemChancePerAgitationTier);
     }
 
     function getResourceDifference( _lair, _lairResources, _partyResources )
@@ -277,7 +277,7 @@ Raids.Lairs <-
             return false;
         }
 
-        if (_checkProximity && !Raids.Shared.isPlayerInProximityTo(_lair.getTile(), 1))
+        if (_checkProximity && !Raids.Shared.isPlayerInProximityTo(_lair.getTile()))
         {
             return false;
         }

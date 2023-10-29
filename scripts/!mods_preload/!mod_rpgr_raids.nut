@@ -15,6 +15,7 @@
         RoamerScaleChance = 50,
         RoamerResourceModifier = 70,
         DepopulateLairLootOnSpawn = true,
+        OfficialDocumentDropChance = 100,
         RoamerScaleAgitationRequirement = false,
         CaravanReinforcementChance = 100,
         VerboseLogging = false
@@ -55,6 +56,9 @@ local Raids = ::RPGR_Raids;
 
     local depopulateLairLootOnSpawn = pageLairs.addBooleanSetting("DepopulateLairLootOnSpawn", true, "Depopulate Lair Loot On Spawn");
     depopulateLairLootOnSpawn.setDescription("Determines whether Raids should depopulate newly spawned lairs of named loot. This is recommended to compensate for the additional named loot brought about by the introduction of agitation as a game mechanic.");
+
+    local officialDocumentDropChance = pageCaravans.addRangeSetting("OfficialDocumentDropChance", 100, 10, 100, 10, "Official Document Drop Chance");
+    officialDocumentDropChance.setDescription("Determines the chance for supply caravans to drop official documents on defeat. Official documents provide the only means for obtaining edicts.");
 
     local roamerScaleAgitationRequirement = pageLairs.addBooleanSetting("RoamerScaleAgitationRequirement", false, "Roamer Scale Agitation Requirement");
     roamerScaleAgitationRequirement.setDescription("Determines whether roamer scaling occurs for lairs with baseline agitation. Will result in stronger eligible roamer spawns on a game-wide basis.");

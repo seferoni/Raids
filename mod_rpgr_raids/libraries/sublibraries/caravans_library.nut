@@ -197,7 +197,8 @@ Raids.Caravans <-
     }
 
     function initialiseSupplyCaravanParameters( _caravan, _settlement )
-    {   // TODO: revise number for balancing
+    {   
+        if (::Math.rand(1, 100) > Raids.Standard.getSetting("OfficialDocumentDropChance")) return;
         _caravan.addToInventory("special/official_document_item");
     }
 

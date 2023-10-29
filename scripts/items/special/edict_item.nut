@@ -11,6 +11,9 @@ this.edict_item <- ::inherit("scripts/items/item",
 		this.m.IsDroppedAsLoot = true;
 		this.m.IsAllowedInBag = false;
 		this.m.IsUsable = true;
+		this.m.IsCycled = true;
+		this.m.TutorialTextCycled <- "Temporary edicts vacate their occupied slot as soon as they are rendered active. Their effects do not persist beyond the next agitation update for a given lair.";
+		this.m.TutorialTextPermanent <- "Permanent edicts occupy an edict slot in perpetuity unless removed through special means. Their effects persist beyond agitation updates for a given lair.";
 		this.m.InstructionText <- "Right-click to dispatch within proximity of a lair. This edict will be consumed in the process.";
 	}
 
@@ -49,12 +52,18 @@ this.edict_item <- ::inherit("scripts/items/item",
 
 	function getEffect()
     {
-        return this.m.EffectText;
+		return format("%s This edict's effects are %s.", this.m.EffectText, this.m.IsCycled ? "temporary" : "permanent");
     }
 
 	function getInstruction()
 	{
 		return this.m.InstructionText;
+	}
+
+	function getTutorial()
+	{
+		if (this.m.IsCycled) return this.m.TutorialTextCycled;
+		return this.m.TutorialTextPermanent;
 	}
 
     function getTooltip()
@@ -66,6 +75,7 @@ this.edict_item <- ::inherit("scripts/items/item",
 			{id = 66, type = "text", text = this.getValueString()},
 			{id = 3, type = "image", image = this.getIcon()},
 			{id = 6, type = "text", icon = "ui/icons/special.png", text = this.getEffect()},
+			{id = 65, type = "text", icon = "ui/icons/warning.png", text = this.getTutorial()},
 			{id = 65, type = "text", text = this.getInstruction()}
 		];
 
@@ -84,9 +94,7 @@ this.edict_item <- ::inherit("scripts/items/item",
 		local ID = this.getID(), Edicts = Raids.Edicts;
 		lairs = naiveLairs.filter(function( _index, _lair )
 		{
-			local faction = ::World.FactionManager.getFaction(_lair.getFaction());
-
-			if (Edicts.isFactionViable(faction))
+			if (Edicts.isLairViable(_lair))
 			{
 				return false;
 			}

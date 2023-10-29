@@ -9,6 +9,7 @@ this.edict_of_provocation <- ::inherit("scripts/items/special/edict_item",
 		this.m.Name = "Edict of Provocation";
 		this.setDescription("It appraises the martial capabilities of the enemies of the realm, and subsequently finds them lacking.");
 		this.m.Value = 50;
-        this.m.EffectText <- "Will issue a challenge to the closest lairs, forcing them to send out stronger roaming parties. This edict's effects are permanent.";
+		this.m.IsCycled = false;
+        this.m.EffectText <- "Will issue a challenge to the closest lairs, forcing them to send out stronger roaming parties.";
 	}
 });

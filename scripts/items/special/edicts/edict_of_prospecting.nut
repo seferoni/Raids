@@ -7,8 +7,9 @@ this.edict_of_prospecting <- ::inherit("scripts/items/special/edict_item",
 		this.edict_item.create();
         this.m.ID = "special.edict_of_prospecting";
 		this.m.Name = "Edict of Prospecting";
-		this.setDescription("It maps local points of interest said to house long-sought artefacts of innumerable worth.");
+		this.setDescription("It maps local points of interest rumoured to house long-sought artefacts of innumerable worth.");
 		this.m.Value = 150;
-		this.m.EffectText <- "Will increase the chance that nearby lairs discover new famed items to safeguard within their inventories. This edict's effects are permanent.";
+		this.m.IsCycled = false;
+		this.m.EffectText <- "Will increase the chance that nearby lairs discover new famed items to safeguard within their inventories.";
 	}
 });
