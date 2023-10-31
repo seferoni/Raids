@@ -10,7 +10,7 @@ this.edict_of_legibility <- ::inherit("scripts/items/special/edict_item",
 		this.setDescription("It is a functional and accessible treatise on the lingua franca of the realm.");
 		this.m.Value = 100;
 		this.m.IsCycled = false;
-		this.m.EffectText <- "Will permit edicts to be dispatched to nearby lairs inhabited by unconventional factions.";
+		this.m.EffectText = "Will permit edicts to be dispatched to nearby lairs inhabited by unconventional factions.";
 	}
 
     function getViableLairs()
@@ -22,9 +22,14 @@ this.edict_of_legibility <- ::inherit("scripts/items/special/edict_item",
 			return naiveLairs;
 		}
 
-		local ID = this.getID(), Edicts = Raids.Edicts;
+		local ID = this.getID(), Edicts = Raids.Edicts,
 		lairs = naiveLairs.filter(function( _index, _lair )
 		{
+			if (Edicts.isLairViable(_lair))
+			{
+				return false;
+			}
+			
 			if (Edicts.findEdict(ID, _lair) != false)
 			{
 				return false;

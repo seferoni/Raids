@@ -1,6 +1,7 @@
 local Raids = ::RPGR_Raids;
 Raids.Edicts <-
-{
+{   // TODO: evaluate temporary edict behaviour operating when inert
+    // FIXME: after using a temporary edict and permanent edict on a lair, no new edicts apply
     AgnosticEdicts =
     [
         "special.edict_of_agitation",
@@ -177,7 +178,7 @@ Raids.Edicts <-
     }
 
     function getPerspicuityEntry( _lair )
-    {
+    {   // FIXME: this is not showing up
         local entry = {id = 20, type = "text"},
         count = 0;
 
@@ -196,8 +197,8 @@ Raids.Edicts <-
         return this.findEdict("special.edict_of_provocation", _lair, true) != false ? this.Parameters.ProvocationModifier : 1.0;
     }
 
-    function getTooltipEntries( _lair )
-    {
+    function getTooltipEntries( _lair ) // TODO: this won't show edict of legibility in discovery phase
+    {   // TODO: inert state is overriding discovery state
         local entryTemplate = {id = 20, type = "text", icon = "ui/icons/unknown_traits.png", text = "Edict: Vacant"},
         validContainers = this.getValidContainers(_lair);
 
@@ -206,7 +207,7 @@ Raids.Edicts <-
             return [entryTemplate, entryTemplate];
         }
 
-        local entries = [], isAgitated = Raids.Standard.getFlags("Agitation", _lair) != Raids.Lairs.AgitationDescriptors.Relaxed;
+        local entries = [], isAgitated = Raids.Standard.getFlag("Agitation", _lair) != Raids.Lairs.AgitationDescriptors.Relaxed;
 
         foreach( flag in validContainers )
         {

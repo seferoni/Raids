@@ -15,8 +15,9 @@ this.official_document_item <- ::inherit("scripts/items/item",
 		this.m.IsDroppedAsLoot = true;
 		this.m.IsAllowedInBag = false;
 		this.m.IsUsable = true;
-        this.m.EffectText <- "Will produce a counterfeit edict, but only if a counterfeiter's tools are present.";
+        this.m.EffectText <- "Will produce a counterfeit edict, but only if a set of counterfeiting tools are present.";
         this.m.InstructionText <- "Right-click to modify its contents.";
+		this.m.TutorialText <- "A taxidermist can produce counterfeiting tools for a handful of crowns if presented with a set of writing instruments, or with trophies sourced from slain webknechts."; 
 	}
 
     function findCounterfeitingTools()
@@ -27,7 +28,7 @@ this.official_document_item <- ::inherit("scripts/items/item",
         {
             if (item != null && item.getID() == "special.counterfeiting_tools_item")
             {
-                return true;
+                return item;
             }
         }
 
@@ -44,6 +45,11 @@ this.official_document_item <- ::inherit("scripts/items/item",
 		return this.m.InstructionText;
 	}
 
+	function getTutorial()
+	{
+		return this.m.TutorialText;
+	}
+
     function getTooltip()
 	{
 		local tooltipArray =
@@ -53,9 +59,14 @@ this.official_document_item <- ::inherit("scripts/items/item",
 			{id = 66, type = "text", text = this.getValueString()},
 			{id = 3, type = "image", image = this.getIcon()},
 			{id = 6, type = "text", icon = "ui/icons/special.png", text = this.getEffect()},
-			{id = 65, type = "text", text = this.getInstruction()}
 		];
 
+		if (Raids.Standard.getSetting("ShowTutorial"))
+		{
+			tooltipArray.push({id = 6, type = "text", icon = "ui/icons/warning.png", text = this.getTutorial()});
+		}
+
+		tooltipArray.push({id = 65, type = "text", text = this.getInstruction()});
 		return tooltipArray;
 	}
 
@@ -66,14 +77,28 @@ this.official_document_item <- ::inherit("scripts/items/item",
 
 	function onUse( _actor, _item = null )
 	{
-        if (!this.findCounterfeitingTools())
+		local counterfeitingTools = this.findCounterfeitingTools();
+
+        if (!counterfeitingTools)
         {
             return false;
         }
 
         ::Sound.play("sounds/scribble.wav", ::Const.Sound.Volume.Inventory);
         ::World.Assets.getStash().add(Raids.Edicts.createEdict());
-		::World.Assets.getStash().removeByID("special.counterfeiting_tools_item");
+		this.updateUses(counterfeitingTools);
         return true;
+	}
+
+	function updateUses( _counterfeitingTools )
+	{
+		local remainingUses = _counterfeitingTools.getUses();
+
+		if (remainingUses == 1)
+		{
+			::World.Assets.getStash().remove(_counterfeitingTools);
+		} 
+
+		_counterfeitingTools.setUses(remainingUses - 1);
 	}
 });

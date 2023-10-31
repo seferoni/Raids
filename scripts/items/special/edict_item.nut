@@ -11,26 +11,27 @@ this.edict_item <- ::inherit("scripts/items/item",
 		this.m.IsDroppedAsLoot = true;
 		this.m.IsAllowedInBag = false;
 		this.m.IsUsable = true;
-		this.m.IsCycled = true;
-		this.m.TutorialTextCycled <- "Temporary edicts vacate their occupied slot as soon as they are rendered active. Their effects do not persist beyond the next agitation update for a given lair.";
-		this.m.TutorialTextPermanent <- "Permanent edicts occupy an edict slot in perpetuity unless removed through special means. Their effects persist beyond agitation updates for a given lair.";
+		this.m.IsCycled <- true;
+		this.m.EffectText <- null;
 		this.m.InstructionText <- "Right-click to dispatch within proximity of a lair. This edict will be consumed in the process.";
+		this.m.TutorialTextCycled <- "Temporary edicts vacate their occupied slot as soon as they are rendered active. Their effects do not persist beyond the next agitation update for a given lair.";
+		this.m.TutorialTextPermanent <- "Permanent edicts occupy an edict slot in perpetuity or until removed through special means. Their effects persist beyond agitation updates for a given lair.";
 	}
 
 	function executeEdictProcedure( _lairs )
 	{
-		local isFlagOccupied = @(_flag, _lair) Raids.Standard.getFlag(_flag, _lair) != false,
+		local isContainerVacant = @(_flag, _lair) !Raids.Standard.getFlag(_flag, _lair),
 		isValid = false;
 
 		foreach( lair in _lairs )
 		{
 			local flag = null;
 
-			if (!isFlagOccupied("EdictContainerA", lair))
+			if (isContainerVacant("EdictContainerA", lair))
 			{
 				flag = "EdictContainerA";
 			}
-			else if (!isFlagOccupied("EdictContainerB", lair))
+			else if (isContainerVacant("EdictContainerB", lair))
 			{
 				flag = "EdictContainerB";
 			}
@@ -75,10 +76,14 @@ this.edict_item <- ::inherit("scripts/items/item",
 			{id = 66, type = "text", text = this.getValueString()},
 			{id = 3, type = "image", image = this.getIcon()},
 			{id = 6, type = "text", icon = "ui/icons/special.png", text = this.getEffect()},
-			{id = 65, type = "text", icon = "ui/icons/warning.png", text = this.getTutorial()},
-			{id = 65, type = "text", text = this.getInstruction()}
 		];
 
+		if (Raids.Standard.getSetting("ShowTutorial"))
+		{
+			tooltipArray.push({id = 6, type = "text", icon = "ui/icons/warning.png", text = this.getTutorial()})
+		}
+
+		tooltipArray.push({id = 65, type = "text", text = this.getInstruction()});
 		return tooltipArray;
 	}
 
@@ -91,10 +96,10 @@ this.edict_item <- ::inherit("scripts/items/item",
 			return naiveLairs;
 		}
 
-		local ID = this.getID(), Edicts = Raids.Edicts;
+		local ID = this.getID(), Edicts = Raids.Edicts,
 		lairs = naiveLairs.filter(function( _index, _lair )
 		{
-			if (Edicts.isLairViable(_lair))
+			if (!Edicts.isLairViable(_lair))
 			{
 				return false;
 			}
