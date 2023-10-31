@@ -1,12 +1,17 @@
 local Raids = ::RPGR_Raids;
 Raids.Edicts <-
-{   // TODO: evaluate temporary edict behaviour operating when inert
-    // FIXME: after using a temporary edict and permanent edict on a lair, no new edicts apply
+{   // TODO: evaluate temporary edict behaviour operating when inert DONE
+    // FIXME: after using a temporary edict and permanent edict on a lair, no new edicts apply POSSIBLE FIX
     AgnosticEdicts =
     [
         "special.edict_of_agitation",
         "special.edict_of_nullification"
     ],
+    Containers =
+    [
+        "EdictContainerA",
+        "EdictContainerB"
+    ]
     CycledEdicts =
     [
         "special.edict_of_abstention",
@@ -37,35 +42,10 @@ Raids.Edicts <-
 
     function clearEdicts( _lair )
     {
-        local containers = ["EdictContainerA", "EdictContainerB"];
-
-        foreach( container in containers )
+        foreach( container in this.Containers )
         {
-            Raids.Standard.setFlag(container, false, _lair);
-            Raids.Standard.setFlag(format("%sTime", container), false, _lair);
+            this.resetContainer(container, _lair);
         }
-    }
-
-    function cycleEdicts( _lair )
-    {
-        foreach( edict in this.CycledEdicts ) this.emptyContainer(edict, _lair, true);
-    }
-
-    function emptyContainer( _edict, _lair, _filterActive = false )
-    {
-        local container = this.findEdict(_edict, _lair);
-
-        if (!container)
-        {
-            return;
-        }
-
-        if (_filterActive && Raids.Standard.getFlag(format("%sTime", container)) != false)
-        {
-            return;
-        }
-
-        Raids.Standard.setFlag(container, false, _lair);
     }
 
     function executeAbstentionProcedure( _lair )
@@ -73,7 +53,7 @@ Raids.Edicts <-
         _lair.setLastSpawnTimeToNow();
         local settlement = Raids.Shared.getSettlementClosestTo(_lair.getTile());
 
-        if (settlement.getSituationByID("situation.safe_roads") == null) 
+        if (settlement.getSituationByID("situation.safe_roads") == null)
         {
             settlement.addSituation(::new("scripts/entity/world/settlements/situations/safe_roads_situation"));
         }
@@ -89,9 +69,20 @@ Raids.Edicts <-
         Raids.Lairs.setAgitation(_lair, Raids.Lairs.Procedures.Increment);
     }
 
-    function executeEdictProcedure( _flag, _lair )
+    function executeEdictProcedure( _container, _lair )
     {
-        local edict = this.getEdictName(_flag, _lair), procedure = format("execute%sProcedure", edict);
+        local edict = Raids.Standard.getFlag(_container, _lair),
+        edictName = this.getEdictName(edict, _lair),
+        procedure = format("execute%sProcedure", edictName);
+
+        if (this.CycledEdicts.find(edict) != null)
+        {
+            this.resetContainer(_container, _lair);
+        }
+        else
+        {
+            this.resetContainerTime(_container, _lair);
+        }
 
         if (!(procedure in this))
         {
@@ -99,8 +90,6 @@ Raids.Edicts <-
         }
 
         this[procedure](_lair);
-        Raids.Standard.setFlag(format("%sTime", _flag), false, _lair);
-        this.cycleEdicts(_lair);
     }
 
     function executeDiminutionProcedure( _lair )
@@ -121,40 +110,40 @@ Raids.Edicts <-
 
     function findEdict( _ID, _lair, _filterActive = false )
     {
-        if (this.AgnosticEdicts.find(_ID) == null && Raids.Standard.getFlag("Agitation", _lair) == Raids.Lairs.AgitationDescriptors.Relaxed)
+        if (this.isEdictInert(_ID, _lair))
         {
             return false;
         }
 
-        local containers = ["EdictContainerA", "EdictContainerB"], container = false;
+        local edictContainer = false;
 
-        foreach( flag in containers )
+        foreach( container in this.Containers )
         {
-            if (Raids.Standard.getFlag(flag, _lair) == _ID)
+            if (Raids.Standard.getFlag(container, _lair) == _ID)
             {
-                container = flag;
+                edictContainer = container;
                 break;
             }
         }
 
-        if (!container)
+        if (!edictContainer)
         {
             return false;
         }
 
-        if (!_filterActive || !Raids.Standard.getFlag(format("%sTime", container), _lair))
+        if (!_filterActive || !Raids.Standard.getFlag(format("%sTime", edictContainer), _lair))
         {
-            return container;
+            return edictContainer;
         }
 
         return false;
     }
 
-    function getEdictName( _flag, _lair )
+    function getEdictName( _ID, _lair )
     {
-        local culledString = "special.edict_of_", edictID = Raids.Standard.getFlag(_flag, _lair),
-        edict = Raids.Standard.setCase(edictID.slice(culledString.len()), "toupper");
-        return edict;
+        local culledString = "special.edict_of_",
+        edictName = Raids.Standard.setCase(_ID.slice(culledString.len()), "toupper");
+        return edictName;
     }
 
     function getLootScaleOffset( _lair )
@@ -198,24 +187,24 @@ Raids.Edicts <-
     }
 
     function getTooltipEntries( _lair ) // TODO: this won't show edict of legibility in discovery phase
-    {   // TODO: inert state is overriding discovery state
+    {   // TODO: inert state is overriding discovery state POSSIBLE FIX
         local entryTemplate = {id = 20, type = "text", icon = "ui/icons/unknown_traits.png", text = "Edict: Vacant"},
-        validContainers = this.getValidContainers(_lair);
+        occupiedContainers = this.getOccupiedContainers(_lair);
 
-        if (validContainers.len() == 0)
+        if (occupiedContainers.len() == 0)
         {
             return [entryTemplate, entryTemplate];
         }
 
         local entries = [], isAgitated = Raids.Standard.getFlag("Agitation", _lair) != Raids.Lairs.AgitationDescriptors.Relaxed;
 
-        foreach( flag in validContainers )
-        {
+        foreach( container in occupiedContainers )
+        {   // order is Active -> Discovery -> Inert
             local entry = clone entryTemplate,
-            edictTime = Raids.Standard.getFlag(format("%sTime", flag), _lair),
-            isActive = (!edictTime || isAgitated);
-            entry.icon = format("ui/icons/%s", isActive ? "scroll_01_b.png" : isAgitated ? "scroll_02_sw.png" : "scroll_01_sw.png");
-            entry.text = format("Edict: %s (%s)", this.getEdictName(flag, _lair), isActive ? "Active" : isAgitated ? "Discovery" : "Inert");
+            inDiscovery = Raids.Standard.getFlag(format("%sTime", container), _lair) != false,
+            isActive = (!inDiscovery && isAgitated);
+            entry.icon = format("ui/icons/%s", isActive ? "scroll_01_b.png" : inDiscovery ? "scroll_01_sw.png" : "scroll_02_sw.png");
+            entry.text = format("Edict: %s (%s)", this.getEdictName(Raids.Standard.getFlag(container, _lair), _lair), isActive ? "Active" : inDiscovery ? "Discovery" : "Inert");
             entries.push(entry);
         }
 
@@ -232,13 +221,23 @@ Raids.Edicts <-
         return entries;
     }
 
-    function getValidContainers( _lair )
+    function getOccupiedContainers( _lair )
     {
-        local validContainers = [],
-        validityCheck = @(_flag) Raids.Standard.getFlag(_flag, _lair) != false && Raids.Standard.getFlag(format("%sTime", _flag), _lair) != false;
-        if (validityCheck("EdictContainerA")) validContainers.push("EdictContainerA");
-        if (validityCheck("EdictContainerB")) validContainers.push("EdictContainerB");
-        return validContainers;
+        local occupiedContainers = [],
+        occupancyCheck = @(_container) Raids.Standard.getFlag(_container, _lair) != false;
+        if (occupancyCheck("EdictContainerA")) occupiedContainers.push("EdictContainerA");
+        if (occupancyCheck("EdictContainerB")) occupiedContainers.push("EdictContainerB");
+        return occupancyCheck;
+    }
+
+    function isEdictInert( _ID, _lair )
+    {
+        if (this.AgnosticEdicts.find(_ID) == null && Raids.Standard.getFlag("Agitation", _lair) == Raids.Lairs.AgitationDescriptors.Relaxed)
+        {
+            return true;
+        }
+
+        return false;
     }
 
     function isLairViable( _lair )
@@ -254,21 +253,34 @@ Raids.Edicts <-
         return false;
     }
 
+    function resetContainer( _container, _lair )
+    {
+        Raids.Standard.setFlag(_container, false, _lair);
+        this.resetContainerTime(_container, _lair);
+    }
+
+    function resetContainerTime( _container, _lair )
+    {
+        Raids.Standard.setFlag(format("%sTime", _container), false, _lair);
+    }
+
     function updateEdicts( _lair )
     {
-        local validContainers = this.getValidContainers(_lair);
+        local occupiedContainers = this.getOccupiedContainers(_lair);
 
-        if (validContainers.len() == 0)
+        if (occupiedContainers.len() == 0)
         {
             return;
         }
 
-        local edictDates = validContainers.map(@(_flag) Raids.Standard.getFlag(format("%sTime", _flag), _lair));
+        local edicts = occupiedContainers.map(@(_container) Raids.Standard.getFlag(container, _lair));
+        local edictDates = occupiedContainers.map(@(_container) Raids.Standard.getFlag(format("%sTime", _container), _lair));
 
-        for( local i = 0; i < validContainers.len(); i++ )
+        for( local i = 0; i < occupiedContainers.len(); i++ )
         {
+            if (this.isEdictInert(edict[i])) continue;
             if (!edictDates[i]) continue;
-            if (::World.getTime().Days - edictDates[i] >= this.Parameters.DurationDays) this.executeEdictProcedure(validContainers[i], _lair);
+            if (::World.getTime().Days - edictDates[i] >= this.Parameters.DurationDays) this.executeEdictProcedure(occupiedContainers[i], _lair);
         }
     }
 };

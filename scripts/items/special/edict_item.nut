@@ -20,29 +20,29 @@ this.edict_item <- ::inherit("scripts/items/item",
 
 	function executeEdictProcedure( _lairs )
 	{
-		local isContainerVacant = @(_flag, _lair) !Raids.Standard.getFlag(_flag, _lair),
+		local isContainerVacant = @(_container, _lair) !Raids.Standard.getFlag(_container, _lair),
 		isValid = false;
 
 		foreach( lair in _lairs )
 		{
-			local flag = null;
+			local container = null;
 
 			if (isContainerVacant("EdictContainerA", lair))
 			{
-				flag = "EdictContainerA";
+				container = "EdictContainerA";
 			}
 			else if (isContainerVacant("EdictContainerB", lair))
 			{
-				flag = "EdictContainerB";
+				container = "EdictContainerB";
 			}
 
-			if (flag == null)
+			if (container == null)
 			{
 				continue;
 			}
 
-			Raids.Standard.setFlag(flag, this.getID(), lair);
-			Raids.Standard.setFlag(format("%sTime", flag), ::World.getTime().Days, lair);
+			Raids.Standard.setFlag(container, this.getID(), lair);
+			Raids.Standard.setFlag(format("%sTime", container), ::World.getTime().Days, lair);
 			if (!isValid) isValid = true;
 		}
 

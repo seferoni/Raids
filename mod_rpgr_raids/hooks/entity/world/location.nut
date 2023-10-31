@@ -34,14 +34,15 @@ local Raids = ::RPGR_Raids;
         }
 
         Raids.Lairs.updateAgitation(this);
-        Raids.Edicts.updateEdicts(this);
         _tooltipArray.extend(Raids.Lairs.getTooltipEntries(this));
 
-        if (Raids.Edicts.isLairViable(this))
+        if (!Raids.Edicts.isLairViable(this))
         {
-            _tooltipArray.extend(Raids.Edicts.getTooltipEntries(this));
-        } 
-        
+            return _tooltipArray;
+        }
+
+        Raids.Edicts.updateEdicts(this);
+        _tooltipArray.extend(Raids.Edicts.getTooltipEntries(this));
         return _tooltipArray;
     });
 });
