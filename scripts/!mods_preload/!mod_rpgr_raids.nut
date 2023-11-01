@@ -18,7 +18,7 @@
         RoamerScaleChance = 50,
         RoamerResourceModifier = 70,
         RoamerScaleAgitationRequirement = false,
-        ShowTutorial = false,
+        ShowTutorial = true,
         VerboseLogging = false
     }
 }

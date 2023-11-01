@@ -5,6 +5,7 @@ Raids.Edicts <-
     AgnosticEdicts =
     [
         "special.edict_of_agitation",
+        "special.edict_of_legibility",
         "special.edict_of_nullification"
     ],
     Containers =
@@ -46,6 +47,14 @@ Raids.Edicts <-
         {
             this.resetContainer(container, _lair);
         }
+    }
+
+    function createTooltipEntry( _lair, _iconPath, _edictName, _activityState )
+    {
+        local entry = {id = 20, type = "text"};
+        entry.icon <- format("ui/icons/%s", _iconPath);
+        entry.text <- format("Edict: %s (%s)", _edictName, _activityState);
+        return entry;
     }
 
     function executeAbstentionProcedure( _lair )
@@ -146,6 +155,12 @@ Raids.Edicts <-
         return edictName;
     }
 
+    function getLegibilityEntry( _lair )
+    {
+        local entry = this.createTooltipEntry(_lair, "scroll_02_sw.png", "Legibility", "Discovery");
+        return entry;
+    }
+
     function getLootScaleOffset( _lair )
     {
         return this.findEdict("special.edict_of_abundance", _lair, true) != false ? this.Parameters.AbundanceOffset : 0.0;
@@ -166,8 +181,20 @@ Raids.Edicts <-
         return 0.0;
     }
 
+    function getNonviableEntries( _lair )
+    {
+        local entries = [];
+
+        if (this.findEdict("special.edict_of_legibility", _lair) != false)
+        {
+            entries.push(this.getLegibilityEntry(_lair));
+        } 
+
+        return entries;
+    }
+
     function getPerspicuityEntry( _lair )
-    {   // FIXME: this is not showing up
+    {
         local entry = {id = 20, type = "text"},
         count = 0;
 
@@ -181,12 +208,24 @@ Raids.Edicts <-
         return entry;
     }
 
+    function getSpecialEntries( _lair )
+    {  
+        local entries = [];
+
+        if (this.findEdict("special.edict_of_perspicuity", _lair, true) != false)
+        {
+            entries.push(this.getPerspicuityEntry(_lair));
+        }
+        
+        return entries;
+    }
+
     function getResourceModifier( _lair )
     {
         return this.findEdict("special.edict_of_provocation", _lair, true) != false ? this.Parameters.ProvocationModifier : 1.0;
     }
 
-    function getTooltipEntries( _lair ) // TODO: this won't show edict of legibility in discovery phase
+    function getTooltipEntries( _lair ) // TODO: this won't show edict of legibility
     {   // TODO: inert state is overriding discovery state POSSIBLE FIX
         local entryTemplate = {id = 20, type = "text", icon = "ui/icons/unknown_traits.png", text = "Edict: Vacant"},
         occupiedContainers = this.getOccupiedContainers(_lair);
@@ -199,13 +238,13 @@ Raids.Edicts <-
         local entries = [], isAgitated = Raids.Standard.getFlag("Agitation", _lair) != Raids.Lairs.AgitationDescriptors.Relaxed;
 
         foreach( container in occupiedContainers )
-        {   // order is Active -> Discovery -> Inert
-            local entry = clone entryTemplate,
-            inDiscovery = Raids.Standard.getFlag(format("%sTime", container), _lair) != false,
-            isActive = (!inDiscovery && isAgitated);
-            entry.icon = format("ui/icons/%s", isActive ? "scroll_01_b.png" : inDiscovery ? "scroll_01_sw.png" : "scroll_02_sw.png");
-            entry.text = format("Edict: %s (%s)", this.getEdictName(Raids.Standard.getFlag(container, _lair), _lair), isActive ? "Active" : inDiscovery ? "Discovery" : "Inert");
-            entries.push(entry);
+        {
+            local inDiscovery = Raids.Standard.getFlag(format("%sTime", container), _lair) != false,
+            isActive = (!inDiscovery && isAgitated),
+            iconPath = isActive ? "scroll_01_b.png" : inDiscovery ? "scroll_02_sw.png" : "scroll_01_sw.png",
+            edictName = this.getEdictName(Raids.Standard.getFlag(container, _lair), _lair),
+            activityState = isActive ? "Active" : inDiscovery ? "Discovery" : "Inert";
+            entries.push(this.createTooltipEntry(_lair, iconPath, edictName, activityState));
         }
 
         if (entries.len() < 2)
@@ -213,11 +252,7 @@ Raids.Edicts <-
             entries.push(entryTemplate);
         }
 
-        if (this.findEdict("special.edict_of_perspicuity", _lair, true) != false)
-        {
-            entries.push(this.getPerspicuityEntry(_lair));
-        }
-
+        entries.extend(this.getSpecialEntries(_lair));
         return entries;
     }
 
@@ -227,7 +262,7 @@ Raids.Edicts <-
         occupancyCheck = @(_container) Raids.Standard.getFlag(_container, _lair) != false;
         if (occupancyCheck("EdictContainerA")) occupiedContainers.push("EdictContainerA");
         if (occupancyCheck("EdictContainerB")) occupiedContainers.push("EdictContainerB");
-        return occupancyCheck;
+        return occupiedContainers;
     }
 
     function isEdictInert( _ID, _lair )
@@ -273,12 +308,12 @@ Raids.Edicts <-
             return;
         }
 
-        local edicts = occupiedContainers.map(@(_container) Raids.Standard.getFlag(container, _lair));
+        local edicts = occupiedContainers.map(@(_container) Raids.Standard.getFlag(_container, _lair));
         local edictDates = occupiedContainers.map(@(_container) Raids.Standard.getFlag(format("%sTime", _container), _lair));
 
         for( local i = 0; i < occupiedContainers.len(); i++ )
         {
-            if (this.isEdictInert(edict[i])) continue;
+            if (this.isEdictInert(edicts[i], _lair)) continue;
             if (!edictDates[i]) continue;
             if (::World.getTime().Days - edictDates[i] >= this.Parameters.DurationDays) this.executeEdictProcedure(occupiedContainers[i], _lair);
         }
