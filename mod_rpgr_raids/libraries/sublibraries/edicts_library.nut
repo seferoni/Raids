@@ -225,8 +225,8 @@ Raids.Edicts <-
         return this.findEdict("special.edict_of_provocation", _lair, true) != false ? this.Parameters.ProvocationModifier : 1.0;
     }
 
-    function getTooltipEntries( _lair ) // TODO: this won't show edict of legibility
-    {   // TODO: inert state is overriding discovery state POSSIBLE FIX
+    function getTooltipEntries( _lair )
+    {   // TODO: edicts never leave discovery state (test with Abundance)
         local entryTemplate = {id = 20, type = "text", icon = "ui/icons/unknown_traits.png", text = "Edict: Vacant"},
         occupiedContainers = this.getOccupiedContainers(_lair);
 
@@ -313,7 +313,7 @@ Raids.Edicts <-
 
         for( local i = 0; i < occupiedContainers.len(); i++ )
         {
-            if (this.isEdictInert(edicts[i], _lair)) continue;
+            if (this.isEdictInert(edicts[i], _lair)) continue; // FIXME: this prevents edicts from entering Inert from Discovery
             if (!edictDates[i]) continue;
             if (::World.getTime().Days - edictDates[i] >= this.Parameters.DurationDays) this.executeEdictProcedure(occupiedContainers[i], _lair);
         }
