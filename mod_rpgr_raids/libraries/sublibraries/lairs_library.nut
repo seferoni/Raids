@@ -56,11 +56,11 @@ Raids.Lairs <-
             return;
         }
 
-        foreach( itemIndex, item in items )
+        foreach( index, item in items )
         {
             if (item.isItemType(::Const.Items.ItemType.Named))
             {
-                items.remove(itemIndex);
+                items.remove(index);
                 Raids.Standard.log(format("depopulateNamedLoot removed %s from the inventory of lair %s.", item.getName(), _lair.getName()));
                 break;
             }
@@ -91,7 +91,7 @@ Raids.Lairs <-
     function getCandidateAtPosition( _position )
     {
         local Raids = ::RPGR_Raids, entities = ::World.getAllEntitiesAndOneLocationAtPos(_position, 1.0),
-        lairs = entities.filter(function( _entityIndex, _entity )
+        lairs = entities.filter(function( _index, _entity )
         {
             if (!::isKindOf(_entity, "location"))
             {
@@ -156,7 +156,7 @@ Raids.Lairs <-
         }
 
         Raids.Standard.log("Proceeding to lair candidate selection.");
-        lairs.extend(_faction.getSettlements().filter(function( _locationIndex, _location )
+        lairs.extend(_faction.getSettlements().filter(function( _index, _location )
         {
             if (!Raids.Lairs.isLocationTypeViable(_location.getLocationType()))
             {

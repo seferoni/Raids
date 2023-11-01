@@ -1,12 +1,12 @@
 local Raids = ::RPGR_Raids;
 Raids.Edicts <-
-{   // TODO: evaluate temporary edict behaviour operating when inert DONE
+{
     // FIXME: after using a temporary edict and permanent edict on a lair, no new edicts apply POSSIBLE FIX
     AgnosticEdicts =
     [
-        "special.edict_of_agitation",
-        "special.edict_of_legibility",
-        "special.edict_of_nullification"
+        "Agitation",
+        "Legibility",
+        "Nullification"
     ],
     Containers =
     [
@@ -15,10 +15,10 @@ Raids.Edicts <-
     ]
     CycledEdicts =
     [
-        "special.edict_of_abstention",
-        "special.edict_of_agitation",
-        "special.edict_of_diminution",
-        "special.edict_of_opportunism"
+        "Abstention",
+        "Agitation",
+        "Diminution",
+        "Opportunism"
     ],
     Factions =
     [
@@ -80,11 +80,11 @@ Raids.Edicts <-
 
     function executeEdictProcedure( _container, _lair )
     {
-        local edict = Raids.Standard.getFlag(_container, _lair),
-        edictName = this.getEdictName(edict, _lair),
+        local edictID = Raids.Standard.getFlag(_container, _lair),
+        edictName = this.getEdictName(edictID, _lair),
         procedure = format("execute%sProcedure", edictName);
 
-        if (this.CycledEdicts.find(edict) != null)
+        if (this.CycledEdicts.find(this.getEdictName(edictID)) != null)
         {
             this.resetContainer(_container, _lair);
         }
@@ -117,9 +117,9 @@ Raids.Edicts <-
         Raids.Lairs.repopulateNamedLoot(_lair);
     }
 
-    function findEdict( _ID, _lair, _filterActive = false )
+    function findEdict( _edictID, _lair, _filterActive = false )
     {
-        if (this.isEdictInert(_ID, _lair))
+        if (this.isEdictInert(_edictID, _lair))
         {
             return false;
         }
@@ -128,7 +128,7 @@ Raids.Edicts <-
 
         foreach( container in this.Containers )
         {
-            if (Raids.Standard.getFlag(container, _lair) == _ID)
+            if (Raids.Standard.getFlag(container, _lair) == _edictID)
             {
                 edictContainer = container;
                 break;
@@ -148,10 +148,17 @@ Raids.Edicts <-
         return false;
     }
 
-    function getEdictName( _ID, _lair )
+    function getEdictID( _edictName, _lair )
+    {
+        local prependedString = "special.edict_of_",
+        edictID = format("%s%s", prependedString,  Raids.Standard.setCase(_edictName, "tolower"));
+        return edictID;
+    }
+
+    function getEdictName( _edictID, _lair )
     {
         local culledString = "special.edict_of_",
-        edictName = Raids.Standard.setCase(_ID.slice(culledString.len()), "toupper");
+        edictName = Raids.Standard.setCase(_edictID.slice(culledString.len()), "toupper");
         return edictName;
     }
 
@@ -163,17 +170,17 @@ Raids.Edicts <-
 
     function getLootScaleOffset( _lair )
     {
-        return this.findEdict("special.edict_of_abundance", _lair, true) != false ? this.Parameters.AbundanceOffset : 0.0;
+        return this.findEdict(this.getEdictID("Abundance"), _lair, true) != false ? this.Parameters.AbundanceOffset : 0.0;
     }
 
     function getNamedLootChanceOffset( _lair, _depopulate = false )
     {
-        if (_depopulate && this.findEdict("special.edict_of_abeyance", _lair, true) != false)
+        if (_depopulate && this.findEdict(this.getEdictID("Abeyance"), _lair, true) != false)
         {
             return this.Parameters.AbeyanceOffset;
         }
 
-        if (this.findEdict("special_edict_of_prospecting", _lair, true) != false)
+        if (this.findEdict(this.getEdictID("Prospecting"), _lair, true) != false)
         {
             return this.Parameters.ProspectingOffset;
         }
@@ -185,10 +192,10 @@ Raids.Edicts <-
     {
         local entries = [];
 
-        if (this.findEdict("special.edict_of_legibility", _lair) != false)
+        if (this.findEdict(this.getEdictID("Legibility"), _lair) != false)
         {
             entries.push(this.getLegibilityEntry(_lair));
-        } 
+        }
 
         return entries;
     }
@@ -209,24 +216,24 @@ Raids.Edicts <-
     }
 
     function getSpecialEntries( _lair )
-    {  
+    {
         local entries = [];
 
-        if (this.findEdict("special.edict_of_perspicuity", _lair, true) != false)
+        if (this.findEdict(this.getEdictID("Perspicuity"), _lair, true) != false)
         {
             entries.push(this.getPerspicuityEntry(_lair));
         }
-        
+
         return entries;
     }
 
     function getResourceModifier( _lair )
     {
-        return this.findEdict("special.edict_of_provocation", _lair, true) != false ? this.Parameters.ProvocationModifier : 1.0;
+        return this.findEdict(this.getEdictID("Provocation"), _lair, true) != false ? this.Parameters.ProvocationModifier : 1.0;
     }
 
     function getTooltipEntries( _lair )
-    {   // TODO: edicts never leave discovery state (test with Abundance)
+    {
         local entryTemplate = {id = 20, type = "text", icon = "ui/icons/unknown_traits.png", text = "Edict: Vacant"},
         occupiedContainers = this.getOccupiedContainers(_lair);
 
@@ -265,9 +272,9 @@ Raids.Edicts <-
         return occupiedContainers;
     }
 
-    function isEdictInert( _ID, _lair )
+    function isEdictInert( _edictID, _lair )
     {
-        if (this.AgnosticEdicts.find(_ID) == null && Raids.Standard.getFlag("Agitation", _lair) == Raids.Lairs.AgitationDescriptors.Relaxed)
+        if (this.AgnosticEdicts.find(this.getEdictName(_edictID)) == null && Raids.Standard.getFlag("Agitation", _lair) == Raids.Lairs.AgitationDescriptors.Relaxed)
         {
             return true;
         }
@@ -278,7 +285,7 @@ Raids.Edicts <-
     function isLairViable( _lair )
     {
         local factionType = ::World.FactionManager.getFaction(_lair.getFaction()).getType(),
-        factions = this.findEdict("special.edict_of_legibility", _lair, true) != false ? Raids.Lairs.Factions : this.Factions;
+        factions = this.findEdict(this.getEdictID("Legibility"), _lair, true) != false ? Raids.Lairs.Factions : this.Factions;
 
         if (factions.find(factionType) != null)
         {
@@ -313,9 +320,17 @@ Raids.Edicts <-
 
         for( local i = 0; i < occupiedContainers.len(); i++ )
         {
-            if (this.isEdictInert(edicts[i], _lair)) continue; // FIXME: this prevents edicts from entering Inert from Discovery
-            if (!edictDates[i]) continue;
-            if (::World.getTime().Days - edictDates[i] >= this.Parameters.DurationDays) this.executeEdictProcedure(occupiedContainers[i], _lair);
+            if (!edictDates[i])
+            {
+                continue;
+            }
+
+            if (::World.getTime().Days - edictDates[i] < this.Parameters.DurationDays)
+            {
+                continue;
+            }
+
+            this[this.isEdictInert(edicts[i], _lair) ? "resetContainerTime" : "executeEdictProcedure"](occupiedContainers[i], _lair);
         }
     }
 };
