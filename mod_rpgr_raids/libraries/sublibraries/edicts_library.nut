@@ -35,6 +35,13 @@ Raids.Edicts <-
         ProvocationModifier = 2.5
     }
 
+    function addToHistory( _edictName, _lair )
+    {
+        local history = Raids.Standard.getFlag("EdictHistory", _lair),
+        newHistory = format("%s%s", !history ? "" : format("%s, ", history), Raids.Standard.colourWrap(_edictName, "NegativeValue"));
+        Raids.Standard.setFlag("EdictHistory", newHistory, _lair);
+    }
+
     function createEdict()
     {
         local edicts = ::IO.enumerateFiles("scripts/items/special/edicts");
@@ -47,6 +54,11 @@ Raids.Edicts <-
         {
             this.resetContainer(container, _lair);
         }
+    }
+
+    function clearHistory( _lair )
+    {
+        Raids.Standard.setFlag("EdictHistory", false, _lair);
     }
 
     function createTooltipEntry( _lair, _iconPath, _edictName, _activityState )
@@ -87,6 +99,7 @@ Raids.Edicts <-
         if (this.CycledEdicts.find(this.getEdictName(edictID)) != null)
         {
             this.resetContainer(_container, _lair);
+            this.addToHistory(edictName, _lair);
         }
         else
         {
@@ -162,6 +175,12 @@ Raids.Edicts <-
         return edictName;
     }
 
+    function getHistoryEntry( _lair )
+    {
+        local entry = {id = 20, type = "text", icon = "ui/icons/papers.png", text = Raids.Standard.getFlag("EdictHistory", _lair)};
+        return entry;
+    }
+
     function getLegibilityEntry( _lair )
     {
         local entry = this.createTooltipEntry(_lair, "scroll_02_sw.png", "Legibility", "Discovery");
@@ -224,6 +243,11 @@ Raids.Edicts <-
             entries.push(this.getPerspicuityEntry(_lair));
         }
 
+        if (Raids.Standard.getFlag("EdictHistory", _lair) != false)
+        {
+            entries.push(this.getHistoryEntry(_lair));
+        }
+
         return entries;
     }
 
@@ -235,14 +259,16 @@ Raids.Edicts <-
     function getTooltipEntries( _lair )
     {
         local entryTemplate = {id = 20, type = "text", icon = "ui/icons/unknown_traits.png", text = "Edict: Vacant"},
-        occupiedContainers = this.getOccupiedContainers(_lair);
+        entries = [], occupiedContainers = this.getOccupiedContainers(_lair);
 
         if (occupiedContainers.len() == 0)
         {
-            return [entryTemplate, entryTemplate];
+            entries.extend([entryTemplate, entryTemplate]);
+            entries.extend(this.getSpecialEntries(_lair));
+            return entries;
         }
 
-        local entries = [], isAgitated = Raids.Standard.getFlag("Agitation", _lair) != Raids.Lairs.AgitationDescriptors.Relaxed;
+        local isAgitated = Raids.Standard.getFlag("Agitation", _lair) != Raids.Lairs.AgitationDescriptors.Relaxed;
 
         foreach( container in occupiedContainers )
         {

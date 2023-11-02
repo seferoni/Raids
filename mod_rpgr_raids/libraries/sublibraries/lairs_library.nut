@@ -413,6 +413,7 @@ Raids.Lairs <-
             Raids.Edicts.clearEdicts(_lair);
         }
 
+        Raids.Edicts.clearHistory(_lair);
         this.setResourcesByAgitation(_lair);
         _lair.createDefenders();
         _lair.setLootScaleBasedOnResources(_lair.getResources());
