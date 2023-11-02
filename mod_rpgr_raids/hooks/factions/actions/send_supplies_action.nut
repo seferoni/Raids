@@ -20,6 +20,6 @@ local Raids = ::RPGR_Raids;
             return;
         }
 
-        Raids.Caravans.initialiseSupplyCaravanParameters(caravan, this.m.Start);
+        Raids.Caravans.initialiseCaravanParameters(caravan, this.m.Start);
     });
-})
+});

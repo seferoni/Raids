@@ -23,9 +23,10 @@ Raids.Caravans <-
     },
     Parameters =
     {
-        NamedItemChance = 50, // FIXME: this is inflated, revert to 5
         MaximumTroopOffset = 7,
-        ReinforcementThresholdDays = 1 // FIXME: this is deflated, revert to 50
+        NamedItemChance = 50, // FIXME: this is inflated, revert to 5
+        ReinforcementThresholdDays = 1, // FIXME: this is deflated, revert to 50
+        SupplyCaravanDocumentChanceOffset = 25
     },
     SynergisticSituations =
     [
@@ -80,7 +81,15 @@ Raids.Caravans <-
 
     function createCaravanTroops( _wealth, _factionType )
     {
-        local troops = [::Const.World.Spawn.Troops.MercenaryLOW];
+        local troops = [];
+
+        if (_factionType == ::Const.FactionType.NobleHouse)
+        {
+            troops.extend([::Const.World.Spawn.Troops.Billman, ::Const.World.Spawn.Troops.Footman, ::Const.World.Spawn.Troops.Arbalester]);
+            return troops;
+        }
+
+        troops.push(::Const.World.Spawn.Troops.MercenaryLOW);
 
         if (::World.getTime().Days >= this.Parameters.ReinforcementThresholdDays)
         {
@@ -101,15 +110,19 @@ Raids.Caravans <-
     {
         local troops = [];
 
+        if (_factionType == ::Const.FactionType.NobleHouse)
+        {
+            troops.extend([::Const.World.Spawn.Troops.Greatsword, ::Const.World.Spawn.Troops.Knight, ::Const.World.Spawn.Troops.Sergeant]);
+            return troops;
+        }
+
         if (_factionType == ::Const.FactionType.OrientalCityState)
         {
             troops.extend([::Const.World.Spawn.Troops.Assassin, ::Const.World.Spawn.Troops.DesertDevil, ::Const.World.Spawn.Troops.DesertStalker]);
+            return troops;
         }
-        else
-        {
-            troops.extend([::Const.World.Spawn.Troops.HedgeKnight, ::Const.World.Spawn.Troops.MasterArcher, ::Const.World.Spawn.Troops.Swordmaster]);
-        }
-        
+
+        troops.extend([::Const.World.Spawn.Troops.HedgeKnight, ::Const.World.Spawn.Troops.MasterArcher, ::Const.World.Spawn.Troops.Swordmaster]);
         return troops;
     }
 
@@ -121,7 +134,7 @@ Raids.Caravans <-
         wealthEntry.icon <- "ui/icons/money2.png";
         cargoEntry.text <- format("%s", Raids.Standard.getDescriptor(caravanCargo, this.CargoDescriptors));
         wealthEntry.text <- format("%s (%i)", Raids.Standard.getDescriptor(caravanWealth, this.WealthDescriptors), caravanWealth);
-        
+
         if (!Raids.Standard.getFlag("CaravanHasNamedItems", _caravan))
         {
             return [cargoEntry, wealthEntry];
@@ -196,12 +209,6 @@ Raids.Caravans <-
         this.reinforceTroops(_caravan, _settlement);
     }
 
-    function initialiseSupplyCaravanParameters( _caravan, _settlement )
-    {   // TODO: supply caravans need more
-        if (::Math.rand(1, 100) > Raids.Standard.getSetting("OfficialDocumentDropChance")) return;
-        _caravan.addToInventory("special/official_document_item");
-    }
-
     function isPartyViable( _party )
     {
         return Raids.Standard.getFlag("IsCaravan", _party);
@@ -221,6 +228,19 @@ Raids.Caravans <-
         }
 
         Raids.Shared.addToInventory(_caravan, this.createCaravanCargo(_caravan, _settlement));
+        local documentChance = Raids.Standard.getSetting("OfficialDocumentDropChance");
+
+        if (::World.FactionManager.getFaction(_caravan.getFaction()).getType() == ::Const.FactionType.NobleHouse)
+        {
+            documentChance += this.Parameters.SupplyCaravanDocumentOffset;
+        }
+
+        if (::Math.rand(1, 100) > documentChance)
+        {
+            return;
+        }
+
+        _caravan.addToInventory("special/official_document_item");
     }
 
     function reinforceTroops( _caravan, _settlement )

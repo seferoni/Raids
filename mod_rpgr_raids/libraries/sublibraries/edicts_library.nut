@@ -1,6 +1,6 @@
 local Raids = ::RPGR_Raids;
 Raids.Edicts <-
-{   // TODO: needs a list that displays edict history
+{
     // FIXME: after using a temporary edict and permanent edict on a lair, no new edicts apply POSSIBLE FIX
     AgnosticEdicts =
     [
@@ -25,14 +25,18 @@ Raids.Edicts <-
         ::Const.FactionType.Bandits,
         ::Const.FactionType.OrientalBandits
     ],
+    Internal =
+    {
+        DurationDays = 2,
+        WritingInstrumentsChance = 66
+    },
     Parameters =
     {
         AbeyanceOffset = -20,
         AbundanceOffset = 0.25,
-        DurationDays = 2,
         DiminutionModifier = 0.75,
         ProspectingOffset = 10,
-        ProvocationModifier = 2.5
+        ProvocationModifier = 2.5,
     }
 
     function addToHistory( _edictName, _lair )
@@ -352,7 +356,7 @@ Raids.Edicts <-
                 continue;
             }
 
-            if (::World.getTime().Days - edictDates[i] < this.Parameters.DurationDays)
+            if (::World.getTime().Days - edictDates[i] < this.Internal.DurationDays)
             {
                 continue;
             }
