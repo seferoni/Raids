@@ -1,6 +1,6 @@
 local Raids = ::RPGR_Raids;
 Raids.Edicts <-
-{
+{   // TODO: needs a list that displays edict history
     // FIXME: after using a temporary edict and permanent edict on a lair, no new edicts apply POSSIBLE FIX
     AgnosticEdicts =
     [
@@ -81,7 +81,7 @@ Raids.Edicts <-
     function executeEdictProcedure( _container, _lair )
     {
         local edictID = Raids.Standard.getFlag(_container, _lair),
-        edictName = this.getEdictName(edictID, _lair),
+        edictName = this.getEdictName(edictID),
         procedure = format("execute%sProcedure", edictName);
 
         if (this.CycledEdicts.find(this.getEdictName(edictID)) != null)
@@ -148,14 +148,14 @@ Raids.Edicts <-
         return false;
     }
 
-    function getEdictID( _edictName, _lair )
+    function getEdictID( _edictName )
     {
         local prependedString = "special.edict_of_",
         edictID = format("%s%s", prependedString,  Raids.Standard.setCase(_edictName, "tolower"));
         return edictID;
     }
 
-    function getEdictName( _edictID, _lair )
+    function getEdictName( _edictID )
     {
         local culledString = "special.edict_of_",
         edictName = Raids.Standard.setCase(_edictID.slice(culledString.len()), "toupper");
@@ -248,9 +248,10 @@ Raids.Edicts <-
         {
             local inDiscovery = Raids.Standard.getFlag(format("%sTime", container), _lair) != false,
             isActive = (!inDiscovery && isAgitated),
-            iconPath = isActive ? "scroll_01_b.png" : inDiscovery ? "scroll_02_sw.png" : "scroll_01_sw.png",
-            edictName = this.getEdictName(Raids.Standard.getFlag(container, _lair), _lair),
-            activityState = isActive ? "Active" : inDiscovery ? "Discovery" : "Inert";
+            edictName = this.getEdictName(Raids.Standard.getFlag(container, _lair)),
+            isAgnostic = this.AgnosticEdicts.find(edictName) != null,
+            iconPath = format("scroll_0%s.png", isActive ? "1_b" : inDiscovery ? "2_sw" : isAgnostic ? "1_b" : "1_sw"),
+            activityState = isActive ? "Active" : inDiscovery ? "Discovery" : isAgnostic ? "Active" : "Inert";
             entries.push(this.createTooltipEntry(_lair, iconPath, edictName, activityState));
         }
 
