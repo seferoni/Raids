@@ -28,6 +28,7 @@ Raids.Edicts <-
     Internal =
     {
         DurationDays = 2,
+        SupplyCaravanDocumentChanceOffset = 20,
         WritingInstrumentsChance = 66
     },
     Parameters =

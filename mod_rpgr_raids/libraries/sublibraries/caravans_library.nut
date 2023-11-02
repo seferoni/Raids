@@ -232,7 +232,7 @@ Raids.Caravans <-
 
         if (::World.FactionManager.getFaction(_caravan.getFaction()).getType() == ::Const.FactionType.NobleHouse)
         {
-            documentChance += this.Parameters.SupplyCaravanDocumentOffset;
+            documentChance += Raids.Edicts.Internal.SupplyCaravanDocumentChanceOffset;
         }
 
         if (::Math.rand(1, 100) > documentChance)

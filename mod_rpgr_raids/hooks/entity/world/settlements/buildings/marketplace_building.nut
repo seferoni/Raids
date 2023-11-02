@@ -15,6 +15,6 @@ local Raids = ::RPGR_Raids;
             return;
         }
 
-        this.m.Stash.add("scripts/items/special/writing_instruments_item");
+        this.m.Stash.add(::new("scripts/items/special/writing_instruments_item"));
     });
 });

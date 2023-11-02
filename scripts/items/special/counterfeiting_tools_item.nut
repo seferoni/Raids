@@ -53,7 +53,7 @@ this.counterfeiting_tools_item <- ::inherit("scripts/items/item",
 
 	function onDeserialize( _in )
 	{
-		this.item.onDeserialize(_out);
+		this.item.onDeserialize(_in);
 		this.m.Flags.onDeserialize(_in);
 	}
 
