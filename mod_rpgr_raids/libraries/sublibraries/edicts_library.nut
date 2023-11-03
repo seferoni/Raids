@@ -1,6 +1,8 @@
 local Raids = ::RPGR_Raids;
 Raids.Edicts <-
-{
+{   // FIXME: edict of diminution is not cycling after agitation update
+    // FIXME: shouldn't be able to use temporary edicts if agitation is inert/shouldn't be able to use any edict?
+    // FIXME: edict effects don't seem to be updating prior to tooltip pull
     // FIXME: after using a temporary edict and permanent edict on a lair, no new edicts apply POSSIBLE FIX
     AgnosticEdicts =
     [
@@ -41,7 +43,7 @@ Raids.Edicts <-
     }
 
     function addToHistory( _edictName, _lair )
-    {
+    {   // FIXME: colourWrap might break findEdictInHistory
         local history = Raids.Standard.getFlag("EdictHistory", _lair),
         newHistory = format("%s%s", !history ? "" : format("%s, ", history), Raids.Standard.colourWrap(_edictName, "NegativeValue"));
         Raids.Standard.setFlag("EdictHistory", newHistory, _lair);
@@ -101,7 +103,7 @@ Raids.Edicts <-
         edictName = this.getEdictName(edictID),
         procedure = format("execute%sProcedure", edictName);
 
-        if (this.CycledEdicts.find(this.getEdictName(edictID)) != null)
+        if (this.CycledEdicts.find(edictName) != null)
         {
             this.resetContainer(_container, _lair);
             this.addToHistory(edictName, _lair);
@@ -136,7 +138,7 @@ Raids.Edicts <-
     }
 
     function findEdict( _edictID, _lair, _filterActive = false )
-    {
+    {   
         if (this.isEdictInert(_edictID, _lair))
         {
             return false;
@@ -161,6 +163,23 @@ Raids.Edicts <-
         if (!_filterActive || !Raids.Standard.getFlag(format("%sTime", edictContainer), _lair))
         {
             return edictContainer;
+        }
+
+        return false;
+    }
+
+    function findEdictInHistory( _edictName, _lair)
+    {
+        local history = Raids.Standard.getFlag("EdictHistory", _lair);
+
+        if (!history)
+        {
+            return false;
+        }
+
+        if (history.find(_edictName))
+        {
+            return true;
         }
 
         return false;
