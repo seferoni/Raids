@@ -36,14 +36,7 @@ local Raids = ::RPGR_Raids;
         Raids.Lairs.updateAgitation(this);
         _tooltipArray.extend(Raids.Lairs.getTooltipEntries(this));
         Raids.Edicts.updateEdicts(this);
-
-        if (!Raids.Edicts.isLairViable(this))
-        {   
-            _tooltipArray.extend(Raids.Edicts.getNonviableEntries(this))
-            return _tooltipArray;
-        }
-
-        _tooltipArray.extend(Raids.Edicts.getTooltipEntries(this));
+        _tooltipArray.extend(Raids.Edicts[format("get%sEntries", Raids.Edicts.isLairViable(this) ? "Tooltip" : "Nonviable")](this));
         return _tooltipArray;
     });
 });

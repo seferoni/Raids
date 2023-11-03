@@ -1,15 +1,8 @@
 local Raids = ::RPGR_Raids;
 Raids.Edicts <-
-{   // FIXME: edict of diminution is not cycling after agitation update
-    // FIXME: shouldn't be able to use temporary edicts if agitation is inert/shouldn't be able to use any edict?
+{   // FIXME: edict of diminution is not cycling after agitation POSSIBLE FIX
     // FIXME: edict effects don't seem to be updating prior to tooltip pull
     // FIXME: after using a temporary edict and permanent edict on a lair, no new edicts apply POSSIBLE FIX
-    AgnosticEdicts =
-    [
-        "Agitation",
-        "Legibility",
-        "Nullification"
-    ],
     Containers =
     [
         "EdictContainerA",
@@ -30,16 +23,17 @@ Raids.Edicts <-
     Internal =
     {
         DurationDays = 2,
-        SupplyCaravanDocumentChanceOffset = 20,
+        ModifierSmallestUnit = 0.1,
+        SupplyCaravanDocumentChanceOffset = 35,
         WritingInstrumentsChance = 66
     },
     Parameters =
     {
-        AbeyanceOffset = -20,
-        AbundanceOffset = 0.25,
-        DiminutionModifier = 0.75,
-        ProspectingOffset = 10,
-        ProvocationModifier = 2.5,
+        AbeyanceOffset = -5,
+        AbundanceOffset = 0.0625,
+        DiminutionModifier = 0.90,
+        ProspectingOffset = 2.5,
+        ProvocationModifier = 2.1,
     }
 
     function addToHistory( _edictName, _lair )
@@ -89,7 +83,8 @@ Raids.Edicts <-
 
     function executeAbundanceProcedure( _lair )
     {
-        _lair.m.LootScale = ::Math.min(1.0, _lair.m.LootScale + this.Parameters.AbundanceOffset);
+        local offset = this.Parameters.AbundanceOffset * Raids.Standard.getFlag("Agitation", _lair);
+        _lair.m.LootScale = ::Math.min(1.0, _lair.m.LootScale + offset);
     }
 
     function executeAgitationProcedure( _lair )
@@ -123,7 +118,8 @@ Raids.Edicts <-
 
     function executeDiminutionProcedure( _lair )
     {
-        _lair.setResources(this.Parameters.DiminutionModifier * _lair.getResources());
+        local modifier = this.Parameters.DiminutionModifier - (this.Internal.ModifierSmallestUnit * Raids.Standard.getFlag("Agitation", _lair));
+        _lair.setResources(modifier * _lair.getResources());
         _lair.createDefenders();
     }
 
@@ -138,12 +134,7 @@ Raids.Edicts <-
     }
 
     function findEdict( _edictID, _lair, _filterActive = false )
-    {   
-        if (this.isEdictInert(_edictID, _lair))
-        {
-            return false;
-        }
-
+    {
         local edictContainer = false;
 
         foreach( container in this.Containers )
@@ -213,19 +204,22 @@ Raids.Edicts <-
 
     function getLootScaleOffset( _lair )
     {
-        return this.findEdict(this.getEdictID("Abundance"), _lair, true) != false ? this.Parameters.AbundanceOffset : 0.0;
+        local offset = this.Parameters.AbundanceOffset * Raids.Standard.getFlag("Agitation", _lair);
+        return this.findEdict(this.getEdictID("Abundance"), _lair, true) != false ? offset : 0.0;
     }
 
     function getNamedLootChanceOffset( _lair, _depopulate = false )
     {
+        local agitation = Raids.Standard.getFlag("Agitation", _lair);
+
         if (_depopulate && this.findEdict(this.getEdictID("Abeyance"), _lair, true) != false)
         {
-            return this.Parameters.AbeyanceOffset;
+            return this.Parameters.AbeyanceOffset * agitation;
         }
 
         if (this.findEdict(this.getEdictID("Prospecting"), _lair, true) != false)
         {
-            return this.Parameters.ProspectingOffset;
+            return this.Parameters.ProspectingOffset * agitation;
         }
 
         return 0.0;
@@ -277,7 +271,8 @@ Raids.Edicts <-
 
     function getResourceModifier( _lair )
     {
-        return this.findEdict(this.getEdictID("Provocation"), _lair, true) != false ? this.Parameters.ProvocationModifier : 1.0;
+        local modifier = this.Parameters.ProvocationModifier + (this.Internal.ModifierSmallestUnit * Raids.Standard.getFlag("Agitation", _lair));
+        return this.findEdict(this.getEdictID("Provocation"), _lair, true) != false ? modifier : 1.0;
     }
 
     function getTooltipEntries( _lair )
@@ -292,16 +287,12 @@ Raids.Edicts <-
             return entries;
         }
 
-        local isAgitated = Raids.Standard.getFlag("Agitation", _lair) != Raids.Lairs.AgitationDescriptors.Relaxed;
-
         foreach( container in occupiedContainers )
         {
             local inDiscovery = Raids.Standard.getFlag(format("%sTime", container), _lair) != false,
-            isActive = (!inDiscovery && isAgitated),
             edictName = this.getEdictName(Raids.Standard.getFlag(container, _lair)),
-            isAgnostic = this.AgnosticEdicts.find(edictName) != null,
-            iconPath = format("scroll_0%s.png", isActive ? "1_b" : inDiscovery ? "2_sw" : isAgnostic ? "1_b" : "1_sw"),
-            activityState = isActive ? "Active" : inDiscovery ? "Discovery" : isAgnostic ? "Active" : "Inert";
+            iconPath = format("scroll_0%s.png", inDiscovery ? "2_sw" : "1_b"),
+            activityState = inDiscovery ? "Discovery" : "Active";
             entries.push(this.createTooltipEntry(_lair, iconPath, edictName, activityState));
         }
 
@@ -321,16 +312,6 @@ Raids.Edicts <-
         if (occupancyCheck("EdictContainerA")) occupiedContainers.push("EdictContainerA");
         if (occupancyCheck("EdictContainerB")) occupiedContainers.push("EdictContainerB");
         return occupiedContainers;
-    }
-
-    function isEdictInert( _edictID, _lair )
-    {
-        if (this.AgnosticEdicts.find(this.getEdictName(_edictID)) == null && Raids.Standard.getFlag("Agitation", _lair) == Raids.Lairs.AgitationDescriptors.Relaxed)
-        {
-            return true;
-        }
-
-        return false;
     }
 
     function isLairViable( _lair )
@@ -381,7 +362,7 @@ Raids.Edicts <-
                 continue;
             }
 
-            this[this.isEdictInert(edicts[i], _lair) ? "resetContainerTime" : "executeEdictProcedure"](occupiedContainers[i], _lair);
+            this.executeEdictProcedure(occupiedContainers[i], _lair);
         }
     }
 };

@@ -4,9 +4,16 @@ Raids.Caravans <-
     AntagonisticSituations =
     [
         "situation.ambushed_trade_routes",
-        "situation.disappearing_villagers",
+        "situation.draught",
         "situation.greenskins",
-        "situation.raided"
+        "situation.mine_cavein",
+        "situation.moving_sands",
+        "situation.raided",
+        "situation.short_on_food",
+        "situation.sickness",
+        "situation.slave_revolt",
+        "situation.snow_storms",
+        "situation.warehouse_burned_down"
     ],
     CargoDescriptors =
     {
@@ -30,9 +37,13 @@ Raids.Caravans <-
     },
     SynergisticSituations =
     [
-        "situation.well_supplied",
+        "situation.bread_and_games",
+        "situation.full_nets",
         "situation.good_harvest",
-        "situation.safe_roads"
+        "situation.rich_veins",
+        "situation.safe_roads",
+        "situation.seasonal_fair",
+        "situation.well_supplied"
     ],
     WealthDescriptors =
     {
@@ -129,7 +140,8 @@ Raids.Caravans <-
     function getTooltipEntries( _caravan )
     {
         local cargoEntry = {id = 2, type = "hint"}, wealthEntry = clone cargoEntry,
-        caravanWealth = Raids.Standard.getFlag("CaravanWealth", _caravan), caravanCargo = Raids.Standard.getFlag("CaravanCargo", _caravan);
+        caravanWealth = Raids.Standard.getFlag("CaravanWealth", _caravan),
+        caravanCargo = Raids.Standard.getFlag("CaravanCargo", _caravan);
         cargoEntry.icon <- format("ui/icons/%s", this.getCargoIcon(caravanCargo));
         wealthEntry.icon <- "ui/icons/money2.png";
         cargoEntry.text <- format("%s", Raids.Standard.getDescriptor(caravanCargo, this.CargoDescriptors));
@@ -186,7 +198,8 @@ Raids.Caravans <-
 
     function initialiseCaravanParameters( _caravan, _settlement )
     {
-        local randomNumber = ::Math.rand(1, 100), diceRoll = @(_value) randomNumber <= _value;
+        local randomNumber = ::Math.rand(1, 100),
+        diceRoll = @(_value) randomNumber <= _value;
         this.setCaravanWealth(_caravan, _settlement);
         this.setCaravanCargo(_caravan, _settlement);
         this.populateInventory(_caravan, _settlement);

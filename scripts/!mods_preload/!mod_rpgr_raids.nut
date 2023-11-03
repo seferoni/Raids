@@ -8,14 +8,13 @@
         TERMINATE = "__end"
     }
     Defaults =
-    {
-        AgitationDecayInterval = 7,
+    {   // TODO: revise these when done
         AgitationIncrementChance = 100,
         AgitationResourceModifier = 70,
         CaravanReinforcementChance = 100,
         DepopulateLairLootOnSpawn = true,
         OfficialDocumentDropChance = 35,
-        RoamerScaleChance = 50,
+        RoamerScaleChance = 100,
         RoamerResourceModifier = 70,
         RoamerScaleAgitationRequirement = false,
         ShowTutorial = true,
@@ -40,16 +39,13 @@ local Raids = ::RPGR_Raids;
     local pageLairs = Raids.Mod.ModSettings.addPage("Lairs");
     local pageCaravans = Raids.Mod.ModSettings.addPage("Caravans");
 
-    local agitationDecayInterval = pageLairs.addRangeSetting("AgitationDecayInterval", 7, 1, 50, 1, "Agitation Decay Interval");
-    agitationDecayInterval.setDescription("Determines the time interval in days after which a location's agitation value drops by one tier.");
-
     local agitationIncrementChance = pageLairs.addRangeSetting("AgitationIncrementChance", 100, 0, 100, 1, "Agitation Increment Chance");
     agitationIncrementChance.setDescription("Determines the chance for a location's agitation value to increase upon engagement with a roaming party, if within proximity.");
 
     local agitationResourceModifier = pageLairs.addRangeSetting("AgitationResourceModifier", 70, 50, 100, 10, "Agitation Resource Modifier");
     agitationResourceModifier.setDescription("Controls how lair resource calculation is handled after each agitation tier change. Higher percentage values result in greater resources, and therefore more powerful garrisoned troops and better loot.");
 
-    local caravanReinforcementChance = pageCaravans.addRangeSetting("CaravanReinforcementChance", 100, 1, 100, 1, "Caravan Reinforcement Chance");
+    local caravanReinforcementChance = pageCaravans.addRangeSetting("CaravanReinforcementChance", 100, 0, 100, 5, "Caravan Reinforcement Chance");
     caravanReinforcementChance.setDescription("Determines the percentage change for caravan troop count and composition reinforcement based on caravan wealth, and in special cases, cargo type. If certain conditions obtain, this will also result in the addition of special troops with powerful end-game gear to wealthy caravans, independent of player progression.");
 
     local depopulateLairLootOnSpawn = pageLairs.addBooleanSetting("DepopulateLairLootOnSpawn", true, "Depopulate Lair Loot On Spawn");
@@ -58,7 +54,7 @@ local Raids = ::RPGR_Raids;
     local officialDocumentDropChance = pageCaravans.addRangeSetting("OfficialDocumentDropChance", 35, 10, 80, 5, "Official Document Drop Chance");
     officialDocumentDropChance.setDescription("Determines the chance for caravans to drop official documents on defeat. Official documents provide the only means for obtaining edicts.");
 
-    local roamerScaleChance = pageLairs.addRangeSetting("RoamerScaleChance", 50, 1, 100, 1, "Roamer Scale Chance");
+    local roamerScaleChance = pageLairs.addRangeSetting("RoamerScaleChance", 100, 0, 100, 5, "Roamer Scale Chance");
     roamerScaleChance.setDescription("Determines the percentage chance for hostile roaming and ambush parties spawning from lairs to scale in strength with respect to the originating lair's resource count. Does not affect beasts.");
 
     local roamerResourceModifier = pageLairs.addRangeSetting("RoamerResourceModifier", 70, 50, 100, 10, "Roamer Resource Modifier");

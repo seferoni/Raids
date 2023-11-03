@@ -20,6 +20,7 @@ Raids.Lairs <-
     ],
     Parameters =
     {
+        AgitationDecayInterval = 7,
         FactionSpecificNamedLootChance = 33,
         MaximumLootOffset = 3,
         NamedItemChanceOnSpawn = 30,
@@ -209,6 +210,7 @@ Raids.Lairs <-
     function getTooltipEntries( _lair )
     {
         local agitation = Raids.Standard.getFlag("Agitation", _lair),
+        lastUpdateDays = Raids.Standard.getFlag("LastAgitationUpdate", _lair),
         textColour = "PositiveValue", iconPath = "vision.png";
 
         if (agitation != this.AgitationDescriptors.Relaxed)
@@ -222,7 +224,16 @@ Raids.Lairs <-
         resourcesEntry.text <- format("%s resource units", Raids.Standard.colourWrap(format("%i", _lair.getResources()), "PositiveValue"));
         agitationEntry.text <- format("%s", Raids.Standard.colourWrap(format("%s (%i)", Raids.Standard.getDescriptor(agitation, this.AgitationDescriptors), agitation), textColour));
 
-        return [resourcesEntry, agitationEntry];
+        if (!lastUpdateDays)
+        {
+            return [resourcesEntry, agitationEntry];
+        }
+
+        local timeDifference = ::World.getTime().Days - lastUpdateDays,
+        timeEntry = clone resourcesEntry;
+        timeEntry.icon = "ui/icons/action_points.png";
+        timeEntry.text = format("%s days", Raids.Standard.colourWrap(timeDifference, "NegativeValue"));
+        return [resourcesEntry, agitationEntry, timeEntry];
     }
 
     function initialiseLairParameters( _lair )
@@ -380,7 +391,7 @@ Raids.Lairs <-
         }
 
         local timeDifference = ::World.getTime().Days - lastUpdateTimeDays,
-        decayInterval = Raids.Standard.getSetting("AgitationDecayInterval");
+        decayInterval = this.Parameters.AgitationDecayInterval;
 
         if (timeDifference < decayInterval)
         {

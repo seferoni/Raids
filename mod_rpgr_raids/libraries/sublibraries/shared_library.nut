@@ -3,7 +3,7 @@ Raids.Shared <-
 {
     function addToInventory( _party, _goodsPool )
     {
-        local iterations = Raids.Caravans.isPartyInitialised(_party) ? ::Math.rand(1, Raids.Standard.getFlag("CaravanWealth", _party) - 1) : ::Math.rand(1, 2);
+        local iterations = Raids.Caravans.isPartyInitialised(_party) ? ::Math.rand(1, Raids.Standard.getFlag("CaravanWealth", _party)) : ::Math.rand(1, 2);
 
         for( local i = 0; i < iterations; i++ )
         {

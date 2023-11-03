@@ -19,7 +19,7 @@ this.edict_item <- ::inherit("scripts/items/item",
 	}
 
 	function executeEdictProcedure( _lairs )
-	{	// TODO: this should also look within history
+	{
 		local isContainerVacant = @(_container, _lair) !Raids.Standard.getFlag(_container, _lair),
 		isValid = false;
 
@@ -34,6 +34,7 @@ this.edict_item <- ::inherit("scripts/items/item",
 
 			if (Raids.Edicts.findEdictInHistory(Raids.Edicts.getEdictName(this.getID()), lair) != false)
 			{
+				::logInfo("Found edict in history"); // TODO: remove this
 				continue;
 			}
 
