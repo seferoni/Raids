@@ -140,11 +140,10 @@ Raids.Caravans <-
     function getTooltipEntries( _caravan )
     {
         local cargoEntry = {id = 2, type = "hint"}, wealthEntry = clone cargoEntry,
-        caravanWealth = Raids.Standard.getFlag("CaravanWealth", _caravan),
-        caravanCargo = Raids.Standard.getFlag("CaravanCargo", _caravan);
+        caravanWealth = Raids.Standard.getFlag("CaravanWealth", _caravan), caravanCargo = Raids.Standard.getFlag("CaravanCargo", _caravan);
         cargoEntry.icon <- format("ui/icons/%s", this.getCargoIcon(caravanCargo));
-        wealthEntry.icon <- "ui/icons/money2.png";
         cargoEntry.text <- format("%s", Raids.Standard.getDescriptor(caravanCargo, this.CargoDescriptors));
+        wealthEntry.icon <- "ui/icons/money2.png";
         wealthEntry.text <- format("%s (%i)", Raids.Standard.getDescriptor(caravanWealth, this.WealthDescriptors), caravanWealth);
 
         if (!Raids.Standard.getFlag("CaravanHasNamedItems", _caravan))

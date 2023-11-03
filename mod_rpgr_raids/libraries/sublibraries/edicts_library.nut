@@ -70,17 +70,6 @@ Raids.Edicts <-
         return entry;
     }
 
-    function executeAbstentionProcedure( _lair )
-    {
-        _lair.setLastSpawnTimeToNow();
-        local settlement = Raids.Shared.getSettlementClosestTo(_lair.getTile());
-
-        if (settlement.getSituationByID("situation.safe_roads") == null)
-        {
-            settlement.addSituation(::new("scripts/entity/world/settlements/situations/safe_roads_situation"));
-        }
-    }
-
     function executeAbundanceProcedure( _lair )
     {
         local offset = this.Parameters.AbundanceOffset * Raids.Standard.getFlag("Agitation", _lair);
