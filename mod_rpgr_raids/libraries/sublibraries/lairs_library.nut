@@ -229,10 +229,10 @@ Raids.Lairs <-
             return [resourcesEntry, agitationEntry];
         }
 
-        local timeDifference = ::World.getTime().Days - lastUpdateDays,
+        local timeDifference = (::World.getTime().Days + this.Parameters.AgitationDecayInterval) - lastUpdateDays,
         timeEntry = clone resourcesEntry;
         timeEntry.icon = "ui/icons/action_points.png";
-        timeEntry.text = format("%s days", Raids.Standard.colourWrap(timeDifference, "NegativeValue"));
+        timeEntry.text = format("%s day(s)", Raids.Standard.colourWrap(timeDifference, "NegativeValue"));
         return [resourcesEntry, agitationEntry, timeEntry];
     }
 
@@ -371,9 +371,10 @@ Raids.Lairs <-
     {
         local agitation = Raids.Standard.getFlag("Agitation", _lair),
         baseResources = Raids.Standard.getFlag("BaseResources", _lair),
-        interpolatedModifier = -0.0006 * baseResources + 0.4,
-        configurableModifier = Raids.Standard.getPercentageSetting("AgitationResourceModifier");
-        _lair.setResources(::Math.floor(baseResources + (interpolatedModifier * (agitation - 1) * configurableModifier * baseResources)));
+        interpolatedModifier = -0.0006 * baseResources + 0.66,
+        configurableModifier = Raids.Standard.getPercentageSetting("AgitationResourceModifier"),
+        newResources = ::Math.floor(baseResources + (interpolatedModifier * (agitation - 1) * configurableModifier * baseResources));
+        _lair.setResources(::Math.max(newResources, 700));
     }
 
     function updateCombatStatistics( _isParty )

@@ -17,7 +17,6 @@
         RoamerScaleChance = 100,
         RoamerResourceModifier = 70,
         RoamerScaleAgitationRequirement = false,
-        ShowTutorial = true,
         VerboseLogging = false
     }
 }
@@ -62,9 +61,6 @@ local Raids = ::RPGR_Raids;
 
     local roamerScaleAgitationRequirement = pageLairs.addBooleanSetting("RoamerScaleAgitationRequirement", false, "Roamer Scale Agitation Requirement");
     roamerScaleAgitationRequirement.setDescription("Determines whether roamer scaling occurs for lairs with baseline agitation. Will result in stronger eligible roamer spawns on a game-wide basis.");
-
-    local showTutorial = pageGeneral.addBooleanSetting("ShowTutorial", true, "Show Tutorial");
-    showTutorial.setDescription("Determines whether tutorial tooltip entries should be shown. These are reserved exclusively for the tooltips shown when hovering over edicts and related items.");
 
     local verboseLogging = pageGeneral.addBooleanSetting("VerboseLogging", true, "Verbose Logging"); // TODO: set this to false when done
     verboseLogging.setDescription("Enables verbose logging. Recommended for testing purposes only, as the volume of logged messages can make parsing the log more difficult for general use and debugging.");

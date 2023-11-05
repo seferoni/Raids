@@ -22,7 +22,7 @@ Raids.Standard <-
             string = _text.tostring();
         }
 
-        return format("[color=%s] %s [/color]", ::Const.UI.Color[_colour], string)
+        return format("[color=%s]%s[/color]", ::Const.UI.Color[_colour], string)
     }
 
     function getDescriptor( _valueToMatch, _referenceTable )

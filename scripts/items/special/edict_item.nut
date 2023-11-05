@@ -1,7 +1,10 @@
 local Raids = ::RPGR_Raids;
 this.edict_item <- ::inherit("scripts/items/item",
 {
-    m = {},
+    m = 
+	{
+		ScalingModalities = {Static = 0, Agitation = 1, Resources = 2}
+	},
 	function create()
 	{
 		this.item.create();
@@ -12,10 +15,10 @@ this.edict_item <- ::inherit("scripts/items/item",
 		this.m.IsAllowedInBag = false;
 		this.m.IsUsable = true;
 		this.m.IsCycled <- true;
+		this.m.DiscoveryDays <- 2;
+		this.m.ScalingModality <- this.m.ScalingModalities.Static;
 		this.m.EffectText <- null;
 		this.m.InstructionText <- "Right-click to dispatch within proximity of a lair. This edict will be consumed in the process.";
-		this.m.TutorialTextCycled <- "Temporary edicts vacate their occupied slot as soon as they are rendered active. Their effects do not persist beyond the next agitation update for a given lair.";
-		this.m.TutorialTextPermanent <- "Permanent edicts occupy an edict slot in perpetuity or until removed through special means. Their effects persist beyond agitation updates for a given lair.";
 	}
 
 	function executeEdictProcedure( _lairs )
@@ -34,7 +37,6 @@ this.edict_item <- ::inherit("scripts/items/item",
 
 			if (Raids.Edicts.findEdictInHistory(Raids.Edicts.getEdictName(this.getID()), lair) != false)
 			{
-				::logInfo("Found edict in history"); // TODO: remove this
 				continue;
 			}
 
@@ -54,6 +56,7 @@ this.edict_item <- ::inherit("scripts/items/item",
 
 			Raids.Standard.setFlag(container, this.getID(), lair);
 			Raids.Standard.setFlag(format("%sTime", container), ::World.getTime().Days, lair);
+			Raids.Standard.setFlag(format("%sDuration", container), this.m.DiscoveryDays, lair);
 			if (!isValid) isValid = true;
 		}
 
@@ -62,20 +65,42 @@ this.edict_item <- ::inherit("scripts/items/item",
 		return true;
 	}
 
-	function getEffect()
+	function getDiscoveryDuration()
+	{
+		return this.m.DiscoveryDays;
+	}
+
+	function getDiscoveryText()
+	{
+		return format("This edict takes effect in %s days.", Raids.Standard.colourWrap(this.getDiscoveryDuration(), "PositiveValue"));
+	}
+
+	function getEffectText()
     {
-		return format("%s This edict's effects are %s.", this.m.EffectText, this.m.IsCycled ? "temporary" : "permanent");
+		return this.m.EffectText;
     }
 
-	function getInstruction()
+	function getInstructionText()
 	{
 		return this.m.InstructionText;
 	}
 
-	function getTutorial()
+	function getPersistenceText()
 	{
-		if (this.m.IsCycled) return this.m.TutorialTextCycled;
-		return this.m.TutorialTextPermanent;
+		local descriptor = Raids.Standard.colourWrap(this.m.IsCycled ? "temporary" : "permanent", "NegativeValue");
+		return format("This edict's effects are %s.", descriptor);
+	}
+
+	function getScalingModality()
+	{
+		return this.m.ScalingModality;
+	}
+
+	function getScalingText()
+	{
+		local scaling = this.m.ScalingModality, modalities = this.m.ScalingModalities;
+		if (scaling == modalities.Static) return format("This edict's effects are %s.", Raids.Standard.colourWrap("static", "PositiveValue"));
+		return format("This edict's effects scale with lair %s.", Raids.Standard.colourWrap(scaling == modalities.Agitation ? "Agitation" : "resources", "NegativeValue"));
 	}
 
     function getTooltip()
@@ -86,15 +111,12 @@ this.edict_item <- ::inherit("scripts/items/item",
 			{id = 2, type = "description", text = this.getDescription()},
 			{id = 66, type = "text", text = this.getValueString()},
 			{id = 3, type = "image", image = this.getIcon()},
-			{id = 6, type = "text", icon = "ui/icons/special.png", text = this.getEffect()},
+			{id = 6, type = "text", icon = "ui/icons/special.png", text = this.getEffectText()},
+			{id = 6, type = "text", icon = "ui/icons/scroll_01.png", text = this.getPersistenceText()},
+			{id = 6, type = "text", icon = "ui/icons/action_points.png", text = this.getDiscoveryText()},
+			{id = 6, type = "text", icon = "ui/icons/level.png", text = this.getScalingText()},
+			{id = 65, type = "text", text = this.getInstructionText()}
 		];
-
-		if (Raids.Standard.getSetting("ShowTutorial"))
-		{
-			tooltipArray.push({id = 6, type = "text", icon = "ui/icons/warning.png", text = this.getTutorial()})
-		}
-
-		tooltipArray.push({id = 65, type = "text", text = this.getInstruction()});
 		return tooltipArray;
 	}
 

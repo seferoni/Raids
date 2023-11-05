@@ -17,7 +17,6 @@ this.official_document_item <- ::inherit("scripts/items/item",
 		this.m.IsUsable = true;
         this.m.EffectText <- "Will produce a counterfeit edict, but only if a set of counterfeiting tools are present.";
         this.m.InstructionText <- "Right-click to modify its contents.";
-		this.m.TutorialText <- "A taxidermist can produce counterfeiting tools for a handful of crowns if presented with a set of writing instruments, or with trophies sourced from slain webknechts."; 
 	}
 
     function findCounterfeitingTools()
@@ -45,11 +44,6 @@ this.official_document_item <- ::inherit("scripts/items/item",
 		return this.m.InstructionText;
 	}
 
-	function getTutorial()
-	{
-		return this.m.TutorialText;
-	}
-
     function getTooltip()
 	{
 		local tooltipArray =
@@ -59,14 +53,8 @@ this.official_document_item <- ::inherit("scripts/items/item",
 			{id = 66, type = "text", text = this.getValueString()},
 			{id = 3, type = "image", image = this.getIcon()},
 			{id = 6, type = "text", icon = "ui/icons/special.png", text = this.getEffect()},
+			{id = 65, type = "text", text = this.getInstruction()}
 		];
-
-		if (Raids.Standard.getSetting("ShowTutorial"))
-		{
-			tooltipArray.push({id = 6, type = "text", icon = "ui/icons/warning.png", text = this.getTutorial()});
-		}
-
-		tooltipArray.push({id = 65, type = "text", text = this.getInstruction()});
 		return tooltipArray;
 	}
 
