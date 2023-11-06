@@ -9,7 +9,6 @@ Raids.Edicts <-
     CycledEdicts =
     [
         "Abundance",
-        "Agitation",
         "Diminution",
         "Opportunism",
         "Retention"
@@ -38,7 +37,7 @@ Raids.Edicts <-
     function addToHistory( _edictName, _lair )
     {   // FIXME: whitespace between commas
         local history = Raids.Standard.getFlag("EdictHistory", _lair),
-        newHistory = format("%s%s", !history ? "" : format("%s, ", history), Raids.Standard.colourWrap(_edictName, "NegativeValue"));
+        newHistory = format("%s%s", !history ? "" : format("%s, ", history), _edictName);
         Raids.Standard.setFlag("EdictHistory", newHistory, _lair);
     }
 
@@ -77,6 +76,7 @@ Raids.Edicts <-
 
     function executeAgitationProcedure( _lair )
     {
+        this.resetContainer(this.findEdict(this.getEdictID("Agitation"), _lair), _lair, false);
         Raids.Lairs.setAgitation(_lair, Raids.Lairs.Procedures.Increment);
     }
 
@@ -180,7 +180,8 @@ Raids.Edicts <-
 
     function getHistoryEntry( _lair )
     {
-        local entry = {id = 20, type = "text", icon = "ui/icons/papers.png", text = Raids.Standard.getFlag("EdictHistory", _lair)};
+        local history = Raids.Standard.colourWrap(Raids.Standard.getFlag("EdictHistory", _lair), "NegativeValue"),
+        entry = {id = 20, type = "text", icon = "ui/icons/papers.png", text = history};
         return entry;
     }
 
@@ -326,10 +327,24 @@ Raids.Edicts <-
         return false;
     }
 
-    function resetContainer( _container, _lair )
+    function refreshEdicts( _lair )
+    {   // FIXME: need ways to prevent players from applying a boatload of edicts at Relaxed
+        // FIXME: need to prevent special edicts from firing multiple times
+        local history = Raids.Standard.getFlag("EdictHistory", _lair),
+        viableEdicts = this.CycledEdicts.filter(@(_index, _edictID) history.find(_edictID) != null);
+
+        foreach( edictID in viableEdicts )
+        {
+            local edictName = this.getEdictName(edictID),
+            procedure = format("execute%sProcedure", edictName);
+            this[procedure](_lair);
+        }
+    }
+
+    function resetContainer( _container, _lair, _resetTime = true )
     {
         Raids.Standard.setFlag(_container, false, _lair);
-        this.resetContainerTime(_container, _lair);
+        if (_resetTime) this.resetContainerTime(_container, _lair);
     }
 
     function resetContainerTime( _container, _lair )
