@@ -22,7 +22,7 @@ Raids.Edicts <-
     Internal =
     {
         AgitationPrefactor = 0.1,
-        ResourcesPrefactor = 0.01,
+        ResourcesPrefactor = 0.001,
         SupplyCaravanDocumentChanceOffset = 35,
         WritingInstrumentsChance = 66
     },
@@ -105,9 +105,9 @@ Raids.Edicts <-
     }
 
     function executeDiminutionProcedure( _lair )
-    {
+    {   // TODO: check if garrison is appropriately weakened
         local modifier = this.Parameters.DiminutionModifier - (this.Internal.ResourcesPrefactor * _lair.getResources());
-        _lair.setResources(modifier * _lair.getResources());
+        _lair.setResources(::Math.max(Raids.Standard.getFlag("BaseResources", _lair) / 2, modifier * _lair.getResources()));
         _lair.createDefenders();
     }
 

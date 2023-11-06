@@ -10,13 +10,13 @@ Raids.Lairs <-
     },
     Factions =
     [
-        ::Const.FactionType.Zombies,
-        ::Const.FactionType.Undead,
-        ::Const.FactionType.Orcs,
         ::Const.FactionType.Bandits,
-        ::Const.FactionType.Goblins,
         ::Const.FactionType.Barbarians,
+        ::Const.FactionType.Goblins,
+        ::Const.FactionType.Orcs,
         ::Const.FactionType.OrientalBandits
+        ::Const.FactionType.Undead,
+        ::Const.FactionType.Zombies,
     ],
     Parameters =
     {
@@ -26,6 +26,7 @@ Raids.Lairs <-
         NamedItemChanceOnSpawn = 30,
         NamedItemChancePerAgitationTier = 13.33,
         NamedLootRefreshChance = 60,
+        ResourceModifierCeiling = 0.25,
         ResourceModifierLowerBound = 200,
         ResourceModifierUpperBound = 350,
     },
@@ -76,14 +77,14 @@ Raids.Lairs <-
         {
             return modifier;
         }
-
+        // The arbitrary coefficients and constants used here are calibrated to ensure smooth scaling behaviour between resource breakpoints.
         if (_resources <= this.Parameters.ResourceModifierUpperBound)
         {
             modifier = -0.005 * _resources + 2.0;
         }
         else
         {
-            modifier = 0.25;
+            modifier = this.Parameters.ResourceModifierCeiling;
         }
 
         return modifier;
@@ -374,7 +375,7 @@ Raids.Lairs <-
         interpolatedModifier = -0.0006 * baseResources + 0.66,
         configurableModifier = Raids.Standard.getPercentageSetting("AgitationResourceModifier"),
         newResources = ::Math.floor(baseResources + (interpolatedModifier * (agitation - 1) * configurableModifier * baseResources));
-        _lair.setResources(::Math.max(newResources, 700));
+        _lair.setResources(::Math.min(newResources, 700));
     }
 
     function updateCombatStatistics( _isParty )
