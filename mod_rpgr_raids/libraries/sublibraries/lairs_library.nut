@@ -37,7 +37,20 @@ Raids.Lairs <-
         Reset = 3
     }
 
-    function depopulateNamedLoot( _lair, _chance = null )
+    function clearNamedLoot( _lair )
+    {
+        local items = _lair.getLoot().getItems();
+
+        foreach( index, item in items )
+        {
+            if (item.isItemType(::Const.Items.ItemType.Named))
+            {
+                items.remove(index);
+            }
+        }
+    }
+
+    function depopulateNamedLoot( _lair, _chance = null ) // FIXME: needs serious revision
     {
         if (_lair.getLoot().isEmpty())
         {
@@ -48,23 +61,22 @@ Raids.Lairs <-
 
         if (_chance == null)
         {
-            namedLootChance = ::Math.max(0, this.getNamedLootChance(_lair) + Raids.Edicts.getNamedLootChanceOffset(_lair, true));
+            namedLootChance = this.getNamedLootChance(_lair) + Raids.Edicts.getNamedLootChanceOffset(_lair, true);
         }
-
-        local items = _lair.getLoot().getItems();
 
         if (::Math.rand(1, 100) <= namedLootChance)
         {
             return;
         }
 
+        local items = _lair.getLoot().getItems();
+
         foreach( index, item in items )
         {
             if (item.isItemType(::Const.Items.ItemType.Named))
             {
                 items.remove(index);
-                Raids.Standard.log(format("depopulateNamedLoot removed %s from the inventory of lair %s.", item.getName(), _lair.getName()));
-                break;
+                return;
             }
         }
     }
@@ -426,16 +438,18 @@ Raids.Lairs <-
             Raids.Edicts.clearEdicts(_lair);
         }
 
-        Raids.Edicts.clearHistory(_lair);
         this.setResourcesByAgitation(_lair);
         _lair.createDefenders();
         _lair.setLootScaleBasedOnResources(_lair.getResources());
 
-        if (_procedure == this.Procedures.Decrement)
+        if (_procedure != this.Procedures.Increment)
         {
+            Raids.Edicts.clearHistory(_lair);
             this.depopulateNamedLoot(_lair);
             return;
         }
+
+        Raids.Edicts.refreshEdicts(_lair);
 
         if (::Math.rand(1, 100) > this.Parameters.NamedLootRefreshChance && Raids.Standard.getFlag("Agitation", _lair) != this.AgitationDescriptors.Militant)
         {

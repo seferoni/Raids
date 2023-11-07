@@ -8,17 +8,16 @@ local Raids = ::RPGR_Raids;
             return;
         }
 
-        local destination = this.m.Destination;
-
-        if (destination == null)
+        if (this.m.Destination == null)
         {
             return;
         }
 
-        if (Raids.Lairs.isLocationTypeViable(destination.getLocationType()))
+        if (!Raids.Lairs.isLocationTypeViable(this.m.Destination.getLocationType()))
         {
-            Raids.Standard.log(format("%s has been set as current contract destination, performing agitation reset procedure.", destination.getName()));
-            Raids.Lairs.setAgitation(destination, Raids.Lairs.Procedures.Reset);
+            return;
         }
+
+        Raids.Lairs.setAgitation(this.m.Destination, Raids.Lairs.Procedures.Reset);
     });
 });

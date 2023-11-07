@@ -29,7 +29,7 @@ Raids.Edicts <-
     {
         AbundanceOffset = 0.08,
         DiminutionModifier = 0.90,
-        ProspectingOffset = 2.5,
+        ProspectingOffset = 5.0,
         ProvocationModifier = 2.1,
         RetentionOffset = -5
     }
