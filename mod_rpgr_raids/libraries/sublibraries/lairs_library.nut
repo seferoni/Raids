@@ -57,7 +57,7 @@ Raids.Lairs <-
         }
 
         local stash = _lair.getLoot(),
-        loot = stash.getItems().filter(@(_index, _item) _item != null && _item.isItemType(::Const.Items.ItemType.Named));
+        loot = stash.getItems().filter(@(_index, _item) _item != null && _item.isItemType(::Const.Items.ItemType.Named)); // TODO: m.Loot may hold nothing but named items - check
 
         foreach( item in loot )
         {
