@@ -20,6 +20,7 @@ Raids.Edicts <-
     ],
     Internal =
     {
+        AgitationChance = 40,
         AgitationPrefactor = 0.1,
         ResourcesPrefactor = 0.001,
         SupplyCaravanDocumentChanceOffset = 35,
@@ -94,6 +95,11 @@ Raids.Edicts <-
         else
         {
             this.resetContainerTime(_container, _lair);
+        }
+
+        if (Raids.Standard.getFlag("Agitation", _lair) == Raids.Lairs.AgitationDescriptors.Relaxed && ::Math.rand(1, 100) > this.Internal.AgitationChance)
+        {
+            Raids.Lairs.setAgitation(_lair, this.Procedures.Increment);
         }
 
         if (!(procedure in this))
@@ -329,7 +335,6 @@ Raids.Edicts <-
 
     function refreshEdicts( _lair )
     {   // FIXME: need ways to prevent players from applying a boatload of edicts at Relaxed
-        // FIXME: need to prevent special edicts from firing multiple times
         local history = Raids.Standard.getFlag("EdictHistory", _lair),
         viableEdicts = this.CycledEdicts.filter(@(_index, _edictID) history.find(_edictID) != null);
 

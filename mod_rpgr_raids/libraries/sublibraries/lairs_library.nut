@@ -37,20 +37,7 @@ Raids.Lairs <-
         Reset = 3
     }
 
-    function clearNamedLoot( _lair )
-    {
-        local items = _lair.getLoot().getItems();
-
-        foreach( index, item in items )
-        {
-            if (item.isItemType(::Const.Items.ItemType.Named))
-            {
-                items.remove(index);
-            }
-        }
-    }
-
-    function depopulateNamedLoot( _lair, _chance = null ) // FIXME: needs serious revision
+    function depopulateNamedLoot( _lair, _chance = null )
     {
         if (_lair.getLoot().isEmpty())
         {
@@ -64,19 +51,19 @@ Raids.Lairs <-
             namedLootChance = this.getNamedLootChance(_lair) + Raids.Edicts.getNamedLootChanceOffset(_lair, true);
         }
 
-        if (::Math.rand(1, 100) <= namedLootChance)
+        if (namedLootChance <= 0)
         {
             return;
         }
 
-        local items = _lair.getLoot().getItems();
+        local stash = _lair.getLoot(),
+        loot = stash.getItems().filter(@(_index, _item) _item != null && _item.isItemType(::Const.Items.ItemType.Named));
 
-        foreach( index, item in items )
+        foreach( item in loot )
         {
-            if (item.isItemType(::Const.Items.ItemType.Named))
+            if (::Math.rand(1, 100) < namedLootChance)
             {
-                items.remove(index);
-                return;
+                stash.remove(item);
             }
         }
     }
@@ -357,7 +344,6 @@ Raids.Lairs <-
         {
             local namedItem = namedLoot[::Math.rand(0, namedLoot.len() - 1)];
             _lair.getLoot().add(::new(format("scripts/items/%s", namedItem)));
-            Raids.Standard.log(format("Added item with filepath %s to the inventory of %s.", namedItem, _lair.getName()));
         }
     }
 
@@ -438,20 +424,24 @@ Raids.Lairs <-
             Raids.Edicts.clearEdicts(_lair);
         }
 
+        if (_procedure != this.Procedures.Increment)
+        {
+            Raids.Edicts.clearHistory(_lair);
+            this.depopulateNamedLoot(_lair);
+        }
+
         this.setResourcesByAgitation(_lair);
         _lair.createDefenders();
         _lair.setLootScaleBasedOnResources(_lair.getResources());
 
         if (_procedure != this.Procedures.Increment)
         {
-            Raids.Edicts.clearHistory(_lair);
-            this.depopulateNamedLoot(_lair);
             return;
         }
 
         Raids.Edicts.refreshEdicts(_lair);
 
-        if (::Math.rand(1, 100) > this.Parameters.NamedLootRefreshChance && Raids.Standard.getFlag("Agitation", _lair) != this.AgitationDescriptors.Militant)
+        if (Raids.Standard.getFlag("Agitation", _lair) != this.AgitationDescriptors.Militant && ::Math.rand(1, 100) > this.Parameters.NamedLootRefreshChance)
         {
             Raids.Standard.log(format("Skipping named loot refresh procedure within this agitation cycle for lair %s.", _lair.getName()));
             return;
