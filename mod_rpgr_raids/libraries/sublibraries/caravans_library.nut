@@ -28,6 +28,22 @@ Raids.Caravans <-
         Trade = 100,
         Assortment = 20
     },
+    ExcludedGoods = 
+    [
+        "supplies/food_item",
+        "supplies/money_item",
+        "trade/trading_good_item",
+        "supplies/strange_meat_item",
+        "supplies/fermented_unhold_heart_item",
+        "supplies/black_marsh_stew_item"
+    ],
+    NamedItemKeys = 
+    [
+        "NamedArmors",
+        "NamedWeapons",
+        "NamedHelmets",
+        "NamedShields"
+    ],
     Parameters =
     {
         MaximumTroopOffset = 7,
@@ -35,6 +51,14 @@ Raids.Caravans <-
         ReinforcementThresholdDays = 1, // FIXME: this is deflated, revert to 50
         SupplyCaravanDocumentChanceOffset = 25
     },
+    SouthernGoods = 
+    [
+        "supplies/dates_item",
+        "supplies/rice_item",
+        "trade/silk_item",
+        "trade/spices_item",
+        "trade/incense_item"
+    ],
     SynergisticSituations =
     [
         "situation.bread_and_games",
@@ -53,9 +77,21 @@ Raids.Caravans <-
         Abundant = 4
     }
 
+    function addToInventory( _caravan, _goodsPool )
+    {
+        local iterations = Raids.Standard.getFlag("CaravanWealth", _caravan) - 1;
+        
+        for( local i = 0; i < iterations; i++ )
+        {
+            local good = _goodsPool[::Math.rand(0, _goodsPool.len() - 1)];
+            Raids.Standard.log(format("Added item with filepath %s to the inventory of %s.", good, _caravan.getName()));
+            _caravan.addToInventory(good);
+        }
+    }
+
     function addNamedCargo( _lootTable )
     {
-        local namedCargo = Raids.Shared.createNamedLoot(),
+        local namedCargo = this.createNamedLoot(),
         namedItem = ::new(format("scripts/items/%s", namedCargo[::Math.rand(0, namedCargo.len() - 1)]));
         namedItem.onAddedToStash(null);
         _lootTable.push(namedItem);
@@ -84,7 +120,7 @@ Raids.Caravans <-
 
         if (newCargoType == this.CargoDescriptors.Assortment)
         {
-            return Raids.Shared.createNaivePartyLoot(_caravan);
+            return this.createNaiveCaravanCargo(_caravan);
         }
 
         return produce;
@@ -96,7 +132,7 @@ Raids.Caravans <-
 
         if (_factionType == ::Const.FactionType.NobleHouse)
         {
-            troops.extend([::Const.World.Spawn.Troops.Billman, ::Const.World.Spawn.Troops.Footman, ::Const.World.Spawn.Troops.Arbalester]);
+            troops.extend([::Const.World.Spawn.Troops.Arbalester, ::Const.World.Spawn.Troops.Billman, ::Const.World.Spawn.Troops.Footman]);
             return troops;
         }
 
@@ -109,11 +145,11 @@ Raids.Caravans <-
 
         if (_factionType == ::Const.FactionType.OrientalCityState)
         {
-            troops.extend([::Const.World.Spawn.Troops.Conscript, ::Const.World.Spawn.Troops.ConscriptPolearm]);
+            troops.extend([::Const.World.Spawn.Troops.Conscript, ::Const.World.Spawn.Troops.ConscriptPolearm, ::Const.World.Spawn.Troops.Gunner]);
             return troops;
         }
 
-        troops.extend([::Const.World.Spawn.Troops.CaravanHand, ::Const.World.Spawn.Troops.CaravanGuard]);
+        troops.extend([::Const.World.Spawn.Troops.CaravanGuard, ::Const.World.Spawn.Troops.CaravanHand]);
         return troops;
     }
 
@@ -135,6 +171,41 @@ Raids.Caravans <-
 
         troops.extend([::Const.World.Spawn.Troops.HedgeKnight, ::Const.World.Spawn.Troops.MasterArcher, ::Const.World.Spawn.Troops.Swordmaster]);
         return troops;
+    }
+
+    function createNaiveCaravanCargo( _caravan )
+    {
+        if (::World.FactionManager.getFaction(_caravan.getFaction()).getType() == ::Const.FactionType.OrientalCityState)
+        {
+            return this.SouthernGoods;
+        }
+        
+        local exclusionList = clone this.ExcludedGoods;
+        exclusionList.extend(this.SouthernGoods);
+        local scriptFiles = ::IO.enumerateFiles("scripts/items/trade");
+        scriptFiles.extend(::IO.enumerateFiles("scripts/items/supplies"));
+
+        foreach( filePath in exclusionList )
+        {
+            local index = scriptFiles.find(format("scripts/items/%s", filePath));
+            if (index != null) scriptFiles.remove(index);
+        }
+
+        local culledString = "scripts/items/",
+        goods = scriptFiles.map(@(_stringPath) _stringPath.slice(culledString.len()));
+        return goods;
+    }
+
+    function createNamedLoot()
+    {
+        local namedLoot = [];
+
+        foreach( key in this.NamedItemKeys )
+        {
+            namedLoot.extend(::Const.Items[key]);
+        }
+
+        return namedLoot;
     }
 
     function getTooltipEntries( _caravan )
@@ -235,11 +306,11 @@ Raids.Caravans <-
 
         if (Raids.Standard.getFlag("CaravanCargo", _caravan) == this.CargoDescriptors.Assortment)
         {
-            Raids.Shared.createNaivePartyLoot(_caravan);
+            this.addToInventory(_caravan, this.createNaiveCaravanCargo(_caravan));
             return;
         }
 
-        Raids.Shared.addToInventory(_caravan, this.createCaravanCargo(_caravan, _settlement));
+        this.addToInventory(_caravan, this.createCaravanCargo(_caravan, _settlement));
         local documentChance = Raids.Standard.getSetting("OfficialDocumentDropChance");
 
         if (::World.FactionManager.getFaction(_caravan.getFaction()).getType() == ::Const.FactionType.NobleHouse)

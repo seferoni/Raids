@@ -3,7 +3,7 @@ local Raids = ::RPGR_Raids;
 {
     Raids.Standard.wrap(_object, "onCombatStarted", function()
     {
-        if (!Raids.Shared.isPlayerInProximityTo(this.getTile(), 1))
+        if (!Raids.Lairs.isPlayerInProximityTo(this.getTile(), 1))
         {
             return;
         }

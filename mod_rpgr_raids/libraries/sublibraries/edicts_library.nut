@@ -1,6 +1,6 @@
 local Raids = ::RPGR_Raids;
 Raids.Edicts <-
-{
+{   // Note that while Edicts is formally a library in its own right, it is in practice dependent on Lairs, and vice versa.
     Containers =
     [
         "EdictContainerA",
@@ -31,7 +31,7 @@ Raids.Edicts <-
         AbundanceOffset = 0.08,
         DiminutionModifier = 0.90,
         ProspectingOffset = 5.0,
-        ProvocationModifier = 2.1,
+        ProvocationModifier = 1.5,
         RetentionOffset = -5
     }
 
@@ -99,7 +99,7 @@ Raids.Edicts <-
 
         if (Raids.Standard.getFlag("Agitation", _lair) == Raids.Lairs.AgitationDescriptors.Relaxed && ::Math.rand(1, 100) > this.Internal.AgitationChance)
         {
-            Raids.Lairs.setAgitation(_lair, this.Procedures.Increment);
+            Raids.Lairs.setAgitation(_lair, this.Procedures.Increment); // TODO: test this
         }
 
         if (!(procedure in this))
@@ -111,9 +111,9 @@ Raids.Edicts <-
     }
 
     function executeDiminutionProcedure( _lair )
-    {   // TODO: check if garrison is appropriately weakened
+    {   
         local modifier = this.Parameters.DiminutionModifier - (this.Internal.ResourcesPrefactor * _lair.getResources());
-        _lair.setResources(::Math.max(Raids.Standard.getFlag("BaseResources", _lair) / 2, modifier * _lair.getResources()));
+        _lair.setResources(::Math.max(Raids.Standard.getFlag("BaseResources", _lair) / 2, ::Math.floor(modifier * _lair.getResources())));
         _lair.createDefenders();
     }
 
@@ -277,7 +277,7 @@ Raids.Edicts <-
             return 1.0;
         }
 
-        local modifier = this.Parameters.ProvocationModifier + (3.0 * this.Internal.AgitationPrefactor * Raids.Standard.getFlag("Agitation", _lair) - 1);
+        local modifier = this.Parameters.ProvocationModifier + (5.0 * this.Internal.AgitationPrefactor * Raids.Standard.getFlag("Agitation", _lair) - 1);
         return modifier;
     }
 
@@ -334,9 +334,15 @@ Raids.Edicts <-
     }
 
     function refreshEdicts( _lair )
-    {   // FIXME: need ways to prevent players from applying a boatload of edicts at Relaxed
-        local history = Raids.Standard.getFlag("EdictHistory", _lair),
-        viableEdicts = this.CycledEdicts.filter(@(_index, _edictID) history.find(_edictID) != null);
+    {   
+        local history = Raids.Standard.getFlag("EdictHistory", _lair);
+
+        if (!history)
+        {
+            return;
+        }
+
+        local viableEdicts = this.CycledEdicts.filter(@(_index, _edictID) history.find(_edictID) != null);
 
         foreach( edictID in viableEdicts )
         {

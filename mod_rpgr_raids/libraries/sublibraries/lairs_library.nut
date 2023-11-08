@@ -18,6 +18,13 @@ Raids.Lairs <-
         ::Const.FactionType.Undead,
         ::Const.FactionType.Zombies,
     ],
+    NamedItemKeys = 
+    [
+        "NamedArmors",
+        "NamedWeapons",
+        "NamedHelmets",
+        "NamedShields"
+    ],
     Parameters =
     {
         AgitationDecayInterval = 7,
@@ -35,6 +42,41 @@ Raids.Lairs <-
         Increment = 1,
         Decrement = 2,
         Reset = 3
+    }
+
+    function createNaiveNamedLoot()
+    {
+        local namedLoot = [];
+
+        foreach( key in this.NamedItemKeys )
+        {
+            namedLoot.extend(::Const.Items[key]);
+        }
+
+        return namedLoot;
+    }
+
+    function createNamedLoot( _lair )
+    {   
+        if (::Math.rand(1, 100) > this.Parameters.FactionSpecificNamedLootChance)
+        {
+            return this.createNaiveNamedLoot();
+        }
+
+        local namedLoot = [],
+        keys = this.NamedItemKeys.filter(@(_index, _key) _lair.m[format("%sList", _key)] != null);
+
+        foreach( key in keys )
+        {
+            namedLoot.extend(_lair.m[format("%sList", key)]);
+        }
+
+        if (namedLoot.len() == 0)
+        {
+            return this.createNaiveNamedLoot();
+        }
+
+        return namedLoot;
     }
 
     function depopulateNamedLoot( _lair, _chance = null )
@@ -57,7 +99,7 @@ Raids.Lairs <-
         }
 
         local stash = _lair.getLoot(),
-        loot = stash.getItems().filter(@(_index, _item) _item != null && _item.isItemType(::Const.Items.ItemType.Named)); // TODO: m.Loot may hold nothing but named items - check
+        loot = stash.getItems().filter(@(_index, _item) _item != null && _item.isItemType(::Const.Items.ItemType.Named));
 
         foreach( item in loot )
         {
@@ -69,16 +111,16 @@ Raids.Lairs <-
     }
 
     function getBaseResourceModifier( _resources )
-    {
+    {   // The arbitrary coefficients and constants used here are calibrated to ensure smooth scaling behaviour between resource breakpoints.
         local modifier = 1.0;
 
         if (_resources <= this.Parameters.ResourceModifierLowerBound)
         {
             return modifier;
         }
-        // The arbitrary coefficients and constants used here are calibrated to ensure smooth scaling behaviour between resource breakpoints.
+
         if (_resources <= this.Parameters.ResourceModifierUpperBound)
-        {
+        {   
             modifier = -0.005 * _resources + 2.0;
         }
         else
@@ -148,28 +190,27 @@ Raids.Lairs <-
 
     function getCandidatesByFaction( _faction )
     {
-        local lairs = [], Raids = ::RPGR_Raids;
+        local lairs = [], Lairs = ::RPGR_Raids.Lairs;
 
         if (_faction.getSettlements().len() == 0)
         {
-            Raids.Standard.log("getCandidatesByFaction was passed a faction that has no settlements at present.");
             return lairs;
         }
 
         Raids.Standard.log("Proceeding to lair candidate selection.");
         lairs.extend(_faction.getSettlements().filter(function( _index, _location )
         {
-            if (!Raids.Lairs.isLocationTypeViable(_location.getLocationType()))
+            if (!Lairs.isLocationTypeViable(_location.getLocationType()))
             {
                 return false;
             }
 
-            if (!Raids.Shared.isPlayerInProximityTo(_location.getTile()))
+            if (!Lairs.isPlayerInProximityTo(_location.getTile()))
             {
                 return false;
             }
 
-            if (Raids.Lairs.isActiveContractLocation(_location))
+            if (Lairs.isActiveContractLocation(_location))
             {
                 return false;
             }
@@ -182,7 +223,7 @@ Raids.Lairs <-
 
     function getNaiveNamedLootChance( _lair )
     {   // The arbitrary coefficients and constants used here are taken verbatim from the vanilla codebase.
-        local tile = _lair.getTile(), settlement = Raids.Shared.getSettlementClosestTo(tile);
+        local tile = _lair.getTile(), settlement = this.getSettlementClosestTo(tile);
 		return (_lair.getResources() + tile.getDistanceTo(settlement.getTile()) * 4) / 5.0 - 37.0;
     }
 
@@ -200,6 +241,20 @@ Raids.Lairs <-
         baseResourceModifier = this.getBaseResourceModifier(Raids.Standard.getFlag("BaseResources", _lair)),
         configurableModifier = Raids.Standard.getPercentageSetting("RoamerResourceModifier");
         return baseResourceModifier * edictModifier * configurableModifier * naiveDifference;
+    }
+
+    function getSettlementClosestTo( _tile )
+    {
+        local closestSettlement = null,
+        closestDistance = 9000;
+
+		foreach( settlement in ::World.EntityManager.getSettlements() )
+		{
+			local distance = _tile.getDistanceTo(settlement.getTile());
+			if (distance < closestDistance) closestDistance = distance, closestSettlement = settlement;
+		}
+
+        return closestSettlement;
     }
 
     function getTimeModifier()
@@ -254,7 +309,7 @@ Raids.Lairs <-
 
         if (activeContract.m.Destination.get() == _lair)
         {
-            Raids.Standard.log(format("%s was found to be an active contract location, aborting.", lair.getName()));
+            Raids.Standard.log(format("%s was found to be an active contract location, aborting.", _lair.getName()));
             return true;
         }
 
@@ -288,7 +343,7 @@ Raids.Lairs <-
             return false;
         }
 
-        if (_checkProximity && !Raids.Shared.isPlayerInProximityTo(_lair.getTile()))
+        if (_checkProximity && !this.isPlayerInProximityTo(_lair.getTile()))
         {
             return false;
         }
@@ -318,6 +373,11 @@ Raids.Lairs <-
         return _locationType == ::Const.World.LocationType.Lair || _locationType == (::Const.World.LocationType.Lair | ::Const.World.LocationType.Mobile);
     }
 
+    function isPlayerInProximityTo( _tile, _threshold = 6 )
+    {
+        return ::World.State.getPlayer().getTile().getDistanceTo(_tile) <= _threshold;
+    }
+
     function repopulateNamedLoot( _lair )
     {
         local namedLootChance = this.getNamedLootChance(_lair) + Raids.Edicts.getNamedLootChanceOffset(_lair), iterations = 0;
@@ -338,7 +398,7 @@ Raids.Lairs <-
             return;
         }
 
-        local namedLoot = Raids.Shared.createNamedLoot(_lair);
+        local namedLoot = this.createNamedLoot(_lair);
 
         for ( local i = 0; i < iterations ; i++ )
         {
