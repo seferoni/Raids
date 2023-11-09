@@ -70,7 +70,7 @@ Raids.Edicts <-
     }
 
     function executeAbundanceProcedure( _lair )
-    {
+    {   // TODO: test this
         local offset = this.Parameters.AbundanceOffset * Raids.Standard.getFlag("Agitation", _lair);
         _lair.m.LootScale = ::Math.min(1.0, _lair.m.LootScale + offset);
     }
@@ -123,7 +123,7 @@ Raids.Edicts <-
     }
 
     function executeOpportunistProcedure( _lair )
-    {
+    {   // TODO: test this with perspicuity
         Raids.Lairs.repopulateNamedLoot(_lair);
     }
 
@@ -282,7 +282,7 @@ Raids.Edicts <-
     }
 
     function getTooltipEntries( _lair )
-    {
+    {   // FIXME: vacant edict slots give away occupant faction when intentionally hidden
         local entryTemplate = {id = 20, type = "text", icon = "ui/icons/unknown_traits.png", text = "Edict: Vacant"},
         entries = [], occupiedContainers = this.getOccupiedContainers(_lair);
 

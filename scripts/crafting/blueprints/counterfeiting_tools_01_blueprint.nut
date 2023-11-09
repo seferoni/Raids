@@ -1,5 +1,5 @@
 this.counterfeiting_tools_01_blueprint <- ::inherit("scripts/crafting/blueprint",
-{
+{	
 	m = {},
 	function create()
 	{
