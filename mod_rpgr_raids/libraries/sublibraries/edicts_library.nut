@@ -28,7 +28,8 @@ Raids.Edicts <-
     },
     Parameters =
     {
-        AbundanceOffset = 0.08,
+        AbundanceCeiling = 3,
+        AbundanceOffset = 1,
         DiminutionModifier = 0.90,
         ProspectingOffset = 5.0,
         ProvocationModifier = 1.5,
@@ -36,7 +37,7 @@ Raids.Edicts <-
     }
 
     function addToHistory( _edictName, _lair )
-    {   // FIXME: whitespace between commas
+    {   
         local history = Raids.Standard.getFlag("EdictHistory", _lair),
         newHistory = format("%s%s", !history ? "" : format("%s, ", history), _edictName);
         Raids.Standard.setFlag("EdictHistory", newHistory, _lair);
@@ -69,12 +70,6 @@ Raids.Edicts <-
         return entry;
     }
 
-    function executeAbundanceProcedure( _lair )
-    {   // TODO: test this
-        local offset = this.Parameters.AbundanceOffset * Raids.Standard.getFlag("Agitation", _lair);
-        _lair.m.LootScale = ::Math.min(1.0, _lair.m.LootScale + offset);
-    }
-
     function executeAgitationProcedure( _lair )
     {
         this.resetContainer(this.findEdict(this.getEdictID("Agitation"), _lair), _lair, false);
@@ -99,7 +94,7 @@ Raids.Edicts <-
 
         if (Raids.Standard.getFlag("Agitation", _lair) == Raids.Lairs.AgitationDescriptors.Relaxed && ::Math.rand(1, 100) > this.Internal.AgitationChance)
         {
-            Raids.Lairs.setAgitation(_lair, this.Procedures.Increment); // TODO: test this
+            Raids.Lairs.setAgitation(_lair, this.Procedures.Increment);
         }
 
         if (!(procedure in this))
@@ -153,7 +148,7 @@ Raids.Edicts <-
         return false;
     }
 
-    function findEdictInHistory( _edictName, _lair)
+    function findEdictInHistory( _edictName, _lair )
     {
         local history = Raids.Standard.getFlag("EdictHistory", _lair);
 
@@ -195,17 +190,6 @@ Raids.Edicts <-
     {
         local entry = this.createTooltipEntry(_lair, "scroll_02_sw.png", "Legibility", "Discovery");
         return entry;
-    }
-
-    function getLootScaleOffset( _lair )
-    {
-        if (!this.findEdict(this.getEdictID("Abundance"), _lair, true))
-        {
-            return 0;
-        }
-
-        local offset = this.Parameters.AbundanceOffset * Raids.Standard.getFlag("Agitation", _lair);
-        return offset;
     }
 
     function getNamedLootChanceOffset( _lair, _depopulate = false )
@@ -268,6 +252,17 @@ Raids.Edicts <-
         }
 
         return entries;
+    }
+
+    function getTreasureOffset( _lair )
+    {   // TODO: test this
+        if (!this.findEdictInHistory("Abundance", _lair))
+        {
+            return 0;
+        }
+
+        local offset = ::Math.min(this.Parameters.AbundanceCeiling, this.Parameters.AbundanceOffset * Raids.Standard.getFlag("Agitation", _lair));
+        return offset;
     }
 
     function getResourceModifier( _lair )
@@ -344,11 +339,9 @@ Raids.Edicts <-
 
         local viableEdicts = this.CycledEdicts.filter(@(_index, _edictID) history.find(_edictID) != null);
 
-        foreach( edictID in viableEdicts )
+        foreach( edictName in viableEdicts )
         {
-            local edictName = this.getEdictName(edictID),
-            procedure = format("execute%sProcedure", edictName);
-            this[procedure](_lair);
+            this[format("execute%sProcedure", edictName)](_lair);
         }
     }
 
@@ -372,8 +365,7 @@ Raids.Edicts <-
             return;
         }
 
-        local edicts = occupiedContainers.map(@(_container) Raids.Standard.getFlag(_container, _lair)),
-        edictDates = occupiedContainers.map(@(_container) Raids.Standard.getFlag(format("%sTime", _container), _lair)),
+        local edictDates = occupiedContainers.map(@(_container) Raids.Standard.getFlag(format("%sTime", _container), _lair)),
         edictDurations = occupiedContainers.map(@(_container) Raids.Standard.getFlag(format("%sDuration", _container), _lair));
 
         for( local i = 0; i < occupiedContainers.len(); i++ )

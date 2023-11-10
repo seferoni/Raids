@@ -284,7 +284,7 @@ Raids.Lairs <-
             return [resourcesEntry, agitationEntry];
         }
 
-        local timeDifference = (::World.getTime().Days + this.Parameters.AgitationDecayInterval) - lastUpdateDays,
+        local timeDifference = (lastUpdateDays + this.Parameters.AgitationDecayInterval) - ::World.getTime().Days, // FIXME: this is broken
         timeEntry = clone resourcesEntry;
         timeEntry.icon = "ui/icons/action_points.png";
         timeEntry.text = format("%s day(s)", Raids.Standard.colourWrap(timeDifference, "NegativeValue"));
@@ -426,7 +426,7 @@ Raids.Lairs <-
         this.updateProperties(_lair, _procedure);
     }
 
-    function setResourcesByAgitation( _lair )
+    function setResourcesByAgitation( _lair ) // FIXME: this may be too favourable for low resources lairs
     {
         local agitation = Raids.Standard.getFlag("Agitation", _lair),
         baseResources = Raids.Standard.getFlag("BaseResources", _lair),
@@ -445,7 +445,7 @@ Raids.Lairs <-
     {
         local lastUpdateTimeDays = Raids.Standard.getFlag("LastAgitationUpdate", _lair);
 
-        if (lastUpdateTimeDays == false)
+        if (!lastUpdateTimeDays)
         {
             return;
         }

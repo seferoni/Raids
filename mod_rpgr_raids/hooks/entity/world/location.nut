@@ -1,6 +1,17 @@
 local Raids = ::RPGR_Raids;
 ::mods_hookExactClass("entity/world/location", function( _object )
 {
+    Raids.Standard.wrap(_object, "dropTreasure", function( _num, _items, _lootTable )
+    {
+        if (!Raids.Lairs.isLairViable(this))
+        {
+            return;
+        }
+
+        local offset = Raids.Edicts.getTreasureOffset(_lair);
+        return [_num + offset, _items, _lootTable];
+    }, "overrideArguments");
+
     Raids.Standard.wrap(_object, "onCombatStarted", function()
     {
         if (!Raids.Lairs.isLairViable(this, false, true))
@@ -34,8 +45,8 @@ local Raids = ::RPGR_Raids;
         }
 
         Raids.Lairs.updateAgitation(this);
-        _tooltipArray.extend(Raids.Lairs.getTooltipEntries(this));
         Raids.Edicts.updateEdicts(this);
+        _tooltipArray.extend(Raids.Lairs.getTooltipEntries(this));
         _tooltipArray.extend(Raids.Edicts[format("get%sEntries", Raids.Edicts.isLairViable(this) ? "Tooltip" : "Nonviable")](this));
         return _tooltipArray;
     });
