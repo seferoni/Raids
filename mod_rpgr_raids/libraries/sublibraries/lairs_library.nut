@@ -18,7 +18,7 @@ Raids.Lairs <-
         ::Const.FactionType.Undead,
         ::Const.FactionType.Zombies,
     ],
-    NamedItemKeys = 
+    NamedItemKeys =
     [
         "NamedArmors",
         "NamedWeapons",
@@ -57,8 +57,8 @@ Raids.Lairs <-
     }
 
     function createNamedLoot( _lair )
-    {   
-        if (::Math.rand(1, 100) > this.Parameters.FactionSpecificNamedLootChance)
+    {
+        if (::Math.rand(1, 100) > this.Parameters.FactionSpecificNamedLootChance) // TODO: this should be configurable?
         {
             return this.createNaiveNamedLoot();
         }
@@ -120,7 +120,7 @@ Raids.Lairs <-
         }
 
         if (_resources <= this.Parameters.ResourceModifierUpperBound)
-        {   
+        {
             modifier = -0.005 * _resources + 2.0;
         }
         else
@@ -284,7 +284,7 @@ Raids.Lairs <-
             return [resourcesEntry, agitationEntry];
         }
 
-        local timeDifference = (lastUpdateDays + this.Parameters.AgitationDecayInterval) - ::World.getTime().Days, // FIXME: this is broken
+        local timeDifference = (lastUpdateDays + this.Parameters.AgitationDecayInterval) - ::World.getTime().Days,
         timeEntry = clone resourcesEntry;
         timeEntry.icon = "ui/icons/action_points.png";
         timeEntry.text = format("%s day(s)", Raids.Standard.colourWrap(timeDifference, "NegativeValue"));
