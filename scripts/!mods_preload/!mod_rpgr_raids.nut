@@ -13,6 +13,7 @@
         AgitationResourceModifier = 70,
         CaravanReinforcementChance = 100,
         DepopulateLairLootOnSpawn = true,
+        FactionSpecificNamedLootChance = 33,
         OfficialDocumentDropChance = 35,
         RoamerScaleChance = 100,
         RoamerResourceModifier = 70,
@@ -42,13 +43,16 @@ local Raids = ::RPGR_Raids;
     agitationIncrementChance.setDescription("Determines the chance for a location's agitation value to increase upon engagement with a roaming party, if within proximity.");
 
     local agitationResourceModifier = pageLairs.addRangeSetting("AgitationResourceModifier", 70, 50, 100, 10, "Agitation Resource Modifier");
-    agitationResourceModifier.setDescription("Controls how lair resource calculation is handled after each agitation tier change. Higher percentage values result in greater resources, and therefore more powerful garrisoned troops and better loot.");
+    agitationResourceModifier.setDescription("Controls how lair resource calculation is handled after each agitation change. Higher percentage values result in greater resources, and therefore more powerful garrisoned troops and better loot.");
 
     local caravanReinforcementChance = pageCaravans.addRangeSetting("CaravanReinforcementChance", 100, 0, 100, 5, "Caravan Reinforcement Chance");
-    caravanReinforcementChance.setDescription("Determines the percentage change for caravan troop count and composition reinforcement based on caravan wealth, and in special cases, cargo type. If certain conditions obtain, this will also result in the addition of special troops with powerful end-game gear to wealthy caravans, independent of player progression.");
+    caravanReinforcementChance.setDescription("Determines the percentage change for caravan troop count and composition reinforcement based on caravan wealth, and in special cases, cargo type.");
 
     local depopulateLairLootOnSpawn = pageLairs.addBooleanSetting("DepopulateLairLootOnSpawn", true, "Depopulate Lair Loot On Spawn");
     depopulateLairLootOnSpawn.setDescription("Determines whether Raids should depopulate newly spawned lairs of named loot. This is recommended to compensate for the additional named loot brought about by the introduction of agitation as a game mechanic.");
+
+    local factionSpecificNamedLootChance = pageLairs.addRangeSetting("FactionSpecificNamedLootChance", 35, 0, 100, 5, "Faction Specific Named Loot Chance");
+    factionSpecificNamedLootChance.setDescription("Determines the percentage chance for lairs to drop faction-specific named loot only, when conditions obtain.");
 
     local officialDocumentDropChance = pageCaravans.addRangeSetting("OfficialDocumentDropChance", 35, 10, 80, 5, "Official Document Drop Chance");
     officialDocumentDropChance.setDescription("Determines the chance for caravans to drop official documents on defeat. Official documents provide the only means for obtaining edicts.");

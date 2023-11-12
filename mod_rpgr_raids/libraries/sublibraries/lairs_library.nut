@@ -28,7 +28,6 @@ Raids.Lairs <-
     Parameters =
     {
         AgitationDecayInterval = 7,
-        FactionSpecificNamedLootChance = 33,
         MaximumLootOffset = 3,
         NamedItemChanceOnSpawn = 30,
         NamedItemChancePerAgitationTier = 13.33,
@@ -58,7 +57,7 @@ Raids.Lairs <-
 
     function createNamedLoot( _lair )
     {
-        if (::Math.rand(1, 100) > this.Parameters.FactionSpecificNamedLootChance) // TODO: this should be configurable?
+        if (::Math.rand(1, 100) > Raids.Standard.getSetting("FactionSpecificNamedLootChance")) 
         {
             return this.createNaiveNamedLoot();
         }
@@ -426,11 +425,11 @@ Raids.Lairs <-
         this.updateProperties(_lair, _procedure);
     }
 
-    function setResourcesByAgitation( _lair ) // FIXME: this may be too favourable for low resources lairs
+    function setResourcesByAgitation( _lair )
     {
         local agitation = Raids.Standard.getFlag("Agitation", _lair),
         baseResources = Raids.Standard.getFlag("BaseResources", _lair),
-        interpolatedModifier = -0.0006 * baseResources + 0.66,
+        interpolatedModifier = -0.0006 * baseResources + 0.6,
         configurableModifier = Raids.Standard.getPercentageSetting("AgitationResourceModifier"),
         newResources = ::Math.floor(baseResources + (interpolatedModifier * (agitation - 1) * configurableModifier * baseResources));
         _lair.setResources(::Math.min(newResources, 700));

@@ -30,16 +30,6 @@ this.edict_item <- ::inherit("scripts/items/item",
 		{
 			local container = null;
 
-			if (Raids.Edicts.findEdict(this.getID(), lair) != false)
-			{
-				continue;
-			}
-
-			if (Raids.Edicts.findEdictInHistory(Raids.Edicts.getEdictName(this.getID()), lair) != false)
-			{
-				continue;
-			}
-
 			if (isContainerVacant("EdictContainerA", lair))
 			{
 				container = "EdictContainerA";
@@ -56,7 +46,7 @@ this.edict_item <- ::inherit("scripts/items/item",
 
 			Raids.Standard.setFlag(container, this.getID(), lair);
 			Raids.Standard.setFlag(format("%sTime", container), ::World.getTime().Days, lair);
-			Raids.Standard.setFlag(format("%sDuration", container), this.m.DiscoveryDays, lair);
+			Raids.Standard.setFlag(format("%sDuration", container), this.getDiscoveryDuration(), lair);
 			if (!isValid) isValid = true;
 		}
 
@@ -129,7 +119,7 @@ this.edict_item <- ::inherit("scripts/items/item",
 			return naiveLairs;
 		}
 
-		local ID = this.getID(), Edicts = Raids.Edicts,
+		local edictID = this.getID(), Edicts = Raids.Edicts,
 		lairs = naiveLairs.filter(function( _index, _lair )
 		{
 			if (!Edicts.isLairViable(_lair))
@@ -137,7 +127,12 @@ this.edict_item <- ::inherit("scripts/items/item",
 				return false;
 			}
 
-			if (Edicts.findEdict(ID, _lair) != false)
+			if (Edicts.findEdict(edictID, _lair) != false)
+			{
+				return false;
+			}
+
+			if (Edicts.findEdictInHistory(Edicts.getEdictName(edictID), _lair) != false)
 			{
 				return false;
 			}

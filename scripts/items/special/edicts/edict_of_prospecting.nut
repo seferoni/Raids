@@ -12,6 +12,6 @@ this.edict_of_prospecting <- ::inherit("scripts/items/special/edict_item",
 		this.m.IsCycled = false;
 		this.m.DiscoveryDays = 8;
 		this.m.ScalingModality = this.m.ScalingModalities.Resources;
-		this.m.EffectText = "Will increase the chance that nearby lairs discover new famed items to safeguard within their inventories.";
+		this.m.EffectText = "Will increase the chance that nearby lairs discover new Famed items to safeguard within their inventories.";
 	}
 });

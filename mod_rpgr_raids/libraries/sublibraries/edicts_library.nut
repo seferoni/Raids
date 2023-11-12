@@ -115,6 +115,11 @@ Raids.Edicts <-
     function executeNullificationProcedure( _lair )
     {
         this.clearEdicts(_lair);
+        this.clearHistory(_lair);
+        Raids.Lairs.setResourcesByAgitation(_lair);
+        _lair.createDefenders();
+        _lair.setLootScaleBasedOnResources(_lair.getResources());
+
     }
 
     function executeOpportunistProcedure( _lair )
@@ -196,7 +201,7 @@ Raids.Edicts <-
     {
         local agitation = Raids.Standard.getFlag("Agitation", _lair);
 
-        if (_depopulate && this.findEdict(this.getEdictID("Abeyance"), _lair, true) != false)
+        if (_depopulate && this.findEdict(this.getEdictID("Retention"), _lair, true) != false)
         {
             return this.Parameters.RetentionOffset * agitation;
         }
@@ -277,7 +282,7 @@ Raids.Edicts <-
     }
 
     function getTooltipEntries( _lair )
-    {   // FIXME: vacant edict slots give away occupant faction when intentionally hidden
+    {   
         local entryTemplate = {id = 20, type = "text", icon = "ui/icons/unknown_traits.png", text = "Edict: Vacant"},
         entries = [], occupiedContainers = this.getOccupiedContainers(_lair);
 
@@ -317,6 +322,11 @@ Raids.Edicts <-
 
     function isLairViable( _lair )
     {
+        if (!_lair.m.IsShowingBanner)
+        {
+            return false;
+        }
+
         local factionType = ::World.FactionManager.getFaction(_lair.getFaction()).getType(),
         factions = this.findEdict(this.getEdictID("Legibility"), _lair, true) != false ? Raids.Lairs.Factions : this.Factions;
 
@@ -341,7 +351,19 @@ Raids.Edicts <-
 
         foreach( edictName in viableEdicts )
         {
-            this[format("execute%sProcedure", edictName)](_lair);
+            if (!this.CycledEdicts.find(edictName))
+            {
+                continue;
+            }
+            
+            local procedure = format("execute%sProcedure", edictName);
+
+            if (!(procedure in this))
+            {
+                continue;
+            }
+
+            this[procedure](_lair);
         }
     }
 
