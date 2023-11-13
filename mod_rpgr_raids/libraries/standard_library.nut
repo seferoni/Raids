@@ -133,6 +133,13 @@ Raids.Standard <-
         local returnValue = _function.acall(_argumentsArray);
         return returnValue == null ? originalValue : (returnValue == Raids.Internal.TERMINATE ? null : returnValue);
     }
+    
+    function parseSemVer( _version )
+    {
+        local versionArray = split(_version, ".");
+        if (versionArray.len() > 3) versionArray.resize(3);
+        return format("%s.%s%s", versionArray[0], versionArray[1], versionArray[2]).tofloat();
+    }
 
     function prependContextObject( _object, _arguments )
     {
