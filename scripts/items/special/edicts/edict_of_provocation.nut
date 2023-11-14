@@ -1,5 +1,5 @@
 local Raids = ::RPGR_Raids;
-this.edict_of_provocation <- ::inherit("scripts/items/special/edict_item",
+this.edict_of_provocation <- ::inherit("scripts/items/special/edict_item", // TODO: remove this
 {
     m = {},
 	function create()
