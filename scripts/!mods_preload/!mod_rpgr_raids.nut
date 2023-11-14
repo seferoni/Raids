@@ -13,8 +13,8 @@
         AgitationResourceModifier = 70,
         CaravanReinforcementChance = 100,
         DepopulateLairLootOnSpawn = true,
-        FactionSpecificNamedLootChance = 33,
-        OfficialDocumentDropChance = 35,
+        FactionSpecificNamedLootChance = 35,
+        OfficialDocumentDropChance = 50,
         RoamerScaleChance = 100,
         RoamerResourceModifier = 70,
         RoamerScaleAgitationRequirement = false,
@@ -23,21 +23,17 @@
 }
 
 local Raids = ::RPGR_Raids;
+Raids.Internal.MSUFound <- "MSU" in ::getroottable();
 ::include("mod_rpgr_raids/libraries/standard_library.nut");
 
-try 
+if (!Raids.Internal.MSUFound)
 {
-    ::mods_registerMod(Raids.ID, Raids.Version, Raids.Name);
-}
-catch(_exception) 
-{
-    ::mods_registerMod(Raids.ID, Raids.Standard.parseSemVer(Raids.Version), Raids.Name);
+    Raids.Version = Raids.Standard.parseSemVer(Raids.Version);
 }
 
+::mods_registerMod(Raids.ID, Raids.Version, Raids.Name);
 ::mods_queue(Raids.ID, ">mod_msu", function()
 {
-    Raids.Internal.MSUFound <- ::mods_getRegisteredMod("mod_msu") != null;
-
     if (!Raids.Internal.MSUFound)
     {
         return;
@@ -50,6 +46,12 @@ catch(_exception)
     pageCaravans = Raids.Mod.ModSettings.addPage("Caravans"),
     Defaults = Raids.Defaults;
 
+    local depopulateLairLootOnSpawn = pageLairs.addBooleanSetting("DepopulateLairLootOnSpawn", Defaults.DepopulateLairLootOnSpawn, "Depopulate Lair Loot On Spawn");
+    depopulateLairLootOnSpawn.setDescription("Determines whether Raids should depopulate newly spawned lairs of named loot. This is recommended to compensate for the additional named loot brought about by the introduction of agitation as a game mechanic.");
+
+    local roamerScaleAgitationRequirement = pageLairs.addBooleanSetting("RoamerScaleAgitationRequirement", Defaults.RoamerScaleAgitationRequirement, "Roamer Scale Agitation Requirement"); // TODO: revise the wording for this
+    roamerScaleAgitationRequirement.setDescription("Determines whether roamer scaling occurs only for lairs with baseline agitation. Will result in stronger eligible roamer spawns on a game-wide basis.");
+
     local agitationIncrementChance = pageLairs.addRangeSetting("AgitationIncrementChance", Defaults.AgitationIncrementChance, 0, 100, 1, "Agitation Increment Chance");
     agitationIncrementChance.setDescription("Determines the chance for a location's agitation value to increase upon engagement with a roaming party, if within proximity.");
 
@@ -58,9 +60,6 @@ catch(_exception)
 
     local caravanReinforcementChance = pageCaravans.addRangeSetting("CaravanReinforcementChance", Defaults.CaravanReinforcementChance, 0, 100, 5, "Caravan Reinforcement Chance");
     caravanReinforcementChance.setDescription("Determines the percentage change for caravan troop count and composition reinforcement based on caravan wealth, and in special cases, cargo type.");
-
-    local depopulateLairLootOnSpawn = pageLairs.addBooleanSetting("DepopulateLairLootOnSpawn", Defaults.DepopulateLairLootOnSpawn, "Depopulate Lair Loot On Spawn");
-    depopulateLairLootOnSpawn.setDescription("Determines whether Raids should depopulate newly spawned lairs of named loot. This is recommended to compensate for the additional named loot brought about by the introduction of agitation as a game mechanic.");
 
     local factionSpecificNamedLootChance = pageLairs.addRangeSetting("FactionSpecificNamedLootChance", Defaults.FactionSpecificNamedLootChance, 0, 100, 5, "Faction Specific Named Loot Chance");
     factionSpecificNamedLootChance.setDescription("Determines the percentage chance for lairs to drop faction-specific named loot only, when conditions obtain.");
@@ -73,9 +72,6 @@ catch(_exception)
 
     local roamerResourceModifier = pageLairs.addRangeSetting("RoamerResourceModifier", Defaults.RoamerResourceModifier, 50, 100, 10, "Roamer Resource Modifier");
     roamerResourceModifier.setDescription("Controls how resource calculation is handled for roaming parties. Higher percentage values result in greater resources, and therefore more powerful roaming troops. Does nothing if roamer scale chance is set to zero.");
-
-    local roamerScaleAgitationRequirement = pageLairs.addBooleanSetting("RoamerScaleAgitationRequirement", Defaults.RoamerScaleAgitationRequirement, "Roamer Scale Agitation Requirement");
-    roamerScaleAgitationRequirement.setDescription("Determines whether roamer scaling occurs for lairs with baseline agitation. Will result in stronger eligible roamer spawns on a game-wide basis.");
 
     local verboseLogging = pageGeneral.addBooleanSetting("VerboseLogging", Defaults.VerboseLogging, "Verbose Logging"); // TODO: remove when done
     verboseLogging.setDescription("Enables verbose logging. Recommended for testing purposes only, as the volume of logged messages can make parsing the log more difficult for general use and debugging.");
