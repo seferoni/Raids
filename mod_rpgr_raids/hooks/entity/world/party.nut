@@ -29,7 +29,7 @@ local Raids = ::RPGR_Raids;
         }
 
         Raids.Caravans.addNamedCargo(_lootTable);
-        return _lootTable;
+        return [_lootTable];
     }, "overrideArguments");
 
     Raids.Standard.wrap(_object, "getTooltip", function( _tooltipArray )

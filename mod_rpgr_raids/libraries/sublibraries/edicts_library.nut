@@ -32,7 +32,6 @@ Raids.Edicts <-
         AbundanceOffset = 1,
         DiminutionModifier = 0.90,
         ProspectingOffset = 5.0,
-        ProvocationModifier = 1.5,
         RetentionOffset = -5
     }
 
@@ -268,17 +267,6 @@ Raids.Edicts <-
 
         local offset = ::Math.min(this.Parameters.AbundanceCeiling, this.Parameters.AbundanceOffset * Raids.Standard.getFlag("Agitation", _lair));
         return offset;
-    }
-
-    function getResourceModifier( _lair )
-    {
-        if (!this.findEdict(this.getEdictID("Provocation"), _lair, true))
-        {
-            return 1.0;
-        }
-
-        local modifier = this.Parameters.ProvocationModifier + (5.0 * this.Internal.AgitationPrefactor * Raids.Standard.getFlag("Agitation", _lair) - 1);
-        return modifier;
     }
 
     function getTooltipEntries( _lair )

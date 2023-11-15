@@ -236,10 +236,9 @@ Raids.Lairs <-
     function getResourceDifference( _lair, _lairResources, _partyResources )
     {
         local naiveDifference = _lairResources - _partyResources,
-        edictModifier = Raids.Edicts.getResourceModifier(_lair),
         baseResourceModifier = this.getBaseResourceModifier(Raids.Standard.getFlag("BaseResources", _lair)),
         configurableModifier = Raids.Standard.getPercentageSetting("RoamerResourceModifier");
-        return baseResourceModifier * edictModifier * configurableModifier * naiveDifference;
+        return baseResourceModifier * configurableModifier * naiveDifference;
     }
 
     function getSettlementClosestTo( _tile )
