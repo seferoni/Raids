@@ -5,7 +5,7 @@ this.counterfeiting_tools_01_blueprint <- ::inherit("scripts/crafting/blueprint"
 	{
 		this.blueprint.create();
 		this.m.ID = "blueprint.counterfeiting_tools_01";
-		this.m.PreviewCraftable = ::new("scripts/items/special/counterfeiting_tools_item");
+		this.m.PreviewCraftable = ::new("scripts/items/misc/counterfeiting_tools_item");
 		this.m.Cost = 100; // FIXME: prices need adjustment balancing
 		local ingredients =
         [
@@ -17,6 +17,6 @@ this.counterfeiting_tools_01_blueprint <- ::inherit("scripts/crafting/blueprint"
 
 	function onCraft( _stash )
 	{
-		_stash.add(::new("scripts/items/special/counterfeiting_tools_item"));
+		_stash.add(::new("scripts/items/misc/counterfeiting_tools_item"));
 	}
 });

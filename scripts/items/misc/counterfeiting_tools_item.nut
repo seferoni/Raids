@@ -8,13 +8,13 @@ this.counterfeiting_tools_item <- ::inherit("scripts/items/item",
 	{
 		this.item.create();
 		this.m.Flags <- ::new("scripts/tools/tag_collection");
-        this.m.ID = "special.counterfeiting_tools_item";
+        this.m.ID = "misc.counterfeiting_tools_item";
 		this.m.Name = "Counterfeiting Tools";
 		this.m.Description = "An assortment of tools specialised for use in the forgery of noble house seals. Included is a quarter of a quire of gossamer paper, a quill pen fashioned from goose feathers, a filled inkwell, some beeswax, and an imitation wax seal.";
 		this.m.Value = 300;
-		this.m.Icon = "special/counterfeiting_tools_item.png";
+		this.m.Icon = "misc/counterfeiting_tools_item.png";
 		this.m.SlotType = ::Const.ItemSlot.None;
-		this.m.ItemType = ::Const.Items.ItemType.Usable;
+		this.m.ItemType = ::Const.Items.ItemType.Misc;
 		this.m.IsDroppedAsLoot = true;
 		this.m.IsAllowedInBag = false;
 		this.m.IsUsable = false;

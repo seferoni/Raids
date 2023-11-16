@@ -25,7 +25,7 @@ this.official_document_item <- ::inherit("scripts/items/item",
 
         foreach( item in stash )
         {
-            if (item != null && item.getID() == "special.counterfeiting_tools_item")
+            if (item != null && item.getID() == "misc.counterfeiting_tools_item")
             {
                 return item;
             }

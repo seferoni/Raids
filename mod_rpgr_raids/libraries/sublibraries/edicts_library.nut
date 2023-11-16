@@ -70,7 +70,7 @@ Raids.Edicts <-
     }
 
     function executeAgitationProcedure( _lair )
-    {
+    {   // TODO: test this
         this.resetContainer(this.findEdict(this.getEdictID("Agitation"), _lair), _lair, false);
         Raids.Lairs.setAgitation(_lair, Raids.Lairs.Procedures.Increment);
     }
@@ -92,8 +92,8 @@ Raids.Edicts <-
         }
 
         if (Raids.Standard.getFlag("Agitation", _lair) == Raids.Lairs.AgitationDescriptors.Relaxed && ::Math.rand(1, 100) > this.Internal.AgitationChance)
-        {
-            Raids.Lairs.setAgitation(_lair, this.Procedures.Increment);
+        {   // TODO: test this
+            Raids.Lairs.setAgitation(_lair, Raids.Lairs.Procedures.Increment);
         }
 
         if (!(procedure in this))
