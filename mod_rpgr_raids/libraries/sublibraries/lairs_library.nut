@@ -289,6 +289,11 @@ Raids.Lairs <-
         return [resourcesEntry, agitationEntry, timeEntry];
     }
 
+    function getTreasureOffset( _lair )
+    {
+        // TODO: fill this out
+    }
+
     function initialiseLairParameters( _lair )
     {
         Raids.Standard.setFlag("BaseResources", _lair.getResources(), _lair);

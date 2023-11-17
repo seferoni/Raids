@@ -2,13 +2,14 @@ local Raids = ::RPGR_Raids;
 ::mods_hookExactClass("entity/world/location", function( _object )
 {
     Raids.Standard.wrap(_object, "dropTreasure", function( _num, _items, _lootTable )
-    {
+    {   // TODO: test this
+        // TODO: hook ODLFP, rework loot distribution per agitation
         if (!Raids.Lairs.isLairViable(this))
         {
             return;
         }
 
-        local offset = Raids.Edicts.getTreasureOffset(_lair);
+        local offset = Raids.Edicts.getTreasureOffset(this);
         return [_num + offset, _items, _lootTable];
     }, "overrideArguments");
 
