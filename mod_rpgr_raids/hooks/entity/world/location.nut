@@ -3,14 +3,25 @@ local Raids = ::RPGR_Raids;
 {
     Raids.Standard.wrap(_object, "dropTreasure", function( _num, _items, _lootTable )
     {   // TODO: test this
-        // TODO: hook ODLFP, rework loot distribution per agitation
         if (!Raids.Lairs.isLairViable(this))
         {
             return;
         }
 
-        local offset = Raids.Edicts.getTreasureOffset(this);
-        return [_num + offset, _items, _lootTable];
+        local count = Raids.Lairs.getTreasureCount(this),
+        offset = Raids.Edicts.getTreasureOffset(this);
+        return [count + offset, _items, _lootTable];
+    }, "overrideArguments");
+
+    Raids.Standard.wrap(_object, "dropMoney", function( _num, _lootTable )
+    {   // TODO: test this
+        if (!Raids.Lairs.isLairViable(this))
+        {
+            return;
+        }
+
+        local count = Raids.Lairs.getMoneyCount(this);
+        return [count, _lootTable];
     }, "overrideArguments");
 
     Raids.Standard.wrap(_object, "onCombatStarted", function()

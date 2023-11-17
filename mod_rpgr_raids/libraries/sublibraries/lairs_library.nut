@@ -57,7 +57,7 @@ Raids.Lairs <-
 
     function createNamedLoot( _lair )
     {
-        if (::Math.rand(1, 100) > Raids.Standard.getSetting("FactionSpecificNamedLootChance")) 
+        if (::Math.rand(1, 100) > Raids.Standard.getSetting("FactionSpecificNamedLootChance"))
         {
             return this.createNaiveNamedLoot();
         }
@@ -220,6 +220,11 @@ Raids.Lairs <-
         return lairs;
     }
 
+    function getMoneyCount( _lair )
+    {
+        return (_lair.getResources());
+    }
+
     function getNaiveNamedLootChance( _lair )
     {   // The arbitrary coefficients and constants used here are taken verbatim from the vanilla codebase.
         local tile = _lair.getTile(), settlement = this.getSettlementClosestTo(tile);
@@ -289,9 +294,9 @@ Raids.Lairs <-
         return [resourcesEntry, agitationEntry, timeEntry];
     }
 
-    function getTreasureOffset( _lair )
+    function getTreasureCount( _Lair )
     {
-        // TODO: fill this out
+        return (::Math.ceil(_lair.getResources() / 100));
     }
 
     function initialiseLairParameters( _lair )
