@@ -40,7 +40,7 @@ Raids.Standard <-
     {
         local flagValue = _object.getFlags().get(format("mod_rpgr_raids.%s", _string));
 
-        if (flagValue == false)
+        if (!flagValue)
         {
             flagValue = _object.getFlags().get(format("%s", _string));
         }
@@ -100,11 +100,6 @@ Raids.Standard <-
         if (_isError)
         {
             ::logError(format("[Raids] %s", _string));
-            return;
-        }
-
-        if (!this.getSetting("VerboseLogging"))
-        {
             return;
         }
 

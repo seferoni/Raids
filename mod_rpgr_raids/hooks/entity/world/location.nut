@@ -2,7 +2,7 @@ local Raids = ::RPGR_Raids;
 ::mods_hookExactClass("entity/world/location", function( _object )
 {
     Raids.Standard.wrap(_object, "dropTreasure", function( _num, _items, _lootTable )
-    {   // TODO: test this
+    {   
         if (!Raids.Lairs.isLairViable(this))
         {
             return;
@@ -14,7 +14,7 @@ local Raids = ::RPGR_Raids;
     }, "overrideArguments");
 
     Raids.Standard.wrap(_object, "dropMoney", function( _num, _lootTable )
-    {   // TODO: test this
+    {   
         if (!Raids.Lairs.isLairViable(this))
         {
             return;

@@ -141,7 +141,6 @@ Raids.Lairs <-
             }
             else if (!Raids.Lairs.isLocationTypeViable(_entity.getLocationType()))
             {
-                Raids.Standard.log(format("%s is not an viable lair.", _entity.getName()));
                 return false;
             }
 
@@ -196,7 +195,6 @@ Raids.Lairs <-
             return lairs;
         }
 
-        Raids.Standard.log("Proceeding to lair candidate selection.");
         lairs.extend(_faction.getSettlements().filter(function( _index, _location )
         {
             if (!Lairs.isLocationTypeViable(_location.getLocationType()))
@@ -294,9 +292,9 @@ Raids.Lairs <-
         return [resourcesEntry, agitationEntry, timeEntry];
     }
 
-    function getTreasureCount( _Lair )
+    function getTreasureCount( _lair )
     {
-        return (::Math.ceil(_lair.getResources() / 100));
+        return (::Math.ceil(_lair.getResources() / 100.0));
     }
 
     function initialiseLairParameters( _lair )
@@ -317,7 +315,6 @@ Raids.Lairs <-
 
         if (activeContract.m.Destination.get() == _lair)
         {
-            Raids.Standard.log(format("%s was found to be an active contract location, aborting.", _lair.getName()));
             return true;
         }
 
@@ -389,7 +386,6 @@ Raids.Lairs <-
     function repopulateNamedLoot( _lair )
     {
         local namedLootChance = this.getNamedLootChance(_lair) + Raids.Edicts.getNamedLootChanceOffset(_lair), iterations = 0;
-        Raids.Standard.log(format("namedLootChance is %.2f for lair %s.", namedLootChance, _lair.getName()));
 
         if (namedLootChance > 100)
         {
@@ -427,7 +423,6 @@ Raids.Lairs <-
             case (this.Procedures.Increment): Raids.Standard.incrementFlag("Agitation", 1, _lair); break;
             case (this.Procedures.Decrement): Raids.Standard.incrementFlag("Agitation", -1, _lair); break;
             case (this.Procedures.Reset): Raids.Standard.setFlag("Agitation", this.AgitationDescriptors.Relaxed, _lair); break;
-            default: Raids.Standard.log("setAgitation was called with an invalid procedure value.", true); return;
         }
 
         Raids.Standard.setFlag("LastAgitationUpdate", ::World.getTime().Days, _lair);
@@ -466,7 +461,6 @@ Raids.Lairs <-
             return;
         }
 
-        Raids.Standard.log(format("Last agitation update occurred %i days ago.", timeDifference));
         local decrementIterations = ::Math.floor(timeDifference / decayInterval);
 
         if (decrementIterations == 0)
@@ -511,7 +505,6 @@ Raids.Lairs <-
 
         if (Raids.Standard.getFlag("Agitation", _lair) != this.AgitationDescriptors.Militant && ::Math.rand(1, 100) > this.Parameters.NamedLootRefreshChance)
         {
-            Raids.Standard.log(format("Skipping named loot refresh procedure within this agitation cycle for lair %s.", _lair.getName()));
             return;
         }
 

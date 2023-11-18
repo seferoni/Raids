@@ -47,8 +47,8 @@ Raids.Caravans <-
     Parameters =
     {
         MaximumTroopOffset = 7,
-        NamedItemChance = 50, // FIXME: this is inflated, revert to 5
-        ReinforcementThresholdDays = 1, // FIXME: this is deflated, revert to 50
+        NamedItemChance = 5, 
+        ReinforcementThresholdDays = 50,
         SupplyCaravanDocumentChanceOffset = 25
     },
     SouthernGoods = 
@@ -83,9 +83,7 @@ Raids.Caravans <-
         
         for( local i = 0; i < iterations; i++ )
         {
-            local good = _goodsPool[::Math.rand(0, _goodsPool.len() - 1)];
-            Raids.Standard.log(format("Added item with filepath %s to the inventory of %s.", good, _caravan.getName()));
-            _caravan.addToInventory(good);
+            _caravan.addToInventory(_goodsPool[::Math.rand(0, _goodsPool.len() - 1)]);
         }
     }
 
@@ -95,7 +93,6 @@ Raids.Caravans <-
         namedItem = ::new(format("scripts/items/%s", namedCargo[::Math.rand(0, namedCargo.len() - 1)]));
         namedItem.onAddedToStash(null);
         _lootTable.push(namedItem);
-        Raids.Standard.log(format("Added %s to the loot table.", namedItem.getName()));
     }
 
     function isPartyInitialised( _party )
@@ -114,7 +111,6 @@ Raids.Caravans <-
             return actualProduce;
         }
 
-        Raids.Standard.log(format("%s has no produce corresponding to caravan cargo type.", _settlement.getName()));
         local newCargoType = ::Math.rand(1, 100) <= 50 ? this.CargoDescriptors.Assortment : this.CargoDescriptors.Unassorted;
         Raids.Standard.setFlag("CaravanCargo", newCargoType, _caravan);
 

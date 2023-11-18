@@ -20,7 +20,7 @@ Raids.Edicts <-
     ],
     Internal =
     {
-        AgitationChance = 40,
+        AgitationChance = 20,
         AgitationPrefactor = 0.1,
         ResourcesPrefactor = 0.001,
         SupplyCaravanDocumentChanceOffset = 35,
@@ -92,7 +92,7 @@ Raids.Edicts <-
         }
 
         if (Raids.Standard.getFlag("Agitation", _lair) == Raids.Lairs.AgitationDescriptors.Relaxed && ::Math.rand(1, 100) > this.Internal.AgitationChance)
-        {   // TODO: test this
+        {  
             Raids.Lairs.setAgitation(_lair, Raids.Lairs.Procedures.Increment);
         }
 
@@ -122,7 +122,7 @@ Raids.Edicts <-
     }
 
     function executeOpportunistProcedure( _lair )
-    {   // TODO: test this with perspicuity
+    {   
         Raids.Lairs.repopulateNamedLoot(_lair);
     }
 
@@ -161,7 +161,7 @@ Raids.Edicts <-
             return false;
         }
 
-        if (history.find(_edictName))
+        if (history.find(_edictName) != null)
         {
             return true;
         }
@@ -259,7 +259,7 @@ Raids.Edicts <-
     }
 
     function getTreasureOffset( _lair )
-    {   // TODO: test this
+    {   
         if (!this.findEdictInHistory("Abundance", _lair))
         {
             return 0;
