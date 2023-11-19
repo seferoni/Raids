@@ -47,9 +47,9 @@ Raids.Caravans <-
     Parameters =
     {
         MaximumTroopOffset = 7,
-        NamedItemChance = 5, 
-        ReinforcementThresholdDays = 50,
-        SupplyCaravanDocumentChanceOffset = 25
+        NamedItemChance = 100, // TODO: inflated, revert to 5
+        ReinforcementThresholdDays = 1, // TODO: inflated, revert to 50
+        SupplyCaravanDocumentChanceOffset = 25 
     },
     SouthernGoods = 
     [
