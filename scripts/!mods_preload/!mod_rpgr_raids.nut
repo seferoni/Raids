@@ -46,16 +46,16 @@ if (!Raids.Internal.MSUFound)
     Defaults = Raids.Defaults;
 
     local depopulateLairLootOnSpawn = pageLairs.addBooleanSetting("DepopulateLairLootOnSpawn", Defaults.DepopulateLairLootOnSpawn, "Depopulate Lair Loot On Spawn");
-    depopulateLairLootOnSpawn.setDescription("Determines whether Raids should depopulate newly spawned lairs of named loot. This is recommended to compensate for the additional named loot brought about by the introduction of agitation as a game mechanic.");
+    depopulateLairLootOnSpawn.setDescription("Determines whether Raids should depopulate newly spawned lairs of named loot.");
 
     local roamerScaleAgitationRequirement = pageLairs.addBooleanSetting("RoamerScaleAgitationRequirement", Defaults.RoamerScaleAgitationRequirement, "Roamer Scale Agitation Requirement");
-    roamerScaleAgitationRequirement.setDescription("Determines whether roamer scaling occurs only for lairs with baseline agitation. If set to false, this will result in stronger eligible roamer spawns on a game-wide basis.");
+    roamerScaleAgitationRequirement.setDescription("Determines whether roamer scaling occurs only for lairs with baseline Agitation. If set to false, this will result in stronger eligible roamer spawns on a game-wide basis.");
 
     local agitationIncrementChance = pageLairs.addRangeSetting("AgitationIncrementChance", Defaults.AgitationIncrementChance, 0, 100, 1, "Agitation Increment Chance");
-    agitationIncrementChance.setDescription("Determines the chance for a location's agitation value to increase upon engagement with a roaming party, if within proximity.");
+    agitationIncrementChance.setDescription("Determines the chance for a lair's Agitation value to increase upon engagement with a roaming party, if within proximity.");
 
     local agitationResourceModifier = pageLairs.addRangeSetting("AgitationResourceModifier", Defaults.AgitationResourceModifier, 50, 100, 10, "Agitation Resource Modifier");
-    agitationResourceModifier.setDescription("Controls how lair resource calculation is handled after each agitation change. Higher percentage values result in greater resources, and therefore more powerful garrisoned troops and better loot.");
+    agitationResourceModifier.setDescription("Controls how lair resource calculation is handled after each Agitation change. Higher percentage values result in greater resources, and therefore more powerful garrisoned troops and more loot.");
 
     local caravanReinforcementChance = pageCaravans.addRangeSetting("CaravanReinforcementChance", Defaults.CaravanReinforcementChance, 0, 100, 5, "Caravan Reinforcement Chance");
     caravanReinforcementChance.setDescription("Determines the percentage change for caravan troop count and composition reinforcement based on caravan wealth, and in special cases, cargo type.");

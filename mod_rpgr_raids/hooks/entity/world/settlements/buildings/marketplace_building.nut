@@ -1,6 +1,6 @@
 local Raids = ::RPGR_Raids;
 ::mods_hookExactClass("entity/world/settlements/buildings/marketplace_building", function( _object )
-{
+{   
     Raids.Standard.wrap(_object, "fillStash", function( _list, _stash, _priceMult, _allowDamagedEquipment = false )
     {
         this.building.fillStash(_list, _stash, _priceMult, _allowDamagedEquipment);
