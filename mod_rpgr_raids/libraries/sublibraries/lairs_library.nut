@@ -280,7 +280,7 @@ Raids.Lairs <-
         resourcesEntry.text <- format("%s resource units", Raids.Standard.colourWrap(format("%i", _lair.getResources()), "PositiveValue"));
         agitationEntry.text <- format("%s", Raids.Standard.colourWrap(format("%s (%i)", Raids.Standard.getDescriptor(agitation, this.AgitationDescriptors), agitation), textColour));
 
-        if (!lastUpdateDays)
+        if (!lastUpdateDays || agitation == this.AgitationDescriptors.Relaxed)
         {
             return [resourcesEntry, agitationEntry];
         }
