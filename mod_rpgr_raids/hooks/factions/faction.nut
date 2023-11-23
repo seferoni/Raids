@@ -30,7 +30,6 @@ local Raids = ::RPGR_Raids;
             return;
         }
 
-        local resourceDifference = Raids.Lairs.getResourceDifference(lair, lair.getResources() * Raids.Lairs.getTimeModifier(), _resources);
-        return [_tile, _name, _uniqueName, _template, _resources + resourceDifference];
+        return [_tile, _name, _uniqueName, _template, _resources + Raids.Lairs.getPartyResources(lair)];
     }, "overrideArguments");
 });

@@ -14,9 +14,9 @@ Raids.Lairs <-
         ::Const.FactionType.Barbarians,
         ::Const.FactionType.Goblins,
         ::Const.FactionType.Orcs,
-        ::Const.FactionType.OrientalBandits
+        ::Const.FactionType.OrientalBandits,
         ::Const.FactionType.Undead,
-        ::Const.FactionType.Zombies,
+        ::Const.FactionType.Zombies
     ],
     NamedItemKeys =
     [
@@ -220,7 +220,7 @@ Raids.Lairs <-
 
     function getMoneyCount( _lair )
     {
-        return (_lair.getResources());
+        return _lair.getResources();
     }
 
     function getNaiveNamedLootChance( _lair )
@@ -236,12 +236,13 @@ Raids.Lairs <-
         return baseChance + ((agitation - 1) * this.Parameters.NamedItemChancePerAgitationTier);
     }
 
-    function getResourceDifference( _lair, _lairResources, _partyResources )
+    function getPartyResources( _lair )
     {
-        local naiveDifference = _lairResources - _partyResources,
+        local resources = _lair.getResources(),
+        timeModifier = this.getTimeModifier(),
         baseResourceModifier = this.getBaseResourceModifier(Raids.Standard.getFlag("BaseResources", _lair)),
         configurableModifier = Raids.Standard.getPercentageSetting("RoamerResourceModifier");
-        return baseResourceModifier * configurableModifier * naiveDifference;
+        return baseResourceModifier * configurableModifier * timeModifier * resources;
     }
 
     function getSettlementClosestTo( _tile )
@@ -294,7 +295,7 @@ Raids.Lairs <-
 
     function getTreasureCount( _lair )
     {
-        return (::Math.ceil(_lair.getResources() / 100.0));
+        return ::Math.ceil(_lair.getResources() / 100.0);
     }
 
     function initialiseLairParameters( _lair )
@@ -316,21 +317,6 @@ Raids.Lairs <-
         if (activeContract.m.Destination.get() == _lair)
         {
             return true;
-        }
-
-        return false;
-    }
-
-    function isFactionViable( _faction )
-    {
-        local factionType = _faction.getType();
-
-        foreach( viableFaction in this.Factions )
-        {
-            if (factionType == viableFaction)
-            {
-                return true;
-            }
         }
 
         return false;
