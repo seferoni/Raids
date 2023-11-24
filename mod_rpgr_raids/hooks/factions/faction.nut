@@ -7,8 +7,8 @@ local Raids = ::RPGR_Raids;
         {
             return;
         }
-
-        if (Raids.Lairs.Factions.find(this.getType()) == null)
+        
+        if (!Raids.Lairs.isFactionViable(this))
         {
             return;
         }

@@ -15,8 +15,8 @@ Raids.Edicts <-
     ],
     Factions =
     [
-        ::Const.FactionType.Bandits,
-        ::Const.FactionType.OrientalBandits
+        "Bandits",
+        "OrientalBandits"
     ],
     Internal =
     {
@@ -315,10 +315,12 @@ Raids.Edicts <-
             return false;
         }
 
-        local factionType = ::World.FactionManager.getFaction(_lair.getFaction()).getType(),
-        factions = this.findEdict(this.getEdictID("Legibility"), _lair, true) != false ? Raids.Lairs.Factions : this.Factions;
+        local Lairs = Raids.Lairs,
+        factionType = ::World.FactionManager.getFaction(_lair.getFaction()).getType(),
+        factions = this.findEdict(this.getEdictID("Legibility"), _lair, true) != false ? Lairs.Factions : this.Factions,
+        viableFactions = factions.map(@(_factionName) Lairs.getFactionType(_factionName));
 
-        if (factions.find(factionType) != null)
+        if (viableFactions.find(factionType) != null)
         {
             return true;
         }

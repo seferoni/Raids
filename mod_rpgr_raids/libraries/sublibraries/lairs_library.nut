@@ -10,13 +10,13 @@ Raids.Lairs <-
     },
     Factions =
     [
-        ::Const.FactionType.Bandits,
-        ::Const.FactionType.Barbarians,
-        ::Const.FactionType.Goblins,
-        ::Const.FactionType.Orcs,
-        ::Const.FactionType.OrientalBandits,
-        ::Const.FactionType.Undead,
-        ::Const.FactionType.Zombies
+        "Bandits",
+        "Barbarians",
+        "Goblins",
+        "Orcs",
+        "OrientalBandits",
+        "Undead",
+        "Zombies"
     ],
     NamedItemKeys =
     [
@@ -218,6 +218,11 @@ Raids.Lairs <-
         return lairs;
     }
 
+    function getFactionType( _factionName )
+    {
+        return ::Const.FactionType[_factionName];
+    }
+
     function getMoneyCount( _lair )
     {
         return _lair.getResources();
@@ -316,6 +321,20 @@ Raids.Lairs <-
 
         if (activeContract.m.Destination.get() == _lair)
         {
+            return true;
+        }
+
+        return false;
+    }
+
+    function isFactionViable( _faction )
+    {
+        local Lairs = this, 
+        factionType = _faction.getType(),
+        viableFactions = this.Factions.map(@(_factionName) Lairs.getFactionType(_factionName));
+
+        if (viableFactions.find(factionType) != null)
+        { 
             return true;
         }
 

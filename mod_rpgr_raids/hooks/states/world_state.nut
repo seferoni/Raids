@@ -16,14 +16,14 @@ local Raids = ::RPGR_Raids;
         local factionIndex = Raids.Standard.getFlag("LastCombatFaction", ::World.Statistics);
 
         if (!(factionIndex in ::World.FactionManager.m.Factions))
-        {
+        {  
             Raids.Standard.log("Retrieved faction index was out of bounds, aborting lair agitation procedure.", true);
             return;
         }
 
         local faction = ::World.FactionManager.getFaction(factionIndex);
 
-        if (Raids.Lairs.Factions.find(faction.getType()) == null)
+        if (!Raids.Lairs.isFactionViable(faction))
         {
             return;
         }
