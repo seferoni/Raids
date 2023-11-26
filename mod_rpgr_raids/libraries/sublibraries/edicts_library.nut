@@ -70,7 +70,7 @@ Raids.Edicts <-
     }
 
     function executeAgitationProcedure( _lair )
-    {   // TODO: test this
+    {   
         this.resetContainer(this.findEdict(this.getEdictID("Agitation"), _lair), _lair, false);
         Raids.Lairs.setAgitation(_lair, Raids.Lairs.Procedures.Increment);
     }
@@ -121,7 +121,7 @@ Raids.Edicts <-
 
     }
 
-    function executeOpportunistProcedure( _lair )
+    function executeOpportunismProcedure( _lair )
     {   
         Raids.Lairs.repopulateNamedLoot(_lair);
     }
