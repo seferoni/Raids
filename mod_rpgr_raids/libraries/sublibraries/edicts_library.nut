@@ -4,14 +4,14 @@ Raids.Edicts <-
     Containers =
     [
         "EdictContainerA",
-        "EdictContainerB"
-    ]
+        "EdictContainerB",
+        "EdictContainerC"
+    ],
     CycledEdicts =
     [
         "Abundance",
         "Diminution",
-        "Opportunism",
-        "Retention"
+        "Opportunism"
     ],
     Factions =
     [
@@ -276,7 +276,7 @@ Raids.Edicts <-
 
         if (occupiedContainers.len() == 0)
         {
-            entries.extend([entryTemplate, entryTemplate]);
+            entries.resize(this.Containers.len(), entryTemplate);
             entries.extend(this.getSpecialEntries(_lair));
             return entries;
         }
@@ -290,7 +290,7 @@ Raids.Edicts <-
             entries.push(this.createTooltipEntry(_lair, iconPath, edictName, activityState));
         }
 
-        if (entries.len() < 2)
+        if (entries.len() < this.Containers.len())
         {
             entries.push(entryTemplate);
         }
@@ -303,8 +303,12 @@ Raids.Edicts <-
     {
         local occupiedContainers = [],
         occupancyCheck = @(_container) Raids.Standard.getFlag(_container, _lair) != false;
-        if (occupancyCheck("EdictContainerA")) occupiedContainers.push("EdictContainerA");
-        if (occupancyCheck("EdictContainerB")) occupiedContainers.push("EdictContainerB");
+
+        foreach( container in this.Containers )
+        {
+            if (occupancyCheck(container)) occupiedContainers.push(container);
+        }
+
         return occupiedContainers;
     }
 

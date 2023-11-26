@@ -23,27 +23,20 @@ this.edict_item <- ::inherit("scripts/items/item",
 
 	function executeEdictProcedure( _lairs )
 	{
-		local isContainerVacant = @(_container, _lair) !Raids.Standard.getFlag(_container, _lair),
-		isValid = false;
-
+		local isValid = false;
+		
 		foreach( lair in _lairs )
 		{
-			local container = null;
+			local vacantContainers = clone Raids.Edicts.Containers;
+			Raids.Standard.removeFromArray(Raids.Edicts.getOccupiedContainers(lair), vacantContainers);
 
-			if (isContainerVacant("EdictContainerA", lair))
-			{
-				container = "EdictContainerA";
-			}
-			else if (isContainerVacant("EdictContainerB", lair))
-			{
-				container = "EdictContainerB";
-			}
-
-			if (container == null)
+			if (vacantContainers.len() == 0)
 			{
 				continue;
 			}
 
+			foreach(container in vacantContainers) ::logInfo(container); // TODO: remove
+			local container = vacantContainers[0];
 			Raids.Standard.setFlag(container, this.getID(), lair);
 			Raids.Standard.setFlag(format("%sTime", container), ::World.getTime().Days, lair);
 			Raids.Standard.setFlag(format("%sDuration", container), this.getDiscoveryDuration(), lair);

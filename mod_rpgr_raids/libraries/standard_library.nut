@@ -154,6 +154,17 @@ Raids.Standard <-
         return array;
     }
 
+    function removeFromArray( _target, _array )
+    {
+        local targetArray = typeof _target == "array" ? _target : [_target];
+
+        foreach( entry in targetArray )
+        {
+            local index = _array.find(entry);
+            if (index != null) _array.remove(index);
+        }
+    }
+
     function setCase( _string, _case )
     {
         local character = _string[0].tochar()[_case]();
