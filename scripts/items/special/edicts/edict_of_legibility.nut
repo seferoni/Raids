@@ -9,7 +9,6 @@ this.edict_of_legibility <- ::inherit("scripts/items/special/edict_item",
 		this.m.Name = "Edict of Legibility";
 		this.setDescription("It is a functional and accessible treatise on the lingua franca of the realm.");
 		this.m.Value = 100;
-		this.m.IsCycled = false;
 		this.m.DiscoveryDays = 5;
 		this.m.EffectText = "Will permit edicts to be dispatched to nearby lairs inhabited by unconventional factions.";
 	}

@@ -165,17 +165,12 @@ Raids.Lairs <-
         local Lairs = ::RPGR_Raids.Lairs,
         lairs = ::World.EntityManager.getLocations().filter(function( _index, _location )
         {
-            if (!Lairs.isLocationTypeViable(_location.getLocationType()))
+            if (!Lairs.isLocationViable(_location))
             {
                 return false;
             }
 
             if (_tile.getDistanceTo(_location.getTile()) > _distance)
-            {
-                return false;
-            }
-
-            if (Lairs.isActiveContractLocation(_location))
             {
                 return false;
             }
@@ -197,17 +192,7 @@ Raids.Lairs <-
 
         lairs.extend(_faction.getSettlements().filter(function( _index, _location )
         {
-            if (!Lairs.isLocationTypeViable(_location.getLocationType()))
-            {
-                return false;
-            }
-
-            if (!Lairs.isPlayerInProximityTo(_location.getTile()))
-            {
-                return false;
-            }
-
-            if (Lairs.isActiveContractLocation(_location))
+            if (!Lairs.isLocationViable(_location, true, true))
             {
                 return false;
             }
@@ -341,26 +326,6 @@ Raids.Lairs <-
         return false;
     }
 
-    function isLairViable( _lair, _checkContract = true, _checkProximity = false )
-    {
-        if (!this.isLocationTypeViable(_lair.getLocationType()))
-        {
-            return false;
-        }
-
-        if (_checkContract && this.isActiveContractLocation(_lair))
-        {
-            return false;
-        }
-
-        if (_checkProximity && !this.isPlayerInProximityTo(_lair.getTile()))
-        {
-            return false;
-        }
-
-        return true;
-    }
-
     function isLairViableForProcedure( _lair, _procedure )
     {
         local agitation = Raids.Standard.getFlag("Agitation", _lair);
@@ -371,6 +336,26 @@ Raids.Lairs <-
         }
 
         if (_procedure == this.Procedures.Decrement && agitation <= this.AgitationDescriptors.Relaxed)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    function isLocationViable( _location, _checkContract = true, _checkProximity = false )
+    {
+        if (!this.isLocationTypeViable(_location.getLocationType()))
+        {
+            return false;
+        }
+
+        if (_checkContract && this.isActiveContractLocation(_location))
+        {
+            return false;
+        }
+
+        if (_checkProximity && !this.isPlayerInProximityTo(_location.getTile()))
         {
             return false;
         }

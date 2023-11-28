@@ -3,7 +3,7 @@ local Raids = ::RPGR_Raids;
 {
     Raids.Standard.wrap(_object, "dropTreasure", function( _num, _items, _lootTable )
     {   
-        if (!Raids.Lairs.isLairViable(this))
+        if (!Raids.Lairs.isLocationViable(this))
         {
             return;
         }
@@ -15,7 +15,7 @@ local Raids = ::RPGR_Raids;
 
     Raids.Standard.wrap(_object, "dropMoney", function( _num, _lootTable )
     {   
-        if (!Raids.Lairs.isLairViable(this))
+        if (!Raids.Lairs.isLocationViable(this))
         {
             return;
         }
@@ -26,7 +26,7 @@ local Raids = ::RPGR_Raids;
 
     Raids.Standard.wrap(_object, "onCombatStarted", function()
     {
-        if (!Raids.Lairs.isLairViable(this, false, true))
+        if (!Raids.Lairs.isLocationViable(this, false, true))
         {
             return;
         }
@@ -36,7 +36,7 @@ local Raids = ::RPGR_Raids;
 
     Raids.Standard.wrap(_object, "onSpawned", function()
     {
-        if (!Raids.Lairs.isLairViable(this))
+        if (!Raids.Lairs.isLocationViable(this))
         {
             return;
         }
@@ -51,7 +51,7 @@ local Raids = ::RPGR_Raids;
 
     Raids.Standard.wrap(_object, "getTooltip", function( _tooltipArray )
     {
-        if (!Raids.Lairs.isLairViable(this, true, true))
+        if (!Raids.Lairs.isLocationViable(this, true, true))
         {
             return;
         }

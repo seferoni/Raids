@@ -9,7 +9,6 @@ this.edict_of_perspicuity <- ::inherit("scripts/items/special/edict_item",
 		this.m.Name = "Edict of Perspicuity";
 		this.setDescription("It purports to map common stash spots and trafficking routes frequented by the enemies of the realm.");
 		this.m.Value = 400;
-		this.m.IsCycled = false;
-		this.m.EffectText = "Will induce nearby lairs to reveal the contents of their inventory.";
+		this.m.EffectText = "Will induce nearby lairs to reveal the number of Famed items kept in their inventories.";
 	}
 });

@@ -1,6 +1,6 @@
 local Raids = ::RPGR_Raids;
 Raids.Edicts <-
-{   // Note that while Edicts is formally a library in its own right, it is in practice dependent on Lairs, and vice versa.
+{  
     Containers =
     [
         "EdictContainerA",
@@ -32,7 +32,7 @@ Raids.Edicts <-
         AbundanceOffset = 1,
         DiminutionModifier = 0.90,
         ProspectingOffset = 5.0,
-        RetentionOffset = -5
+        RetentionOffset = -5.0
     }
 
     function addToHistory( _edictName, _lair )
@@ -292,7 +292,10 @@ Raids.Edicts <-
 
         if (entries.len() < this.Containers.len())
         {
-            entries.push(entryTemplate);
+            for( i = 0; i < this.Containers.len() - entries.len(); i++ )
+            {
+                entries.push(entryTemplate);
+            }
         }
 
         entries.extend(this.getSpecialEntries(_lair));
@@ -302,11 +305,11 @@ Raids.Edicts <-
     function getOccupiedContainers( _lair )
     {
         local occupiedContainers = [],
-        occupancyCheck = @(_container) Raids.Standard.getFlag(_container, _lair) != false;
+        occupied = @(_container) Raids.Standard.getFlag(_container, _lair) != false;
 
         foreach( container in this.Containers )
         {
-            if (occupancyCheck(container)) occupiedContainers.push(container);
+            if (occupied(container)) occupiedContainers.push(container);
         }
 
         return occupiedContainers;

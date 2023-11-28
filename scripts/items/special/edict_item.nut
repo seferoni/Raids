@@ -14,7 +14,6 @@ this.edict_item <- ::inherit("scripts/items/item",
 		this.m.IsDroppedAsLoot = true;
 		this.m.IsAllowedInBag = false;
 		this.m.IsUsable = true;
-		this.m.IsCycled <- true;
 		this.m.DiscoveryDays <- 2;
 		this.m.ScalingModality <- this.m.ScalingModalities.Static;
 		this.m.EffectText <- null;
@@ -35,7 +34,6 @@ this.edict_item <- ::inherit("scripts/items/item",
 				continue;
 			}
 
-			foreach(container in vacantContainers) ::logInfo(container); // TODO: remove
 			local container = vacantContainers[0];
 			Raids.Standard.setFlag(container, this.getID(), lair);
 			Raids.Standard.setFlag(format("%sTime", container), ::World.getTime().Days, lair);
@@ -70,7 +68,7 @@ this.edict_item <- ::inherit("scripts/items/item",
 
 	function getPersistenceText()
 	{
-		local descriptor = Raids.Standard.colourWrap(this.m.IsCycled ? "temporary" : "permanent", "NegativeValue");
+		local descriptor = Raids.Standard.colourWrap(this.isCycled() ? "temporary" : "permanent", "NegativeValue");
 		return format("This edict's effects are %s.", descriptor);
 	}
 
@@ -134,6 +132,11 @@ this.edict_item <- ::inherit("scripts/items/item",
 		});
 
 		return lairs;
+	}
+
+	function isCycled()
+	{
+		return Raids.Edicts.CycledEdicts.find(Raids.Edicts.getEdictName(this.getID())) != null;
 	}
 
     function playInventorySound( _eventType )
