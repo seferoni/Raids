@@ -18,12 +18,17 @@ Raids.Edicts <-
         "Bandits",
         "OrientalBandits"
     ],
+    InertEdicts =
+    [
+        "Agitation",
+        "Legibility"
+    ],
     Internal =
     {
         AgitationChance = 20,
         AgitationPrefactor = 0.1,
         ResourcesPrefactor = 0.001,
-        SupplyCaravanDocumentChanceOffset = 35,
+        SupplyCaravanDocumentChanceOffset = 35, 
         WritingInstrumentsChance = 66
     },
     Parameters =
@@ -91,7 +96,7 @@ Raids.Edicts <-
             this.resetContainerTime(_container, _lair);
         }
 
-        if (Raids.Standard.getFlag("Agitation", _lair) == Raids.Lairs.AgitationDescriptors.Relaxed && ::Math.rand(1, 100) > this.Internal.AgitationChance)
+        if (this.InertEdicts.find(edictName) == null && Raids.Standard.getFlag("Agitation", _lair) == Raids.Lairs.AgitationDescriptors.Relaxed && ::Math.rand(1, 100) > this.Internal.AgitationChance)
         {  
             Raids.Lairs.setAgitation(_lair, Raids.Lairs.Procedures.Increment);
         }
@@ -290,9 +295,14 @@ Raids.Edicts <-
             entries.push(this.createTooltipEntry(_lair, iconPath, edictName, activityState));
         }
 
+        ::logInfo(entries.len())
+        ::logInfo(this.Containers.len())
+
         if (entries.len() < this.Containers.len())
         {
-            for( i = 0; i < this.Containers.len() - entries.len(); i++ )
+            local iterations = this.Containers.len() - entries.len();
+
+            for( local i = 0; i < iterations; i++ )
             {
                 entries.push(entryTemplate);
             }

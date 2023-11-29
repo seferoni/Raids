@@ -14,7 +14,7 @@ this.counterfeiting_tools_item <- ::inherit("scripts/items/item",
 		this.m.Value = 300;
 		this.m.Icon = "misc/counterfeiting_tools_item.png";
 		this.m.SlotType = ::Const.ItemSlot.None;
-		this.m.ItemType = ::Const.Items.ItemType.Misc;
+		this.m.ItemType = ::Const.Items.ItemType.Supply | ::Const.Items.ItemType.Crafting;
 		this.m.IsDroppedAsLoot = true;
 		this.m.IsAllowedInBag = false;
 		this.m.IsUsable = false;

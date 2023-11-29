@@ -46,10 +46,9 @@ Raids.Caravans <-
     ],
     Parameters =
     {
-        MaximumTroopOffset = 7,
-        NamedItemChance = 100, // TODO: inflated, revert to 5
-        ReinforcementThresholdDays = 1, // TODO: inflated, revert to 50
-        SupplyCaravanDocumentChanceOffset = 25 
+        MaximumTroopOffset = 9,
+        NamedItemChance = 5, 
+        ReinforcementThresholdDays = 50
     },
     SouthernGoods = 
     [
@@ -93,11 +92,6 @@ Raids.Caravans <-
         namedItem = ::new(format("scripts/items/%s", namedCargo[::Math.rand(0, namedCargo.len() - 1)]));
         namedItem.onAddedToStash(null);
         _lootTable.push(namedItem);
-    }
-
-    function isPartyInitialised( _party )
-    {
-        return Raids.Standard.getFlag("CaravanWealth", _party) != false && Raids.Standard.getFlag("CaravanCargo", _party) != false;
     }
 
     function createCaravanCargo( _caravan, _settlement )
@@ -244,18 +238,29 @@ Raids.Caravans <-
 
     function getSituationModifier( _settlement )
     {
-        local modifier = 0, smallestIncrement = 1.0,
-        settlementSituations = _settlement.getSituations().map(@(_situation) _situation.getID());
+        local modifier = 0, grossSituations = _settlement.getSituations();
+        
+        if (grossSituations.len() == 0)
+        {
+            return modifier;
+        }
+
+        local settlementSituations = grossSituations.map(@(_situation) _situation.getID());
+
+        if (settlementSituations.len() == 0)
+        {
+            return modifier;
+        }
 
         foreach( situation in settlementSituations )
         {
             if (this.SynergisticSituations.find(situation) != null)
             {
-                modifier += smallestIncrement;
+                modifier += 1;
             }
             else if (this.AntagonisticSituations.find(situation) != null)
             {
-                modifier -= smallestIncrement;
+                modifier -= 1;
             }
         }
 
@@ -286,6 +291,11 @@ Raids.Caravans <-
         }
 
         this.reinforceTroops(_caravan, _settlement);
+    }
+
+    function isPartyInitialised( _party )
+    {
+        return Raids.Standard.getFlag("CaravanWealth", _party) != false && Raids.Standard.getFlag("CaravanCargo", _party) != false;
     }
 
     function isPartyViable( _party )
@@ -374,7 +384,8 @@ Raids.Caravans <-
 
     function setCaravanCargo( _caravan, _settlement )
     {
-        local randomNumber = ::Math.rand(1, 100), diceRoll = @(_value) randomNumber <= _value,
+        local randomNumber = ::Math.rand(1, 100), 
+        diceRoll = @(_value) randomNumber <= _value,
         cargoType = this.CargoDescriptors.Trade;
 
         if (diceRoll(this.CargoDistribution.Assortment) || _settlement.getProduce().len() == 0)

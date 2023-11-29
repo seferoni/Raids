@@ -8,7 +8,7 @@
         TERMINATE = "__end"
     },
     Defaults =
-    {   // TODO: revise these when done
+    {  
         AgitationIncrementChance = 70,
         AgitationResourceModifier = 70,
         CaravanReinforcementChance = 100,
@@ -63,7 +63,7 @@ if (!Raids.Internal.MSUFound)
     local factionSpecificNamedLootChance = pageLairs.addRangeSetting("FactionSpecificNamedLootChance", Defaults.FactionSpecificNamedLootChance, 0, 100, 5, "Faction Specific Named Loot Chance");
     factionSpecificNamedLootChance.setDescription("Determines the percentage chance for lairs to drop faction-specific named loot only, when conditions obtain.");
 
-    local officialDocumentDropChance = pageCaravans.addRangeSetting("OfficialDocumentDropChance", Defaults.OfficialDocumentDropChance, 10, 80, 5, "Official Document Drop Chance");
+    local officialDocumentDropChance = pageCaravans.addRangeSetting("OfficialDocumentDropChance", Defaults.OfficialDocumentDropChance, 10, 65, 5, "Official Document Drop Chance");
     officialDocumentDropChance.setDescription("Determines the chance for caravans to drop official documents on defeat. Official documents provide the only means for obtaining edicts.");
 
     local roamerScaleChance = pageLairs.addRangeSetting("RoamerScaleChance", Defaults.RoamerScaleChance, 0, 100, 5, "Roamer Scale Chance");

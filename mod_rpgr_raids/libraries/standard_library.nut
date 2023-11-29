@@ -1,13 +1,13 @@
 local Raids = ::RPGR_Raids;
 Raids.Standard <-
 {
-    function cacheHookedMethod( _object, _functionName )
+    function cacheHookedMethod( _object, _methodName )
     {
         local naiveMethod = null;
 
-        if (_functionName in _object)
+        if (_methodName in _object)
         {
-            naiveMethod = _object[_functionName];
+            naiveMethod = _object[_methodName];
         }
 
         return naiveMethod;
@@ -196,19 +196,18 @@ Raids.Standard <-
         return false;
     }
 
-    function wrap( _object, _functionName, _function, _procedure = "overrideReturn" )
+    function wrap( _object, _methodName, _function, _procedure = "overrideReturn" )
     {
-        local cachedMethod = this.cacheHookedMethod(_object, _functionName),
-        Standard = ::RPGR_Raids.Standard,
-        parentName = _object.SuperName;
+        local cachedMethod = this.cacheHookedMethod(_object, _methodName),
+        Standard = this, parentName = _object.SuperName;
 
-        _object.rawset(_functionName, function( ... )
+        _object.rawset(_methodName, function( ... )
         {
-            local originalMethod = cachedMethod == null ? this[parentName][_functionName] : cachedMethod;
+            local originalMethod = cachedMethod == null ? this[parentName][_methodName] : cachedMethod;
 
             if (!Standard.validateParameters(originalMethod, vargv))
             {
-                Standard.log(format("An invalid number of parameters were passed to %s, aborting wrap procedure.", _functionName), true);
+                Standard.log(format("An invalid number of parameters were passed to %s, aborting wrap procedure.", _methodName), true);
                 return;
             }
 
