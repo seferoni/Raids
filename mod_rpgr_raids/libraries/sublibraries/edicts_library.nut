@@ -25,7 +25,7 @@ Raids.Edicts <-
     ],
     Internal =
     {
-        AgitationChance = 20,
+        AgitationChance = 15,
         AgitationPrefactor = 0.1,
         ResourcesPrefactor = 0.001,
         SupplyCaravanDocumentChanceOffset = 35, 
@@ -294,9 +294,6 @@ Raids.Edicts <-
             activityState = inDiscovery ? "Discovery" : "Active";
             entries.push(this.createTooltipEntry(_lair, iconPath, edictName, activityState));
         }
-
-        ::logInfo(entries.len())
-        ::logInfo(this.Containers.len())
 
         if (entries.len() < this.Containers.len())
         {

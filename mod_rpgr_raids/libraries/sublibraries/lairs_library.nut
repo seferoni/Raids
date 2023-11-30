@@ -110,7 +110,7 @@ Raids.Lairs <-
     }
 
     function getBaseResourceModifier( _resources )
-    {   // The arbitrary coefficients and constants used here are calibrated to ensure smooth scaling behaviour between resource breakpoints.
+    {   # The arbitrary coefficients and constants used here are calibrated to ensure smooth scaling behaviour between resource breakpoints.
         local modifier = 1.0;
 
         if (_resources <= this.Parameters.ResourceModifierLowerBound)
@@ -214,7 +214,7 @@ Raids.Lairs <-
     }
 
     function getNaiveNamedLootChance( _lair )
-    {   // The arbitrary coefficients and constants used here are taken verbatim from the vanilla codebase.
+    {   # The arbitrary coefficients and constants used here are taken verbatim from the vanilla codebase.
         local tile = _lair.getTile(), settlement = this.getSettlementClosestTo(tile);
 		return (_lair.getResources() + tile.getDistanceTo(settlement.getTile()) * 4) / 5.0 - 37.0;
     }
@@ -314,12 +314,12 @@ Raids.Lairs <-
 
     function isFactionViable( _faction )
     {
-        local Lairs = this, 
+        local Lairs = this,
         factionType = _faction.getType(),
         viableFactions = this.Factions.map(@(_factionName) Lairs.getFactionType(_factionName));
 
         if (viableFactions.find(factionType) != null)
-        { 
+        {
             return true;
         }
 
