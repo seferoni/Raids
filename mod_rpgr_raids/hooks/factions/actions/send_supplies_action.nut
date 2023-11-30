@@ -3,8 +3,7 @@ local Raids = ::RPGR_Raids;
 {
     Raids.Standard.wrap(_object, "onExecute", function( _faction )
     {
-        local grossEntities = ::World.getAllEntitiesAtPos(this.m.Start.getPos(), 1.0);
-        local caravan = null;
+        local grossEntities = ::World.getAllEntitiesAtPos(this.m.Start.getPos(), 1.0), caravan = null;
 
         foreach( entity in grossEntities )
         {

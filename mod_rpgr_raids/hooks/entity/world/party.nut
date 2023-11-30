@@ -8,6 +8,11 @@ local Raids = ::RPGR_Raids;
             return;
         }
 
+        if (Raids.Caravans.isPartyViable(this) && Raids.Caravans.isPartyInitialised(this))
+        {
+            Raids.Caravans.updateOrigin(Raids.Standard.getFlag("CaravanOrigin", this));
+        }
+
         Raids.Lairs.updateCombatStatistics(true);
     });
 

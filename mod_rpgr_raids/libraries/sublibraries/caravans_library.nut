@@ -28,7 +28,7 @@ Raids.Caravans <-
         Trade = 100,
         Assortment = 20
     },
-    ExcludedGoods = 
+    ExcludedGoods =
     [
         "supplies/food_item",
         "supplies/money_item",
@@ -37,7 +37,7 @@ Raids.Caravans <-
         "supplies/fermented_unhold_heart_item",
         "supplies/black_marsh_stew_item"
     ],
-    NamedItemKeys = 
+    NamedItemKeys =
     [
         "NamedArmors",
         "NamedWeapons",
@@ -46,11 +46,15 @@ Raids.Caravans <-
     ],
     Parameters =
     {
+        MaximumSituationOffset = 1,
         MaximumTroopOffset = 9,
-        NamedItemChance = 5, 
-        ReinforcementThresholdDays = 50
+        MinimumSituationOffset = -1,
+        NamedItemChance = 5,
+        ReinforcementThresholdDays = 50,
+        SituationExtensionDuration = 4,
+        SituationMaximumDuration = 14
     },
-    SouthernGoods = 
+    SouthernGoods =
     [
         "supplies/dates_item",
         "supplies/rice_item",
@@ -79,7 +83,7 @@ Raids.Caravans <-
     function addToInventory( _caravan, _goodsPool )
     {
         local iterations = Raids.Standard.getFlag("CaravanWealth", _caravan) - 1;
-        
+
         for( local i = 0; i < iterations; i++ )
         {
             _caravan.addToInventory(_goodsPool[::Math.rand(0, _goodsPool.len() - 1)]);
@@ -169,7 +173,7 @@ Raids.Caravans <-
         {
             return this.SouthernGoods;
         }
-        
+
         local exclusionList = clone this.ExcludedGoods;
         exclusionList.extend(this.SouthernGoods);
         local scriptFiles = ::IO.enumerateFiles("scripts/items/trade");
@@ -236,35 +240,35 @@ Raids.Caravans <-
         return ::Math.min(this.Parameters.MaximumTroopOffset, naiveIterations);
     }
 
-    function getSituationModifier( _settlement )
+    function getSituationOffset( _settlement )
     {
-        local modifier = 0, grossSituations = _settlement.getSituations();
-        
+        local offset = 0, grossSituations = _settlement.getSituations();
+
         if (grossSituations.len() == 0)
         {
-            return modifier;
+            return offset;
         }
 
         local settlementSituations = grossSituations.map(@(_situation) _situation.getID());
 
         if (settlementSituations.len() == 0)
         {
-            return modifier;
+            return offset;
         }
 
         foreach( situation in settlementSituations )
         {
             if (this.SynergisticSituations.find(situation) != null)
             {
-                modifier += 1;
+                offset += 1;
             }
             else if (this.AntagonisticSituations.find(situation) != null)
             {
-                modifier -= 1;
+                offset -= 1;
             }
         }
 
-        return ::Math.max(0, modifier);
+        return offset <= 0 ? ::Math.max(this.Parameters.MinimumSituationOffset, offset) : this.Parameters.MaximumSituationOffset;
     }
 
     function initialiseCaravanParameters( _caravan, _settlement )
@@ -273,6 +277,7 @@ Raids.Caravans <-
         diceRoll = @(_value) randomNumber <= _value;
         this.setCaravanWealth(_caravan, _settlement);
         this.setCaravanCargo(_caravan, _settlement);
+        this.setCaravanOrigin(_caravan, _settlement);
         this.populateInventory(_caravan, _settlement);
 
         if (Raids.Standard.getFlag("CaravanWealth", _caravan) < this.WealthDescriptors.Plentiful)
@@ -295,7 +300,8 @@ Raids.Caravans <-
 
     function isPartyInitialised( _party )
     {
-        return Raids.Standard.getFlag("CaravanWealth", _party) != false && Raids.Standard.getFlag("CaravanCargo", _party) != false;
+        local isInitialised = @(_flag) Raids.Standard.getFlag(_flag, _party) != false;
+        return isInitialised("CaravanWealth") && isInitialised("CaravanCargo") && isInitialised("CaravanOrigin");
     }
 
     function isPartyViable( _party )
@@ -364,27 +370,9 @@ Raids.Caravans <-
         ::Const.World.Common.addTroop(_caravan, {Type = eliteTroops[::Math.rand(0, eliteTroops.len() - 1)]}, true);
     }
 
-    function setCaravanWealth( _caravan, _settlement )
-    {
-        local caravanWealth = ::Math.rand(1, 2);
-
-        if (_settlement.isMilitary() || _settlement.isSouthern())
-        {
-            caravanWealth += 1;
-        }
-
-        if (_settlement.getSize() >= 3)
-        {
-            caravanWealth += 1;
-        }
-
-        caravanWealth += ::Math.ceil(this.getSituationModifier(_settlement));
-        Raids.Standard.setFlag("CaravanWealth", ::Math.min(this.WealthDescriptors.Abundant, caravanWealth), _caravan);
-    }
-
     function setCaravanCargo( _caravan, _settlement )
     {
-        local randomNumber = ::Math.rand(1, 100), 
+        local randomNumber = ::Math.rand(1, 100),
         diceRoll = @(_value) randomNumber <= _value,
         cargoType = this.CargoDescriptors.Trade;
 
@@ -398,5 +386,42 @@ Raids.Caravans <-
         }
 
         Raids.Standard.setFlag("CaravanCargo", cargoType, _caravan);
+    }
+
+    function setCaravanOrigin( _caravan, _settlement )
+    {
+        Raids.Standard.setFlag("CaravanOrigin", _settlement, _caravan);
+    }
+
+    function setCaravanWealth( _caravan, _settlement )
+    {
+        local caravanWealth = ::Math.rand(1, 2),
+        normalise = @(_value) ::Math.min(::Math.max(_value, this.WealthDescriptors.Meager), this.WealthDescriptors.Abundant);
+
+        if (_settlement.isMilitary() || _settlement.isSouthern())
+        {
+            caravanWealth += 1;
+        }
+
+        if (_settlement.getSize() >= 3)
+        {
+            caravanWealth += 1;
+        }
+
+        caravanWealth += this.getSituationOffset(_settlement);
+        Raids.Standard.setFlag("CaravanWealth", normalise(caravanWealth), _caravan);
+    }
+
+    function updateOrigin( _settlement )
+    {
+        if (_settlement.hasSituation("situation.ambushed_trade_routes"))
+        {
+            local situation = _settlement.getSituationByID("situation.ambushed_trade_routes"),
+            duration = situation.getValidUntil() + this.Parameters.SituationExtensionDuration;
+            situation.setValidForDays(::Math.min(this.Parameters.SituationMaximumDuration, duration));
+            return;
+        }
+
+        _settlement.addSituation(::new("scripts/entity/world/settlements/situations/ambushed_trade_routes_situation"));
     }
 };
