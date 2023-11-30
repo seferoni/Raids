@@ -1,11 +1,11 @@
 local Raids = ::RPGR_Raids;
 this.official_document_item <- ::inherit("scripts/items/item",
 {
-    m = {},
+	m = {},
 	function create()
 	{
 		this.item.create();
-        this.m.ID = "special.official_document_item";
+		this.m.ID = "special.official_document_item";
 		this.m.Name = "Official Document";
 		this.m.Description = "A sealed document. The materials used in its fabrication are fairly rare, but rarer still would be a pair of literate hands to pen its contents.";
 		this.m.Value = 150;
@@ -15,36 +15,36 @@ this.official_document_item <- ::inherit("scripts/items/item",
 		this.m.IsDroppedAsLoot = true;
 		this.m.IsAllowedInBag = false;
 		this.m.IsUsable = true;
-        this.m.EffectText <- "Will produce a counterfeit edict, but only if a set of counterfeiting tools are present.";
-        this.m.InstructionText <- "Right-click to modify its contents.";
+		this.m.EffectText <- "Will produce a counterfeit edict, but only if a set of counterfeiting tools are present.";
+		this.m.InstructionText <- "Right-click to modify its contents.";
 	}
 
-    function findCounterfeitingTools()
-    {
-        local stash = ::World.Assets.getStash().getItems();
+	function findCounterfeitingTools()
+	{
+		local stash = ::World.Assets.getStash().getItems();
 
-        foreach( item in stash )
-        {
-            if (item != null && item.getID() == "misc.counterfeiting_tools_item")
-            {
-                return item;
-            }
-        }
+		foreach( item in stash )
+		{
+			if (item != null && item.getID() == "misc.counterfeiting_tools_item")
+			{
+				return item;
+			}
+		}
 
-        return false;
-    }
+		return false;
+	}
 
 	function getEffect()
-    {
-        return this.m.EffectText;
-    }
+	{
+		return this.m.EffectText;
+	}
 
 	function getInstruction()
 	{
 		return this.m.InstructionText;
 	}
 
-    function getTooltip()
+	function getTooltip()
 	{
 		local tooltipArray =
 		[
@@ -58,7 +58,7 @@ this.official_document_item <- ::inherit("scripts/items/item",
 		return tooltipArray;
 	}
 
-    function playInventorySound( _eventType )
+	function playInventorySound( _eventType )
 	{
 		::Sound.play("sounds/cloth_01.wav", ::Const.Sound.Volume.Inventory);
 	}
@@ -67,15 +67,15 @@ this.official_document_item <- ::inherit("scripts/items/item",
 	{
 		local counterfeitingTools = this.findCounterfeitingTools();
 
-        if (!counterfeitingTools)
-        {
-            return false;
-        }
+		if (!counterfeitingTools)
+		{
+			return false;
+		}
 
-        ::Sound.play("sounds/scribble.wav", ::Const.Sound.Volume.Inventory);
-        ::World.Assets.getStash().add(Raids.Edicts.createEdict());
+		::Sound.play("sounds/scribble.wav", ::Const.Sound.Volume.Inventory);
+		::World.Assets.getStash().add(Raids.Edicts.createEdict());
 		this.updateUses(counterfeitingTools);
-        return true;
+		return true;
 	}
 
 	function updateUses( _counterfeitingTools )

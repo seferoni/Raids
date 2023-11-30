@@ -1,11 +1,11 @@
 local Raids = ::RPGR_Raids;
 this.edict_of_abundance <- ::inherit("scripts/items/special/edict_item",
 {
-    m = {},
+	m = {},
 	function create()
 	{
 		this.edict_item.create();
-        this.m.ID = "special.edict_of_abundance";
+		this.m.ID = "special.edict_of_abundance";
 		this.m.Name = "Edict of Abundance";
 		this.setDescription("It speculates on an upsurge of demand for locally sourced trade goods.");
 		this.m.Value = 50;

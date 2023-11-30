@@ -1,5 +1,5 @@
 this.counterfeiting_tools_01_blueprint <- ::inherit("scripts/crafting/blueprint",
-{	
+{
 	m = {},
 	function create()
 	{
@@ -8,7 +8,7 @@ this.counterfeiting_tools_01_blueprint <- ::inherit("scripts/crafting/blueprint"
 		this.m.PreviewCraftable = ::new("scripts/items/misc/counterfeiting_tools_item");
 		this.m.Cost = 100;
 		local ingredients =
-        [
+		[
 			{Script = "scripts/items/misc/spider_silk_item", Num = 1},
 			{Script = "scripts/items/misc/poison_gland_item", Num = 1}
 		];

@@ -1,7 +1,7 @@
 local Raids = ::RPGR_Raids;
 this.edict_item <- ::inherit("scripts/items/item",
 {
-    m = 
+	m = 
 	{
 		ScalingModalities = {Static = 0, Agitation = 1, Resources = 2}
 	},
@@ -57,9 +57,9 @@ this.edict_item <- ::inherit("scripts/items/item",
 	}
 
 	function getEffectText()
-    {
+	{
 		return this.m.EffectText;
-    }
+	}
 
 	function getInstructionText()
 	{
@@ -84,7 +84,7 @@ this.edict_item <- ::inherit("scripts/items/item",
 		return format("This edict's effects scale with lair %s.", Raids.Standard.colourWrap(scaling == modalities.Agitation ? "Agitation" : "resources", "NegativeValue"));
 	}
 
-    function getTooltip()
+	function getTooltip()
 	{
 		local tooltipArray =
 		[
@@ -139,7 +139,7 @@ this.edict_item <- ::inherit("scripts/items/item",
 		return Raids.Edicts.CycledEdicts.find(Raids.Edicts.getEdictName(this.getID())) != null;
 	}
 
-    function playInventorySound( _eventType )
+	function playInventorySound( _eventType )
 	{
 		::Sound.play("sounds/cloth_01.wav", ::Const.Sound.Volume.Inventory);
 	}
