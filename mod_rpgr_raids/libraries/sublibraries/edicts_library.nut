@@ -1,6 +1,6 @@
 local Raids = ::RPGR_Raids;
 Raids.Edicts <-
-{  
+{  // TODO: add an edict that resets spawn time
 	Containers =
 	[
 		"EdictContainerA",
