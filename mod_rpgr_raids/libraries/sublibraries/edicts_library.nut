@@ -1,6 +1,6 @@
 local Raids = ::RPGR_Raids;
 Raids.Edicts <-
-{  // TODO: add an edict that resets spawn time
+{
 	Containers =
 	[
 		"EdictContainerA",
@@ -11,6 +11,7 @@ Raids.Edicts <-
 	[
 		"Abundance",
 		"Diminution",
+		"Mobilisation",
 		"Opportunism"
 	],
 	Factions =
@@ -28,7 +29,7 @@ Raids.Edicts <-
 		AgitationChance = 15,
 		AgitationPrefactor = 0.1,
 		ResourcesPrefactor = 0.001,
-		SupplyCaravanDocumentChanceOffset = 35, 
+		SupplyCaravanDocumentChanceOffset = 35,
 		WritingInstrumentsChance = 66
 	},
 	Parameters =
@@ -36,12 +37,13 @@ Raids.Edicts <-
 		AbundanceCeiling = 3,
 		AbundanceOffset = 1,
 		DiminutionModifier = 0.90,
+		MobilisationOffset = 12.0,
 		ProspectingOffset = 5.0,
 		RetentionOffset = -5.0
 	}
 
 	function addToHistory( _edictName, _lair )
-	{   
+	{
 		local history = Raids.Standard.getFlag("EdictHistory", _lair),
 		newHistory = format("%s%s", !history ? "" : format("%s, ", history), _edictName);
 		Raids.Standard.setFlag("EdictHistory", newHistory, _lair);
@@ -75,7 +77,7 @@ Raids.Edicts <-
 	}
 
 	function executeAgitationProcedure( _lair )
-	{   
+	{
 		this.resetContainer(this.findEdict(this.getEdictID("Agitation"), _lair), _lair, false);
 		Raids.Lairs.setAgitation(_lair, Raids.Lairs.Procedures.Increment);
 	}
@@ -97,7 +99,7 @@ Raids.Edicts <-
 		}
 
 		if (this.InertEdicts.find(edictName) == null && Raids.Standard.getFlag("Agitation", _lair) == Raids.Lairs.AgitationDescriptors.Relaxed && ::Math.rand(1, 100) > this.Internal.AgitationChance)
-		{  
+		{
 			Raids.Lairs.setAgitation(_lair, Raids.Lairs.Procedures.Increment);
 		}
 
@@ -110,10 +112,15 @@ Raids.Edicts <-
 	}
 
 	function executeDiminutionProcedure( _lair )
-	{   
+	{
 		local modifier = this.Parameters.DiminutionModifier - (this.Internal.ResourcesPrefactor * _lair.getResources());
 		_lair.setResources(::Math.max(Raids.Standard.getFlag("BaseResources", _lair) / 2, ::Math.floor(modifier * _lair.getResources())));
 		_lair.createDefenders();
+	}
+
+	function executeMobilisationProcedure( _lair )
+	{
+		_lair.m.LastSpawnTime = _lair.getLastSpawnTime() - this.Parameters.MobilisationOffset;
 	}
 
 	function executeNullificationProcedure( _lair )
@@ -123,11 +130,10 @@ Raids.Edicts <-
 		Raids.Lairs.setResourcesByAgitation(_lair);
 		_lair.createDefenders();
 		_lair.setLootScaleBasedOnResources(_lair.getResources());
-
 	}
 
 	function executeOpportunismProcedure( _lair )
-	{   
+	{
 		Raids.Lairs.repopulateNamedLoot(_lair);
 	}
 
@@ -264,7 +270,7 @@ Raids.Edicts <-
 	}
 
 	function getTreasureOffset( _lair )
-	{   
+	{
 		if (!this.findEdictInHistory("Abundance", _lair))
 		{
 			return 0;
@@ -275,7 +281,7 @@ Raids.Edicts <-
 	}
 
 	function getTooltipEntries( _lair )
-	{   
+	{
 		local entryTemplate = {id = 20, type = "text", icon = "ui/icons/unknown_traits.png", text = "Edict: Vacant"},
 		entries = [], occupiedContainers = this.getOccupiedContainers(_lair);
 
@@ -305,6 +311,7 @@ Raids.Edicts <-
 			}
 		}
 
+		::logInfo(_lair.getLastSpawnTime()); // TODO: remove this
 		entries.extend(this.getSpecialEntries(_lair));
 		return entries;
 	}
@@ -343,7 +350,7 @@ Raids.Edicts <-
 	}
 
 	function refreshEdicts( _lair )
-	{   
+	{
 		local history = Raids.Standard.getFlag("EdictHistory", _lair);
 
 		if (!history)
@@ -359,7 +366,7 @@ Raids.Edicts <-
 			{
 				continue;
 			}
-			
+
 			local procedure = format("execute%sProcedure", edictName);
 
 			if (!(procedure in this))

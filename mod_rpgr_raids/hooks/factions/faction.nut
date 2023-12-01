@@ -7,7 +7,7 @@ local Raids = ::RPGR_Raids;
 		{
 			return;
 		}
-		
+
 		if (!Raids.Lairs.isFactionViable(this))
 		{
 			return;
