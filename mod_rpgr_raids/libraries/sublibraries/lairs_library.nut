@@ -109,6 +109,12 @@ Raids.Lairs <-
 		}
 	}
 
+	function getAgitationDecayInterval( _lair )
+	{
+		local decayInterval = this.Parameters.AgitationDecayInterval + Raids.Edicts.getAgitationDecayOffset(_lair);
+		return decayInterval;
+	}
+
 	function getBaseResourceModifier( _resources )
 	{	# The arbitrary coefficients and constants used here are calibrated to ensure smooth scaling behaviour between resource breakpoints.
 		local modifier = 1.0;
@@ -276,7 +282,7 @@ Raids.Lairs <-
 			return [resourcesEntry, agitationEntry];
 		}
 
-		local timeDifference = (lastUpdateDays + this.Parameters.AgitationDecayInterval) - ::World.getTime().Days,
+		local timeDifference = (lastUpdateDays + this.getAgitationDecayInterval(_lair)) - ::World.getTime().Days,
 		timeEntry = clone resourcesEntry;
 		timeEntry.icon = "ui/icons/action_points.png";
 		timeEntry.text = format("%s day(s)", Raids.Standard.colourWrap(timeDifference, "NegativeValue"));
@@ -444,7 +450,7 @@ Raids.Lairs <-
 		}
 
 		local timeDifference = ::World.getTime().Days - lastUpdateTimeDays,
-		decayInterval = this.Parameters.AgitationDecayInterval;
+		decayInterval = this.getAgitationDecayInterval(_lair);
 
 		if (timeDifference < decayInterval)
 		{

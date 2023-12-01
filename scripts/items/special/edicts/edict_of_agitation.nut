@@ -9,7 +9,7 @@ this.edict_of_agitation <- ::inherit("scripts/items/special/edict_item",
 		this.m.Name = "Edict of Agitation";
 		this.setDescription("It specifies the date, time, and mustered strength of a scheduled raid.");
 		this.m.Value = 20;
-		this.m.EffectText = "Will agitate nearby lairs.";
+		this.m.EffectText = "Will Agitate nearby lairs.";
 	}
 
 	function getViableLairs()

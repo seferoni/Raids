@@ -37,9 +37,10 @@ Raids.Edicts <-
 		AbundanceCeiling = 3,
 		AbundanceOffset = 1,
 		DiminutionModifier = 0.90,
-		MobilisationOffset = 12.0,
+		MobilisationOffset = 150.0,
 		ProspectingOffset = 5.0,
 		RetentionOffset = -5.0
+		StasisOffset = 7,
 	}
 
 	function addToHistory( _edictName, _lair )
@@ -120,7 +121,7 @@ Raids.Edicts <-
 
 	function executeMobilisationProcedure( _lair )
 	{
-		_lair.m.LastSpawnTime = _lair.getLastSpawnTime() - this.Parameters.MobilisationOffset;
+		_lair.m.LastSpawnTime = ::Math.max(0.0, _lair.getLastSpawnTime() - this.Parameters.MobilisationOffset);
 	}
 
 	function executeNullificationProcedure( _lair )
@@ -178,6 +179,18 @@ Raids.Edicts <-
 		}
 
 		return false;
+	}
+
+	function getAgitationDecayOffset( _lair )
+	{
+		local offset = 0;
+
+		if (this.findEdict(this.getEdictID("Stasis"), _lair, true) != false)
+		{
+			offset += this.Parameters.StasisOffset;
+		}
+
+		return offset;
 	}
 
 	function getEdictID( _edictName )
@@ -311,7 +324,6 @@ Raids.Edicts <-
 			}
 		}
 
-		::logInfo(_lair.getLastSpawnTime()); // TODO: remove this
 		entries.extend(this.getSpecialEntries(_lair));
 		return entries;
 	}
