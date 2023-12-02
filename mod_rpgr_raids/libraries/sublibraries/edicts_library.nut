@@ -387,7 +387,7 @@ Raids.Edicts <-
 			return;
 		}
 
-		local viableEdicts = this.CycledEdicts.filter(@(_index, _edictID) history.find(_edictID) != null);
+		local viableEdicts = this.CycledEdicts.filter(@(_index, _edictName) history.find(_edictName) != null);
 
 		foreach( edictName in viableEdicts )
 		{
