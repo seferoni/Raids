@@ -220,7 +220,7 @@ Raids.Lairs <-
 	}
 
 	function getNaiveNamedLootChance( _lair )
-	{   # The arbitrary coefficients and constants used here are taken verbatim from the vanilla codebase.
+	{	# The arbitrary coefficients and constants used here are taken verbatim from the vanilla codebase.
 		local tile = _lair.getTile(), settlement = this.getSettlementClosestTo(tile);
 		return (_lair.getResources() + tile.getDistanceTo(settlement.getTile()) * 4) / 5.0 - 37.0;
 	}
@@ -400,7 +400,7 @@ Raids.Lairs <-
 
 		local namedLoot = this.createNamedLoot(_lair);
 
-		for ( local i = 0; i < iterations ; i++ )
+		for ( local i = 0; i < iterations; i++ )
 		{
 			local namedItem = namedLoot[::Math.rand(0, namedLoot.len() - 1)];
 			_lair.getLoot().add(::new(format("scripts/items/%s", namedItem)));

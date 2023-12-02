@@ -271,7 +271,7 @@ Raids.Edicts <-
 
 	function getSpawnTimeOffset( _lair )
 	{
-		local offset = 0,
+		local offset = 0.0,
 		agitation = Raids.Standard.getFlag("Agitation", _lair);
 
 		if (this.findEdict(this.getEdictID("Mobilisation"), _lair, true) != false)
@@ -301,12 +301,14 @@ Raids.Edicts <-
 
 	function getTreasureOffset( _lair )
 	{
+		local offset = 0;
+
 		if (!this.findEdictInHistory("Abundance", _lair))
 		{
-			return 0;
+			return offset;
 		}
 
-		local offset = ::Math.min(this.Parameters.AbundanceCeiling, this.Parameters.AbundanceOffset * Raids.Standard.getFlag("Agitation", _lair));
+		offset = ::Math.min(this.Parameters.AbundanceCeiling, this.Parameters.AbundanceOffset * Raids.Standard.getFlag("Agitation", _lair));
 		return offset;
 	}
 
@@ -380,14 +382,12 @@ Raids.Edicts <-
 
 	function refreshEdicts( _lair )
 	{
-		local history = Raids.Standard.getFlag("EdictHistory", _lair);
-
-		if (!history)
+		if (!Raids.Standard.getFlag("EdictHistory", _lair))
 		{
 			return;
 		}
 
-		local viableEdicts = this.CycledEdicts.filter(@(_index, _edictName) history.find(_edictName) != null);
+		local Edicts = this, viableEdicts = this.CycledEdicts.filter(@(_index, _edictName) Edicts.findEdictInHistory(_edictName, _lair));
 
 		foreach( edictName in viableEdicts )
 		{
