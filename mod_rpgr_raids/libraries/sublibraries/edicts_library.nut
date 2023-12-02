@@ -11,7 +11,6 @@ Raids.Edicts <-
 	[
 		"Abundance",
 		"Diminution",
-		"Mobilisation",
 		"Opportunism"
 	],
 	Factions =
@@ -26,8 +25,7 @@ Raids.Edicts <-
 	],
 	Internal =
 	{
-		AgitationChance = 15,
-		AgitationPrefactor = 0.1,
+		AgitationChance = 20,
 		ResourcesPrefactor = 0.001,
 		SupplyCaravanDocumentChanceOffset = 35,
 		WritingInstrumentsChance = 66
@@ -37,7 +35,7 @@ Raids.Edicts <-
 		AbundanceCeiling = 3,
 		AbundanceOffset = 1,
 		DiminutionModifier = 0.90,
-		MobilisationOffset = 150.0,
+		MobilisationOffset = -37.5,
 		ProspectingOffset = 5.0,
 		RetentionOffset = -5.0
 		StasisOffset = 7,
@@ -99,17 +97,27 @@ Raids.Edicts <-
 			this.resetContainerTime(_container, _lair);
 		}
 
-		if (this.InertEdicts.find(edictName) == null && Raids.Standard.getFlag("Agitation", _lair) == Raids.Lairs.AgitationDescriptors.Relaxed && ::Math.rand(1, 100) > this.Internal.AgitationChance)
+		if (procedure in this)
 		{
-			Raids.Lairs.setAgitation(_lair, Raids.Lairs.Procedures.Increment);
-		}
+			this[procedure](_lair);
+		}	
 
-		if (!(procedure in this))
+		if (this.InertEdicts.find(edictName) != null)
 		{
 			return;
 		}
 
-		this[procedure](_lair);
+		if (::Math.rand(1, 100) > this.Internal.AgitationChance)
+		{
+			return;
+		}
+
+		if (Raids.Standard.getFlag("Agitation", _lair) != Raids.Lairs.AgitationDescriptors.Relaxed)
+		{
+			return;
+		}
+
+		Raids.Lairs.setAgitation(_lair, Raids.Lairs.Procedures.Increment);
 	}
 
 	function executeDiminutionProcedure( _lair )
@@ -117,11 +125,6 @@ Raids.Edicts <-
 		local modifier = this.Parameters.DiminutionModifier - (this.Internal.ResourcesPrefactor * _lair.getResources());
 		_lair.setResources(::Math.max(Raids.Standard.getFlag("BaseResources", _lair) / 2, ::Math.floor(modifier * _lair.getResources())));
 		_lair.createDefenders();
-	}
-
-	function executeMobilisationProcedure( _lair )
-	{
-		_lair.m.LastSpawnTime = ::Math.max(0.0, _lair.getLastSpawnTime() - this.Parameters.MobilisationOffset);
 	}
 
 	function executeNullificationProcedure( _lair )
@@ -183,11 +186,12 @@ Raids.Edicts <-
 
 	function getAgitationDecayOffset( _lair )
 	{
-		local offset = 0;
+		local offset = 0,
+		agitation = Raids.Standard.getFlag("Agitation", _lair);
 
 		if (this.findEdict(this.getEdictID("Stasis"), _lair, true) != false)
 		{
-			offset += this.Parameters.StasisOffset;
+			offset += this.Parameters.StasisOffset * agitation;
 		}
 
 		return offset;
@@ -222,19 +226,19 @@ Raids.Edicts <-
 
 	function getNamedLootChanceOffset( _lair, _depopulate = false )
 	{
-		local agitation = Raids.Standard.getFlag("Agitation", _lair);
+		local offset = 0.0, 
+		agitation = Raids.Standard.getFlag("Agitation", _lair);
 
 		if (_depopulate && this.findEdict(this.getEdictID("Retention"), _lair, true) != false)
 		{
-			return this.Parameters.RetentionOffset * agitation;
+			offset = this.Parameters.RetentionOffset * agitation;
 		}
-
-		if (this.findEdict(this.getEdictID("Prospecting"), _lair, true) != false)
+		else if (this.findEdict(this.getEdictID("Prospecting"), _lair, true) != false)
 		{
-			return this.Parameters.ProspectingOffset * agitation;
+			offset = this.Parameters.ProspectingOffset * agitation;
 		}
 
-		return 0.0;
+		return offset;
 	}
 
 	function getNonviableEntries( _lair )
@@ -263,6 +267,19 @@ Raids.Edicts <-
 		entry.icon <- format("ui/icons/%s", count == 0 ? "cancel.png" : "special.png");
 		entry.text <- Raids.Standard.colourWrap(format("Famed (%i)", count), format("%sValue", count == 0 ? "Negative" : "Positive"));
 		return entry;
+	}
+
+	function getSpawnTimeOffset( _lair )
+	{
+		local offset = 0,
+		agitation = Raids.Standard.getFlag("Agitation", _lair);
+
+		if (this.findEdict(this.getEdictID("Mobilisation"), _lair, true) != false)
+		{
+			offset += this.Parameters.MobilisationOffset * agitation;
+		}
+
+		return offset;
 	}
 
 	function getSpecialEntries( _lair )
@@ -374,11 +391,6 @@ Raids.Edicts <-
 
 		foreach( edictName in viableEdicts )
 		{
-			if (!this.CycledEdicts.find(edictName))
-			{
-				continue;
-			}
-
 			local procedure = format("execute%sProcedure", edictName);
 
 			if (!(procedure in this))

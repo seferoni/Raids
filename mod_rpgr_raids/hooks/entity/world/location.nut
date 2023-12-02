@@ -23,6 +23,20 @@ local Raids = ::RPGR_Raids;
 		local count = Raids.Lairs.getMoneyCount(this);
 		return [count, _lootTable];
 	}, "overrideArguments");
+	
+	Raids.Standard.wrap(_object, "getTooltip", function( _tooltipArray )
+	{
+		if (!Raids.Lairs.isLocationViable(this, true, true))
+		{
+			return;
+		}
+
+		Raids.Lairs.updateAgitation(this);
+		Raids.Edicts.updateEdicts(this);
+		_tooltipArray.extend(Raids.Lairs.getTooltipEntries(this));
+		_tooltipArray.extend(Raids.Edicts[format("get%sEntries", Raids.Edicts.isLairViable(this) ? "Tooltip" : "Nonviable")](this));
+		return _tooltipArray;
+	});
 
 	Raids.Standard.wrap(_object, "onCombatStarted", function()
 	{
@@ -49,17 +63,15 @@ local Raids = ::RPGR_Raids;
 		}
 	});
 
-	Raids.Standard.wrap(_object, "getTooltip", function( _tooltipArray )
+	Raids.Standard.wrap(_object, "setLastSpawnTimeToNow", function()
 	{
-		if (!Raids.Lairs.isLocationViable(this, true, true))
+		if (!Raids.Lairs.isLocationViable(this))
 		{
 			return;
 		}
 
-		Raids.Lairs.updateAgitation(this);
-		Raids.Edicts.updateEdicts(this);
-		_tooltipArray.extend(Raids.Lairs.getTooltipEntries(this));
-		_tooltipArray.extend(Raids.Edicts[format("get%sEntries", Raids.Edicts.isLairViable(this) ? "Tooltip" : "Nonviable")](this));
-		return _tooltipArray;
+		local spawnTime = this.getLastSpawnTime(), 
+		offset = Raids.Edicts.getSpawnTimeOffset(this);
+		_lair.m.LastSpawnTime = ::Math.max(0.0, spawnTime + offset);
 	});
 });
