@@ -22,7 +22,7 @@ this.edict_of_legibility <- ::inherit("scripts/items/special/edict_item",
 			return naiveLairs;
 		}
 
-		local ID = this.getID(), Edicts = Raids.Edicts,
+		local Edicts = Raids.Edicts, edictName = Edicts.getEdictName(this.getID()),
 		lairs = naiveLairs.filter(function( _index, _lair )
 		{
 			if (Edicts.isLairViable(_lair))
@@ -30,7 +30,7 @@ this.edict_of_legibility <- ::inherit("scripts/items/special/edict_item",
 				return false;
 			}
 
-			if (Edicts.findEdict(ID, _lair) != false)
+			if (Edicts.findEdict(edictName, _lair) != false)
 			{
 				return false;
 			}

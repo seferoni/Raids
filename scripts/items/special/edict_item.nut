@@ -110,7 +110,7 @@ this.edict_item <- ::inherit("scripts/items/item",
 			return naiveLairs;
 		}
 
-		local edictID = this.getID(), Edicts = Raids.Edicts,
+		local Edicts = Raids.Edicts, edictName = Edicts.getEdictName(this.getID()),
 		lairs = naiveLairs.filter(function( _index, _lair )
 		{
 			if (!Edicts.isLairViable(_lair))
@@ -118,12 +118,12 @@ this.edict_item <- ::inherit("scripts/items/item",
 				return false;
 			}
 
-			if (Edicts.findEdict(edictID, _lair) != false)
+			if (Edicts.findEdict(edictName, _lair) != false)
 			{
 				return false;
 			}
 
-			if (Edicts.findEdictInHistory(Edicts.getEdictName(edictID), _lair) != false)
+			if (Edicts.findEdictInHistory(edictName, _lair) != false)
 			{
 				return false;
 			}

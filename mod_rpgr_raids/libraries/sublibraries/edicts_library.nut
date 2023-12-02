@@ -77,7 +77,7 @@ Raids.Edicts <-
 
 	function executeAgitationProcedure( _lair )
 	{
-		this.resetContainer(this.findEdict(this.getEdictID("Agitation"), _lair), _lair, false);
+		this.resetContainer(this.findEdict("Agitation", _lair), _lair, false);
 		Raids.Lairs.setAgitation(_lair, Raids.Lairs.Procedures.Increment);
 	}
 
@@ -141,13 +141,13 @@ Raids.Edicts <-
 		Raids.Lairs.repopulateNamedLoot(_lair);
 	}
 
-	function findEdict( _edictID, _lair, _filterActive = false )
+	function findEdict( _edictName, _lair, _filterActive = false )
 	{
-		local edictContainer = false;
+		local edictID = this.getEdictID(_edictName), edictContainer = false;
 
 		foreach( container in this.Containers )
 		{
-			if (Raids.Standard.getFlag(container, _lair) == _edictID)
+			if (Raids.Standard.getFlag(container, _lair) == edictID)
 			{
 				edictContainer = container;
 				break;
@@ -186,12 +186,11 @@ Raids.Edicts <-
 
 	function getAgitationDecayOffset( _lair )
 	{
-		local offset = 0,
-		agitation = Raids.Standard.getFlag("Agitation", _lair);
+		local offset = 0;
 
-		if (this.findEdict(this.getEdictID("Stasis"), _lair, true) != false)
+		if (this.findEdict("Stasis", _lair, true) != false)
 		{
-			offset += this.Parameters.StasisOffset * agitation;
+			offset = this.Parameters.StasisOffset * Raids.Standard.getFlag("Agitation", _lair);
 		}
 
 		return offset;
@@ -229,11 +228,11 @@ Raids.Edicts <-
 		local offset = 0.0, 
 		agitation = Raids.Standard.getFlag("Agitation", _lair);
 
-		if (_depopulate && this.findEdict(this.getEdictID("Retention"), _lair, true) != false)
+		if (_depopulate && this.findEdict("Retention", _lair, true) != false)
 		{
 			offset = this.Parameters.RetentionOffset * agitation;
 		}
-		else if (this.findEdict(this.getEdictID("Prospecting"), _lair, true) != false)
+		else if (this.findEdict("Prospecting", _lair, true) != false)
 		{
 			offset = this.Parameters.ProspectingOffset * agitation;
 		}
@@ -245,7 +244,7 @@ Raids.Edicts <-
 	{
 		local entries = [];
 
-		if (this.findEdict(this.getEdictID("Legibility"), _lair) != false)
+		if (this.findEdict("Legibility", _lair) != false)
 		{
 			entries.push(this.getLegibilityEntry(_lair));
 		}
@@ -271,12 +270,11 @@ Raids.Edicts <-
 
 	function getSpawnTimeOffset( _lair )
 	{
-		local offset = 0.0,
-		agitation = Raids.Standard.getFlag("Agitation", _lair);
+		local offset = 0.0;
 
-		if (this.findEdict(this.getEdictID("Mobilisation"), _lair, true) != false)
+		if (this.findEdict("Mobilisation", _lair, true) != false)
 		{
-			offset += this.Parameters.MobilisationOffset * agitation;
+			offset = this.Parameters.MobilisationOffset * Raids.Standard.getFlag("Agitation", _lair);
 		}
 
 		return offset;
@@ -286,7 +284,7 @@ Raids.Edicts <-
 	{
 		local entries = [];
 
-		if (this.findEdict(this.getEdictID("Perspicuity"), _lair, true) != false)
+		if (this.findEdict("Perspicuity", _lair, true) != false)
 		{
 			entries.push(this.getPerspicuityEntry(_lair));
 		}
@@ -303,12 +301,11 @@ Raids.Edicts <-
 	{
 		local offset = 0;
 
-		if (!this.findEdictInHistory("Abundance", _lair))
+		if (this.findEdictInHistory("Abundance", _lair) != false)
 		{
-			return offset;
+			offset = ::Math.min(this.Parameters.AbundanceCeiling, this.Parameters.AbundanceOffset * Raids.Standard.getFlag("Agitation", _lair));
 		}
 
-		offset = ::Math.min(this.Parameters.AbundanceCeiling, this.Parameters.AbundanceOffset * Raids.Standard.getFlag("Agitation", _lair));
 		return offset;
 	}
 
@@ -369,7 +366,7 @@ Raids.Edicts <-
 
 		local Lairs = Raids.Lairs,
 		factionType = ::World.FactionManager.getFaction(_lair.getFaction()).getType(),
-		factions = this.findEdict(this.getEdictID("Legibility"), _lair, true) != false ? Lairs.Factions : this.Factions,
+		factions = this.findEdict("Legibility", _lair, true) != false ? Lairs.Factions : this.Factions,
 		viableFactions = factions.map(@(_factionName) Lairs.getFactionType(_factionName));
 
 		if (viableFactions.find(factionType) != null)
