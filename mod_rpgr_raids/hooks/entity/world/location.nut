@@ -72,6 +72,6 @@ local Raids = ::RPGR_Raids;
 
 		local spawnTime = this.getLastSpawnTime(), 
 		offset = Raids.Edicts.getSpawnTimeOffset(this);
-		_lair.m.LastSpawnTime = ::Math.max(0.0, spawnTime + offset);
+		this.m.LastSpawnTime = ::Math.max(0.0, spawnTime + offset);
 	});
 });

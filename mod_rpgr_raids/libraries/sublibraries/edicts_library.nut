@@ -35,10 +35,10 @@ Raids.Edicts <-
 		AbundanceCeiling = 3,
 		AbundanceOffset = 1,
 		DiminutionModifier = 0.90,
-		MobilisationOffset = -37.5,
+		MobilisationOffset = -150.0,
 		ProspectingOffset = 5.0,
 		RetentionOffset = -5.0
-		StasisOffset = 7,
+		StasisOffset = 2,
 	}
 
 	function addToHistory( _edictName, _lair )
@@ -97,27 +97,20 @@ Raids.Edicts <-
 			this.resetContainerTime(_container, _lair);
 		}
 
-		if (procedure in this)
+		local isAgitated = Raids.Standard.getFlag("Agitation", _lair) != Raids.Lairs.AgitationDescriptors.Relaxed,
+		isInert = this.InertEdicts.find(edictName) != null;
+
+		if (!isAgitated && !isInert && ::Math.rand(1, 100) <= this.Internal.AgitationChance)
 		{
-			this[procedure](_lair);
+			Raids.Lairs.setAgitation(_lair, Raids.Lairs.Procedures.Increment);
+		}
+
+		if (!(procedure in this))
+		{
+			return;
 		}	
 
-		if (this.InertEdicts.find(edictName) != null)
-		{
-			return;
-		}
-
-		if (::Math.rand(1, 100) > this.Internal.AgitationChance)
-		{
-			return;
-		}
-
-		if (Raids.Standard.getFlag("Agitation", _lair) != Raids.Lairs.AgitationDescriptors.Relaxed)
-		{
-			return;
-		}
-
-		Raids.Lairs.setAgitation(_lair, Raids.Lairs.Procedures.Increment);
+		this[procedure](_lair);
 	}
 
 	function executeDiminutionProcedure( _lair )
@@ -190,7 +183,7 @@ Raids.Edicts <-
 
 		if (this.findEdict("Stasis", _lair, true) != false)
 		{
-			offset = this.Parameters.StasisOffset * Raids.Standard.getFlag("Agitation", _lair);
+			offset = this.Parameters.StasisOffset * (Raids.Standard.getFlag("Agitation", _lair) - 1);
 		}
 
 		return offset;
@@ -274,7 +267,7 @@ Raids.Edicts <-
 
 		if (this.findEdict("Mobilisation", _lair, true) != false)
 		{
-			offset = this.Parameters.MobilisationOffset * Raids.Standard.getFlag("Agitation", _lair);
+			offset = this.Parameters.MobilisationOffset;
 		}
 
 		return offset;
