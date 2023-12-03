@@ -37,8 +37,8 @@ Raids.Edicts <-
 		DiminutionModifier = 0.90,
 		MobilisationOffset = -150.0,
 		ProspectingOffset = 5.0,
-		RetentionOffset = -5.0
-		StasisOffset = 2,
+		RetentionOffset = -5.0,
+		StasisOffset = 2
 	}
 
 	function addToHistory( _edictName, _lair )

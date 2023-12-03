@@ -49,7 +49,7 @@ if (!Raids.Internal.MSUFound)
 	depopulateLairLootOnSpawn.setDescription("Determines whether Raids should depopulate newly spawned lairs of named loot.");
 
 	local roamerScaleAgitationRequirement = pageLairs.addBooleanSetting("RoamerScaleAgitationRequirement", Defaults.RoamerScaleAgitationRequirement, "Roamer Scale Agitation Requirement");
-	roamerScaleAgitationRequirement.setDescription("Determines whether roamer scaling occurs only for lairs with baseline Agitation. If set to false, this will result in stronger eligible roamer spawns on a game-wide basis.");
+	roamerScaleAgitationRequirement.setDescription("Determines whether roamer scaling occurs only for lairs above baseline Agitation. If set to false, this will result in stronger eligible roamer spawns on a game-wide basis.");
 
 	local agitationIncrementChance = pageLairs.addRangeSetting("AgitationIncrementChance", Defaults.AgitationIncrementChance, 0, 100, 1, "Agitation Increment Chance");
 	agitationIncrementChance.setDescription("Determines the chance for a lair's Agitation value to increase upon engagement with a roaming party, if within proximity.");
