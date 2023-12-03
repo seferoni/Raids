@@ -40,8 +40,7 @@ if (!Raids.Internal.MSUFound)
 
 	Raids.Mod <- ::MSU.Class.Mod(Raids.ID, Raids.Version, Raids.Name);
 
-	local pageGeneral = Raids.Mod.ModSettings.addPage("General"),
-	pageLairs = Raids.Mod.ModSettings.addPage("Lairs"),
+	local pageLairs = Raids.Mod.ModSettings.addPage("Lairs"),
 	pageCaravans = Raids.Mod.ModSettings.addPage("Caravans"),
 	Defaults = Raids.Defaults;
 
