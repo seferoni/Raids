@@ -32,6 +32,7 @@ Raids.Lairs <-
 		NamedItemChanceOnSpawn = 30,
 		NamedItemChancePerAgitationTier = 13.33,
 		NamedLootRefreshChance = 60,
+		ResourcesCeiling = 700,
 		ResourceModifierCeiling = 0.25,
 		ResourceModifierLowerBound = 200,
 		ResourceModifierUpperBound = 350,
@@ -168,7 +169,7 @@ Raids.Lairs <-
 
 	function getCandidatesWithin( _tile, _distance = 6 )
 	{
-		local Lairs = ::RPGR_Raids.Lairs,
+		local Lairs = this,
 		lairs = ::World.EntityManager.getLocations().filter(function( _index, _location )
 		{
 			if (!Lairs.isLocationViable(_location))
@@ -189,13 +190,14 @@ Raids.Lairs <-
 
 	function getCandidatesByFaction( _faction )
 	{
-		local lairs = [], Lairs = ::RPGR_Raids.Lairs;
+		local lairs = [];
 
 		if (_faction.getSettlements().len() == 0)
 		{
 			return lairs;
 		}
 
+		local Lairs = this;
 		lairs.extend(_faction.getSettlements().filter(function( _index, _location )
 		{
 			if (!Lairs.isLocationViable(_location, true, true))
@@ -432,7 +434,7 @@ Raids.Lairs <-
 		interpolatedModifier = -0.0006 * baseResources + 0.6,
 		configurableModifier = Raids.Standard.getPercentageSetting("AgitationResourceModifier"),
 		newResources = ::Math.floor(baseResources + (interpolatedModifier * (agitation - 1) * configurableModifier * baseResources));
-		_lair.setResources(::Math.min(newResources, 700));
+		_lair.setResources(::Math.min(newResources, this.Parameters.ResourcesCeiling));
 	}
 
 	function updateCombatStatistics( _isParty )
@@ -457,14 +459,14 @@ Raids.Lairs <-
 			return;
 		}
 
-		local decrementIterations = ::Math.floor(timeDifference / decayInterval);
+		local iterations = ::Math.floor(timeDifference / decayInterval);
 
-		if (decrementIterations == 0)
+		if (iterations == 0)
 		{
 			return;
 		}
 
-		for( local i = 0; i < decrementIterations; i++ )
+		for( local i = 0; i < iterations; i++ )
 		{
 			this.setAgitation(_lair, this.Procedures.Decrement);
 
