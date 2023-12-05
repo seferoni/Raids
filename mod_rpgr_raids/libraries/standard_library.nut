@@ -74,8 +74,8 @@ Raids.Standard <-
 
 		if (!(_settingID in Raids.Defaults))
 		{
-			this.log(format("Invalid settingID %s passed to getSetting, returning null.", _settingID), true);
-			return null;
+			this.log(format("Invalid settingID %s passed to getSetting.", _settingID), true);
+			return;
 		}
 
 		return Raids.Defaults[_settingID];
