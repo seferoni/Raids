@@ -83,7 +83,9 @@ Raids.Standard <-
 
 	function includeFiles( _path )
 	{
-		foreach( file in ::IO.enumerateFiles(_path) )
+		local filePaths = ::IO.enumerateFiles(_path);
+
+		foreach( file in filePaths )
 		{
 			::include(file);
 		}
