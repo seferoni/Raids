@@ -97,6 +97,21 @@ Raids.Standard <-
 		_object.getFlags().increment(flag, _value);
 	}
 
+	function isWeakRef( _object )
+	{
+		if (typeof _object != "instance")
+		{
+			return false;
+		}
+
+		if (!(_object instanceof ::WeakTableRef))
+		{
+			return false;
+		}
+
+		return true;
+	}
+
 	function log( _string, _isError = false )
 	{
 		if (_isError)

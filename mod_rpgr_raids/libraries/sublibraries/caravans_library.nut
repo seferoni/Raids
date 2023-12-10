@@ -2,18 +2,18 @@ local Raids = ::RPGR_Raids;
 Raids.Caravans <-
 {
 	AntagonisticSituations =
-	[
-		"situation.ambushed_trade_routes",
-		"situation.draught",
-		"situation.greenskins",
-		"situation.mine_cavein",
-		"situation.moving_sands",
-		"situation.raided",
-		"situation.short_on_food",
-		"situation.sickness",
-		"situation.slave_revolt",
-		"situation.snow_storms",
-		"situation.warehouse_burned_down"
+	[	
+		"ambushed_trade_routes",
+		"draught",
+		"greenskins",
+		"mine_cavein",
+		"moving_sands",
+		"raided",
+		"short_on_food",
+		"sickness",
+		"slave_revolt",
+		"snow_storms",
+		"warehouse_burned_down"
 	],
 	CargoDescriptors =
 	{
@@ -64,14 +64,22 @@ Raids.Caravans <-
 	],
 	SynergisticSituations =
 	[
-		"situation.bread_and_games",
-		"situation.full_nets",
-		"situation.good_harvest",
-		"situation.rich_veins",
-		"situation.safe_roads",
-		"situation.seasonal_fair",
-		"situation.well_supplied"
+		"bread_and_games",
+		"full_nets",
+		"good_harvest",
+		"rich_veins",
+		"safe_roads",
+		"seasonal_fair",
+		"well_supplied"
 	],
+	TroopTypes =
+	{
+		Generic = {Conventional = ["CaravanHand", "CaravanGuard"]},
+		Mercenaries = {Conventional = ["Mercenary, MercenaryRanged"], Elite = ["HedgeKnight", "MasterArcher", "Swordmaster"]},
+		MercenariesLow = {Conventional = ["MercenaryLOW"]},
+		NobleHouse = {Conventional = ["Arbalester", "Billman", "Footman"], Elite = ["Greatsword", "Knight", "Sergeant"]},
+		OrientalCityState = {Conventional = ["Conscript", "ConscriptPolearm", "Gunner"], Elite = ["Assassin", "DesertDevil", "DesertStalker"]}
+	},
 	WealthDescriptors =
 	{
 		Meager = 1,
@@ -126,24 +134,24 @@ Raids.Caravans <-
 
 		if (_factionType == ::Const.FactionType.NobleHouse)
 		{
-			troops.extend([::Const.World.Spawn.Troops.Arbalester, ::Const.World.Spawn.Troops.Billman, ::Const.World.Spawn.Troops.Footman]);
+			troops.extend(this.formatTroopType(this.TroopTypes.NobleHouse.Conventional))
 			return troops;
 		}
 
-		troops.push(::Const.World.Spawn.Troops.MercenaryLOW);
+		troops.extend(this.formatTroopType(this.TroopTypes.MercenariesLow.Conventional));
 
 		if (::World.getTime().Days >= this.Parameters.ReinforcementThresholdDays)
 		{
-			troops.extend([::Const.World.Spawn.Troops.Mercenary, ::Const.World.Spawn.Troops.MercenaryRanged]);
+			troops.extend(this.formatTroopType(this.TroopTypes.Mercenaries.Conventional));
 		}
 
 		if (_factionType == ::Const.FactionType.OrientalCityState)
 		{
-			troops.extend([::Const.World.Spawn.Troops.Conscript, ::Const.World.Spawn.Troops.ConscriptPolearm, ::Const.World.Spawn.Troops.Gunner]);
+			troops.extend(this.formatTroopType(this.TroopTypes.OrientalCityState.Conventional));
 			return troops;
 		}
 
-		troops.extend([::Const.World.Spawn.Troops.CaravanGuard, ::Const.World.Spawn.Troops.CaravanHand]);
+		troops.extend(this.formatTroopType(this.TroopTypes.Generic.Conventional));
 		return troops;
 	}
 
@@ -153,17 +161,17 @@ Raids.Caravans <-
 
 		if (_factionType == ::Const.FactionType.NobleHouse)
 		{
-			troops.extend([::Const.World.Spawn.Troops.Greatsword, ::Const.World.Spawn.Troops.Knight, ::Const.World.Spawn.Troops.Sergeant]);
+			troops.extend(this.formatTroopType(this.TroopTypes.NobleHouse.Elite));
 			return troops;
 		}
 
 		if (_factionType == ::Const.FactionType.OrientalCityState)
 		{
-			troops.extend([::Const.World.Spawn.Troops.Assassin, ::Const.World.Spawn.Troops.DesertDevil, ::Const.World.Spawn.Troops.DesertStalker]);
+			troops.extend(this.formatTroopType(this.TroopTypes.OrientalCityState.Elite));
 			return troops;
 		}
 
-		troops.extend([::Const.World.Spawn.Troops.HedgeKnight, ::Const.World.Spawn.Troops.MasterArcher, ::Const.World.Spawn.Troops.Swordmaster]);
+		troops.extend(this.formatTroopType(this.TroopTypes.Mercenaries.Elite));
 		return troops;
 	}
 
@@ -200,6 +208,19 @@ Raids.Caravans <-
 		}
 
 		return namedLoot;
+	}
+
+	function formatSituationID( _situationID )
+	{
+		local culledString = "situation.",
+		situationString = _situationID.slice(culledString.len());
+		return situationString;
+	}
+
+	function formatTroopType( _troopsArray )
+	{
+		local troops = _troopsArray.map(@(_troopString) ::Const.World.Spawn.Troops[_troopString]);
+		return troops;
 	}
 
 	function getTooltipEntries( _caravan )
@@ -249,7 +270,8 @@ Raids.Caravans <-
 			return offset;
 		}
 
-		local settlementSituations = grossSituations.map(@(_situation) _situation.getID());
+		local Caravans = this, 
+		settlementSituations = grossSituations.map(@(_situation) Caravans.formatSituationID(_situation.getID()));
 
 		if (settlementSituations.len() == 0)
 		{

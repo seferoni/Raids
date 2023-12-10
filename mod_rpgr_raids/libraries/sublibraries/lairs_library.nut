@@ -304,7 +304,7 @@ Raids.Lairs <-
 	}
 
 	function isActiveContractLocation( _lair )
-	{
+	{	
 		local activeContract = ::World.Contracts.getActiveContract();
 
 		if (activeContract == null || !("Destination" in activeContract.m))
@@ -312,12 +312,24 @@ Raids.Lairs <-
 			return false;
 		}
 
-		if (activeContract.m.Destination.get() == _lair)
+		local targetLocation = activeContract.m.Destination;
+
+		if (targetLocation == null)
 		{
-			return true;
+			return false;
 		}
 
-		return false;
+		if (!Raids.Standard.isWeakRef(targetLocation))
+		{
+			return false;
+		}
+
+		if (targetLocation.isNull() || targetLocation.get() != _lair)
+		{
+			return false;
+		}
+
+		return true;
 	}
 
 	function isFactionViable( _faction )
