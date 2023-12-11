@@ -2,13 +2,13 @@
 {
 	ID = "mod_rpgr_raids",
 	Name = "RPG Rebalance - Raids",
-	Version = "1.1.1",
+	Version = "2.0.0",
 	Internal =
 	{
 		TERMINATE = "__end"
 	},
 	Defaults =
-	{  
+	{
 		AgitationIncrementChance = 100,
 		AgitationResourceModifier = 70,
 		CaravanReinforcementChance = 100,
