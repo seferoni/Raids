@@ -1,6 +1,12 @@
 local Raids = ::RPGR_Raids;
 Raids.Standard <-
 {
+	function appendToString( _targetString, _string )
+	{
+		local newString = _targetString == "" ? format("%s", _string) : format("%s, %s", _targetString, _string);
+		return newString;
+	}
+
 	function cacheHookedMethod( _object, _methodName )
 	{
 		local naiveMethod = null;
