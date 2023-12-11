@@ -26,7 +26,7 @@ Raids.Edicts <-
 	Internal =
 	{
 		AgitationChance = 20,
-		DirectoryPath = "scripts/items/special/edicts",
+		DirectoryPath = "scripts/items/special/edicts/",
 		ResourcesPrefactor = 0.001,
 		SupplyCaravanDocumentChanceOffset = 35,
 		WritingInstrumentsChance = 66
@@ -49,9 +49,9 @@ Raids.Edicts <-
 		Raids.Standard.setFlag("EdictHistory", newHistory, _lair);
 	}
 
-	function createEdict()
+	function createEdict( _counterfeitingTools )
 	{
-		local edicts = this.getEdictFiles();
+		local Edicts = this, edicts = _counterfeitingTools.getEdictSelectionAsFiles();
 		return ::new(edicts[::Math.rand(0, edicts.len() - 1)]);
 	}
 
@@ -109,7 +109,7 @@ Raids.Edicts <-
 		if (!(procedure in this))
 		{
 			return;
-		}	
+		}
 
 		this[procedure](_lair);
 	}
@@ -190,6 +190,13 @@ Raids.Edicts <-
 		return offset;
 	}
 
+	function getEdictFileName( _edictName )
+	{
+		local prependedString = this.Internal.DirectoryPath,
+		edictFileName = format("%s%s", prependedString, Raids.Standard.setCase(_edictName, "tolower"));
+		return edictFileName;
+	}
+
 	function getEdictFiles()
 	{
 		return ::IO.enumerateFiles(this.Internal.DirectoryPath);
@@ -224,7 +231,7 @@ Raids.Edicts <-
 
 	function getNamedLootChanceOffset( _lair, _depopulate = false )
 	{
-		local offset = 0.0, 
+		local offset = 0.0,
 		agitation = Raids.Standard.getFlag("Agitation", _lair);
 
 		if (_depopulate && this.findEdict("Retention", _lair, true) != false)

@@ -73,7 +73,7 @@ this.official_document_item <- ::inherit("scripts/items/item",
 		}
 
 		::Sound.play("sounds/scribble.wav", ::Const.Sound.Volume.Inventory);
-		::World.Assets.getStash().add(Raids.Edicts.createEdict());
+		::World.Assets.getStash().add(Raids.Edicts.createEdict(counterfeitingTools));
 		this.updateUses(counterfeitingTools);
 		return true;
 	}
@@ -85,7 +85,7 @@ this.official_document_item <- ::inherit("scripts/items/item",
 		if (remainingUses == 1)
 		{
 			::World.Assets.getStash().remove(_counterfeitingTools);
-		} 
+		}
 
 		_counterfeitingTools.setUses(remainingUses - 1);
 	}

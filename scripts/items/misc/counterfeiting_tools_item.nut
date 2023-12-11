@@ -18,7 +18,7 @@ this.counterfeiting_tools_item <- ::inherit("scripts/items/item",
 		this.m.ItemType = ::Const.Items.ItemType.Supply | ::Const.Items.ItemType.Crafting;
 		this.m.IsDroppedAsLoot = true;
 		this.m.IsAllowedInBag = false;
-		this.m.IsUsable = false;
+		this.m.IsUsable = true;
 		this.initialiseEdictSelection();
 		this.setUses(this.m.MaximumUses);
 	}
@@ -46,6 +46,26 @@ this.counterfeiting_tools_item <- ::inherit("scripts/items/item",
 	function getEdictSelection()
 	{
 		return Raids.Standard.getFlag("EdictSelection", this);
+	}
+
+	function getEdictSelectionAsArray()
+	{
+		local selectionArray = split(this.getEdictSelection(), ",").map(@(_edictName) strip(_edictName));
+		return selectionArray;
+	}
+
+	function getEdictSelectionAsFiles()
+	{
+		local Edicts = Raids.Edicts,
+		toFileName = @(_array) _array.map(@(_edictName) Edicts.getEdictFileName(_edictName)),
+		selectionMode = this.getEdictSelectionMode();
+
+		switch (selectionMode)
+		{
+			case this.SelectionModes.Indiscriminate: return Edicts.getEdictFiles(); break;
+			case this.SelectionModes.Selective: return toFileName(this.getEdictSelectionAsArray()); break;
+			case this.SelectionModes.Inverted: return Raids.Standard.removeFromArray(Edicts.getEdictFiles(), toFileName(this.getEdictSelectionAsArray)); break;
+		}
 	}
 
 	function getEdictSelectionMode()
