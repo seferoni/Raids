@@ -18,7 +18,28 @@ this.counterfeiting_tools_item <- ::inherit("scripts/items/item",
 		this.m.IsDroppedAsLoot = true;
 		this.m.IsAllowedInBag = false;
 		this.m.IsUsable = false;
+		this.initialiseEdictSelection();
 		this.setUses(this.m.MaximumUses);
+	}
+
+	function getEdictCandidates()
+	{
+		local edicts = Raids.Edicts.getEdictFiles(),
+		selectedEdicts = [];
+
+		while( selectedEdicts.len() <= Raids.Internal.EdictSelectionSize )
+		{
+			local candidate = edicts[::Math.rand(0, edicts.len() -1)];
+			
+			if (selectedEdicts.find(candidate) != null)
+			{
+				continue;
+			}
+
+			selectedEdicts.push(candidate);
+		}
+
+		return selectedEdicts;
 	}
 
 	function getFlags()
@@ -43,6 +64,12 @@ this.counterfeiting_tools_item <- ::inherit("scripts/items/item",
 	function getUses()
 	{
 		return Raids.Standard.getFlag("Uses", this);
+	}
+
+	function initialiseEdictSelection()
+	{
+		local Edicts = Raids.Edicts, edictCandidates = this.getEdictCandidates().map(@(_filePath) Edicts.getEdictName(_filePath, true)),
+		selection = "";
 	}
 	
 	function onSerialize( _out )

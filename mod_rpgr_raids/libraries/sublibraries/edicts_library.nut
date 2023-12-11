@@ -26,6 +26,7 @@ Raids.Edicts <-
 	Internal =
 	{
 		AgitationChance = 20,
+		DirectoryPath = "scripts/items/special/edicts",
 		ResourcesPrefactor = 0.001,
 		SupplyCaravanDocumentChanceOffset = 35,
 		WritingInstrumentsChance = 66
@@ -50,7 +51,7 @@ Raids.Edicts <-
 
 	function createEdict()
 	{
-		local edicts = ::IO.enumerateFiles("scripts/items/special/edicts");
+		local edicts = this.getEdictFiles();
 		return ::new(edicts[::Math.rand(0, edicts.len() - 1)]);
 	}
 
@@ -189,6 +190,11 @@ Raids.Edicts <-
 		return offset;
 	}
 
+	function getEdictFiles()
+	{
+		return ::IO.enumerateFiles(this.Internal.DirectoryPath);
+	}
+
 	function getEdictID( _edictName )
 	{
 		local prependedString = "special.edict_of_",
@@ -196,9 +202,9 @@ Raids.Edicts <-
 		return edictID;
 	}
 
-	function getEdictName( _edictID )
+	function getEdictName( _edictID, _isFileName = false )
 	{
-		local culledString = "special.edict_of_",
+		local culledString = _isFileName ? this.Internal.DirectoryPath : "special.edict_of_",
 		edictName = Raids.Standard.setCase(_edictID.slice(culledString.len()), "toupper");
 		return edictName;
 	}
