@@ -92,6 +92,7 @@ this.official_document_item <- ::inherit("scripts/items/item",
 		if (remainingUses == 1)
 		{
 			::World.Assets.getStash().remove(_counterfeitingTools);
+			return;
 		}
 
 		_counterfeitingTools.setUses(remainingUses - 1);
