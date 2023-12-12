@@ -21,7 +21,7 @@ this.official_document_item <- ::inherit("scripts/items/item",
 
 	function findCounterfeitingTools()
 	{
-		local candidates = ::World.Assets.getStash().getItems().filter(@(_item) _item != null && _item.getID() == "misc.counterfeiting_tools_item");
+		local candidates = ::World.Assets.getStash().getItems().filter(@(_index, _item) _item != null && _item.getID() == "misc.counterfeiting_tools_item");
 
 		if (candidates.len() == 0)
 		{

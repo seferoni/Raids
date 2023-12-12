@@ -68,9 +68,14 @@ this.counterfeiting_tools_item <- ::inherit("scripts/items/item",
 
 		switch (selectionMode)
 		{
-			case this.SelectionModes.Indiscriminate: return Edicts.getEdictFiles(); break;
-			case this.SelectionModes.Selective: return toFileName(this.getEdictSelectionAsArray()); break;
-			case this.SelectionModes.Inverted: return Raids.Standard.removeFromArray(Edicts.getEdictFiles(), toFileName(this.getEdictSelectionAsArray)); break;
+			case this.SelectionModes.Indiscriminate: return Edicts.getEdictFiles();
+			case this.SelectionModes.Selective: return toFileName(this.getEdictSelectionAsArray());
+			case this.SelectionModes.Inverted: 
+			{
+				local edictFiles = Edicts.getEdictFiles();
+				Raids.Standard.removeFromArray(edictFiles, toFileName(this.getEdictSelectionAsArray()));
+				return edictFiles;
+			}
 		}
 	}
 
