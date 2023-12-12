@@ -2,7 +2,7 @@ local Raids = ::RPGR_Raids;
 Raids.Caravans <-
 {
 	AntagonisticSituations =
-	[	
+	[
 		"ambushed_trade_routes",
 		"draught",
 		"greenskins",
@@ -50,9 +50,11 @@ Raids.Caravans <-
 		MaximumTroopOffset = 9,
 		MinimumSituationOffset = -1,
 		NamedItemChance = 5,
-		ReinforcementThresholdDays = 50,
+		ReinforcementThresholdDays = 25,
 		SituationDuration = 4,
-		SituationMaximumDuration = 16
+		SituationMaximumDuration = 16,
+		SupplyCaravanDocumentChanceOffset = 35,
+		WealthDocumentChanceOffset = 10
 	},
 	SouthernGoods =
 	[
@@ -75,8 +77,7 @@ Raids.Caravans <-
 	TroopTypes =
 	{
 		Generic = {Conventional = ["CaravanHand", "CaravanGuard"]},
-		Mercenaries = {Conventional = ["Mercenary, MercenaryRanged"], Elite = ["HedgeKnight", "MasterArcher", "Swordmaster"]},
-		MercenariesLow = {Conventional = ["MercenaryLOW"]},
+		Mercenaries = {Conventional = ["Mercenary", "MercenaryLOW", "MercenaryRanged"], Elite = ["HedgeKnight", "MasterArcher", "Swordmaster"]},
 		NobleHouse = {Conventional = ["Arbalester", "Billman", "Footman"], Elite = ["Greatsword", "Knight", "Sergeant"]},
 		OrientalCityState = {Conventional = ["Conscript", "ConscriptPolearm", "Gunner"], Elite = ["Assassin", "DesertDevil", "DesertStalker"]}
 	},
@@ -138,20 +139,17 @@ Raids.Caravans <-
 			return troops;
 		}
 
-		troops.extend(this.formatTroopType(this.TroopTypes.MercenariesLow.Conventional));
-
-		if (::World.getTime().Days >= this.Parameters.ReinforcementThresholdDays)
-		{
-			troops.extend(this.formatTroopType(this.TroopTypes.Mercenaries.Conventional));
-		}
+		troops.extend(this.formatTroopType(this.TroopTypes.Mercenaries.Conventional));
 
 		if (_factionType == ::Const.FactionType.OrientalCityState)
 		{
 			troops.extend(this.formatTroopType(this.TroopTypes.OrientalCityState.Conventional));
-			return troops;
+		}
+		else
+		{
+			troops.extend(this.formatTroopType(this.TroopTypes.Generic.Conventional));
 		}
 
-		troops.extend(this.formatTroopType(this.TroopTypes.Generic.Conventional));
 		return troops;
 	}
 
@@ -270,7 +268,7 @@ Raids.Caravans <-
 			return offset;
 		}
 
-		local Caravans = this, 
+		local Caravans = this,
 		settlementSituations = grossSituations.map(@(_situation) Caravans.formatSituationID(_situation.getID()));
 
 		if (settlementSituations.len() == 0)
@@ -345,19 +343,45 @@ Raids.Caravans <-
 		}
 
 		this.addToInventory(_caravan, this.createCaravanCargo(_caravan, _settlement));
-		local documentChance = Raids.Standard.getSetting("OfficialDocumentDropChance");
+		this.populateOfficialDocuments(_caravan);
+	}
+
+	function populateOfficialDocuments( _caravan )
+	{
+		local documentChance = Raids.Standard.getSetting("OfficialDocumentDropChance"),
+		wealth = Raids.Standard.getFlag("CaravanWealth", _caravan);
 
 		if (::World.FactionManager.getFaction(_caravan.getFaction()).getType() == ::Const.FactionType.NobleHouse)
 		{
-			documentChance += Raids.Edicts.Internal.SupplyCaravanDocumentChanceOffset;
+			documentChance += this.Parameters.SupplyCaravanDocumentChanceOffset;
 		}
 
-		if (::Math.rand(1, 100) > documentChance)
+		if (wealth != this.WealthDescriptors.Meager)
+		{
+			documentChance += wealth * this.Parameters.WealthDocumentChanceOffset;
+		}
+
+		local iterations = 0;
+
+		if (documentChance > 100)
+		{
+			iterations += 1;
+		}
+
+		if (::Math.rand(1, 100) <= documentChance - (iterations * 100))
+		{
+			iterations += 1;
+		}
+
+		if (iterations == 0)
 		{
 			return;
 		}
 
-		_caravan.addToInventory("special/official_document_item");
+		for( local i = 0; i < iterations; i++ )
+		{
+			_caravan.addToInventory("special/official_document_item");
+		}
 	}
 
 	function reinforceTroops( _caravan, _settlement )
@@ -458,7 +482,7 @@ Raids.Caravans <-
 		}
 
 		if (settlement.hasSituation("situation.ambushed_trade_routes"))
-		{	
+		{
 			local situation = settlement.getSituationByID("situation.ambushed_trade_routes"),
 			duration = situation.getValidUntil() + this.Parameters.SituationDuration;
 			situation.setValidForDays(::Math.min(this.Parameters.SituationMaximumDuration, duration));

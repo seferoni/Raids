@@ -21,17 +21,24 @@ this.official_document_item <- ::inherit("scripts/items/item",
 
 	function findCounterfeitingTools()
 	{
-		local stash = ::World.Assets.getStash().getItems();
+		local candidates = ::World.Assets.getStash().getItems().filter(@(_item) _item != null && _item.getID() == "misc.counterfeiting_tools_item");
 
-		foreach( item in stash )
+		if (candidates.len() == 0)
 		{
-			if (item != null && item.getID() == "misc.counterfeiting_tools_item")
+			return false;
+		}
+
+		foreach( candidate in candidates )
+		{
+			local selectionMode = candidate.getEdictSelectionMode();
+
+			if (selectionMode != candidate.SelectionModes.Indiscriminate)
 			{
-				return item;
+				return candidate;
 			}
 		}
 
-		return false;
+		return candidates[0];
 	}
 
 	function getEffect()

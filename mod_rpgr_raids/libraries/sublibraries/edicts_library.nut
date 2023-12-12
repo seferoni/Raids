@@ -29,7 +29,6 @@ Raids.Edicts <-
 		DirectoryPath = "scripts/items/special/edicts/",
 		EdictSelectionSize = 3,
 		ResourcesPrefactor = 0.001,
-		SupplyCaravanDocumentChanceOffset = 35,
 		WritingInstrumentsChance = 66
 	},
 	Parameters =

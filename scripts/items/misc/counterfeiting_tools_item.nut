@@ -1,14 +1,14 @@
 local Raids = ::RPGR_Raids;
 this.counterfeiting_tools_item <- ::inherit("scripts/items/item",
 {
-	m = 
+	m =
 	{
 		MaximumUses = 3,
 	},
-	SelectionModes = 
+	SelectionModes =
 	{
 		Indiscriminate = 1,
-		Selective = 2, 
+		Selective = 2,
 		Inverted = 3
 	},
 	function create()
@@ -21,7 +21,7 @@ this.counterfeiting_tools_item <- ::inherit("scripts/items/item",
 		this.m.Value = 300;
 		this.m.Icon = "misc/counterfeiting_tools_item.png";
 		this.m.SlotType = ::Const.ItemSlot.None;
-		this.m.ItemType = ::Const.Items.ItemType.Supply | ::Const.Items.ItemType.Crafting;
+		this.m.ItemType = ::Const.Items.ItemType.Usable;
 		this.m.IsDroppedAsLoot = true;
 		this.m.IsAllowedInBag = false;
 		this.m.IsUsable = true;
