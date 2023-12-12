@@ -1,9 +1,15 @@
 local Raids = ::RPGR_Raids;
 this.counterfeiting_tools_item <- ::inherit("scripts/items/item",
 {
-	m = {
+	m = 
+	{
 		MaximumUses = 3,
-		SelectionModes = {Indiscriminate = 1, Selective = 2, Inverted = 3}
+	},
+	SelectionModes = 
+	{
+		Indiscriminate = 1,
+		Selective = 2, 
+		Inverted = 3
 	},
 	function create()
 	{
@@ -28,7 +34,7 @@ this.counterfeiting_tools_item <- ::inherit("scripts/items/item",
 		local edicts = Raids.Edicts.getEdictFiles(),
 		selectedEdicts = [];
 
-		while (selectedEdicts.len() <= Raids.Internal.EdictSelectionSize)
+		while (selectedEdicts.len() < Raids.Edicts.Internal.EdictSelectionSize)
 		{
 			local candidate = edicts[::Math.rand(0, edicts.len() - 1)];
 
@@ -77,10 +83,10 @@ this.counterfeiting_tools_item <- ::inherit("scripts/items/item",
 	{
 		local selectionMode = this.getEdictSelectionMode();
 
-		if (selectionMode == this.SelectionModes.Selective)
+		if (selectionMode != this.SelectionModes.Indiscriminate)
 		{
-			local selection = this.getEdictSelection();
-			return format("Selective: %s", Raids.Standard.colourWrap(selection, "NegativeValue"));
+			local selection = Raids.Standard.colourWrap(this.getEdictSelection(), format("%sValue", selectionMode == this.SelectionModes.Selective ? "Positive" : "Negative"));
+			return format("%s: %s", Raids.Standard.getDescriptor(selectionMode, this.SelectionModes), selection);
 		}
 
 		return Raids.Standard.getDescriptor(selectionMode, this.SelectionModes);
@@ -119,7 +125,7 @@ this.counterfeiting_tools_item <- ::inherit("scripts/items/item",
 
 		foreach( edictName in edictCandidates )
 		{
-			Raids.Standard.appendToString(selection, edictName);
+			selection = Raids.Standard.appendToString(selection, edictName);
 		}
 
 		Raids.Standard.setFlag("EdictSelection", selection, this);
@@ -152,7 +158,14 @@ this.counterfeiting_tools_item <- ::inherit("scripts/items/item",
 		}
 
 		this.setEdictSelectionMode(selectionMode);
+		::Sound.play("sounds/cloth_01.wav", ::Const.Sound.Volume.Inventory); // TODO: replace with custom assets
+		::Tooltip.reload();
 		return false;
+	}
+
+	function playInventorySound( _eventType )
+	{
+		::Sound.play("sounds/move_pot_clay_01.wav", ::Const.Sound.Volume.Inventory);
 	}
 
 	function setEdictSelection( _selection )
@@ -168,10 +181,5 @@ this.counterfeiting_tools_item <- ::inherit("scripts/items/item",
 	function setUses( _integer )
 	{
 		Raids.Standard.setFlag("Uses", _integer, this);
-	}
-
-	function playInventorySound( _eventType )
-	{
-		::Sound.play("sounds/move_pot_clay_01.wav", ::Const.Sound.Volume.Inventory);
 	}
 });

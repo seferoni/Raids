@@ -25,4 +25,9 @@ this.edict_of_agitation <- ::inherit("scripts/items/special/edict_item",
 		local lairs = naiveLairs.filter(@(_index, _lair) Raids.Standard.getFlag("Agitation", _lair) != Raids.Lairs.AgitationDescriptors.Militant);
 		return lairs;
 	}
+
+	function isCycled()
+	{
+		return true;
+	}
 });

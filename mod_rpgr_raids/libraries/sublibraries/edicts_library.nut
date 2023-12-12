@@ -27,6 +27,7 @@ Raids.Edicts <-
 	{
 		AgitationChance = 20,
 		DirectoryPath = "scripts/items/special/edicts/",
+		EdictSelectionSize = 3,
 		ResourcesPrefactor = 0.001,
 		SupplyCaravanDocumentChanceOffset = 35,
 		WritingInstrumentsChance = 66
@@ -192,7 +193,7 @@ Raids.Edicts <-
 
 	function getEdictFileName( _edictName )
 	{
-		local prependedString = this.Internal.DirectoryPath,
+		local prependedString = format("%s%s", this.Internal.DirectoryPath, "edict_of_"),
 		edictFileName = format("%s%s", prependedString, Raids.Standard.setCase(_edictName, "tolower"));
 		return edictFileName;
 	}
@@ -211,7 +212,7 @@ Raids.Edicts <-
 
 	function getEdictName( _edictID, _isFileName = false )
 	{
-		local culledString = _isFileName ? this.Internal.DirectoryPath : "special.edict_of_",
+		local culledString = _isFileName ? format("%s%s", this.Internal.DirectoryPath, "edict_of_") : "special.edict_of_",
 		edictName = Raids.Standard.setCase(_edictID.slice(culledString.len()), "toupper");
 		return edictName;
 	}
