@@ -62,6 +62,7 @@ this.official_document_item <- ::inherit("scripts/items/item",
 			{id = 6, type = "text", icon = "ui/icons/special.png", text = this.getEffect()},
 			{id = 65, type = "text", text = this.getInstruction()}
 		];
+
 		return tooltipArray;
 	}
 

@@ -1,7 +1,7 @@
 local Raids = ::RPGR_Raids;
 this.edict_item <- ::inherit("scripts/items/item",
 {
-	m = 
+	m =
 	{
 		ScalingModalities = {Static = 0, Agitation = 1, Resources = 2}
 	},
@@ -23,7 +23,7 @@ this.edict_item <- ::inherit("scripts/items/item",
 	function executeEdictProcedure( _lairs )
 	{
 		local isValid = false;
-		
+
 		foreach( lair in _lairs )
 		{
 			local vacantContainers = clone Raids.Edicts.Containers;
@@ -98,6 +98,7 @@ this.edict_item <- ::inherit("scripts/items/item",
 			{id = 6, type = "text", icon = "ui/icons/level.png", text = this.getScalingText()},
 			{id = 65, type = "text", text = this.getInstructionText()}
 		];
+
 		return tooltipArray;
 	}
 
