@@ -1,7 +1,7 @@
 local Raids = ::RPGR_Raids;
 Raids.Standard <-
 {
-	function appendToString( _targetString, _string )
+	function appendToStringList( _targetString, _string )
 	{
 		local newString = _targetString == "" ? format("%s", _string) : format("%s, %s", _targetString, _string);
 		return newString;

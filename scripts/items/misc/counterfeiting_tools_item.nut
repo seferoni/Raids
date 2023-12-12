@@ -125,7 +125,7 @@ this.counterfeiting_tools_item <- ::inherit("scripts/items/item",
 
 		foreach( edictName in edictCandidates )
 		{
-			selection = Raids.Standard.appendToString(selection, edictName);
+			selection = Raids.Standard.appendToStringList(selection, edictName);
 		}
 
 		Raids.Standard.setFlag("EdictSelection", selection, this);
