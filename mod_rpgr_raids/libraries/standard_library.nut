@@ -177,14 +177,14 @@ Raids.Standard <-
 		return array;
 	}
 
-	function removeFromArray( _target, _array )
+	function removeFromArray( _object, _target )
 	{
-		local targetArray = typeof _target == "array" ? _target : [_target];
+		local culledObjects = typeof _object == "array" ? _object : [_object];
 
-		foreach( entry in targetArray )
+		foreach( entry in culledObjects )
 		{
-			local index = _array.find(entry);
-			if (index != null) _array.remove(index);
+			local index = _target.find(entry);
+			if (index != null) _target.remove(index);
 		}
 	}
 

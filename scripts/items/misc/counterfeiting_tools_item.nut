@@ -27,6 +27,7 @@ this.counterfeiting_tools_item <- ::inherit("scripts/items/item",
 		this.m.IsUsable = true;
 		this.initialiseEdictSelection();
 		this.setUses(this.m.MaximumUses);
+		this.m.InstructionText <- "Right-click to cycle between different selection modes.";
 	}
 
 	function getEdictCandidates()
@@ -73,7 +74,7 @@ this.counterfeiting_tools_item <- ::inherit("scripts/items/item",
 			case this.SelectionModes.Inverted: 
 			{
 				local edictFiles = Edicts.getEdictFiles();
-				Raids.Standard.removeFromArray(edictFiles, toFileName(this.getEdictSelectionAsArray()));
+				Raids.Standard.removeFromArray(toFileName(this.getEdictSelectionAsArray()), edictFiles);
 				return edictFiles;
 			}
 		}
@@ -102,16 +103,22 @@ this.counterfeiting_tools_item <- ::inherit("scripts/items/item",
 		return this.m.Flags;
 	}
 
+	function getInstruction()
+	{
+		return this.m.InstructionText;
+	}
+
 	function getTooltip()
 	{
 		local tooltipArray =
 		[
 			{id = 1, type = "title", text = this.getName()},
 			{id = 2, type = "description", text = this.getDescription()},
+			{id = 66, type = "text", text = this.getValueString()},
+			{id = 3, type = "image", image = this.getIcon()},
 			{id = 6, type = "text", icon = "ui/icons/warning.png", text = format("Has %s uses remaining.", Raids.Standard.colourWrap(this.getUses(), "NegativeValue"))},
 			{id = 6, type = "text", icon = "ui/icons/special.png", text = this.getEdictSelectionText()},
-			{id = 66, type = "text", text = this.getValueString()},
-			{id = 3, type = "image", image = this.getIcon()}
+			{id = 65, type = "text", text = this.getInstruction()}
 		];
 
 		return tooltipArray;
