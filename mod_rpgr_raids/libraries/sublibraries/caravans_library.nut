@@ -254,8 +254,8 @@ Raids.Caravans <-
 
 	function getReinforcementCount( _caravanWealth )
 	{
-		local timeModifier = ::Math.floor(::World.getTime().Days / this.Parameters.ReinforcementThresholdDays),
-		naiveIterations = ::Math.rand(1, _caravanWealth * 2) + timeModifier;
+		local timeOffset = ::Math.floor(::World.getTime().Days / this.Parameters.ReinforcementThresholdDays),
+		naiveIterations = _caravanWealth + ::Math.rand(1, _caravanWealth) + timeOffset;
 		return ::Math.min(this.Parameters.MaximumTroopOffset, naiveIterations);
 	}
 
@@ -293,24 +293,20 @@ Raids.Caravans <-
 
 	function initialiseCaravanParameters( _caravan, _settlement )
 	{
-		local randomNumber = ::Math.rand(1, 100),
-		diceRoll = @(_value) randomNumber <= _value;
 		this.setCaravanWealth(_caravan, _settlement);
 		this.setCaravanCargo(_caravan, _settlement);
 		this.setCaravanOrigin(_caravan, _settlement);
 		this.populateInventory(_caravan, _settlement);
 
-		if (Raids.Standard.getFlag("CaravanWealth", _caravan) < this.WealthDescriptors.Plentiful)
+		if (::Math.rand(1, 100) > Raids.Standard.getSetting("CaravanReinforcementChance"))
 		{
 			return;
 		}
 
-		if (!diceRoll(Raids.Standard.getSetting("CaravanReinforcementChance")))
-		{
-			return;
-		}
+		local isAbundant = Raids.Standard.getFlag("CaravanWealth", _caravan) == this.WealthDescriptors.Abundant,
+		exceedsThreshold = ::World.getTime().Days >= this.Parameters.ReinforcementThresholdDays;
 
-		if (diceRoll(this.Parameters.NamedItemChance) && Raids.Standard.getFlag("CaravanWealth", _caravan) == this.WealthDescriptors.Abundant && ::World.getTime().Days >= this.Parameters.ReinforcementThresholdDays)
+		if (isAbundant && exceedsThreshold && ::Math.rand(1, 100) <= this.Parameters.NamedItemChance)
 		{
 			Raids.Standard.setFlag("CaravanHasNamedItems", true, _caravan);
 		}
@@ -444,7 +440,7 @@ Raids.Caravans <-
 		local caravanWealth = ::Math.rand(1, 2),
 		normalise = @(_value) ::Math.min(::Math.max(_value, this.WealthDescriptors.Meager), this.WealthDescriptors.Abundant);
 
-		if (_settlement.isMilitary() || _settlement.isSouthern())
+		if (_settlement.isSouthern() || ::World.FactionManager.getFaction(_caravan.getFaction()).getType() == ::Const.FactionType.NobleHouse)
 		{
 			caravanWealth += 1;
 		}

@@ -11,6 +11,12 @@ this.counterfeiting_tools_item <- ::inherit("scripts/items/item",
 		Selective = 2,
 		Inverted = 3
 	},
+	Sounds = 
+	[
+		"sounds/raids.paper_01.wav",
+		"sounds/raids.paper_02.wav",
+		"sounds/raids.paper_03.wav"
+	],
 	function create()
 	{
 		this.item.create();
@@ -170,7 +176,7 @@ this.counterfeiting_tools_item <- ::inherit("scripts/items/item",
 		}
 
 		this.setEdictSelectionMode(selectionMode);
-		::Sound.play("sounds/cloth_01.wav", ::Const.Sound.Volume.Inventory); // TODO: replace with custom assets
+		this.playUseSound();
 		::Tooltip.reload();
 		return false;
 	}
@@ -178,6 +184,11 @@ this.counterfeiting_tools_item <- ::inherit("scripts/items/item",
 	function playInventorySound( _eventType )
 	{
 		::Sound.play("sounds/move_pot_clay_01.wav", ::Const.Sound.Volume.Inventory);
+	}
+
+	function playUseSound()
+	{
+		::Sound.play(this.Sounds[::Math.rand(0, this.Sounds.len() - 1)], ::Const.Sound.Volume.Inventory);
 	}
 
 	function setEdictSelection( _selection )
