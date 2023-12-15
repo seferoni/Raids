@@ -46,14 +46,17 @@ Raids.Caravans <-
 	],
 	Parameters =
 	{
+		EliteTroopNobleScoreOffset = 10,
+		EliteTroopScore = 10,
 		MaximumSituationOffset = 1,
 		MaximumTroopOffset = 9,
 		MinimumSituationOffset = -1,
-		NamedItemChance = 5,
-		ReinforcementThresholdDays = 25,
+		NamedItemChance = 12,
+		ReinforcementThresholdDays = 1, // TODO: revert this
 		SituationDuration = 4,
 		SituationMaximumDuration = 16,
 		SupplyCaravanDocumentChanceOffset = 35,
+		TroopReinforcementOffset = 1,
 		WealthDocumentChanceOffset = 10
 	},
 	SouthernGoods =
@@ -76,7 +79,7 @@ Raids.Caravans <-
 	],
 	TroopTypes =
 	{
-		Generic = {Conventional = ["CaravanHand", "CaravanGuard"]},
+		Generic = {Conventional = ["CaravanGuard"]},
 		Mercenaries = {Conventional = ["Mercenary", "MercenaryLOW", "MercenaryRanged"], Elite = ["HedgeKnight", "MasterArcher", "Swordmaster"]},
 		NobleHouse = {Conventional = ["Arbalester", "Billman", "Footman"], Elite = ["Greatsword", "Knight", "Sergeant"]},
 		OrientalCityState = {Conventional = ["Conscript", "ConscriptPolearm", "Gunner"], Elite = ["Assassin", "DesertDevil", "DesertStalker"]}
@@ -105,6 +108,14 @@ Raids.Caravans <-
 		namedItem = ::new(format("scripts/items/%s", namedCargo[::Math.rand(0, namedCargo.len() - 1)]));
 		namedItem.onAddedToStash(null);
 		_lootTable.push(namedItem);
+	}
+
+	function addTroops( _caravan, _troopType, _count )
+	{
+		for( local i = 0; i < _count; i++ )
+		{
+			::Const.World.Common.addTroop(_caravan, _troopType, true);
+		}
 	}
 
 	function createCaravanCargo( _caravan, _settlement )
@@ -221,26 +232,6 @@ Raids.Caravans <-
 		return troops;
 	}
 
-	function getTooltipEntries( _caravan )
-	{
-		local cargoEntry = {id = 2, type = "hint"}, wealthEntry = clone cargoEntry,
-		caravanWealth = Raids.Standard.getFlag("CaravanWealth", _caravan), caravanCargo = Raids.Standard.getFlag("CaravanCargo", _caravan);
-		cargoEntry.icon <- format("ui/icons/%s", this.getCargoIcon(caravanCargo));
-		cargoEntry.text <- format("%s", Raids.Standard.getDescriptor(caravanCargo, this.CargoDescriptors));
-		wealthEntry.icon <- "ui/icons/money2.png";
-		wealthEntry.text <- format("%s (%i)", Raids.Standard.getDescriptor(caravanWealth, this.WealthDescriptors), caravanWealth);
-
-		if (!Raids.Standard.getFlag("CaravanHasNamedItems", _caravan))
-		{
-			return [cargoEntry, wealthEntry];
-		}
-
-		local famedItemEntry = clone cargoEntry;
-		famedItemEntry.icon = "ui/icons/special.png";
-		famedItemEntry.text = "Famed";
-		return [cargoEntry, wealthEntry, famedItemEntry];
-	}
-
 	function getCargoIcon( _cargoValue )
 	{
 		switch (_cargoValue)
@@ -252,11 +243,35 @@ Raids.Caravans <-
 		}
 	}
 
-	function getReinforcementCount( _caravanWealth )
+	function getEliteReinforcementCount( _caravan )
 	{
-		local timeOffset = ::Math.floor(::World.getTime().Days / this.Parameters.ReinforcementThresholdDays),
-		naiveIterations = _caravanWealth + ::Math.rand(1, _caravanWealth) + timeOffset;
-		return ::Math.min(this.Parameters.MaximumTroopOffset, naiveIterations);
+		local wealth = Raids.Standard.getFlag("CaravanWealth", _caravan),
+		iterations = 0, score = this.Parameters.EliteTroopScore * (wealth - 1);
+
+		if (Raids.Standard.getFlag("CaravanHasNamedItems", _caravan))
+		{
+			iterations += 1;
+		}
+
+		if (::World.FactionManager.getFaction(_caravan.getFaction()).getType() == ::Const.FactionType.NobleHouse)
+		{
+			score += this.Parameters.EliteTroopNobleScoreOffset;
+		}
+
+		if (::Math.rand(1, 100) <= score)
+		{
+			iterations += 1;
+		}
+
+		return iterations;
+	}
+
+	function getReinforcementCount( _caravan )
+	{	
+		local wealth = Raids.Standard.getFlag("CaravanWealth", _caravan),
+		timeOffset = ::World.getTime().Days > this.Parameters.ReinforcementThresholdDays ? this.Parameters.TroopReinforcementOffset : 0,
+		naiveIterations = wealth + ::Math.rand(wealth - this.WealthDescriptors.Moderate, wealth) + timeOffset;
+		return ::Math.min(this.Parameters.MaximumTroopOffset, ::Math.ceil(naiveIterations));
 	}
 
 	function getSituationOffset( _settlement )
@@ -289,6 +304,26 @@ Raids.Caravans <-
 		}
 
 		return offset <= 0 ? ::Math.max(this.Parameters.MinimumSituationOffset, offset) : this.Parameters.MaximumSituationOffset;
+	}
+
+	function getTooltipEntries( _caravan )
+	{
+		local cargoEntry = {id = 2, type = "hint"}, wealthEntry = clone cargoEntry,
+		caravanWealth = Raids.Standard.getFlag("CaravanWealth", _caravan), caravanCargo = Raids.Standard.getFlag("CaravanCargo", _caravan);
+		cargoEntry.icon <- format("ui/icons/%s", this.getCargoIcon(caravanCargo));
+		cargoEntry.text <- format("%s", Raids.Standard.getDescriptor(caravanCargo, this.CargoDescriptors));
+		wealthEntry.icon <- "ui/icons/money2.png";
+		wealthEntry.text <- format("%s (%i)", Raids.Standard.getDescriptor(caravanWealth, this.WealthDescriptors), caravanWealth);
+
+		if (!Raids.Standard.getFlag("CaravanHasNamedItems", _caravan))
+		{
+			return [cargoEntry, wealthEntry];
+		}
+
+		local famedItemEntry = clone cargoEntry;
+		famedItemEntry.icon = "ui/icons/special.png";
+		famedItemEntry.text = "Famed";
+		return [cargoEntry, wealthEntry, famedItemEntry];
 	}
 
 	function initialiseCaravanParameters( _caravan, _settlement )
@@ -389,16 +424,12 @@ Raids.Caravans <-
 			return;
 		}
 
-		local iterations = this.getReinforcementCount(wealth),
+		local iterations = this.getReinforcementCount(_caravan),
 		factionType = ::World.FactionManager.getFaction(_caravan.getFaction()).getType(),
 		mundaneTroops = this.createCaravanTroops(wealth, factionType);
+		this.addTroops(_caravan, {Type = mundaneTroops[::Math.rand(0, mundaneTroops.len() - 1)]}, iterations);
 
-		for( local i = 0; i < iterations; i++ )
-		{
-			::Const.World.Common.addTroop(_caravan, {Type = mundaneTroops[::Math.rand(0, mundaneTroops.len() - 1)]}, true);
-		}
-
-		if (!(wealth == this.WealthDescriptors.Abundant && Raids.Standard.getFlag("CaravanHasNamedItems", _caravan)))
+		if (wealth < this.WealthDescriptors.Plentiful)
 		{
 			return;
 		}
@@ -408,8 +439,15 @@ Raids.Caravans <-
 			return;
 		}
 
+		iterations = this.getEliteReinforcementCount(_caravan);
+
+		if (iterations == 0)
+		{
+			return;
+		}
+
 		local eliteTroops = this.createEliteCaravanTroops(factionType);
-		::Const.World.Common.addTroop(_caravan, {Type = eliteTroops[::Math.rand(0, eliteTroops.len() - 1)]}, true);
+		this.addTroops(_caravan, {Type = eliteTroops[::Math.rand(0, eliteTroops.len() - 1)]}, iterations);
 	}
 
 	function setCaravanCargo( _caravan, _settlement )
