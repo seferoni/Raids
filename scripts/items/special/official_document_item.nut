@@ -15,7 +15,7 @@ this.official_document_item <- ::inherit("scripts/items/item",
 		this.m.IsDroppedAsLoot = true;
 		this.m.IsAllowedInBag = false;
 		this.m.IsUsable = true;
-		this.m.EffectText <- "Will produce a counterfeit edict, but only if a set of counterfeiting tools are present.";
+		this.m.EffectText <- "Will produce a counterfeit Edict, but only if a set of counterfeiting tools are present.";
 		this.m.InstructionText <- "Right-click to modify its contents.";
 	}
 

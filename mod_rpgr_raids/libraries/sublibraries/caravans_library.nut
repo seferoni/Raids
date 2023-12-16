@@ -46,17 +46,18 @@ Raids.Caravans <-
 	],
 	Parameters =
 	{
-		EliteTroopNobleScoreOffset = 10,
+		EliteTroopNobleOffset = 10,
+		EliteTroopTimeOffset = 10,
 		EliteTroopScore = 10,
 		MaximumSituationOffset = 1,
 		MaximumTroopOffset = 9,
 		MinimumSituationOffset = -1,
 		NamedItemChance = 12,
-		ReinforcementThresholdDays = 1, // TODO: revert this
+		ReinforcementThresholdDays = 25,
 		SituationDuration = 4,
 		SituationMaximumDuration = 16,
 		SupplyCaravanDocumentChanceOffset = 35,
-		TroopReinforcementOffset = 1,
+		TroopTimeOffset = 1,
 		WealthDocumentChanceOffset = 10
 	},
 	SouthernGoods =
@@ -255,7 +256,12 @@ Raids.Caravans <-
 
 		if (::World.FactionManager.getFaction(_caravan.getFaction()).getType() == ::Const.FactionType.NobleHouse)
 		{
-			score += this.Parameters.EliteTroopNobleScoreOffset;
+			score += this.Parameters.EliteTroopNobleOffset;
+		}
+
+		if (::World.getTime().Days >= this.Parameters.ReinforcementThresholdDays)
+		{
+			score += this.Parameters.EliteTroopTimeOffset;
 		}
 
 		if (::Math.rand(1, 100) <= score)
@@ -269,7 +275,7 @@ Raids.Caravans <-
 	function getReinforcementCount( _caravan )
 	{	
 		local wealth = Raids.Standard.getFlag("CaravanWealth", _caravan),
-		timeOffset = ::World.getTime().Days > this.Parameters.ReinforcementThresholdDays ? this.Parameters.TroopReinforcementOffset : 0,
+		timeOffset = ::World.getTime().Days >= this.Parameters.ReinforcementThresholdDays ? this.Parameters.TroopTimeOffset : 0,
 		naiveIterations = wealth + ::Math.rand(wealth - this.WealthDescriptors.Moderate, wealth) + timeOffset;
 		return ::Math.min(this.Parameters.MaximumTroopOffset, ::Math.ceil(naiveIterations));
 	}
