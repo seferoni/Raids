@@ -29,7 +29,7 @@ Raids.Lairs <-
 	{
 		AgitationDecayInterval = 7,
 		MaximumLootOffset = 3,
-		NamedItemChanceOnSpawn = 30,
+		NamedItemChanceOnSpawn = 0,
 		NamedItemChancePerAgitationTier = 13.33,
 		NamedLootRefreshChance = 60,
 		ResourcesCeiling = 700,
