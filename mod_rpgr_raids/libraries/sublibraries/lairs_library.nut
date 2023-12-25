@@ -264,6 +264,7 @@ Raids.Lairs <-
 
 	function getTooltipEntries( _lair )
 	{
+		# Initialise references in local environment.
 		local agitation = Raids.Standard.getFlag("Agitation", _lair),
 		lastUpdateDays = Raids.Standard.getFlag("LastAgitationUpdate", _lair),
 		textColour = "PositiveValue", iconPath = "vision.png";
@@ -273,19 +274,26 @@ Raids.Lairs <-
 			textColour = "NegativeValue", iconPath = "miniboss.png";
 		}
 
-		local resourcesEntry = {id = 20, type = "text"}, agitationEntry = clone resourcesEntry;
+		# Create resources entry.
+		local resourcesEntry = {id = 20, type = "text"};
 		resourcesEntry.icon <- "ui/icons/asset_money.png";
-		agitationEntry.icon <- format("ui/icons/%s", iconPath);
 		resourcesEntry.text <- format("%s resource units", Raids.Standard.colourWrap(format("%i", _lair.getResources()), "PositiveValue"));
-		agitationEntry.text <- format("%s", Raids.Standard.colourWrap(format("%s (%i)", Raids.Standard.getDescriptor(agitation, this.AgitationDescriptors), agitation), textColour));
+
+		# Create Agitation entry.
+		local agitationEntry = clone resourcesEntry;
+		agitationEntry.icon = format("ui/icons/%s", iconPath);
+		agitationEntry.text = format("%s", Raids.Standard.colourWrap(format("%s (%i)", Raids.Standard.getDescriptor(agitation, this.AgitationDescriptors), agitation), textColour));
 
 		if (!lastUpdateDays || agitation == this.AgitationDescriptors.Relaxed)
 		{
 			return [resourcesEntry, agitationEntry];
 		}
 
-		local timeDifference = (lastUpdateDays + this.getAgitationDecayInterval(_lair)) - ::World.getTime().Days,
-		timeEntry = clone resourcesEntry;
+		# Initialise variable in local environment.
+		local timeDifference = (lastUpdateDays + this.getAgitationDecayInterval(_lair)) - ::World.getTime().Days;
+
+		# Create decay timer entry.
+		local timeEntry = clone resourcesEntry;
 		timeEntry.icon = "ui/icons/action_points.png";
 		timeEntry.text = format("%s day(s)", Raids.Standard.colourWrap(timeDifference, "NegativeValue"));
 		return [resourcesEntry, agitationEntry, timeEntry];

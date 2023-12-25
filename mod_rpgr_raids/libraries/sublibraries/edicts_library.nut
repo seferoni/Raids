@@ -317,9 +317,11 @@ Raids.Edicts <-
 
 	function getTooltipEntries( _lair )
 	{
-		local entryTemplate = {id = 20, type = "text", icon = "ui/icons/unknown_traits.png", text = "Edict: Vacant"},
-		entries = [], occupiedContainers = this.getOccupiedContainers(_lair);
+		# Initialise references in local environment.
+		local entries = [], occupiedContainers = this.getOccupiedContainers(_lair),
+		entryTemplate = {id = 20, type = "text", icon = "ui/icons/unknown_traits.png", text = "Edict: Vacant"};
 
+		# Handle case where all containers are vacant.
 		if (occupiedContainers.len() == 0)
 		{
 			entries.resize(this.Containers.len(), entryTemplate);
@@ -327,15 +329,19 @@ Raids.Edicts <-
 			return entries;
 		}
 
+		# Create entries for occupied containers.
 		foreach( container in occupiedContainers )
 		{
+			# Initialise references in local environment.
 			local inDiscovery = Raids.Standard.getFlag(format("%sTime", container), _lair) != false,
-			edictName = this.getEdictName(Raids.Standard.getFlag(container, _lair)),
-			iconPath = format("scroll_0%s.png", inDiscovery ? "2_sw" : "1_b"),
-			activityState = inDiscovery ? "Discovery" : "Active";
+			edictName = this.getEdictName(Raids.Standard.getFlag(container, _lair));
+
+			# Create tooltip entry.
+			iconPath = format("scroll_0%s.png", inDiscovery ? "2_sw" : "1_b"), activityState = inDiscovery ? "Discovery" : "Active";
 			entries.push(this.createTooltipEntry(_lair, iconPath, edictName, activityState));
 		}
 
+		# Create entries for vacant containers.
 		if (entries.len() < this.Containers.len())
 		{
 			local iterations = this.Containers.len() - entries.len();

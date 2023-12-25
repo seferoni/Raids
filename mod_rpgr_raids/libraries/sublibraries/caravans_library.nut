@@ -80,10 +80,25 @@ Raids.Caravans <-
 	],
 	TroopTypes =
 	{
-		Generic = {Conventional = ["CaravanGuard"]},
-		Mercenaries = {Conventional = ["Mercenary", "MercenaryLOW", "MercenaryRanged"], Elite = ["HedgeKnight", "MasterArcher", "Swordmaster"]},
-		NobleHouse = {Conventional = ["Arbalester", "Billman", "Footman"], Elite = ["Greatsword", "Knight", "Sergeant"]},
-		OrientalCityState = {Conventional = ["Conscript", "ConscriptPolearm", "Gunner"], Elite = ["Assassin", "DesertDevil", "DesertStalker"]}
+		Generic = 
+		{
+			Conventional = ["CaravanGuard"]
+		},
+		Mercenaries = 
+		{
+			Conventional = ["Mercenary", "MercenaryLOW", "MercenaryRanged"], 
+			Elite = ["HedgeKnight", "MasterArcher", "Swordmaster"]
+		},
+		NobleHouse = 
+		{
+			Conventional = ["Arbalester", "Billman", "Footman"],
+			Elite = ["Greatsword", "Knight", "Sergeant"]
+		},
+		OrientalCityState = 
+		{
+			Conventional = ["Conscript", "ConscriptPolearm", "Gunner"], 
+			Elite = ["Assassin", "DesertDevil", "DesertStalker"]
+		}
 	},
 	WealthDescriptors =
 	{
@@ -314,18 +329,26 @@ Raids.Caravans <-
 
 	function getTooltipEntries( _caravan )
 	{
-		local cargoEntry = {id = 2, type = "hint"}, wealthEntry = clone cargoEntry,
-		caravanWealth = Raids.Standard.getFlag("CaravanWealth", _caravan), caravanCargo = Raids.Standard.getFlag("CaravanCargo", _caravan);
+		# Initialise references in local environment.
+		local caravanWealth = Raids.Standard.getFlag("CaravanWealth", _caravan), 
+		caravanCargo = Raids.Standard.getFlag("CaravanCargo", _caravan);
+
+		# Create cargo tooltip entry.
+		cargoEntry = {id = 2, type = "hint"},
 		cargoEntry.icon <- format("ui/icons/%s", this.getCargoIcon(caravanCargo));
 		cargoEntry.text <- format("%s", Raids.Standard.getDescriptor(caravanCargo, this.CargoDescriptors));
-		wealthEntry.icon <- "ui/icons/money2.png";
-		wealthEntry.text <- format("%s (%i)", Raids.Standard.getDescriptor(caravanWealth, this.WealthDescriptors), caravanWealth);
+
+		# Create wealth tooltip entry.
+		wealthEntry = clone cargoEntry;
+		wealthEntry.icon = "ui/icons/money2.png";
+		wealthEntry.text = format("%s (%i)", Raids.Standard.getDescriptor(caravanWealth, this.WealthDescriptors), caravanWealth);
 
 		if (!Raids.Standard.getFlag("CaravanHasNamedItems", _caravan))
 		{
 			return [cargoEntry, wealthEntry];
 		}
 
+		# Create famed item entry.
 		local famedItemEntry = clone cargoEntry;
 		famedItemEntry.icon = "ui/icons/special.png";
 		famedItemEntry.text = "Famed";
