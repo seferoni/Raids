@@ -59,7 +59,7 @@ local Raids = ::RPGR_Raids;
 
 		if (Raids.Standard.getSetting("DepopulateLairLootOnSpawn"))
 		{
-			Raids.Lairs.depopulateNamedLoot(this, Raids.Lairs.Parameters.NamedItemChanceOnSpawn);
+			Raids.Lairs.depopulateNamedLoot(this, Raids.Lairs.Parameters.NamedItemRemovalChanceOnSpawn);
 		}
 	});
 
