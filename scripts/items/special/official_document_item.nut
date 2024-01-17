@@ -19,9 +19,9 @@ this.official_document_item <- ::inherit("scripts/items/item",
 		this.m.InstructionText <- "Right-click to modify its contents.";
 	}
 
-	function findCounterfeitingTools()
+	function findWritingInstruments()
 	{
-		local candidates = ::World.Assets.getStash().getItems().filter(@(_index, _item) _item != null && _item.getID() == "misc.counterfeiting_tools_item");
+		local candidates = ::World.Assets.getStash().getItems().filter(@(_index, _item) _item != null && _item.getID() == "misc.writing_instruments_item");
 
 		if (candidates.len() == 0)
 		{
@@ -73,29 +73,29 @@ this.official_document_item <- ::inherit("scripts/items/item",
 
 	function onUse( _actor, _item = null )
 	{
-		local counterfeitingTools = this.findCounterfeitingTools();
+		local writingInstruments = this.findWritingInstruments();
 
-		if (!counterfeitingTools)
+		if (!writingInstruments)
 		{
 			return false;
 		}
 
 		::Sound.play("sounds/scribble.wav", ::Const.Sound.Volume.Inventory);
-		::World.Assets.getStash().add(Raids.Edicts.createEdict(counterfeitingTools));
-		this.updateUses(counterfeitingTools);
+		::World.Assets.getStash().add(Raids.Edicts.createEdict(writingInstruments));
+		this.updateUses(writingInstruments);
 		return true;
 	}
 
-	function updateUses( _counterfeitingTools )
+	function updateUses( _writingInstruments )
 	{
-		local remainingUses = _counterfeitingTools.getUses();
+		local remainingUses = _writingInstruments.getUses();
 
 		if (remainingUses == 1)
 		{
-			::World.Assets.getStash().remove(_counterfeitingTools);
+			::World.Assets.getStash().remove(_writingInstruments);
 			return;
 		}
 
-		_counterfeitingTools.setUses(remainingUses - 1);
+		_writingInstruments.setUses(remainingUses - 1);
 	}
 });

@@ -48,6 +48,17 @@ local Raids = ::RPGR_Raids;
 		Raids.Lairs.updateCombatStatistics(false);
 	});
 
+	Raids.Standard.wrap(_object, "onDropLootForPlayer", function( _lootTable )
+	{
+		if (!Raids.Lairs.isLocationViable(this, true))
+		{
+			return;
+		}
+
+		Raids.Lairs.addLoot(_lootTable);
+		return [_lootTable];
+	}, "overrideArguments");
+
 	Raids.Standard.wrap(_object, "onSpawned", function()
 	{
 		if (!Raids.Lairs.isLocationViable(this))

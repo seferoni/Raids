@@ -40,70 +40,80 @@ Raids.Edicts <-
 		ProspectingOffset = 5.0,
 		RetentionOffset = -5.0,
 		StasisOffset = 2
-	}
-
-	function addToHistory( _edictName, _lair )
+	},
+	Tooltip =
 	{
-		local history = Raids.Standard.getFlag("EdictHistory", _lair),
-		newHistory = format("%s%s", !history ? "" : format("%s, ", history), _edictName);
-		Raids.Standard.setFlag("EdictHistory", newHistory, _lair);
-	}
-
-	function createEdict( _counterfeitingTools )
-	{
-		local Edicts = this, edicts = _counterfeitingTools.getEdictSelectionAsFiles();
-		return ::new(edicts[::Math.rand(0, edicts.len() - 1)]);
-	}
-
-	function clearEdicts( _lair )
-	{
-		foreach( container in this.Containers )
+		Text = 
 		{
-			this.resetContainer(container, _lair);
+			id = 20, 
+			type = "text", 
+			icon = "ui/icons/unknown_traits.png", 
+			text = "Edict: Vacant"
 		}
 	}
 
-	function clearHistory( _lair )
+	function addToHistory( _edictName, _lairObject )
 	{
-		Raids.Standard.setFlag("EdictHistory", false, _lair);
+		local history = Raids.Standard.getFlag("EdictHistory", _lairObject),
+		newHistory = format("%s%s", !history ? "" : format("%s, ", history), _edictName);
+		Raids.Standard.setFlag("EdictHistory", newHistory, _lairObject);
 	}
 
-	function createTooltipEntry( _lair, _iconPath, _edictName, _activityState )
+	function createEdict( _writingInstruments )
 	{
-		local entry = {id = 20, type = "text"};
-		entry.icon <- format("ui/icons/%s", _iconPath);
-		entry.text <- format("Edict: %s (%s)", _edictName, _activityState);
+		local edicts = _writingInstruments.getEdictSelectionAsFiles();
+		return ::new(edicts[::Math.rand(0, edicts.len() - 1)]);
+	}
+
+	function clearEdicts( _lairObject )
+	{
+		foreach( container in this.Containers )
+		{
+			this.resetContainer(container, _lairObject);
+		}
+	}
+
+	function clearHistory( _lairObject )
+	{
+		Raids.Standard.setFlag("EdictHistory", false, _lairObject);
+	}
+
+	function createTooltipEntry( _lairObject, _iconPath, _edictName, _activityState )
+	{
+		local entry = clone this.Tooltip.Text;
+		entry.icon = format("ui/icons/%s", _iconPath);
+		entry.text = format("Edict: %s (%s)", _edictName, _activityState);
 		return entry;
 	}
 
-	function executeAgitationProcedure( _lair )
+	function executeAgitationProcedure( _lairObject )
 	{
-		this.resetContainer(this.findEdict("Agitation", _lair), _lair, false);
-		Raids.Lairs.setAgitation(_lair, Raids.Lairs.Procedures.Increment);
+		this.resetContainer(this.findEdict("Agitation", _lairObject), _lairObject, false);
+		Raids.Lairs.setAgitation(_lairObject, Raids.Lairs.Procedures.Increment);
 	}
 
-	function executeEdictProcedure( _container, _lair )
+	function executeEdictProcedure( _container, _lairObject )
 	{
-		local edictID = Raids.Standard.getFlag(_container, _lair),
+		local edictID = Raids.Standard.getFlag(_container, _lairObject),
 		edictName = this.getEdictName(edictID),
 		procedure = format("execute%sProcedure", edictName);
 
 		if (this.CycledEdicts.find(edictName) != null)
 		{
-			this.resetContainer(_container, _lair);
-			this.addToHistory(edictName, _lair);
+			this.resetContainer(_container, _lairObject);
+			this.addToHistory(edictName, _lairObject);
 		}
 		else
 		{
-			this.resetContainerTime(_container, _lair);
+			this.resetContainerTime(_container, _lairObject);
 		}
 
-		local isAgitated = Raids.Standard.getFlag("Agitation", _lair) != Raids.Lairs.AgitationDescriptors.Relaxed,
+		local isAgitated = Raids.Standard.getFlag("Agitation", _lairObject) != Raids.Lairs.AgitationDescriptors.Relaxed,
 		isInert = this.InertEdicts.find(edictName) != null;
 
 		if (!isAgitated && !isInert && ::Math.rand(1, 100) <= this.Internal.AgitationChance)
 		{
-			Raids.Lairs.setAgitation(_lair, Raids.Lairs.Procedures.Increment);
+			Raids.Lairs.setAgitation(_lairObject, Raids.Lairs.Procedures.Increment);
 		}
 
 		if (!(procedure in this))
@@ -111,37 +121,37 @@ Raids.Edicts <-
 			return;
 		}
 
-		this[procedure](_lair);
+		this[procedure](_lairObject);
 	}
 
-	function executeDiminutionProcedure( _lair )
+	function executeDiminutionProcedure( _lairObject )
 	{
-		local modifier = this.Parameters.DiminutionModifier - (this.Internal.ResourcesPrefactor * _lair.getResources());
-		_lair.setResources(::Math.max(Raids.Standard.getFlag("BaseResources", _lair) / 2, ::Math.floor(modifier * _lair.getResources())));
-		_lair.createDefenders();
+		local modifier = this.Parameters.DiminutionModifier - (this.Internal.ResourcesPrefactor * _lairObject.getResources());
+		_lairObject.setResources(::Math.max(Raids.Standard.getFlag("BaseResources", _lairObject) / 2, ::Math.floor(modifier * _lairObject.getResources())));
+		_lairObject.createDefenders();
 	}
 
-	function executeNullificationProcedure( _lair )
+	function executeNullificationProcedure( _lairObject )
 	{
-		this.clearEdicts(_lair);
-		this.clearHistory(_lair);
-		Raids.Lairs.setResourcesByAgitation(_lair);
-		_lair.createDefenders();
-		_lair.setLootScaleBasedOnResources(_lair.getResources());
+		this.clearEdicts(_lairObject);
+		this.clearHistory(_lairObject);
+		Raids.Lairs.setResourcesByAgitation(_lairObject);
+		_lairObject.createDefenders();
+		_lairObject.setLootScaleBasedOnResources(_lairObject.getResources());
 	}
 
-	function executeOpportunismProcedure( _lair )
+	function executeOpportunismProcedure( _lairObject )
 	{
-		Raids.Lairs.repopulateNamedLoot(_lair);
+		Raids.Lairs.repopulateNamedLoot(_lairObject);
 	}
 
-	function findEdict( _edictName, _lair, _filterActive = false )
+	function findEdict( _edictName, _lairObject, _filterActive = false )
 	{
 		local edictID = this.getEdictID(_edictName), edictContainer = false;
 
 		foreach( container in this.Containers )
 		{
-			if (Raids.Standard.getFlag(container, _lair) == edictID)
+			if (Raids.Standard.getFlag(container, _lairObject) == edictID)
 			{
 				edictContainer = container;
 				break;
@@ -153,7 +163,7 @@ Raids.Edicts <-
 			return false;
 		}
 
-		if (!_filterActive || !Raids.Standard.getFlag(format("%sTime", edictContainer), _lair))
+		if (!_filterActive || !Raids.Standard.getFlag(format("%sTime", edictContainer), _lairObject))
 		{
 			return edictContainer;
 		}
@@ -161,9 +171,9 @@ Raids.Edicts <-
 		return false;
 	}
 
-	function findEdictInHistory( _edictName, _lair )
+	function findEdictInHistory( _edictName, _lairObject )
 	{
-		local history = Raids.Standard.getFlag("EdictHistory", _lair);
+		local history = Raids.Standard.getFlag("EdictHistory", _lairObject);
 
 		if (!history)
 		{
@@ -178,16 +188,56 @@ Raids.Edicts <-
 		return false;
 	}
 
-	function getAgitationDecayOffset( _lair )
+	function getAgitationDecayOffset( _lairObject )
 	{
 		local offset = 0;
 
-		if (this.findEdict("Stasis", _lair, true) != false)
+		if (this.findEdict("Stasis", _lairObject, true) != false)
 		{
-			offset = this.Parameters.StasisOffset * (Raids.Standard.getFlag("Agitation", _lair) - 1);
+			offset = this.Parameters.StasisOffset * (Raids.Standard.getFlag("Agitation", _lairObject) - 1);
 		}
 
 		return offset;
+	}
+
+	function getContainerEntries( _lairObject )
+	{
+		# Prepare variables in local environment.
+		local entries = [], 
+		occupiedContainers = this.getOccupiedContainers(_lairObject);
+
+		# Handle case where all containers are vacant.
+		if (occupiedContainers.len() == 0)
+		{
+			entries.resize(this.Containers.len(), this.Tooltip.Text);
+			entries.extend(this.getSpecialEntries(_lairObject));
+			return entries;
+		}
+
+		# Create entries for occupied containers.
+		foreach( container in occupiedContainers )
+		{
+			# Prepare variables in local environment.
+			local inDiscovery = Raids.Standard.getFlag(format("%sTime", container), _lairObject) != false,
+			edictName = this.getEdictName(Raids.Standard.getFlag(container, _lairObject));
+
+			# Create tooltip entry.
+			iconPath = format("scroll_0%s.png", inDiscovery ? "2_sw" : "1_b"), activityState = inDiscovery ? "Discovery" : "Active";
+			entries.push(this.createTooltipEntry(_lairObject, iconPath, edictName, activityState));
+		}
+
+		# Create entries for vacant containers.
+		if (entries.len() < this.Containers.len())
+		{
+			local iterations = this.Containers.len() - entries.len();
+
+			for( local i = 0; i < iterations; i++ )
+			{
+				entries.push(this.Tooltip.Text);
+			}
+		}
+
+		return entries;
 	}
 
 	function getEdictFileName( _edictName )
@@ -216,29 +266,29 @@ Raids.Edicts <-
 		return edictName;
 	}
 
-	function getHistoryEntry( _lair )
+	function getHistoryEntry( _lairObject )
 	{
-		local history = Raids.Standard.colourWrap(Raids.Standard.getFlag("EdictHistory", _lair), "NegativeValue"),
+		local history = Raids.Standard.colourWrap(Raids.Standard.getFlag("EdictHistory", _lairObject), "NegativeValue"),
 		entry = {id = 20, type = "text", icon = "ui/icons/papers.png", text = history};
 		return entry;
 	}
 
-	function getLegibilityEntry( _lair )
+	function getLegibilityEntry( _lairObject )
 	{
-		local entry = this.createTooltipEntry(_lair, "scroll_02_sw.png", "Legibility", "Discovery");
+		local entry = this.createTooltipEntry(_lairObject, "scroll_02_sw.png", "Legibility", "Discovery");
 		return entry;
 	}
 
-	function getNamedLootChanceOffset( _lair, _depopulate = false )
+	function getNamedLootChanceOffset( _lairObject, _depopulate = false )
 	{
 		local offset = 0.0,
-		agitation = Raids.Standard.getFlag("Agitation", _lair);
+		agitation = Raids.Standard.getFlag("Agitation", _lairObject);
 
-		if (_depopulate && this.findEdict("Retention", _lair, true) != false)
+		if (_depopulate && this.findEdict("Retention", _lairObject, true) != false)
 		{
 			offset = this.Parameters.RetentionOffset * agitation;
 		}
-		else if (this.findEdict("Prospecting", _lair, true) != false)
+		else if (this.findEdict("Prospecting", _lairObject, true) != false)
 		{
 			offset = this.Parameters.ProspectingOffset * agitation;
 		}
@@ -246,22 +296,22 @@ Raids.Edicts <-
 		return offset;
 	}
 
-	function getNonviableEntries( _lair )
+	function getNonviableEntries( _lairObject )
 	{
 		local entries = [];
 
-		if (this.findEdict("Legibility", _lair) != false)
+		if (this.findEdict("Legibility", _lairObject) != false)
 		{
-			entries.push(this.getLegibilityEntry(_lair));
+			entries.push(this.getLegibilityEntry(_lairObject));
 		}
 
 		return entries;
 	}
 
-	function getPerspicuityEntry( _lair )
+	function getPerspicuityEntry( _lairObject )
 	{
-		local entry = {id = 20, type = "text"},
-		loot = _lair.getLoot().getItems(),
+		local entry = clone this.Tooltip.Text,
+		loot = _lairObject.getLoot().getItems(),
 		count = 0;
 
 		foreach( item in loot )
@@ -269,16 +319,16 @@ Raids.Edicts <-
 			if (item != null && item.isItemType(::Const.Items.ItemType.Named)) count++;
 		}
 
-		entry.icon <- format("ui/icons/%s", count == 0 ? "cancel.png" : "special.png");
-		entry.text <- Raids.Standard.colourWrap(format("Famed (%i)", count), format("%sValue", count == 0 ? "Negative" : "Positive"));
+		entry.icon = format("ui/icons/%s", count == 0 ? "cancel.png" : "special.png");
+		entry.text = Raids.Standard.colourWrap(format("Famed (%i)", count), format("%sValue", count == 0 ? "Negative" : "Positive"));
 		return entry;
 	}
 
-	function getSpawnTimeOffset( _lair )
+	function getSpawnTimeOffset( _lairObject )
 	{
 		local offset = 0.0;
 
-		if (this.findEdict("Mobilisation", _lair, true) != false)
+		if (this.findEdict("Mobilisation", _lairObject, true) != false)
 		{
 			offset = this.Parameters.MobilisationOffset;
 		}
@@ -286,80 +336,46 @@ Raids.Edicts <-
 		return offset;
 	}
 
-	function getSpecialEntries( _lair )
+	function getSpecialEntries( _lairObject )
 	{
 		local entries = [];
 
-		if (this.findEdict("Perspicuity", _lair, true) != false)
+		if (this.findEdict("Perspicuity", _lairObject, true) != false)
 		{
-			entries.push(this.getPerspicuityEntry(_lair));
+			entries.push(this.getPerspicuityEntry(_lairObject));
 		}
 
-		if (Raids.Standard.getFlag("EdictHistory", _lair) != false)
+		if (Raids.Standard.getFlag("EdictHistory", _lairObject) != false)
 		{
-			entries.push(this.getHistoryEntry(_lair));
+			entries.push(this.getHistoryEntry(_lairObject));
 		}
 
 		return entries;
 	}
 
-	function getTreasureOffset( _lair )
+	function getTreasureOffset( _lairObject )
 	{
 		local offset = 0;
 
-		if (this.findEdictInHistory("Abundance", _lair) != false)
+		if (this.findEdictInHistory("Abundance", _lairObject) != false)
 		{
-			offset = ::Math.min(this.Parameters.AbundanceCeiling, this.Parameters.AbundanceOffset * Raids.Standard.getFlag("Agitation", _lair));
+			offset = ::Math.min(this.Parameters.AbundanceCeiling, this.Parameters.AbundanceOffset * Raids.Standard.getFlag("Agitation", _lairObject));
 		}
 
 		return offset;
 	}
 
-	function getTooltipEntries( _lair )
+	function getTooltipEntries( _lairObject )
 	{
-		# Initialise references in local environment.
-		local entries = [], occupiedContainers = this.getOccupiedContainers(_lair),
-		entryTemplate = {id = 20, type = "text", icon = "ui/icons/unknown_traits.png", text = "Edict: Vacant"};
-
-		# Handle case where all containers are vacant.
-		if (occupiedContainers.len() == 0)
-		{
-			entries.resize(this.Containers.len(), entryTemplate);
-			entries.extend(this.getSpecialEntries(_lair));
-			return entries;
-		}
-
-		# Create entries for occupied containers.
-		foreach( container in occupiedContainers )
-		{
-			# Initialise references in local environment.
-			local inDiscovery = Raids.Standard.getFlag(format("%sTime", container), _lair) != false,
-			edictName = this.getEdictName(Raids.Standard.getFlag(container, _lair));
-
-			# Create tooltip entry.
-			iconPath = format("scroll_0%s.png", inDiscovery ? "2_sw" : "1_b"), activityState = inDiscovery ? "Discovery" : "Active";
-			entries.push(this.createTooltipEntry(_lair, iconPath, edictName, activityState));
-		}
-
-		# Create entries for vacant containers.
-		if (entries.len() < this.Containers.len())
-		{
-			local iterations = this.Containers.len() - entries.len();
-
-			for( local i = 0; i < iterations; i++ )
-			{
-				entries.push(entryTemplate);
-			}
-		}
-
-		entries.extend(this.getSpecialEntries(_lair));
+		local entries = this.getContainerEntries(_lairObject);
+		entries.extend(this.getSpecialEntries(_lairObject));
 		return entries;
 	}
 
-	function getOccupiedContainers( _lair )
+	function getOccupiedContainers( _lairObject )
 	{
 		local occupiedContainers = [],
-		occupied = @(_container) Raids.Standard.getFlag(_container, _lair) != false;
+		occupied = @(_container) Raids.Standard.getFlag(_container, _lairObject) != false;
 
 		foreach( container in this.Containers )
 		{
@@ -369,16 +385,16 @@ Raids.Edicts <-
 		return occupiedContainers;
 	}
 
-	function isLairViable( _lair )
+	function isLairViable( _lairObject )
 	{
-		if (!_lair.m.IsShowingBanner)
+		if (!_lairObject.m.IsShowingBanner)
 		{
 			return false;
 		}
 
 		local Lairs = Raids.Lairs,
-		factionType = ::World.FactionManager.getFaction(_lair.getFaction()).getType(),
-		factions = this.findEdict("Legibility", _lair, true) != false ? Lairs.Factions : this.Factions,
+		factionType = ::World.FactionManager.getFaction(_lairObject.getFaction()).getType(),
+		factions = this.findEdict("Legibility", _lairObject, true) != false ? Lairs.Factions : this.Factions,
 		viableFactions = factions.map(@(_factionName) Lairs.getFactionType(_factionName));
 
 		if (viableFactions.find(factionType) != null)
@@ -389,14 +405,14 @@ Raids.Edicts <-
 		return false;
 	}
 
-	function refreshEdicts( _lair )
+	function refreshEdicts( _lairObject )
 	{
-		if (!Raids.Standard.getFlag("EdictHistory", _lair))
+		if (!Raids.Standard.getFlag("EdictHistory", _lairObject))
 		{
 			return;
 		}
 
-		local Edicts = this, viableEdicts = this.CycledEdicts.filter(@(_index, _edictName) Edicts.findEdictInHistory(_edictName, _lair));
+		local Edicts = this, viableEdicts = this.CycledEdicts.filter(@(_index, _edictName) Edicts.findEdictInHistory(_edictName, _lairObject));
 
 		foreach( edictName in viableEdicts )
 		{
@@ -407,32 +423,32 @@ Raids.Edicts <-
 				continue;
 			}
 
-			this[procedure](_lair);
+			this[procedure](_lairObject);
 		}
 	}
 
-	function resetContainer( _container, _lair, _resetTime = true )
+	function resetContainer( _container, _lairObject, _resetTime = true )
 	{
-		Raids.Standard.setFlag(_container, false, _lair);
-		if (_resetTime) this.resetContainerTime(_container, _lair);
+		Raids.Standard.setFlag(_container, false, _lairObject);
+		if (_resetTime) this.resetContainerTime(_container, _lairObject);
 	}
 
-	function resetContainerTime( _container, _lair )
+	function resetContainerTime( _container, _lairObject )
 	{
-		Raids.Standard.setFlag(format("%sTime", _container), false, _lair);
+		Raids.Standard.setFlag(format("%sTime", _container), false, _lairObject);
 	}
 
-	function updateEdicts( _lair )
+	function updateEdicts( _lairObject )
 	{
-		local occupiedContainers = this.getOccupiedContainers(_lair);
+		local occupiedContainers = this.getOccupiedContainers(_lairObject);
 
 		if (occupiedContainers.len() == 0)
 		{
 			return;
 		}
 
-		local edictDates = occupiedContainers.map(@(_container) Raids.Standard.getFlag(format("%sTime", _container), _lair)),
-		edictDurations = occupiedContainers.map(@(_container) Raids.Standard.getFlag(format("%sDuration", _container), _lair));
+		local edictDates = occupiedContainers.map(@(_container) Raids.Standard.getFlag(format("%sTime", _container), _lairObject)),
+		edictDurations = occupiedContainers.map(@(_container) Raids.Standard.getFlag(format("%sDuration", _container), _lairObject));
 
 		for( local i = 0; i < occupiedContainers.len(); i++ )
 		{
@@ -446,7 +462,7 @@ Raids.Edicts <-
 				continue;
 			}
 
-			this.executeEdictProcedure(occupiedContainers[i], _lair);
+			this.executeEdictProcedure(occupiedContainers[i], _lairObject);
 		}
 	}
 };

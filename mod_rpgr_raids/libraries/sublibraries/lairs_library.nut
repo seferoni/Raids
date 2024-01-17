@@ -42,6 +42,54 @@ Raids.Lairs <-
 		Increment = 1,
 		Decrement = 2,
 		Reset = 3
+	},
+	Tooltip = 
+	{
+		Icons = 
+		{
+			Agitated = "ui/icons/miniboss.png",
+			Relaxed = "ui/icons/vision.png",
+			Resources = "ui/icons/asset_money.png"
+		},
+		Text = 
+		{
+			id = 20, 
+			type = "text",
+			icon = "",
+			text = ""
+		}
+	}
+
+	function addLoot( _lairObject )
+	{	// TODO:
+		local stash = _lairObject.getLoot();
+		agitation = Raids.Standard.getFlag("Agitation", _lairObject);
+
+		for( local i = 0; i < agitation; i++ )
+		{
+			stash.add(::new("scripts/items/special/official_document_item"));
+		}
+	}
+
+	function createAgitationEntry( _lairObject )
+	{
+		# Prepare variables in local environment.
+		local textColour = "PositiveValue",
+		iconPath = this.Tooltip.Icons.Relaxed,
+		agitation = Raids.Standard.getFlag("Agitation", _lairObject);
+
+		# Modify field values when Agitation is above baseline.
+		if (agitation != this.AgitationDescriptors.Relaxed)
+		{
+			textColour = "NegativeValue";
+			iconPath = this.Tooltip.Icons.Agitated;
+		}
+
+		# Create Agitation entry.
+		local entry = clone this.Tooltip.Text;
+		entry.icon = iconPath;
+		entry.text = Raids.Standard.colourWrap(format("%s (%i)", Raids.Standard.getDescriptor(agitation, this.AgitationDescriptors), agitation), textColour);
+		return entry;
 	}
 
 	function createNaiveNamedLoot()
@@ -56,7 +104,7 @@ Raids.Lairs <-
 		return namedLoot;
 	}
 
-	function createNamedLoot( _lair )
+	function createNamedLoot( _lairObject )
 	{
 		if (::Math.rand(1, 100) > Raids.Standard.getSetting("FactionSpecificNamedLootChance"))
 		{
@@ -64,11 +112,11 @@ Raids.Lairs <-
 		}
 
 		local namedLoot = [],
-		keys = this.NamedItemKeys.filter(@(_index, _key) _lair.m[format("%sList", _key)] != null);
+		keys = this.NamedItemKeys.filter(@(_index, _key) _lairObject.m[format("%sList", _key)] != null);
 
 		foreach( key in keys )
 		{
-			namedLoot.extend(_lair.m[format("%sList", key)]);
+			namedLoot.extend(_lairObject.m[format("%sList", key)]);
 		}
 
 		if (namedLoot.len() == 0)
@@ -79,9 +127,43 @@ Raids.Lairs <-
 		return namedLoot;
 	}
 
-	function depopulateNamedLoot( _lair, _chance = null )
+	function createResourcesEntry( _lairObject )
 	{
-		if (_lair.getLoot().isEmpty())
+		# Prepare variables in local environment.
+		local resources = _lairObject.getResources();
+
+		# Create resources entry.
+		local entry = clone this.Tooltip.Text;
+		entry.icon <- this.Tooltip.Icons.Resources;
+		entry.text <- format("%s resource units", Raids.Standard.colourWrap(resources, "PositiveValue"));
+		return entry;
+	}
+
+	function createTimerEntry( _lairObject )
+	{
+		# Prepare auxiliary variables to dictate process flow.
+		local agitation = Raids.Standard.getFlag("Agitation", _lairObject),
+		lastUpdateDays = Raids.Standard.getFlag("LastAgitationUpdate", _lairObject);
+
+		# Handle cases where the decay timer variable either occupies a value of the wrong type or holds no interest to the user.
+		if (!lastUpdateDays || agitation == this.AgitationDescriptors.Relaxed)
+		{
+			return null;
+		}
+
+		# Prepare variables in local environment.
+		local timeDifference = (lastUpdateDays + this.getAgitationDecayInterval(_lairObject)) - ::World.getTime().Days;
+
+		# Create decay timer entry.
+		local entry = clone this.Tooltip.Text;
+		entry.icon = "ui/icons/action_points.png";
+		entry.text = format("%s day(s)", Raids.Standard.colourWrap(timeDifference, "NegativeValue"));
+		return entry;
+	}
+
+	function depopulateNamedLoot( _lairObject, _chance = null )
+	{
+		if (_lairObject.getLoot().isEmpty())
 		{
 			return;
 		}
@@ -90,7 +172,7 @@ Raids.Lairs <-
 
 		if (_chance == null)
 		{
-			namedLootChance = this.getNamedLootChance(_lair) + Raids.Edicts.getNamedLootChanceOffset(_lair, true);
+			namedLootChance = this.getNamedLootChance(_lairObject) + Raids.Edicts.getNamedLootChanceOffset(_lairObject, true);
 		}
 
 		if (namedLootChance <= 0)
@@ -98,7 +180,7 @@ Raids.Lairs <-
 			return;
 		}
 
-		local stash = _lair.getLoot(),
+		local stash = _lairObject.getLoot(),
 		loot = stash.getItems().filter(@(_index, _item) _item != null && _item.isItemType(::Const.Items.ItemType.Named));
 
 		foreach( item in loot )
@@ -110,9 +192,9 @@ Raids.Lairs <-
 		}
 	}
 
-	function getAgitationDecayInterval( _lair )
+	function getAgitationDecayInterval( _lairObject )
 	{
-		local decayInterval = this.Parameters.AgitationDecayInterval + Raids.Edicts.getAgitationDecayOffset(_lair);
+		local decayInterval = this.Parameters.AgitationDecayInterval + Raids.Edicts.getAgitationDecayOffset(_lairObject);
 		return decayInterval;
 	}
 
@@ -216,29 +298,29 @@ Raids.Lairs <-
 		return ::Const.FactionType[_factionName];
 	}
 
-	function getMoneyCount( _lair )
+	function getMoneyCount( _lairObject )
 	{
-		return _lair.getResources();
+		return _lairObject.getResources();
 	}
 
-	function getNaiveNamedLootChance( _lair )
+	function getNaiveNamedLootChance( _lairObject )
 	{	# The arbitrary coefficients and constants used here are taken verbatim from the vanilla codebase.
-		local tile = _lair.getTile(), settlement = this.getSettlementClosestTo(tile);
-		return (_lair.getResources() + tile.getDistanceTo(settlement.getTile()) * 4) / 5.0 - 37.0;
+		local tile = _lairObject.getTile(), settlement = this.getSettlementClosestTo(tile);
+		return (_lairObject.getResources() + tile.getDistanceTo(settlement.getTile()) * 4) / 5.0 - 37.0;
 	}
 
-	function getNamedLootChance( _lair )
+	function getNamedLootChance( _lairObject )
 	{
-		local baseChance = Raids.Standard.getFlag("BaseNamedItemChance", _lair),
-		agitation = Raids.Standard.getFlag("Agitation", _lair);
+		local baseChance = Raids.Standard.getFlag("BaseNamedItemChance", _lairObject),
+		agitation = Raids.Standard.getFlag("Agitation", _lairObject);
 		return baseChance + ((agitation - 1) * this.Parameters.NamedItemChancePerAgitationTier);
 	}
 
-	function getPartyResources( _lair )
+	function getPartyResources( _lairObject )
 	{
-		local resources = _lair.getResources(),
+		local resources = _lairObject.getResources(),
 		timeModifier = this.getTimeModifier(),
-		baseResourceModifier = this.getBaseResourceModifier(Raids.Standard.getFlag("BaseResources", _lair)),
+		baseResourceModifier = this.getBaseResourceModifier(Raids.Standard.getFlag("BaseResources", _lairObject)),
 		configurableModifier = Raids.Standard.getPercentageSetting("RoamerResourceModifier");
 		return baseResourceModifier * configurableModifier * timeModifier * resources;
 	}
@@ -258,60 +340,46 @@ Raids.Lairs <-
 	}
 
 	function getTimeModifier()
-	{
+	{	# The arbitrary coefficients and constants used here are extrapolated from the vanilla codebase.
 		return (0.9 + ::Math.minf(2.0, ::World.getTime().Days * 0.014) * ::Const.Difficulty.EnemyMult[::World.Assets.getCombatDifficulty()]);
 	}
 
-	function getTooltipEntries( _lair )
+	function getTooltipEntries( _lairObject )
 	{
-		# Initialise references in local environment.
-		local agitation = Raids.Standard.getFlag("Agitation", _lair),
-		lastUpdateDays = Raids.Standard.getFlag("LastAgitationUpdate", _lair),
-		textColour = "PositiveValue", iconPath = "vision.png";
-
-		if (agitation != this.AgitationDescriptors.Relaxed)
-		{
-			textColour = "NegativeValue", iconPath = "miniboss.png";
-		}
+		# Prepare variables in local environment.
+		local entries = [],
+		push = @(_entry) entries.push(_entry);
 
 		# Create resources entry.
-		local resourcesEntry = {id = 20, type = "text"};
-		resourcesEntry.icon <- "ui/icons/asset_money.png";
-		resourcesEntry.text <- format("%s resource units", Raids.Standard.colourWrap(format("%i", _lair.getResources()), "PositiveValue"));
+		push(this.createResourcesEntry(_lairObject));
 
 		# Create Agitation entry.
-		local agitationEntry = clone resourcesEntry;
-		agitationEntry.icon = format("ui/icons/%s", iconPath);
-		agitationEntry.text = format("%s", Raids.Standard.colourWrap(format("%s (%i)", Raids.Standard.getDescriptor(agitation, this.AgitationDescriptors), agitation), textColour));
+		push(this.createAgitationEntry(_lairObject));
 
-		if (!lastUpdateDays || agitation == this.AgitationDescriptors.Relaxed)
+		# Create Agitation decay timer entry.
+		local timerEntry = this.createTimerEntry(_lairObject);
+
+		if (timerEntry != null)
 		{
-			return [resourcesEntry, agitationEntry];
+			push(timerEntry);
 		}
 
-		# Initialise variable in local environment.
-		local timeDifference = (lastUpdateDays + this.getAgitationDecayInterval(_lair)) - ::World.getTime().Days;
-
-		# Create decay timer entry.
-		local timeEntry = clone resourcesEntry;
-		timeEntry.icon = "ui/icons/action_points.png";
-		timeEntry.text = format("%s day(s)", Raids.Standard.colourWrap(timeDifference, "NegativeValue"));
-		return [resourcesEntry, agitationEntry, timeEntry];
+		return entries;
 	}
 
-	function getTreasureCount( _lair )
+	function getTreasureCount( _lairObject )
 	{
-		return ::Math.ceil(_lair.getResources() / 100.0);
+		return ::Math.ceil(_lairObject.getResources() / 100.0);
 	}
 
-	function initialiseLairParameters( _lair )
+	function initialiseLairParameters( _lairObject )
 	{
-		Raids.Standard.setFlag("BaseResources", _lair.getResources(), _lair);
-		Raids.Standard.setFlag("Agitation", this.AgitationDescriptors.Relaxed, _lair);
-		Raids.Standard.setFlag("BaseNamedItemChance", this.getNaiveNamedLootChance(_lair), _lair);
+		Raids.Standard.setFlag("BaseResources", _lairObject.getResources(), _lairObject);
+		Raids.Standard.setFlag("Agitation", this.AgitationDescriptors.Relaxed, _lairObject);
+		Raids.Standard.setFlag("BaseNamedItemChance", this.getNaiveNamedLootChance(_lairObject), _lairObject);
 	}
 
-	function isActiveContractLocation( _lair )
+	function isActiveContractLocation( _lairObject )
 	{	
 		local activeContract = ::World.Contracts.getActiveContract();
 
@@ -332,7 +400,7 @@ Raids.Lairs <-
 			return false;
 		}
 
-		if (targetLocation.isNull() || targetLocation.get() != _lair)
+		if (targetLocation.isNull() || targetLocation.get() != _lairObject)
 		{
 			return false;
 		}
@@ -354,9 +422,9 @@ Raids.Lairs <-
 		return false;
 	}
 
-	function isLairViableForProcedure( _lair, _procedure )
+	function isLairViableForProcedure( _lairObject, _procedure )
 	{
-		local agitation = Raids.Standard.getFlag("Agitation", _lair);
+		local agitation = Raids.Standard.getFlag("Agitation", _lairObject);
 
 		if (_procedure == this.Procedures.Increment && agitation >= this.AgitationDescriptors.Militant)
 		{
@@ -401,9 +469,9 @@ Raids.Lairs <-
 		return ::World.State.getPlayer().getTile().getDistanceTo(_tile) <= _threshold;
 	}
 
-	function repopulateNamedLoot( _lair )
+	function repopulateNamedLoot( _lairObject )
 	{
-		local namedLootChance = this.getNamedLootChance(_lair) + Raids.Edicts.getNamedLootChanceOffset(_lair), iterations = 0;
+		local namedLootChance = this.getNamedLootChance(_lairObject) + Raids.Edicts.getNamedLootChanceOffset(_lairObject), iterations = 0;
 
 		if (namedLootChance > 100)
 		{
@@ -420,41 +488,52 @@ Raids.Lairs <-
 			return;
 		}
 
-		local namedLoot = this.createNamedLoot(_lair);
+		local namedLoot = this.createNamedLoot(_lairObject);
 
 		for ( local i = 0; i < iterations; i++ )
 		{
 			local namedItem = namedLoot[::Math.rand(0, namedLoot.len() - 1)];
-			_lair.getLoot().add(::new(format("scripts/items/%s", namedItem)));
+			_lairObject.getLoot().add(::new(format("scripts/items/%s", namedItem)));
 		}
 	}
 
-	function setAgitation( _lair, _procedure )
+	function setAgitation( _lairObject, _procedure )
 	{
-		if (!this.isLairViableForProcedure(_lair, _procedure))
+		if (!this.isLairViableForProcedure(_lairObject, _procedure))
 		{
 			return;
 		}
 
 		switch (_procedure)
 		{
-			case (this.Procedures.Increment): Raids.Standard.incrementFlag("Agitation", 1, _lair); break;
-			case (this.Procedures.Decrement): Raids.Standard.incrementFlag("Agitation", -1, _lair); break;
-			case (this.Procedures.Reset): Raids.Standard.setFlag("Agitation", this.AgitationDescriptors.Relaxed, _lair); break;
+			case (this.Procedures.Increment): Raids.Standard.incrementFlag("Agitation", 1, _lairObject); break;
+			case (this.Procedures.Decrement): Raids.Standard.incrementFlag("Agitation", -1, _lairObject); break;
+			case (this.Procedures.Reset): Raids.Standard.setFlag("Agitation", this.AgitationDescriptors.Relaxed, _lairObject); break;
 		}
 
-		Raids.Standard.setFlag("LastAgitationUpdate", ::World.getTime().Days, _lair);
-		this.updateProperties(_lair, _procedure);
+		Raids.Standard.setFlag("LastAgitationUpdate", ::World.getTime().Days, _lairObject);
+		this.updateProperties(_lairObject, _procedure);
 	}
 
-	function setResourcesByAgitation( _lair )
+	function setResourcesByAgitation( _lairObject )
 	{
-		local agitation = Raids.Standard.getFlag("Agitation", _lair),
-		baseResources = Raids.Standard.getFlag("BaseResources", _lair),
-		interpolatedModifier = -0.0006 * baseResources + 0.6,
-		configurableModifier = Raids.Standard.getPercentageSetting("AgitationResourceModifier"),
+		# Get current lair Agitation.
+		local agitation = Raids.Standard.getFlag("Agitation", _lairObject);
+
+		# Get resources assigned to the lair upon creation.
+		local baseResources = Raids.Standard.getFlag("BaseResources", _lairObject);
+
+		# Create a modifier meant to modulate resource scaling behaviour at both extremes.
+		local interpolatedModifier = -0.0006 * baseResources + 0.6;
+
+		# Get configured resources modifier.
+		local configurableModifier = Raids.Standard.getPercentageSetting("AgitationResourceModifier");
+
+		# Apply factors as appropriate to produce a new value for resources, scaled by Agitation.
 		newResources = ::Math.floor(baseResources + (interpolatedModifier * (agitation - 1) * configurableModifier * baseResources));
-		_lair.setResources(::Math.min(newResources, this.Parameters.ResourcesCeiling));
+
+		# Set new resources value.
+		_lairObject.setResources(::Math.min(newResources, this.Parameters.ResourcesCeiling));
 	}
 
 	function updateCombatStatistics( _isParty )
@@ -462,9 +541,9 @@ Raids.Lairs <-
 		Raids.Standard.setFlag("LastFoeWasParty", _isParty, ::World.Statistics);
 	}
 
-	function updateAgitation( _lair )
+	function updateAgitation( _lairObject )
 	{
-		local lastUpdateTimeDays = Raids.Standard.getFlag("LastAgitationUpdate", _lair);
+		local lastUpdateTimeDays = Raids.Standard.getFlag("LastAgitationUpdate", _lairObject);
 
 		if (!lastUpdateTimeDays)
 		{
@@ -472,7 +551,7 @@ Raids.Lairs <-
 		}
 
 		local timeDifference = ::World.getTime().Days - lastUpdateTimeDays,
-		decayInterval = this.getAgitationDecayInterval(_lair);
+		decayInterval = this.getAgitationDecayInterval(_lairObject);
 
 		if (timeDifference < decayInterval)
 		{
@@ -488,44 +567,44 @@ Raids.Lairs <-
 
 		for( local i = 0; i < iterations; i++ )
 		{
-			this.setAgitation(_lair, this.Procedures.Decrement);
+			this.setAgitation(_lairObject, this.Procedures.Decrement);
 
-			if (Raids.Standard.getFlag("Agitation", _lair) == this.AgitationDescriptors.Relaxed)
+			if (Raids.Standard.getFlag("Agitation", _lairObject) == this.AgitationDescriptors.Relaxed)
 			{
 				break;
 			}
 		}
 	}
 
-	function updateProperties( _lair, _procedure )
+	function updateProperties( _lairObject, _procedure )
 	{
 		if (_procedure == this.Procedures.Reset)
 		{
-			Raids.Edicts.clearEdicts(_lair);
+			Raids.Edicts.clearEdicts(_lairObject);
 		}
 
 		if (_procedure != this.Procedures.Increment)
 		{
-			Raids.Edicts.clearHistory(_lair);
-			this.depopulateNamedLoot(_lair);
+			Raids.Edicts.clearHistory(_lairObject);
+			this.depopulateNamedLoot(_lairObject);
 		}
 
-		this.setResourcesByAgitation(_lair);
-		_lair.createDefenders();
-		_lair.setLootScaleBasedOnResources(_lair.getResources());
+		this.setResourcesByAgitation(_lairObject);
+		_lairObject.createDefenders();
+		_lairObject.setLootScaleBasedOnResources(_lairObject.getResources());
 
 		if (_procedure != this.Procedures.Increment)
 		{
 			return;
 		}
 
-		Raids.Edicts.refreshEdicts(_lair);
+		Raids.Edicts.refreshEdicts(_lairObject);
 
-		if (Raids.Standard.getFlag("Agitation", _lair) != this.AgitationDescriptors.Militant && ::Math.rand(1, 100) > this.Parameters.NamedLootRefreshChance)
+		if (Raids.Standard.getFlag("Agitation", _lairObject) != this.AgitationDescriptors.Militant && ::Math.rand(1, 100) > this.Parameters.NamedLootRefreshChance)
 		{
 			return;
 		}
 
-		this.repopulateNamedLoot(_lair);
+		this.repopulateNamedLoot(_lairObject);
 	}
 };
