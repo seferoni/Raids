@@ -114,8 +114,13 @@ this.writing_instruments_item <- ::inherit("scripts/items/item",
 		return this.m.InstructionText;
 	}
 
+	function getPositionInQueue()
+	{	// TODO:
+		local stash = ::World.Assets.getStash().getItems();
+	}
+
 	function getTooltip()
-	{
+	{	// TODO: refactor
 		local tooltipArray =
 		[
 			{id = 1, type = "title", text = this.getName()},

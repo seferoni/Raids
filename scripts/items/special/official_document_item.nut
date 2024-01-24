@@ -15,7 +15,7 @@ this.official_document_item <- ::inherit("scripts/items/item",
 		this.m.IsDroppedAsLoot = true;
 		this.m.IsAllowedInBag = false;
 		this.m.IsUsable = true;
-		this.m.EffectText <- "Will produce a counterfeit Edict, but only if a set of counterfeiting tools are present.";
+		this.m.EffectText <- "Will produce a counterfeit Edict upon use. The resulting Edict type can be modulated by a set of writing instruments, if present.";
 		this.m.InstructionText <- "Right-click to modify its contents.";
 	}
 
@@ -25,7 +25,7 @@ this.official_document_item <- ::inherit("scripts/items/item",
 
 		if (candidates.len() == 0)
 		{
-			return false;
+			return null;
 		}
 
 		foreach( candidate in candidates )
@@ -53,15 +53,20 @@ this.official_document_item <- ::inherit("scripts/items/item",
 
 	function getTooltip()
 	{
-		local tooltipArray =
-		[
-			{id = 1, type = "title", text = this.getName()},
-			{id = 2, type = "description", text = this.getDescription()},
-			{id = 66, type = "text", text = this.getValueString()},
-			{id = 3, type = "image", image = this.getIcon()},
-			{id = 6, type = "text", icon = "ui/icons/special.png", text = this.getEffect()},
-			{id = 65, type = "text", text = this.getInstruction()}
-		];
+		local tooltipArray = [],
+		push = @(_entry) tooltipArray.push(_entry);
+
+		# Create generic entries.
+		push({id = 1, type = "title", text = this.getName()});
+		push({id = 2, type = "description", text = this.getDescription()});
+		push({id = 66, type = "text", text = this.getValueString()});
+		push({id = 3, type = "image", image = this.getIcon()});
+
+		# Create effect entry.
+		push({id = 6, type = "text", icon = "ui/icons/special.png", text = this.getEffect()});
+
+		# Create instruction entry.
+		push({id = 65, type = "text", text = this.getInstruction()});
 
 		return tooltipArray;
 	}
@@ -74,14 +79,19 @@ this.official_document_item <- ::inherit("scripts/items/item",
 	function onUse( _actor, _item = null )
 	{
 		local writingInstruments = this.findWritingInstruments();
-
-		if (!writingInstruments)
-		{
-			return false;
-		}
-
 		::Sound.play("sounds/scribble.wav", ::Const.Sound.Volume.Inventory);
 		::World.Assets.getStash().add(Raids.Edicts.createEdict(writingInstruments));
+
+		if (writingInstruments == null)
+		{
+			return true;
+		}
+
+		if (writingInstruments.getEdictSelectionMode() == writingInstruments.SelectionModes.Indiscriminate)
+		{
+			return true;
+		}
+
 		this.updateUses(writingInstruments);
 		return true;
 	}

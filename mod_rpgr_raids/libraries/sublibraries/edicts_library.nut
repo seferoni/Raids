@@ -59,9 +59,9 @@ Raids.Edicts <-
 		Raids.Standard.setFlag("EdictHistory", newHistory, _lairObject);
 	}
 
-	function createEdict( _writingInstruments )
+	function createEdict( _writingInstruments = null )
 	{
-		local edicts = _writingInstruments.getEdictSelectionAsFiles();
+		local edicts = _writingInstruments == null ? this.getEdictFiles() : _writingInstruments.getEdictSelectionAsFiles();
 		return ::new(edicts[::Math.rand(0, edicts.len() - 1)]);
 	}
 

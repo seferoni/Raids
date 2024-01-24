@@ -18,6 +18,32 @@ this.edict_item <- ::inherit("scripts/items/item",
 		this.m.ScalingModality <- this.m.ScalingModalities.Static;
 		this.m.EffectText <- null;
 		this.m.InstructionText <- "Right-click to dispatch within proximity of a lair. This edict will be consumed in the process.";
+		this.m.ShowWarning <- false;
+	},
+	Tooltip = 
+	{
+		Icons = 
+		{
+			Effect = "ui/icons/special.png",
+			Discovery = "ui/icons/action_points.png",
+			Persistence = "ui/icons/scroll_01.png",
+			Scaling = "ui/icons/level.png",
+			Warning = "ui/icons/warning.png"
+		},
+		Template = 
+		{
+			id = 6, 
+			type = "text", 
+			icon = "",
+			text = ""
+		}
+	}
+
+	function createWarningEntry()
+	{
+		local entry = clone this.Tooltip.Template;
+		entry.icon <- this.Tooltip.Icons.Warning;
+		entry.text <- "There are no viable lairs within proximity. Lairs that are viable and within proximity will present the contents of their Edict slots on the tooltip.";
 	}
 
 	function executeEdictProcedure( _lairs )
@@ -86,18 +112,39 @@ this.edict_item <- ::inherit("scripts/items/item",
 
 	function getTooltip()
 	{
-		local tooltipArray =
-		[
-			{id = 1, type = "title", text = this.getName()},
-			{id = 2, type = "description", text = this.getDescription()},
-			{id = 66, type = "text", text = this.getValueString()},
-			{id = 3, type = "image", image = this.getIcon()},
-			{id = 6, type = "text", icon = "ui/icons/special.png", text = this.getEffectText()},
-			{id = 6, type = "text", icon = "ui/icons/scroll_01.png", text = this.getPersistenceText()},
-			{id = 6, type = "text", icon = "ui/icons/action_points.png", text = this.getDiscoveryText()},
-			{id = 6, type = "text", icon = "ui/icons/level.png", text = this.getScalingText()},
-			{id = 65, type = "text", text = this.getInstructionText()}
-		];
+		# Prepare variables in local environment.
+		local tooltipArray = [],
+		push = @(_entry) tooltipArray.push(_entry);
+
+		# Create generic entries.
+		push({id = 1, type = "title", text = this.getName()});
+		push({id = 2, type = "description", text = this.getDescription()});
+		push({id = 66, type = "text", text = this.getValueString()});
+		push({id = 3, type = "image", image = this.getIcon()});
+
+		# Create effect entry.
+		push({id = 6, type = "text", icon = this.Tooltip.Icon.Effect, text = this.getEffectText()});
+		
+		# Create persistence entry.
+		push({id = 6, type = "text", icon = this.Tooltip.Icon.Persistence, text = this.getPersistenceText()});
+
+		# Create discovery time entry.
+		push({id = 6, type = "text", icon = this.Tooltip.Icon.Discovery, text = this.getDiscoveryText()});
+
+		# Create scaling modality entry.
+		push({id = 6, type = "text", icon = this.Tooltip.Icon.Scaling, text = this.getScalingText()});
+
+		# Create hint entry.
+		push({id = 65, type = "text", text = this.getInstructionText()});
+		
+		# Evaluate viability for appending warning entry.
+		if (this.getWarningState())
+		{	# Create warning entry.
+			push(this.createWarningEntry());
+
+			# Reset warning state.
+			this.setWarningState(false);
+		}
 
 		return tooltipArray;
 	}
@@ -135,6 +182,11 @@ this.edict_item <- ::inherit("scripts/items/item",
 		return lairs;
 	}
 
+	function getWarningState()
+	{
+		return this.m.ShowWarning;
+	}
+
 	function isCycled()
 	{
 		return Raids.Edicts.CycledEdicts.find(Raids.Edicts.getEdictName(this.getID())) != null;
@@ -143,6 +195,11 @@ this.edict_item <- ::inherit("scripts/items/item",
 	function playInventorySound( _eventType )
 	{
 		::Sound.play("sounds/cloth_01.wav", ::Const.Sound.Volume.Inventory);
+	}
+
+	function setWarningState( _bool )
+	{
+		this.m.ShowWarning = _bool;
 	}
 
 	function setDescription( _string )
@@ -156,6 +213,8 @@ this.edict_item <- ::inherit("scripts/items/item",
 
 		if (lairs.len() == 0)
 		{
+			this.setWarningState(true);
+			::Tooltip.reload();
 			return false;
 		}
 
