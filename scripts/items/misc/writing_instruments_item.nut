@@ -11,12 +11,27 @@ this.writing_instruments_item <- ::inherit("scripts/items/item",
 		Selective = 2,
 		Inverted = 3
 	},
-	Sounds = 
+	Sounds =
 	[
 		"sounds/raids.paper_01.wav",
 		"sounds/raids.paper_02.wav",
 		"sounds/raids.paper_03.wav"
 	],
+	Tooltip =
+	{
+		Icons =
+		{
+			Selection = "ui/icons/special.png",
+			Warning = "ui/icons/warning.png"
+		},
+		Template =
+		{
+			id = 6,
+			type = "text",
+			icon = "",
+			text = ""
+		}
+	}
 	function create()
 	{
 		this.item.create();
@@ -34,6 +49,14 @@ this.writing_instruments_item <- ::inherit("scripts/items/item",
 		this.initialiseEdictSelection();
 		this.setUses(this.m.MaximumUses);
 		this.m.InstructionText <- "Right-click to cycle between different selection modes.";
+	}
+
+	function createQueueEntry()
+	{
+		local entry = clone this.Tooltip.Template;
+		entry.icon = this.Tooltip.Icons.Warning;
+		entry.text = "This item's Edict selection preferences take precedence.";
+		return entry;
 	}
 
 	function getEdictCandidates()
@@ -77,7 +100,7 @@ this.writing_instruments_item <- ::inherit("scripts/items/item",
 		{
 			case this.SelectionModes.Indiscriminate: return Edicts.getEdictFiles();
 			case this.SelectionModes.Selective: return toFileName(this.getEdictSelectionAsArray());
-			case this.SelectionModes.Inverted: 
+			case this.SelectionModes.Inverted:
 			{
 				local edictFiles = Edicts.getEdictFiles();
 				Raids.Standard.removeFromArray(toFileName(this.getEdictSelectionAsArray()), edictFiles);
@@ -114,23 +137,63 @@ this.writing_instruments_item <- ::inherit("scripts/items/item",
 		return this.m.InstructionText;
 	}
 
-	function getPositionInQueue()
-	{	// TODO:
-		local stash = ::World.Assets.getStash().getItems();
+	function isFirstInQueue()
+	{
+		# Prepare variables in local environment.
+		local candidates = ::World.Assets.getStash().getItems().filter(@(_index, _item) _item != null && _item.getID() == "misc.writing_instruments_item");
+
+		# Handle case where the current object is the only valid instance.
+		if (candidates.len() == 1)
+		{
+			return true;
+		}
+
+		local currentPosition = candidates.find(this);
+
+		# Handle case where object is unequivocally first in queue.
+		if (this.getEdictSelectionMode() == this.SelectionModes.Indiscriminate && currentPosition != 0)
+		{
+			return false;
+		}
+
+		# Process all candidates ahead in queue to current object.
+		for( local i = 0; i < currentPosition; i++ )
+		{
+			if (candidates[i].getEdictSelectionMode() != this.SelectionModes.Indiscriminate)
+			{
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	function getTooltip()
-	{	// TODO: refactor
-		local tooltipArray =
-		[
-			{id = 1, type = "title", text = this.getName()},
-			{id = 2, type = "description", text = this.getDescription()},
-			{id = 66, type = "text", text = this.getValueString()},
-			{id = 3, type = "image", image = this.getIcon()},
-			{id = 6, type = "text", icon = "ui/icons/warning.png", text = format("Has %s uses remaining.", Raids.Standard.colourWrap(this.getUses(), "NegativeValue"))},
-			{id = 6, type = "text", icon = "ui/icons/special.png", text = this.getEdictSelectionText()},
-			{id = 65, type = "text", text = this.getInstruction()}
-		];
+	{
+		# Prepare variables in local environment.
+		local tooltipArray = [],
+		push = @(_entry) tooltipArray.push(_entry);
+
+		# Create generic entries.
+		push({id = 1, type = "title", text = this.getName()});
+		push({id = 2, type = "description", text = this.getDescription()});
+		push({id = 66, type = "text", text = this.getValueString()});
+		push({id = 3, type = "image", image = this.getIcon()});
+
+		# Create warning entry.
+		push({id = 6, type = "text", icon = this.Tooltip.Icons.Warning, text = format("Has %s uses remaining.", Raids.Standard.colourWrap(this.getUses(), "NegativeValue"))});
+
+		# Evaluate if this instance is queued first.
+		if (this.isFirstInQueue())
+		{	# Create queue entry.
+			push(this.createQueueEntry());
+		}
+
+		# Create selection mode entry.
+		push({id = 6, type = "text", icon = this.Tooltip.Icons.Selection, text = this.getEdictSelectionText()});
+
+		# Create instruction entry.
+		push({id = 65, type = "text", text = this.getInstruction()});
 
 		return tooltipArray;
 	}
