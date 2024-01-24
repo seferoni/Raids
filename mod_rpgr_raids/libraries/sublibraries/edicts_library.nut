@@ -266,6 +266,22 @@ Raids.Edicts <-
 		return edictName;
 	}
 
+	function getFamedItemEntry( _lairObject )
+	{
+		local entry = clone this.Tooltip.Text,
+		loot = _lairObject.getLoot().getItems(),
+		count = 0;
+
+		foreach( item in loot )
+		{
+			if (item != null && item.isItemType(::Const.Items.ItemType.Named)) count++;
+		}
+
+		entry.icon = format("ui/icons/%s", count == 0 ? "cancel.png" : "special.png");
+		entry.text = Raids.Standard.colourWrap(format("Famed (%i)", count), format("%sValue", count == 0 ? "Negative" : "Positive"));
+		return entry;
+	}
+
 	function getHistoryEntry( _lairObject )
 	{
 		local history = Raids.Standard.colourWrap(Raids.Standard.getFlag("EdictHistory", _lairObject), "NegativeValue"),
@@ -308,22 +324,6 @@ Raids.Edicts <-
 		return entries;
 	}
 
-	function getPerspicuityEntry( _lairObject )
-	{
-		local entry = clone this.Tooltip.Text,
-		loot = _lairObject.getLoot().getItems(),
-		count = 0;
-
-		foreach( item in loot )
-		{
-			if (item != null && item.isItemType(::Const.Items.ItemType.Named)) count++;
-		}
-
-		entry.icon = format("ui/icons/%s", count == 0 ? "cancel.png" : "special.png");
-		entry.text = Raids.Standard.colourWrap(format("Famed (%i)", count), format("%sValue", count == 0 ? "Negative" : "Positive"));
-		return entry;
-	}
-
 	function getSpawnTimeOffset( _lairObject )
 	{
 		local offset = 0.0;
@@ -338,12 +338,7 @@ Raids.Edicts <-
 
 	function getSpecialEntries( _lairObject )
 	{
-		local entries = [];
-
-		if (this.findEdict("Perspicuity", _lairObject, true) != false)
-		{
-			entries.push(this.getPerspicuityEntry(_lairObject));
-		}
+		local entries = [this.getFamedItemEntry(_lairObject)];
 
 		if (Raids.Standard.getFlag("EdictHistory", _lairObject) != false)
 		{
