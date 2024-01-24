@@ -60,14 +60,13 @@ Raids.Lairs <-
 		}
 	}
 
-	function addLoot( _lairObject )
-	{	// TODO:
-		local stash = _lairObject.getLoot();
-		agitation = Raids.Standard.getFlag("Agitation", _lairObject);
+	function addLoot( _lootTable, _lairObject )
+	{
+		local agitation = Raids.Standard.getFlag("Agitation", _lairObject);
 
 		for( local i = 0; i < agitation; i++ )
 		{
-			stash.add(::new("scripts/items/special/official_document_item"));
+			_lootTable.push(::new("scripts/items/special/official_document_item"));
 		}
 	}
 
