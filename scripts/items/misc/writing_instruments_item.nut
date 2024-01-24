@@ -148,9 +148,10 @@ this.writing_instruments_item <- ::inherit("scripts/items/item",
 			return true;
 		}
 
+		# Find position of object in queue.
 		local currentPosition = candidates.find(this);
 
-		# Handle case where object is unequivocally first in queue.
+		# Handle case where object is unequivocally not first in queue.
 		if (this.getEdictSelectionMode() == this.SelectionModes.Indiscriminate && currentPosition != 0)
 		{
 			return false;
