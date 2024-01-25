@@ -138,27 +138,39 @@ this.writing_instruments_item <- ::inherit("scripts/items/item",
 	}
 
 	function isFirstInQueue()
-	{	// TODO: this is bugged
+	{
 		# Prepare variables in local environment.
 		local candidates = ::World.Assets.getStash().getItems().filter(@(_index, _item) _item != null && _item.getID() == "misc.writing_instruments_item");
 
 		# Handle case where the current object is the only valid instance.
 		if (candidates.len() == 1)
-		{
-			return true;
+		{	# In the case that there are no other valid instances, hide queue entry.
+			return false;
 		}
 
 		# Find position of object in queue.
 		local currentPosition = candidates.find(this);
 
-		# Handle case where object is unequivocally not first in queue.
-		if (this.getEdictSelectionMode() == this.SelectionModes.Indiscriminate && currentPosition != 0)
+		# Get current Edict selection mode.
+		local selectionMode = this.getEdictSelection();
+
+		# Handle case where object is unequivocally not first in queue. This evaluation relaxes the range of indices iterated over in the succeeding conditions.
+		if (selectionMode == this.SelectionModes.Indiscriminate && currentPosition != 0)
 		{
 			return false;
 		}
 
+		local originIndex = 0,
+		thresholdIndex = currentPosition;
+
+		if (selectionMode == this.SelectionModes.Indiscriminate)
+		{
+			originIndex = currentPosition;
+			thresholdIndex = candidates.len();
+		}
+
 		# Process all candidates ahead in queue to current object.
-		for( local i = 0; i < currentPosition; i++ )
+		for( local i = originIndex; i < indexThreshold; i++ )
 		{
 			if (candidates[i].getEdictSelectionMode() != this.SelectionModes.Indiscriminate)
 			{
