@@ -45,11 +45,22 @@ Raids.Edicts <-
 	},
 	Tooltip =
 	{
-		Text = 
+		Icons =
 		{
-			id = 20, 
-			type = "text", 
-			icon = "ui/icons/unknown_traits.png", 
+			Contracted =
+			{
+				Active = "scroll_01_b.png",
+				Discovery = "scroll_02_sw.png"
+			},
+			FamedEmpty = "ui/icons/cancel.png",
+			FamedPresent = "ui/icons/special.png",
+			History = "ui/icons/papers.png"
+		},
+		Template =
+		{
+			id = 20,
+			type = "text",
+			icon = "ui/icons/unknown_traits.png",
 			text = "Edict: Vacant"
 		}
 	}
@@ -80,9 +91,18 @@ Raids.Edicts <-
 		Raids.Standard.setFlag("EdictHistory", false, _lairObject);
 	}
 
+	function createHistoryEntry( _lairObject )
+	{
+		local history = Raids.Standard.colourWrap(Raids.Standard.getFlag("EdictHistory", _lairObject), "NegativeValue"),
+		entry = clone this.Tooltip.Template;
+		entry.icon = this.Tooltip.Icons.History;
+		entry.text = history;
+		return entry;
+	}
+
 	function createTooltipEntry( _lairObject, _iconPath, _edictName, _activityState )
 	{
-		local entry = clone this.Tooltip.Text;
+		local entry = clone this.Tooltip.Template;
 		entry.icon = format("ui/icons/%s", _iconPath);
 		entry.text = format("Edict: %s (%s)", _edictName, _activityState);
 		return entry;
@@ -205,13 +225,13 @@ Raids.Edicts <-
 	function getContainerEntries( _lairObject )
 	{
 		# Prepare variables in local environment.
-		local entries = [], 
+		local entries = [],
 		occupiedContainers = this.getOccupiedContainers(_lairObject);
 
 		# Handle case where all containers are vacant.
 		if (occupiedContainers.len() == 0)
 		{
-			entries.resize(this.Containers.len(), this.Tooltip.Text);
+			entries.resize(this.Containers.len(), this.Tooltip.Template);
 			return entries;
 		}
 
@@ -223,7 +243,8 @@ Raids.Edicts <-
 			edictName = this.getEdictName(Raids.Standard.getFlag(container, _lairObject));
 
 			# Create tooltip entry.
-			iconPath = format("scroll_0%s.png", inDiscovery ? "2_sw" : "1_b"), activityState = inDiscovery ? "Discovery" : "Active";
+			iconPath = this.Tooltip.Icons.Contracted[inDiscovery ? "Discovery" : "Active"],
+			activityState = inDiscovery ? "Discovery" : "Active";
 			entries.push(this.createTooltipEntry(_lairObject, iconPath, edictName, activityState));
 		}
 
@@ -234,7 +255,7 @@ Raids.Edicts <-
 
 			for( local i = 0; i < iterations; i++ )
 			{
-				entries.push(this.Tooltip.Text);
+				entries.push(this.Tooltip.Template);
 			}
 		}
 
@@ -269,7 +290,7 @@ Raids.Edicts <-
 
 	function getFamedItemEntry( _lairObject )
 	{
-		local entry = clone this.Tooltip.Text,
+		local entry = clone this.Tooltip.Template,
 		loot = _lairObject.getLoot().getItems(),
 		count = 0;
 
@@ -278,21 +299,14 @@ Raids.Edicts <-
 			if (item != null && item.isItemType(::Const.Items.ItemType.Named)) count++;
 		}
 
-		entry.icon = format("ui/icons/%s", count == 0 ? "cancel.png" : "special.png");
+		entry.icon = format(this.Tooltip.Icons[count == 0 ? "FamedEmpty" : "FamedPresent"]);
 		entry.text = Raids.Standard.colourWrap(format("Famed (%i)", count), format("%sValue", count == 0 ? "Negative" : "Positive"));
-		return entry;
-	}
-
-	function getHistoryEntry( _lairObject )
-	{
-		local history = Raids.Standard.colourWrap(Raids.Standard.getFlag("EdictHistory", _lairObject), "NegativeValue"),
-		entry = {id = 20, type = "text", icon = "ui/icons/papers.png", text = history};
 		return entry;
 	}
 
 	function getLegibilityEntry( _lairObject )
 	{
-		local entry = this.createTooltipEntry(_lairObject, "scroll_02_sw.png", "Legibility", "Discovery");
+		local entry = this.createTooltipEntry(_lairObject, this.Tooltip.Icons.Contracted.Discovery, "Legibility", "Discovery");
 		return entry;
 	}
 
@@ -343,7 +357,7 @@ Raids.Edicts <-
 
 		if (Raids.Standard.getFlag("EdictHistory", _lairObject) != false)
 		{
-			entries.push(this.getHistoryEntry(_lairObject));
+			entries.push(this.createHistoryEntry(_lairObject));
 		}
 
 		return entries;
