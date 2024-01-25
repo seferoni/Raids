@@ -16,7 +16,9 @@ Raids.Edicts <-
 	Factions =
 	[
 		"Bandits",
-		"OrientalBandits"
+		"Barbarians",
+		"OrientalBandits",
+		"Zombies"
 	],
 	InertEdicts =
 	[
@@ -210,7 +212,6 @@ Raids.Edicts <-
 		if (occupiedContainers.len() == 0)
 		{
 			entries.resize(this.Containers.len(), this.Tooltip.Text);
-			entries.extend(this.getSpecialEntries(_lairObject));
 			return entries;
 		}
 
