@@ -138,7 +138,7 @@ this.writing_instruments_item <- ::inherit("scripts/items/item",
 	}
 
 	function isFirstInQueue()
-	{
+	{	// TODO: this is bugged
 		# Prepare variables in local environment.
 		local candidates = ::World.Assets.getStash().getItems().filter(@(_index, _item) _item != null && _item.getID() == "misc.writing_instruments_item");
 

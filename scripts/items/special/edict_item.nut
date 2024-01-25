@@ -42,8 +42,9 @@ this.edict_item <- ::inherit("scripts/items/item",
 	function createWarningEntry()
 	{
 		local entry = clone this.Tooltip.Template;
-		entry.icon <- this.Tooltip.Icons.Warning;
-		entry.text <- "There are no viable lairs within proximity. Lairs that are viable and within proximity will present the contents of their Edict slots on the tooltip.";
+		entry.icon = this.Tooltip.Icons.Warning;
+		entry.text = "There are no viable lairs within proximity. Lairs that are viable and within proximity will present the contents of their Edict slots on the tooltip.";
+		return entry;
 	}
 
 	function executeEdictProcedure( _lairs )
@@ -123,20 +124,17 @@ this.edict_item <- ::inherit("scripts/items/item",
 		push({id = 3, type = "image", image = this.getIcon()});
 
 		# Create effect entry.
-		push({id = 6, type = "text", icon = this.Tooltip.Icon.Effect, text = this.getEffectText()});
+		push({id = 6, type = "text", icon = this.Tooltip.Icons.Effect, text = this.getEffectText()});
 		
 		# Create persistence entry.
-		push({id = 6, type = "text", icon = this.Tooltip.Icon.Persistence, text = this.getPersistenceText()});
+		push({id = 6, type = "text", icon = this.Tooltip.Icons.Persistence, text = this.getPersistenceText()});
 
 		# Create discovery time entry.
-		push({id = 6, type = "text", icon = this.Tooltip.Icon.Discovery, text = this.getDiscoveryText()});
+		push({id = 6, type = "text", icon = this.Tooltip.Icons.Discovery, text = this.getDiscoveryText()});
 
 		# Create scaling modality entry.
-		push({id = 6, type = "text", icon = this.Tooltip.Icon.Scaling, text = this.getScalingText()});
+		push({id = 6, type = "text", icon = this.Tooltip.Icons.Scaling, text = this.getScalingText()});
 
-		# Create hint entry.
-		push({id = 65, type = "text", text = this.getInstructionText()});
-		
 		# Evaluate viability for appending warning entry.
 		if (this.getWarningState())
 		{	# Create warning entry.
@@ -145,6 +143,9 @@ this.edict_item <- ::inherit("scripts/items/item",
 			# Reset warning state.
 			this.setWarningState(false);
 		}
+
+		# Create hint entry.
+		push({id = 65, type = "text", text = this.getInstructionText()});
 
 		return tooltipArray;
 	}
