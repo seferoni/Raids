@@ -160,16 +160,18 @@ this.writing_instruments_item <- ::inherit("scripts/items/item",
 			return false;
 		}
 
+		# Prepare variables for the case of a non-indiscriminate selection mode.
 		local originIndex = 0,
 		thresholdIndex = currentPosition;
 
+		# Handle case where selection mode is indiscriminate.
 		if (selectionMode == this.SelectionModes.Indiscriminate)
 		{
 			originIndex = currentPosition;
 			thresholdIndex = candidates.len();
 		}
 
-		# Process all candidates ahead in queue to current object.
+		# Process candidates in queue as appropriate.
 		for( local i = originIndex; i < indexThreshold; i++ )
 		{
 			if (candidates[i].getEdictSelectionMode() != this.SelectionModes.Indiscriminate)
