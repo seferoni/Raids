@@ -23,7 +23,7 @@ local Raids = ::RPGR_Raids;
 		local count = Raids.Lairs.getMoneyCount(this);
 		return [count, _lootTable];
 	}, "overrideArguments");
-	
+
 	Raids.Standard.wrap(_object, "getTooltip", function( _tooltipArray )
 	{
 		if (!Raids.Lairs.isLocationViable(this, true, true))
@@ -50,7 +50,14 @@ local Raids = ::RPGR_Raids;
 
 	Raids.Standard.wrap(_object, "onDropLootForPlayer", function( _lootTable )
 	{
-		if (!Raids.Lairs.isLocationViable(this, true))
+		if (!Raids.Lairs.isLocationViable(this, true, false, false))
+		{
+			return;
+		}
+
+		local locationType = this.getLocationType();
+
+		if (!Raids.Lairs.isLocationTypeViable(locationType) && !Raids.Lairs.isLocationTypePassive(locationType))
 		{
 			return;
 		}
@@ -81,8 +88,8 @@ local Raids = ::RPGR_Raids;
 			return;
 		}
 
-		local spawnTime = this.getLastSpawnTime(), 
-		offset = Raids.Edicts.getSpawnTimeOffset(this);
+		local spawnTime = this.getLastSpawnTime(),
+		offset = Raids.Lairs.getSpawnTimeOffset(this);
 		this.m.LastSpawnTime = ::Math.max(0.0, spawnTime + offset);
 	});
 });

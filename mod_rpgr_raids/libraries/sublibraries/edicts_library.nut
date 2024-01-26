@@ -1,6 +1,7 @@
 local Raids = ::RPGR_Raids;
 Raids.Edicts <-
-{	// TODO: significantly shorten edict initialisation durations
+{
+	// TODO: get error sound effects for when edicts are used inappropriately
 	Containers =
 	[
 		"EdictContainerA",
@@ -38,7 +39,6 @@ Raids.Edicts <-
 		AbundanceCeiling = 3,
 		AbundanceOffset = 1,
 		DiminutionModifier = 0.90,
-		MobilisationOffset = -150.0,
 		ProspectingOffset = 5.0,
 		RetentionOffset = -5.0,
 		StasisOffset = 2
@@ -337,18 +337,6 @@ Raids.Edicts <-
 		}
 
 		return entries;
-	}
-
-	function getSpawnTimeOffset( _lairObject )
-	{
-		local offset = 0.0;
-
-		if (this.findEdict("Mobilisation", _lairObject, true) != false)
-		{
-			offset = this.Parameters.MobilisationOffset;
-		}
-
-		return offset;
 	}
 
 	function getSpecialEntries( _lairObject )

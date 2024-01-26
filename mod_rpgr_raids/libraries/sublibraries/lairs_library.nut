@@ -32,10 +32,12 @@ Raids.Lairs <-
 		NamedItemChancePerAgitationTier = 13.33,
 		NamedItemRemovalChanceOnSpawn = 80,
 		NamedLootRefreshChance = 60,
+		PassiveOfficialDocumentCount = ::Math.rand(1, 2),
 		ResourcesCeiling = 700,
 		ResourceModifierCeiling = 0.25,
 		ResourceModifierLowerBound = 200,
 		ResourceModifierUpperBound = 350,
+		SpawnTimeOffsetInterval = -50.0,
 	},
 	Procedures =
 	{
@@ -43,28 +45,33 @@ Raids.Lairs <-
 		Decrement = 2,
 		Reset = 3
 	},
-	Tooltip = 
+	Tooltip =
 	{
-		Icons = 
+		Icons =
 		{
 			Agitated = "ui/icons/miniboss.png",
 			Relaxed = "ui/icons/vision.png",
 			Resources = "ui/icons/asset_money.png"
 		},
-		Text = 
+		Text =
 		{
-			id = 20, 
+			id = 20,
 			type = "text",
 			icon = "",
 			text = ""
 		}
 	}
 
-	function addLoot( _lootTable, _lairObject )
+	function addLoot( _lootTable, _locationObject )
 	{
-		local agitation = Raids.Standard.getFlag("Agitation", _lairObject);
+		local count = Raids.Standard.getFlag("Agitation", _locationObject);
 
-		for( local i = 0; i < agitation; i++ )
+		if (!count)
+		{
+			count = this.Parameters.PassiveOfficialDocumentCount;
+		}
+
+		for( local i = 0; i < count; i++ )
 		{
 			_lootTable.push(::new("scripts/items/special/official_document_item"));
 		}
@@ -338,6 +345,20 @@ Raids.Lairs <-
 		return closestSettlement;
 	}
 
+	function getSpawnTimeOffset( _lairObject )
+	{
+		local offset = 0.0,
+		agitation = Raids.Standard.getFlag("Agitation", _lairObject);
+
+		if (agitation == this.AgitationDescriptors.Relaxed)
+		{
+			return offset;
+		}
+
+		offset += agitation * this.Parameters.SpawnTimeOffsetInterval;
+		return offset;
+	}
+
 	function getTimeModifier()
 	{	# The arbitrary coefficients and constants used here are extrapolated from the vanilla codebase.
 		return (0.9 + ::Math.minf(2.0, ::World.getTime().Days * 0.014) * ::Const.Difficulty.EnemyMult[::World.Assets.getCombatDifficulty()]);
@@ -379,7 +400,7 @@ Raids.Lairs <-
 	}
 
 	function isActiveContractLocation( _lairObject )
-	{	
+	{
 		local activeContract = ::World.Contracts.getActiveContract();
 
 		if (activeContract == null || !("Destination" in activeContract.m))
@@ -438,9 +459,14 @@ Raids.Lairs <-
 		return true;
 	}
 
-	function isLocationViable( _location, _checkContract = true, _checkProximity = false )
+	function isLocationTypePassive( _locationType )
 	{
-		if (!this.isLocationTypeViable(_location.getLocationType()))
+		return _locationType == ::Const.World.LocationType.Passive || _locationType == (::Const.World.LocationType.Lair | ::Const.World.LocationType.Passive);
+	}
+
+	function isLocationViable( _location, _checkContract = true, _checkProximity = false, _checkType = true )
+	{
+		if (_checkType && !this.isLocationTypeViable(_location.getLocationType()))
 		{
 			return false;
 		}

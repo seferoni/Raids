@@ -14,15 +14,15 @@ this.edict_item <- ::inherit("scripts/items/item",
 		this.m.IsDroppedAsLoot = true;
 		this.m.IsAllowedInBag = false;
 		this.m.IsUsable = true;
-		this.m.DiscoveryDays <- 2;
+		this.m.DiscoveryDays <- 1;
 		this.m.ScalingModality <- this.m.ScalingModalities.Static;
 		this.m.EffectText <- null;
 		this.m.InstructionText <- "Right-click to dispatch within proximity of a lair. This edict will be consumed in the process.";
 		this.m.ShowWarning <- false;
 	},
-	Tooltip = 
+	Tooltip =
 	{
-		Icons = 
+		Icons =
 		{
 			Effect = "ui/icons/special.png",
 			Discovery = "ui/icons/action_points.png",
@@ -30,10 +30,10 @@ this.edict_item <- ::inherit("scripts/items/item",
 			Scaling = "ui/icons/level.png",
 			Warning = "ui/icons/warning.png"
 		},
-		Template = 
+		Template =
 		{
-			id = 6, 
-			type = "text", 
+			id = 6,
+			type = "text",
 			icon = "",
 			text = ""
 		}
@@ -125,7 +125,7 @@ this.edict_item <- ::inherit("scripts/items/item",
 
 		# Create effect entry.
 		push({id = 6, type = "text", icon = this.Tooltip.Icons.Effect, text = this.getEffectText()});
-		
+
 		# Create persistence entry.
 		push({id = 6, type = "text", icon = this.Tooltip.Icons.Persistence, text = this.getPersistenceText()});
 

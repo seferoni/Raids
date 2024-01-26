@@ -10,6 +10,6 @@ this.edict_of_nullification <- ::inherit("scripts/items/special/edict_item",
 		this.setDescription("It signals the end of a somewhat unusual state of affairs.");
 		this.m.Value = 50;
 		this.m.EffectText = "Will nullify all ongoing edict effects on nearby lairs.";
-		this.m.DiscoveryDays = 5;
+		this.m.DiscoveryDays = 3;
 	}
 });
