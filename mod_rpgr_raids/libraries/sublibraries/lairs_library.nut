@@ -529,7 +529,7 @@ Raids.Lairs <-
 		local configurableModifier = Raids.Standard.getPercentageSetting("AgitationResourceModifier");
 
 		# Apply factors as appropriate to produce a new value for resources, scaled by Agitation.
-		newResources = ::Math.floor(baseResources + (interpolatedModifier * (agitation - 1) * configurableModifier * baseResources));
+		local newResources = ::Math.floor(baseResources + (interpolatedModifier * (agitation - 1) * configurableModifier * baseResources));
 
 		# Set new resources value.
 		_lairObject.setResources(::Math.min(newResources, this.Parameters.ResourcesCeiling));

@@ -1,6 +1,6 @@
 local Raids = ::RPGR_Raids;
 Raids.Edicts <-
-{
+{	// TODO: significantly shorten edict initialisation durations
 	Containers =
 	[
 		"EdictContainerA",
@@ -243,7 +243,7 @@ Raids.Edicts <-
 			edictName = this.getEdictName(Raids.Standard.getFlag(container, _lairObject));
 
 			# Create tooltip entry.
-			iconPath = this.Tooltip.Icons.Contracted[inDiscovery ? "Discovery" : "Active"],
+			local iconPath = this.Tooltip.Icons.Contracted[inDiscovery ? "Discovery" : "Active"],
 			activityState = inDiscovery ? "Discovery" : "Active";
 			entries.push(this.createTooltipEntry(_lairObject, iconPath, edictName, activityState));
 		}

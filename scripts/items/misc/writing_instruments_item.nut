@@ -152,7 +152,7 @@ this.writing_instruments_item <- ::inherit("scripts/items/item",
 		local currentPosition = candidates.find(this);
 
 		# Get current Edict selection mode.
-		local selectionMode = this.getEdictSelection();
+		local selectionMode = this.getEdictSelectionMode();
 
 		# Handle case where object is unequivocally not first in queue. This evaluation relaxes the range of indices iterated over in the succeeding conditions.
 		if (selectionMode == this.SelectionModes.Indiscriminate && currentPosition != 0)
@@ -172,7 +172,7 @@ this.writing_instruments_item <- ::inherit("scripts/items/item",
 		}
 
 		# Process candidates in queue as appropriate.
-		for( local i = originIndex; i < indexThreshold; i++ )
+		for( local i = originIndex; i < thresholdIndex; i++ )
 		{
 			if (candidates[i].getEdictSelectionMode() != this.SelectionModes.Indiscriminate)
 			{

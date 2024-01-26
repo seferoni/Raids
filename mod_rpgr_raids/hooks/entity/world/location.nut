@@ -55,7 +55,7 @@ local Raids = ::RPGR_Raids;
 			return;
 		}
 
-		Raids.Lairs.addLoot(_lootTable);
+		Raids.Lairs.addLoot(_lootTable, this);
 		return [_lootTable];
 	}, "overrideArguments");
 
