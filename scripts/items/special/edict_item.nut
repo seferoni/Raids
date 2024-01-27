@@ -127,7 +127,6 @@ this.edict_item <- ::inherit("scripts/items/item",
 
 	function getTooltip()
 	{
-		# Prepare variables in local environment.
 		local tooltipArray = [],
 		push = @(_entry) tooltipArray.push(_entry);
 

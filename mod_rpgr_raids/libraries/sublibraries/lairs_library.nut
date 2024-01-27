@@ -366,7 +366,6 @@ Raids.Lairs <-
 
 	function getTooltipEntries( _lairObject )
 	{
-		# Prepare variables in local environment.
 		local entries = [],
 		push = @(_entry) entries.push(_entry);
 

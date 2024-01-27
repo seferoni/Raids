@@ -78,6 +78,25 @@ Raids.Caravans <-
 		"seasonal_fair",
 		"well_supplied"
 	],
+	Tooltip = 
+	{
+		Icons = 
+		{
+			Assortment = "ui/icons/asset_money.png",
+			Famed = "ui/icons/special.png",
+			Supplies = "ui/icons/asset_food.png"
+			Trade = "ui/icons/money.png",
+			Unassorted = "ui/icons/bag.png",
+			Wealth = "ui/icons/money2.png"
+		},
+		Template =
+		{
+			id = 2, 
+			type = "hint",
+			icon = "",
+			text = ""
+		}
+	}
 	TroopTypes =
 	{
 		Generic = 
@@ -248,21 +267,11 @@ Raids.Caravans <-
 		return troops;
 	}
 
-	function getCargoIcon( _cargoValue )
-	{
-		switch (_cargoValue)
-		{
-			case (this.CargoDescriptors.Unassorted): return "bag.png";
-			case (this.CargoDescriptors.Assortment): return "asset_money.png";
-			case (this.CargoDescriptors.Trade): return "money.png";
-			case (this.CargoDescriptors.Supplies): return "asset_food.png"
-		}
-	}
-
 	function getEliteReinforcementCount( _caravan )
 	{
-		local wealth = Raids.Standard.getFlag("CaravanWealth", _caravan),
-		iterations = 0, score = this.Parameters.EliteTroopScore * (wealth - 1);
+		local iterations = 0,  
+		wealth = Raids.Standard.getFlag("CaravanWealth", _caravan),
+		score = this.Parameters.EliteTroopScore * (wealth - 1);
 
 		if (Raids.Standard.getFlag("CaravanHasNamedItems", _caravan))
 		{
@@ -289,10 +298,17 @@ Raids.Caravans <-
 
 	function getReinforcementCount( _caravan )
 	{	
-		local wealth = Raids.Standard.getFlag("CaravanWealth", _caravan),
-		timeOffset = ::World.getTime().Days >= this.Parameters.ReinforcementThresholdDays ? this.Parameters.TroopTimeOffset : 0,
-		naiveIterations = wealth + ::Math.rand(wealth - this.WealthDescriptors.Moderate, wealth) + timeOffset;
-		return ::Math.min(this.Parameters.MaximumTroopOffset, ::Math.ceil(naiveIterations));
+		# Get caravan wealth value.
+		local wealth = Raids.Standard.getFlag("CaravanWealth", _caravan);
+
+		# Get time offset if current time exceeds pre-defined threshold.
+		local timeOffset = ::World.getTime().Days >= this.Parameters.ReinforcementThresholdDays ? this.Parameters.TroopTimeOffset : 0;
+
+		# Define total troop count based on wealth and time.
+		local naiveIterations = wealth + ::Math.rand(wealth - this.WealthDescriptors.Moderate, wealth) + timeOffset;
+
+		# Ensure return value remains short of the pre-defined troop reinforcement ceiling.
+		return ::Math.min(this.Parameters.MaximumTroopOffset, naiveIterations);
 	}
 
 	function getSituationOffset( _settlement )
@@ -329,30 +345,38 @@ Raids.Caravans <-
 
 	function getTooltipEntries( _caravan )
 	{
-		# Initialise references in local environment.
-		local caravanWealth = Raids.Standard.getFlag("CaravanWealth", _caravan), 
-		caravanCargo = Raids.Standard.getFlag("CaravanCargo", _caravan);
+		local entries = [],
+		push = @(_entry) entries.push(_entry);
+
+		# Prepare variables in local environment.
+		local caravanWealth = Raids.Standard.getFlag("CaravanWealth", _caravan),
+		wealthDescriptor = Raids.Standard.getDescriptor(caravanWealth, this.WealthDescriptors), 
+		cargoDescriptor = Raids.Standard.getDescriptor(Raids.Standard.getFlag("CaravanCargo", _caravan), this.CargoDescriptors);
 
 		# Create cargo tooltip entry.
-		cargoEntry = {id = 2, type = "hint"},
-		cargoEntry.icon <- format("ui/icons/%s", this.getCargoIcon(caravanCargo));
-		cargoEntry.text <- format("%s", Raids.Standard.getDescriptor(caravanCargo, this.CargoDescriptors));
+		local cargoEntry = clone this.Tooltip.Template;
+		cargoEntry.icon = format(this.Tooltip.Icons.Cargo[cargoDescriptor]);
+		cargoEntry.text = format("%s", cargoDescriptor);
+		push(cargoEntry);
 
 		# Create wealth tooltip entry.
-		wealthEntry = clone cargoEntry;
-		wealthEntry.icon = "ui/icons/money2.png";
-		wealthEntry.text = format("%s (%i)", Raids.Standard.getDescriptor(caravanWealth, this.WealthDescriptors), caravanWealth);
+		local wealthEntry = clone this.Tooltip.Template;
+		wealthEntry.icon = this.Tooltip.Icons.Wealth;
+		wealthEntry.text = format("%s (%i)", wealthDescriptor, caravanWealth);
+		push(wealthEntry);
 
 		if (!Raids.Standard.getFlag("CaravanHasNamedItems", _caravan))
 		{
-			return [cargoEntry, wealthEntry];
+			return entries;
 		}
 
 		# Create famed item entry.
-		local famedItemEntry = clone cargoEntry;
-		famedItemEntry.icon = "ui/icons/special.png";
+		local famedItemEntry = clone this.Tooltip.Template;
+		famedItemEntry.icon = this.Tooltip.Icons.Famed;
 		famedItemEntry.text = "Famed";
-		return [cargoEntry, wealthEntry, famedItemEntry];
+		push(famedItemEntry);
+
+		return entries;
 	}
 
 	function initialiseCaravanParameters( _caravan, _settlement )
