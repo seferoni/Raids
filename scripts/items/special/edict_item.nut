@@ -1,10 +1,7 @@
 local Raids = ::RPGR_Raids;
 this.edict_item <- ::inherit("scripts/items/item",
 {
-	m =
-	{
-		ScalingModalities = {Static = 0, Agitation = 1, Resources = 2}
-	},
+	m = {},
 	function create()
 	{
 		this.item.create();
@@ -15,10 +12,22 @@ this.edict_item <- ::inherit("scripts/items/item",
 		this.m.IsAllowedInBag = false;
 		this.m.IsUsable = true;
 		this.m.DiscoveryDays <- 1;
-		this.m.ScalingModality <- this.m.ScalingModalities.Static;
+		this.m.ScalingModality <- this.ScalingModalities.Static;
 		this.m.EffectText <- null;
 		this.m.InstructionText <- "Right-click to dispatch within proximity of a lair. This edict will be consumed in the process.";
 		this.m.ShowWarning <- false;
+	},
+	ScalingModalities = 
+	{
+		Static = 0,
+		Agitation = 1, 
+		Resources = 2
+	},
+	Sounds = 
+	{
+		Move = "sounds/cloth_01.wav",
+		Use = "sounds/cloth_01.wav",
+		Warning = "sounds/move_pot_clay_01.wav"
 	},
 	Tooltip =
 	{
@@ -61,15 +70,20 @@ this.edict_item <- ::inherit("scripts/items/item",
 				continue;
 			}
 
-			local container = vacantContainers[0];
-			Raids.Standard.setFlag(container, this.getID(), lair);
-			Raids.Standard.setFlag(format("%sTime", container), ::World.getTime().Days, lair);
-			Raids.Standard.setFlag(format("%sDuration", container), this.getDiscoveryDuration(), lair);
-			if (!isValid) isValid = true;
+			this.initialiseContainer(vacantContainers[0], lair);
+
+			if (!isValid)
+			{
+				isValid = true;
+			}
 		}
 
-		if (!isValid) return false;
-		::Sound.play("sounds/cloth_01.wav", ::Const.Sound.Volume.Inventory);
+		if (!isValid)
+		{
+			return false;
+		} 
+		
+		this.playUseSound();
 		return true;
 	}
 
@@ -80,7 +94,7 @@ this.edict_item <- ::inherit("scripts/items/item",
 
 	function getDiscoveryText()
 	{
-		return format("This edict takes effect in %s days.", Raids.Standard.colourWrap(this.getDiscoveryDuration(), "PositiveValue"));
+		return format("This edict takes effect in %s days.", Raids.Standard.colourWrap(this.getDiscoveryDuration(), Raids.Standard.Colour.Green));
 	}
 
 	function getEffectText()
@@ -95,7 +109,7 @@ this.edict_item <- ::inherit("scripts/items/item",
 
 	function getPersistenceText()
 	{
-		local descriptor = Raids.Standard.colourWrap(this.isCycled() ? "temporary" : "permanent", "NegativeValue");
+		local descriptor = Raids.Standard.colourWrap(this.isCycled() ? "temporary" : "permanent", Raids.Standard.Colour.Red);
 		return format("This edict's effects are %s.", descriptor);
 	}
 
@@ -106,9 +120,9 @@ this.edict_item <- ::inherit("scripts/items/item",
 
 	function getScalingText()
 	{
-		local scaling = this.m.ScalingModality, modalities = this.m.ScalingModalities;
-		if (scaling == modalities.Static) return format("This edict's effects are %s.", Raids.Standard.colourWrap("static", "PositiveValue"));
-		return format("This edict's effects scale with lair %s.", Raids.Standard.colourWrap(scaling == modalities.Agitation ? "Agitation" : "resources", "NegativeValue"));
+		local scaling = this.m.ScalingModality, modalities = this.ScalingModalities;
+		if (scaling == modalities.Static) return format("This edict's effects are %s.", Raids.Standard.colourWrap("static", Raids.Standard.Colour.Green));
+		return format("This edict's effects scale with lair %s.", Raids.Standard.colourWrap(scaling == modalities.Agitation ? "Agitation" : "resources", Raids.Standard.Colour.Red));
 	}
 
 	function getTooltip()
@@ -188,6 +202,13 @@ this.edict_item <- ::inherit("scripts/items/item",
 		return this.m.ShowWarning;
 	}
 
+	function initialiseContainer( _container, _lair )
+	{
+		Raids.Standard.setFlag(_container, this.getID(), _lair);
+		Raids.Standard.setFlag(format("%sTime", _container), ::World.getTime().Days, _lair);
+		Raids.Standard.setFlag(format("%sDuration", _container), this.getDiscoveryDuration(), _lair);
+	}
+
 	function isCycled()
 	{
 		return Raids.Edicts.CycledEdicts.find(Raids.Edicts.getEdictName(this.getID())) != null;
@@ -195,7 +216,17 @@ this.edict_item <- ::inherit("scripts/items/item",
 
 	function playInventorySound( _eventType )
 	{
-		::Sound.play("sounds/cloth_01.wav", ::Const.Sound.Volume.Inventory);
+		::Sound.play(this.Sounds.Inventory, ::Const.Sound.Volume.Inventory);
+	}
+
+	function playUseSound()
+	{
+		::Sound.play(this.Sounds.Use, ::Const.Sound.Volume.Inventory);
+	}
+
+	function playWarningSound()
+	{
+		::Sound.play(this.Sounds.Warning, ::Const.Sound.Volume.Inventory);
 	}
 
 	function setWarningState( _bool )
@@ -215,6 +246,7 @@ this.edict_item <- ::inherit("scripts/items/item",
 		if (lairs.len() == 0)
 		{
 			this.setWarningState(true);
+			this.playWarningSound();
 			::Tooltip.reload();
 			return false;
 		}

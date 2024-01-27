@@ -5,18 +5,27 @@ this.writing_instruments_item <- ::inherit("scripts/items/item",
 	{
 		MaximumUses = 3,
 	},
+	Excluded = 
+	[
+		"Agitation"
+	],
 	SelectionModes =
 	{
 		Indiscriminate = 1,
-		Selective = 2,
-		Inverted = 3
+		Agitation = 2,
+		Selective = 3,
+		Inverted = 4
 	},
 	Sounds =
-	[
-		"sounds/raids.paper_01.wav",
-		"sounds/raids.paper_02.wav",
-		"sounds/raids.paper_03.wav"
-	],
+	{
+		Move = "sounds/move_pot_clay_01.wav",
+		Use = 
+		[
+			"sounds/raids.paper_01.wav",
+			"sounds/raids.paper_02.wav",
+			"sounds/raids.paper_03.wav"
+		]
+	},
 	Tooltip =
 	{
 		Icons =
@@ -66,9 +75,14 @@ this.writing_instruments_item <- ::inherit("scripts/items/item",
 
 		while (selectedEdicts.len() < Raids.Edicts.Internal.EdictSelectionSize)
 		{
-			local candidate = edicts[::Math.rand(0, edicts.len() - 1)];
+			local candidate = Raids.Edicts.getEdictName(edicts[::Math.rand(0, edicts.len() - 1)], true);
 
 			if (selectedEdicts.find(candidate) != null)
+			{
+				continue;
+			}
+
+			if (this.Excluded.find(candidate) != null)
 			{
 				continue;
 			}
@@ -92,21 +106,44 @@ this.writing_instruments_item <- ::inherit("scripts/items/item",
 
 	function getEdictSelectionAsFiles()
 	{
+		# Prepare dummy array as return value.
+		local edictFiles = [];
+
+		# Prepare variables in local environment.
 		local Edicts = Raids.Edicts,
-		toFileName = @(_array) _array.map(@(_edictName) Edicts.getEdictFileName(_edictName)),
 		selectionMode = this.getEdictSelectionMode();
 
+		# Write function to map Edict names to their corresponding file names.
+		local toFileName = @(_array) _array.map(@(_edictName) Edicts.getEdictFileName(_edictName));
+
+		# Handle selection mode cases.
 		switch (selectionMode)
 		{
-			case this.SelectionModes.Indiscriminate: return Edicts.getEdictFiles();
-			case this.SelectionModes.Selective: return toFileName(this.getEdictSelectionAsArray());
+			case this.SelectionModes.Indiscriminate: 
+			{
+				edictFiles.extend(Edicts.getEdictFiles());
+				break;
+			};
+			case this.SelectionModes.Agitation:
+			{
+				edictFiles.push(Edicts.getEdictFileName("Agitation"));
+				break;
+			}; 
+			case this.SelectionModes.Selective:
+			{
+				edictFiles.extend(toFileName(this.getEdictSelectionAsArray()));
+				break;
+			}; 
 			case this.SelectionModes.Inverted:
 			{
-				local edictFiles = Edicts.getEdictFiles();
-				Raids.Standard.removeFromArray(toFileName(this.getEdictSelectionAsArray()), edictFiles);
-				return edictFiles;
-			}
+				# Remove selected files from Edict pool.
+				local naiveEdicts = Edicts.getEdictFiles();
+				Raids.Standard.removeFromArray(toFileName(this.getEdictSelectionAsArray()), naiveEdicts);
+				edictFiles.extend(naiveEdicts);
+			};
 		}
+
+		return edictFiles;
 	}
 
 	function getEdictSelectionMode()
@@ -118,13 +155,14 @@ this.writing_instruments_item <- ::inherit("scripts/items/item",
 	{
 		local selectionMode = this.getEdictSelectionMode();
 
-		if (selectionMode != this.SelectionModes.Indiscriminate)
+		if (selectionMode != this.SelectionModes.Indiscriminate && selectionMode != this.SelectionModes.Agitation)
 		{
-			local selection = Raids.Standard.colourWrap(this.getEdictSelection(), format("%sValue", selectionMode == this.SelectionModes.Selective ? "Positive" : "Negative"));
+			local colourValue = Raids.Standard.Colour[format("%s", selectionMode == this.SelectionModes.Selective ? "Green" : "Red")],
+			selection = Raids.Standard.colourWrap(this.getEdictSelection(), colourValue);
 			return format("%s: %s", Raids.Standard.getDescriptor(selectionMode, this.SelectionModes), selection);
 		}
 
-		return Raids.Standard.getDescriptor(selectionMode, this.SelectionModes);
+		return Raids.Standard.colourWrap(Raids.Standard.getDescriptor(selectionMode, this.SelectionModes), Raids.Standard.Colour.Red);
 	}
 
 	function getFlags()
@@ -196,7 +234,7 @@ this.writing_instruments_item <- ::inherit("scripts/items/item",
 		push({id = 3, type = "image", image = this.getIcon()});
 
 		# Create warning entry.
-		push({id = 6, type = "text", icon = this.Tooltip.Icons.Warning, text = format("Has %s uses remaining.", Raids.Standard.colourWrap(this.getUses(), "NegativeValue"))});
+		push({id = 6, type = "text", icon = this.Tooltip.Icons.Warning, text = format("Has %s uses remaining.", Raids.Standard.colourWrap(this.getUses(), Raids.Standard.Colour.Red))});
 
 		# Evaluate if this instance is queued first.
 		if (this.isFirstInQueue())
@@ -221,7 +259,7 @@ this.writing_instruments_item <- ::inherit("scripts/items/item",
 	function initialiseEdictSelection()
 	{
 		local Edicts = Raids.Edicts,
-		edictCandidates = this.getEdictCandidates().map(@(_filePath) Edicts.getEdictName(_filePath, true)),
+		edictCandidates = this.getEdictCandidates(),
 		selection = "";
 
 		foreach( edictName in edictCandidates )
@@ -266,12 +304,12 @@ this.writing_instruments_item <- ::inherit("scripts/items/item",
 
 	function playInventorySound( _eventType )
 	{
-		::Sound.play("sounds/move_pot_clay_01.wav", ::Const.Sound.Volume.Inventory);
+		::Sound.play(this.Sounds.Move, ::Const.Sound.Volume.Inventory);
 	}
 
 	function playUseSound()
 	{
-		::Sound.play(this.Sounds[::Math.rand(0, this.Sounds.len() - 1)], ::Const.Sound.Volume.Inventory);
+		::Sound.play(this.Sounds.Use[::Math.rand(0, this.Sounds.Use.len() - 1)], ::Const.Sound.Volume.Inventory);
 	}
 
 	function setEdictSelection( _selection )

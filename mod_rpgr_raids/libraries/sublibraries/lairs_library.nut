@@ -80,14 +80,14 @@ Raids.Lairs <-
 	function createAgitationEntry( _lairObject )
 	{
 		# Prepare variables in local environment.
-		local textColour = "PositiveValue",
+		local textColour = Raids.Standard.Colour.Green,
 		iconPath = this.Tooltip.Icons.Relaxed,
 		agitation = Raids.Standard.getFlag("Agitation", _lairObject);
 
 		# Modify field values when Agitation is above baseline.
 		if (agitation != this.AgitationDescriptors.Relaxed)
 		{
-			textColour = "NegativeValue";
+			textColour = Raids.Standard.Colour.Red;
 			iconPath = this.Tooltip.Icons.Agitated;
 		}
 
@@ -141,7 +141,7 @@ Raids.Lairs <-
 		# Create resources entry.
 		local entry = clone this.Tooltip.Text;
 		entry.icon <- this.Tooltip.Icons.Resources;
-		entry.text <- format("%s resource units", Raids.Standard.colourWrap(resources, "PositiveValue"));
+		entry.text <- format("%s resource units", Raids.Standard.colourWrap(resources, Raids.Standard.Colour.Green));
 		return entry;
 	}
 
@@ -163,7 +163,7 @@ Raids.Lairs <-
 		# Create decay timer entry.
 		local entry = clone this.Tooltip.Text;
 		entry.icon = "ui/icons/action_points.png";
-		entry.text = format("%s day(s)", Raids.Standard.colourWrap(timeDifference, "NegativeValue"));
+		entry.text = format("%s day(s)", Raids.Standard.colourWrap(timeDifference, Raids.Standard.Colour.Red));
 		return entry;
 	}
 

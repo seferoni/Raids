@@ -1,6 +1,12 @@
 local Raids = ::RPGR_Raids;
 Raids.Standard <-
 {
+	Colour = 
+	{
+		Green = "PositiveValue",
+		Red = "NegativeValue"
+	}
+	
 	function appendToStringList( _targetString, _string )
 	{
 		local newString = _targetString == "" ? format("%s", _string) : format("%s, %s", _targetString, _string);

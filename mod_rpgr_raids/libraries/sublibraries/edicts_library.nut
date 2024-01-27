@@ -1,7 +1,6 @@
 local Raids = ::RPGR_Raids;
 Raids.Edicts <-
 {
-	// TODO: get error sound effects for when edicts are used inappropriately
 	Containers =
 	[
 		"EdictContainerA",
@@ -93,7 +92,7 @@ Raids.Edicts <-
 
 	function createHistoryEntry( _lairObject )
 	{
-		local history = Raids.Standard.colourWrap(Raids.Standard.getFlag("EdictHistory", _lairObject), "NegativeValue"),
+		local history = Raids.Standard.colourWrap(Raids.Standard.getFlag("EdictHistory", _lairObject), Raids.Standard.Colour.Red),
 		entry = clone this.Tooltip.Template;
 		entry.icon = this.Tooltip.Icons.History;
 		entry.text = history;
@@ -300,7 +299,7 @@ Raids.Edicts <-
 		}
 
 		entry.icon = format(this.Tooltip.Icons[count == 0 ? "FamedEmpty" : "FamedPresent"]);
-		entry.text = Raids.Standard.colourWrap(format("Famed (%i)", count), format("%sValue", count == 0 ? "Negative" : "Positive"));
+		entry.text = Raids.Standard.colourWrap(format("Famed (%i)", count), Raids.Standard.Colour[format("%sValue", count == 0 ? "Red" : "Green")]);
 		return entry;
 	}
 
