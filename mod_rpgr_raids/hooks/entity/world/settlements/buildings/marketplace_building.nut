@@ -3,14 +3,12 @@ local Raids = ::RPGR_Raids;
 {
 	Raids.Standard.wrap(_object, "fillStash", function( _list, _stash, _priceMult, _allowDamagedEquipment = false )
 	{
-		this.building.fillStash(_list, _stash, _priceMult, _allowDamagedEquipment);
-
-		if (::Math.rand(1, 100) > Raids.Edicts.Internal.WritingInstrumentsChance)
+		if (this.m.Settlement.getSize() < 3)
 		{
 			return;
 		}
 
-		if (this.m.Settlement.getSize() < 3)
+		if (::Math.rand(1, 100) > Raids.Edicts.Internal.WritingInstrumentsChance)
 		{
 			return;
 		}
