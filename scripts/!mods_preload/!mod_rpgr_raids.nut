@@ -63,7 +63,7 @@ if (!Raids.Internal.MSUFound)
 	factionSpecificNamedLootChance.setDescription("Determines the percentage chance for lairs to drop faction-specific named loot only, when conditions obtain.");
 
 	local officialDocumentDropChance = pageCaravans.addRangeSetting("OfficialDocumentDropChance", Defaults.OfficialDocumentDropChance, 10, 65, 5, "Official Document Drop Chance");
-	officialDocumentDropChance.setDescription("Determines the chance for caravans to drop official documents on defeat. Official documents provide the only means for obtaining Edicts.");
+	officialDocumentDropChance.setDescription("Determines the chance for caravans to drop official documents on defeat. Official documents provide the only means for obtaining Edicts. This does not affect the drop rate for lairs.");
 
 	local roamerScaleChance = pageLairs.addRangeSetting("RoamerScaleChance", Defaults.RoamerScaleChance, 0, 100, 5, "Roamer Scale Chance");
 	roamerScaleChance.setDescription("Determines the percentage chance for hostile roaming and ambush parties spawning from lairs to scale in strength with respect to the originating lair's resource count. Does not affect beasts.");

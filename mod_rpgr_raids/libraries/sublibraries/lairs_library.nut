@@ -30,7 +30,7 @@ Raids.Lairs <-
 		AgitationDecayInterval = 7,
 		MaximumLootOffset = 3,
 		NamedItemChancePerAgitationTier = 13.33,
-		NamedItemRemovalChanceOnSpawn = 80,
+		NamedItemRemovalChanceOnSpawn = 90,
 		NamedLootRefreshChance = 60,
 		PassiveOfficialDocumentCount = ::Math.rand(1, 2),
 		ResourcesCeiling = 700,
