@@ -299,7 +299,7 @@ Raids.Edicts <-
 		}
 
 		entry.icon = format(this.Tooltip.Icons[count == 0 ? "FamedEmpty" : "FamedPresent"]);
-		entry.text = Raids.Standard.colourWrap(format("Famed (%i)", count), Raids.Standard.Colour[format("%sValue", count == 0 ? "Red" : "Green")]);
+		entry.text = Raids.Standard.colourWrap(format("Famed (%i)", count), Raids.Standard.Colour[count == 0 ? "Red" : "Green"]);
 		return entry;
 	}
 

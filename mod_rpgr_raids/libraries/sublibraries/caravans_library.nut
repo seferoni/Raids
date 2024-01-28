@@ -355,7 +355,7 @@ Raids.Caravans <-
 
 		# Create cargo tooltip entry.
 		local cargoEntry = clone this.Tooltip.Template;
-		cargoEntry.icon = format(this.Tooltip.Icons.Cargo[cargoDescriptor]);
+		cargoEntry.icon = format(this.Tooltip.Icons[cargoDescriptor]);
 		cargoEntry.text = format("%s", cargoDescriptor);
 		push(cargoEntry);
 

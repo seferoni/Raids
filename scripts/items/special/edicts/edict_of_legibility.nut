@@ -10,7 +10,29 @@ this.edict_of_legibility <- ::inherit("scripts/items/special/edict_item",
 		this.setDescription("It is a functional and accessible treatise on the lingua franca of the realm.");
 		this.m.Value = 100;
 		this.m.DiscoveryDays = 3;
-		this.m.EffectText = "Will permit edicts to be dispatched to nearby lairs inhabited by unconventional factions.";
+		this.m.EffectText = "Will permit Edicts to be dispatched to nearby lairs inhabited by unconventional factions.";
+	}
+
+	function createWarningEntry()
+	{
+		# Define entry from template.
+		local entry = clone this.Tooltip.Template;
+		entry.icon = this.Tooltip.Icons.Warning;
+
+		# Define colour wrap lambda to ease readability.
+		local Standard = Raids.Standard,
+		colourWrap = @(_string) Standard.colourWrap(_string, Standard.Colour.Red);
+
+		# Create sentence fragments for text field.
+		local fragmentA = format("There are no %s.", colourWrap("viable lairs within proximity"));
+
+		# Highlight sections of text most relevant to a prospective reader.
+		local fragmentB =  format("Edicts of Legibility target lairs occupied by factions such as %s.", colourWrap("goblins, orcs, and ancient undead"));
+
+		# Concatenate fragments.
+		entry.text = format("%s %s", fragmentA, fragmentB);
+
+		return entry;
 	}
 
 	function getViableLairs()

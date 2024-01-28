@@ -50,9 +50,23 @@ this.edict_item <- ::inherit("scripts/items/item",
 
 	function createWarningEntry()
 	{
+		# Define entry from template.
 		local entry = clone this.Tooltip.Template;
 		entry.icon = this.Tooltip.Icons.Warning;
-		entry.text = "There are no viable lairs within proximity. Lairs that are viable and within proximity will present the contents of their Edict slots on the tooltip.";
+
+		# Define colour wrap lambda to ease readability.
+		local Standard = Raids.Standard,
+		colourWrap = @(_string) Standard.colourWrap(_string, Standard.Colour.Red);
+
+		# Create sentence fragments for text field.
+		local fragmentA = format("There are no %s.", colourWrap("viable lairs within proximity"));
+
+		# Highlight sections of text most relevant to a prospective reader.
+		local fragmentB =  format("Lairs that are viable and within proximity %s.", colourWrap("will display Edict slots on their tooltip"));
+
+		# Concatenate fragments.
+		entry.text = format("%s %s", fragmentA, fragmentB);
+
 		return entry;
 	}
 
@@ -94,7 +108,9 @@ this.edict_item <- ::inherit("scripts/items/item",
 
 	function getDiscoveryText()
 	{
-		return format("This edict takes effect in %s days.", Raids.Standard.colourWrap(this.getDiscoveryDuration(), Raids.Standard.Colour.Green));
+		local discoveryDuration = this.getDiscoveryDuration(),
+		discoveryText = Raids.Standard.colourWrap(discoveryDuration, Raids.Standard.Colour.Green);
+		return format("This edict takes effect in %s %s.", discoveryText, discoveryDuration > 1 ? "days" : "day");
 	}
 
 	function getEffectText()
