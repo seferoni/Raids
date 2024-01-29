@@ -38,8 +38,8 @@ Raids.Edicts <-
 		AbundanceCeiling = 3,
 		AbundanceOffset = 1,
 		DiminutionModifier = 0.90,
-		ProspectingOffset = 5.0,
-		RetentionOffset = -5.0,
+		ProspectingOffset = 8.0,
+		RetentionOffset = -8.0,
 		StasisOffset = 2
 	},
 	Tooltip =
@@ -51,8 +51,8 @@ Raids.Edicts <-
 				Active = "scroll_01_b.png",
 				Discovery = "scroll_02_sw.png"
 			},
-			FamedEmpty = "ui/icons/cancel.png",
-			FamedPresent = "ui/icons/special.png",
+			NamedEmpty = "ui/icons/cancel.png",
+			NamedPresent = "ui/icons/special.png",
 			History = "ui/icons/papers.png"
 		},
 		Template =
@@ -287,22 +287,6 @@ Raids.Edicts <-
 		return edictName;
 	}
 
-	function getFamedItemEntry( _lairObject )
-	{
-		local entry = clone this.Tooltip.Template,
-		loot = _lairObject.getLoot().getItems(),
-		count = 0;
-
-		foreach( item in loot )
-		{
-			if (item != null && item.isItemType(::Const.Items.ItemType.Named)) count++;
-		}
-
-		entry.icon = format(this.Tooltip.Icons[count == 0 ? "FamedEmpty" : "FamedPresent"]);
-		entry.text = Raids.Standard.colourWrap(format("Famed (%i)", count), Raids.Standard.Colour[count == 0 ? "Red" : "Green"]);
-		return entry;
-	}
-
 	function getLegibilityEntry( _lairObject )
 	{
 		local entry = this.createTooltipEntry(_lairObject, this.Tooltip.Icons.Contracted.Discovery, "Legibility", "Discovery");
@@ -326,6 +310,34 @@ Raids.Edicts <-
 		return offset;
 	}
 
+	function getNamedLootEntry( _lairObject )
+	{
+		local entry = clone this.Tooltip.Template;
+
+		# Get lair stash and current named loot chance.
+		namedLootChance = Raids.Lairs.getNamedLootChance(_lairObject) + this.getNamedLootChanceOffset(_lairObject),
+		loot = _lairObject.getLoot().getItems(),
+		count = 0;
+
+		# Tally named item count.
+		foreach( item in loot )
+		{
+			if (item != null && item.isItemType(::Const.Items.ItemType.Named)) count++;
+		}
+
+		# Assign text fragment corresponding to currently housed named items.
+		local fragmentA = Raids.Standard.colourWrap(format("Famed (%i)", count), Raids.Standard.Colour[count == 0 ? "Red" : "Green"]);
+
+		# Assign text fragment corresponding to current named loot chance.
+		local fragmentB = Raids.Standard.colourWrap(format("(%i%%)", namedLootChance), Raids.Standard.Colour[namedLootChance > 0 ? "Green" : "Red"]);
+
+		# Create entry.
+		entry.icon = format(this.Tooltip.Icons[count == 0 ? "NamedEmpty" : "NamedPresent"]);
+		entry.text = format("%s %s", fragmentA, fragmentB);
+
+		return entry;
+	}
+
 	function getNonviableEntries( _lairObject )
 	{
 		local entries = [];
@@ -340,7 +352,7 @@ Raids.Edicts <-
 
 	function getSpecialEntries( _lairObject )
 	{
-		local entries = [this.getFamedItemEntry(_lairObject)];
+		local entries = [this.getNamedLootEntry(_lairObject)];
 
 		if (Raids.Standard.getFlag("EdictHistory", _lairObject) != false)
 		{
