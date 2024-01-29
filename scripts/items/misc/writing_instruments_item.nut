@@ -177,7 +177,13 @@ this.writing_instruments_item <- ::inherit("scripts/items/item",
 
 	function isFirstInQueue()
 	{
-		# Prepare variables in local environment.
+		# If parent stash is not the player's, hide queue entry.
+		if (!this.isShowingQueueState())
+		{
+			return false;
+		}
+
+		# Filter all writing instruments present in player stash.
 		local candidates = ::World.Assets.getStash().getItems().filter(@(_index, _item) _item != null && _item.getID() == "misc.writing_instruments_item");
 
 		# Handle case where the current object is the only valid instance.
@@ -268,6 +274,19 @@ this.writing_instruments_item <- ::inherit("scripts/items/item",
 		}
 
 		Raids.Standard.setFlag("EdictSelection", selection, this);
+		Raids.Standard.setFlag("EdictSelectionMode", this.SelectionModes.Selective, this);
+	}
+
+	function onAddedToStash( _stashID )
+	{
+		item.onAddedToStash(_stashID);
+
+		if (_stashID != "player")
+		{
+			return;
+		}
+
+		Raids.Standard.setFlag("ShowQueueState", true, this);
 		Raids.Standard.setFlag("EdictSelectionMode", this.SelectionModes.Indiscriminate, this);
 	}
 
@@ -275,6 +294,18 @@ this.writing_instruments_item <- ::inherit("scripts/items/item",
 	{
 		this.item.onDeserialize(_in);
 		this.m.Flags.onDeserialize(_in);
+	}
+
+	function onRemovedFromStash( _stashID )
+	{
+		item.onRemovedFromStash(_stashID);
+
+		if (_stashID != "player")
+		{
+			return;
+		}
+
+		Raids.Standard.setFlag("ShowQueueState", false, this);
 	}
 
 	function onSerialize( _out )
@@ -325,5 +356,10 @@ this.writing_instruments_item <- ::inherit("scripts/items/item",
 	function setUses( _integer )
 	{
 		Raids.Standard.setFlag("Uses", _integer, this);
+	}
+
+	function isShowingQueueState()
+	{
+		return Raids.Standard.getFlag("ShowQueueState", this);
 	}
 });
