@@ -315,7 +315,7 @@ Raids.Edicts <-
 		local entry = clone this.Tooltip.Template;
 
 		# Get lair stash and current named loot chance.
-		namedLootChance = Raids.Lairs.getNamedLootChance(_lairObject) + this.getNamedLootChanceOffset(_lairObject),
+		local namedLootChance = Raids.Lairs.getNamedLootChance(_lairObject) + this.getNamedLootChanceOffset(_lairObject),
 		loot = _lairObject.getLoot().getItems(),
 		count = 0;
 
