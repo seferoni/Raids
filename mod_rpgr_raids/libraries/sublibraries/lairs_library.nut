@@ -32,7 +32,7 @@ Raids.Lairs <-
 		NamedItemChancePerAgitationTier = 13.33,
 		NamedItemRemovalChanceOnSpawn = 90,
 		NamedLootRefreshChance = 60,
-		PassiveOfficialDocumentCount = ::Math.rand(1, 3),
+		PassiveOfficialDocumentCountCeiling = 2,
 		ResourcesCeiling = 700,
 		ResourceModifierCeiling = 0.25,
 		ResourceModifierLowerBound = 200,
@@ -68,7 +68,7 @@ Raids.Lairs <-
 
 		if (!count)
 		{
-			count = this.Parameters.PassiveOfficialDocumentCount;
+			count = ::Math.rand(1, this.Parameters.PassiveOfficialDocumentCountCeiling);
 		}
 
 		for( local i = 0; i < count; i++ )
