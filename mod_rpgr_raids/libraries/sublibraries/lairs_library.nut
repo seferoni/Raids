@@ -79,7 +79,6 @@ Raids.Lairs <-
 
 	function createAgitationEntry( _lairObject )
 	{
-		# Prepare variables in local environment.
 		local textColour = Raids.Standard.Colour.Green,
 		iconPath = this.Tooltip.Icons.Relaxed,
 		agitation = Raids.Standard.getFlag("Agitation", _lairObject);
@@ -135,7 +134,6 @@ Raids.Lairs <-
 
 	function createResourcesEntry( _lairObject )
 	{
-		# Prepare variables in local environment.
 		local resources = _lairObject.getResources();
 
 		# Create resources entry.
@@ -157,7 +155,7 @@ Raids.Lairs <-
 			return null;
 		}
 
-		# Prepare variables in local environment.
+		# Get time difference.
 		local timeDifference = (lastUpdateDays + this.getAgitationDecayInterval(_lairObject)) - ::World.getTime().Days;
 
 		# Create decay timer entry.
@@ -205,7 +203,8 @@ Raids.Lairs <-
 	}
 
 	function getBaseResourceModifier( _resources )
-	{	# The arbitrary coefficients and constants used here are calibrated to ensure smooth scaling behaviour between resource breakpoints.
+	{	
+		# The arbitrary coefficients and constants used here are calibrated to ensure smooth scaling behaviour between resource breakpoints.
 		local modifier = 1.0;
 
 		if (_resources <= this.Parameters.ResourceModifierLowerBound)
@@ -310,7 +309,8 @@ Raids.Lairs <-
 	}
 
 	function getNaiveNamedLootChance( _lairObject )
-	{	# The arbitrary coefficients and constants used here are taken verbatim from the vanilla codebase.
+	{	
+		# The arbitrary coefficients and constants used here are taken verbatim from the vanilla codebase.
 		local tile = _lairObject.getTile(), settlement = this.getSettlementClosestTo(tile);
 		return (_lairObject.getResources() + tile.getDistanceTo(settlement.getTile()) * 4) / 5.0 - 37.0;
 	}
@@ -360,7 +360,8 @@ Raids.Lairs <-
 	}
 
 	function getTimeModifier()
-	{	# The arbitrary coefficients and constants used here are extrapolated from the vanilla codebase.
+	{	
+		# The arbitrary coefficients and constants used here are extrapolated from the vanilla codebase.
 		return (0.9 + ::Math.minf(2.0, ::World.getTime().Days * 0.014) * ::Const.Difficulty.EnemyMult[::World.Assets.getCombatDifficulty()]);
 	}
 

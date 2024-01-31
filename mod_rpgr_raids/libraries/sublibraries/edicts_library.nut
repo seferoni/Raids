@@ -223,7 +223,6 @@ Raids.Edicts <-
 
 	function getContainerEntries( _lairObject )
 	{
-		# Prepare variables in local environment.
 		local entries = [],
 		occupiedContainers = this.getOccupiedContainers(_lairObject);
 

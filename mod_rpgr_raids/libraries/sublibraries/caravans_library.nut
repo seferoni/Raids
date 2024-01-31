@@ -96,7 +96,7 @@ Raids.Caravans <-
 			icon = "",
 			text = ""
 		}
-	}
+	},
 	TroopTypes =
 	{
 		Generic = 
@@ -348,7 +348,7 @@ Raids.Caravans <-
 		local entries = [],
 		push = @(_entry) entries.push(_entry);
 
-		# Prepare variables in local environment.
+		# Get wealth and cargo descriptors.
 		local caravanWealth = Raids.Standard.getFlag("CaravanWealth", _caravan),
 		wealthDescriptor = Raids.Standard.getDescriptor(caravanWealth, this.WealthDescriptors), 
 		cargoDescriptor = Raids.Standard.getDescriptor(Raids.Standard.getFlag("CaravanCargo", _caravan), this.CargoDescriptors);
