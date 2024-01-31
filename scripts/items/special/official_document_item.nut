@@ -11,12 +11,13 @@ this.official_document_item <- ::inherit("scripts/items/item",
 		this.m.Value = 150;
 		this.m.Icon = "special/official_document_item.png";
 		this.m.SlotType = ::Const.ItemSlot.None;
-		this.m.ItemType = ::Const.Items.ItemType.Usable;
+		this.m.ItemType = ::Const.Items.ItemType.Supply;
 		this.m.IsDroppedAsLoot = true;
 		this.m.IsAllowedInBag = false;
 		this.m.IsUsable = true;
 		this.m.EffectText <- "Will produce a counterfeit Edict upon use. The resulting Edict type can be modulated by a set of writing instruments, if present.";
 		this.m.InstructionText <- "Right-click to modify its contents.";
+		this.m.Amount = 1;
 	}
 
 	function findWritingInstruments()
@@ -41,6 +42,11 @@ this.official_document_item <- ::inherit("scripts/items/item",
 		return candidates[0];
 	}
 
+	function getAmount()
+	{
+		return this.m.Amount;
+	}
+
 	function getEffect()
 	{
 		return this.m.EffectText;
@@ -49,6 +55,21 @@ this.official_document_item <- ::inherit("scripts/items/item",
 	function getInstruction()
 	{
 		return this.m.InstructionText;
+	}
+
+	function getMasterDocument()
+	{
+		local items = ::World.Assets.getStash().getItems();
+
+		foreach( item in items )
+		{
+			if (item != null && item.getID() == this.getID())
+			{
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	function getTooltip()
@@ -71,9 +92,45 @@ this.official_document_item <- ::inherit("scripts/items/item",
 		return tooltipArray;
 	}
 
+	function incrementAmount( _integer = 1 )
+	{
+		local newAmount = this.getAmount() + _integer;
+		this.setAmount(newAmount);
+	}
+
+	function isViableForRemoval()
+	{
+		if (this.getAmount() == 0)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
 	function playInventorySound( _eventType )
 	{
 		::Sound.play("sounds/cloth_01.wav", ::Const.Sound.Volume.Inventory);
+	}
+
+	function onAddedToStash( _stashID )
+	{
+		this.item.onAddedToStash(_stashID);
+
+		if (_stashID != "player")
+		{
+			return;
+		}
+
+		local masterDocument = this.getMasterDocument();
+
+		if (masterDocument == null)
+		{
+			return;
+		}
+
+		masterDocument.incrementAmount();
+		::World.Assets.getStash().remove(this);
 	}
 
 	function onUse( _actor, _item = null )
@@ -81,22 +138,33 @@ this.official_document_item <- ::inherit("scripts/items/item",
 		local writingInstruments = this.findWritingInstruments();
 		::Sound.play("sounds/scribble.wav", ::Const.Sound.Volume.Inventory);
 		::World.Assets.getStash().add(Raids.Edicts.createEdict(writingInstruments));
+		this.updateAmountOnUse();
 
 		if (writingInstruments == null)
 		{
-			return true;
+			return isViableForRemoval();
 		}
 
 		if (writingInstruments.getEdictSelectionMode() == writingInstruments.SelectionModes.Indiscriminate)
 		{
-			return true;
+			return isViableForRemoval();
 		}
 
-		this.updateUses(writingInstruments);
-		return true;
+		this.updateWritingInstruments(writingInstruments);
+		return isViableForRemoval();
 	}
 
-	function updateUses( _writingInstruments )
+	function setAmount( _integer )
+	{
+		this.m.Amount = ::Math.max(0, _integer);
+	}
+
+	function updateAmountOnUse()
+	{
+		this.incrementAmount(-1);
+	}
+
+	function updateWritingInstruments( _writingInstruments )
 	{
 		local remainingUses = _writingInstruments.getUses();
 
