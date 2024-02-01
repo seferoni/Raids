@@ -279,7 +279,7 @@ this.writing_instruments_item <- ::inherit("scripts/items/item",
 
 	function onAddedToStash( _stashID )
 	{
-		item.onAddedToStash(_stashID);
+		this.item.onAddedToStash(_stashID);
 
 		if (_stashID != "player")
 		{

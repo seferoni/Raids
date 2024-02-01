@@ -311,12 +311,18 @@ Raids.Edicts <-
 
 	function getNamedLootEntry( _lairObject )
 	{
-		local entry = clone this.Tooltip.Template;
-
-		# Get lair stash and current named loot chance.
-		local namedLootChance = Raids.Lairs.getNamedLootChance(_lairObject) + this.getNamedLootChanceOffset(_lairObject),
-		loot = _lairObject.getLoot().getItems(),
+		local entry = clone this.Tooltip.Template,
 		count = 0;
+
+		# Get naive named loot chance.
+		local naiveNamedLootChance = Raids.Lairs.getNamedLootChance(_lairObject);
+
+		# Get post-offset named loot chance values.
+		local namedLootChance = naiveNamedLootChance + this.getNamedLootChanceOffset(_lairObject),
+		namedLootRemovalChance =  naiveNamedLootChance - this.getNamedLootChanceOffset(_lairObject, true);
+
+		# Get contents of lair stash.
+		local loot = _lairObject.getLoot().getItems();
 
 		# Tally named item count.
 		foreach( item in loot )
@@ -328,11 +334,14 @@ Raids.Edicts <-
 		local fragmentA = Raids.Standard.colourWrap(format("Famed (%i)", count), Raids.Standard.Colour[count == 0 ? "Red" : "Green"]);
 
 		# Assign text fragment corresponding to current named loot chance.
-		local fragmentB = Raids.Standard.colourWrap(format("(%i%%)", namedLootChance), Raids.Standard.Colour[namedLootChance > 0 ? "Green" : "Red"]);
+		local fragmentB = Raids.Standard.colourWrap(format("(%i%%", namedLootChance), Raids.Standard.Colour.Green);
+
+		# Assign text fragment corresponding to current named loot removal chance.
+		local fragmentC = Raids.Standard.colourWrap(format("%i%%)", namedLootRemovalChance), Raids.Standard.Colour.Red);
 
 		# Create entry.
 		entry.icon = format(this.Tooltip.Icons[count == 0 ? "NamedEmpty" : "NamedPresent"]);
-		entry.text = format("%s %s", fragmentA, fragmentB);
+		entry.text = format("%s %s|%s", fragmentA, fragmentB, fragmentC);
 
 		return entry;
 	}
@@ -347,6 +356,19 @@ Raids.Edicts <-
 		}
 
 		return entries;
+	}
+
+	function getOccupiedContainers( _lairObject )
+	{
+		local occupiedContainers = [],
+		occupied = @(_container) Raids.Standard.getFlag(_container, _lairObject) != false;
+
+		foreach( container in this.Containers )
+		{
+			if (occupied(container)) occupiedContainers.push(container);
+		}
+
+		return occupiedContainers;
 	}
 
 	function getSpecialEntries( _lairObject )
@@ -378,19 +400,6 @@ Raids.Edicts <-
 		local entries = this.getContainerEntries(_lairObject);
 		entries.extend(this.getSpecialEntries(_lairObject));
 		return entries;
-	}
-
-	function getOccupiedContainers( _lairObject )
-	{
-		local occupiedContainers = [],
-		occupied = @(_container) Raids.Standard.getFlag(_container, _lairObject) != false;
-
-		foreach( container in this.Containers )
-		{
-			if (occupied(container)) occupiedContainers.push(container);
-		}
-
-		return occupiedContainers;
 	}
 
 	function isLairViable( _lairObject )

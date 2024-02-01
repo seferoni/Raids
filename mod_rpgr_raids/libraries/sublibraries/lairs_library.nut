@@ -324,10 +324,19 @@ Raids.Lairs <-
 
 	function getPartyResources( _lairObject )
 	{
-		local resources = _lairObject.getResources(),
-		timeModifier = this.getTimeModifier(),
-		baseResourceModifier = this.getBaseResourceModifier(Raids.Standard.getFlag("BaseResources", _lairObject)),
-		configurableModifier = Raids.Standard.getPercentageSetting("RoamerResourceModifier");
+		# Get current resources value.
+		local resources = _lairObject.getResources();
+
+		# Get vanilla time scaling factor.
+		local timeModifier = this.getTimeModifier();
+
+		# Get base resources modifier.
+		local baseResourceModifier = this.getBaseResourceModifier(Raids.Standard.getFlag("BaseResources", _lairObject));
+
+		# Get user-configured modifier.
+		local configurableModifier = Raids.Standard.getPercentageSetting("RoamerResourceModifier");
+
+		# Return product of all factors.
 		return baseResourceModifier * configurableModifier * timeModifier * resources;
 	}
 
@@ -339,7 +348,12 @@ Raids.Lairs <-
 		foreach( settlement in ::World.EntityManager.getSettlements() )
 		{
 			local distance = _tile.getDistanceTo(settlement.getTile());
-			if (distance < closestDistance) closestDistance = distance, closestSettlement = settlement;
+
+			if (distance < closestDistance)
+			{
+				closestDistance = distance;
+				closestSettlement = settlement;
+			} 
 		}
 
 		return closestSettlement;

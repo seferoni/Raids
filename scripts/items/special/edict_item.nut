@@ -14,7 +14,7 @@ this.edict_item <- ::inherit("scripts/items/item",
 		this.m.DiscoveryDays <- 1;
 		this.m.ScalingModality <- this.ScalingModalities.Static;
 		this.m.EffectText <- null;
-		this.m.InstructionText <- "Right-click to dispatch within proximity of a lair. This edict will be consumed in the process.";
+		this.m.InstructionText <- "Right-click to dispatch within proximity of a lair. This Edict will be consumed in the process.";
 		this.m.ShowWarning <- false;
 	},
 	ScalingModalities = 
@@ -231,7 +231,7 @@ this.edict_item <- ::inherit("scripts/items/item",
 
 	function playInventorySound( _eventType )
 	{
-		::Sound.play(this.Sounds.Inventory, ::Const.Sound.Volume.Inventory);
+		::Sound.play(this.Sounds.Move, ::Const.Sound.Volume.Inventory);
 	}
 
 	function playUseSound()
