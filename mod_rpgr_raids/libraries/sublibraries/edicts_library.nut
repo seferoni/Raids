@@ -20,11 +20,6 @@ Raids.Edicts <-
 		"OrientalBandits",
 		"Zombies"
 	],
-	InertEdicts =
-	[
-		"Agitation",
-		"Legibility"
-	],
 	Internal =
 	{
 		AgitationChance = 20,
@@ -127,14 +122,6 @@ Raids.Edicts <-
 		else
 		{
 			this.resetContainerTime(_container, _lairObject);
-		}
-
-		local isAgitated = Raids.Standard.getFlag("Agitation", _lairObject) != Raids.Lairs.AgitationDescriptors.Relaxed,
-		isInert = this.InertEdicts.find(edictName) != null;
-
-		if (!isAgitated && !isInert && ::Math.rand(1, 100) <= this.Internal.AgitationChance)
-		{
-			Raids.Lairs.setAgitation(_lairObject, Raids.Lairs.Procedures.Increment);
 		}
 
 		if (!(procedure in this))
@@ -319,7 +306,7 @@ Raids.Edicts <-
 
 		# Get post-offset named loot chance values.
 		local namedLootChance = naiveNamedLootChance + this.getNamedLootChanceOffset(_lairObject),
-		namedLootRemovalChance =  naiveNamedLootChance - this.getNamedLootChanceOffset(_lairObject, true);
+		namedLootRemovalChance =  naiveNamedLootChance + this.getNamedLootChanceOffset(_lairObject, true);
 
 		# Get contents of lair stash.
 		local loot = _lairObject.getLoot().getItems();
