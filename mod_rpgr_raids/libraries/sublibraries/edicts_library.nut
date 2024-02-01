@@ -22,7 +22,6 @@ Raids.Edicts <-
 	],
 	Internal =
 	{
-		AgitationChance = 20,
 		DirectoryPath = "scripts/items/special/edicts/",
 		EdictSelectionSize = 3,
 		ResourcesPrefactor = 0.001,
