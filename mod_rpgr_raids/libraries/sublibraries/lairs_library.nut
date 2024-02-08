@@ -31,7 +31,6 @@ Raids.Lairs <-
 		MaximumLootOffset = 3,
 		NamedItemChancePerAgitationTier = 13.33,
 		NamedItemRemovalChanceOnSpawn = 90,
-		NamedLootRefreshChance = 60,
 		PassiveOfficialDocumentCountCeiling = 2,
 		ResourcesCeiling = 700,
 		ResourceModifierCeiling = 0.25,
@@ -639,7 +638,7 @@ Raids.Lairs <-
 
 		Raids.Edicts.refreshEdicts(_lairObject);
 
-		if (Raids.Standard.getFlag("Agitation", _lairObject) != this.AgitationDescriptors.Militant && ::Math.rand(1, 100) > this.Parameters.NamedLootRefreshChance)
+		if (Raids.Standard.getFlag("Agitation", _lairObject) != this.AgitationDescriptors.Militant)
 		{
 			return;
 		}

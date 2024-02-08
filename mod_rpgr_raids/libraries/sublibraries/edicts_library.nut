@@ -341,6 +341,7 @@ Raids.Edicts <-
 			entries.push(this.getLegibilityEntry(_lairObject));
 		}
 
+		entries.extend(this.getSpecialEntries(_lairObject));
 		return entries;
 	}
 
