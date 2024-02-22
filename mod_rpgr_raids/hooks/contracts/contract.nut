@@ -8,7 +8,7 @@ local Raids = ::RPGR_Raids;
 			return;
 		}
 
-		if (this.m.Destination == null)
+		if (this.m.Destination == null || this.m.Destination.isNull())
 		{
 			return;
 		}

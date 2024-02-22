@@ -619,6 +619,7 @@ Raids.Lairs <-
 		if (_procedure == this.Procedures.Reset)
 		{
 			Raids.Edicts.clearEdicts(_lairObject);
+			return;
 		}
 
 		if (_procedure != this.Procedures.Increment)
