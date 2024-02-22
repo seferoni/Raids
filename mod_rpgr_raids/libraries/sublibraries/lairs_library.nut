@@ -1,6 +1,6 @@
 local Raids = ::RPGR_Raids;
 Raids.Lairs <-
-{
+{	// TODO: need some way to revert resources after contracts do their business. hook into tooltip, figure that out (updateResources)
 	AgitationDescriptors =
 	{
 		Relaxed = 1,
@@ -286,7 +286,7 @@ Raids.Lairs <-
 		local Lairs = this;
 		lairs.extend(_faction.getSettlements().filter(function( _index, _location )
 		{
-			if (!Lairs.isLocationViable(_location, true, true))
+			if (!Lairs.isLocationViable(_location, false, true))
 			{
 				return false;
 			}
@@ -477,7 +477,7 @@ Raids.Lairs <-
 		return _locationType == ::Const.World.LocationType.Passive || _locationType == (::Const.World.LocationType.Lair | ::Const.World.LocationType.Passive);
 	}
 
-	function isLocationViable( _location, _checkContract = true, _checkProximity = false, _checkType = true )
+	function isLocationViable( _location, _checkContract = false, _checkProximity = false, _checkType = true )
 	{
 		if (_checkType && !this.isLocationTypeViable(_location.getLocationType()))
 		{

@@ -26,7 +26,7 @@ local Raids = ::RPGR_Raids;
 
 	Raids.Standard.wrap(_object, "getTooltip", function( _tooltipArray )
 	{
-		if (!Raids.Lairs.isLocationViable(this, true, true))
+		if (!Raids.Lairs.isLocationViable(this, false, true))
 		{
 			return;
 		}
@@ -50,7 +50,7 @@ local Raids = ::RPGR_Raids;
 
 	Raids.Standard.wrap(_object, "onDropLootForPlayer", function( _lootTable )
 	{
-		if (!Raids.Lairs.isLocationViable(this, true, false, false))
+		if (!Raids.Lairs.isLocationViable(this, false, false, false))
 		{
 			return;
 		}
