@@ -637,12 +637,6 @@ Raids.Lairs <-
 		}
 
 		Raids.Edicts.refreshEdicts(_lairObject);
-
-		if (Raids.Standard.getFlag("Agitation", _lairObject) != this.AgitationDescriptors.Militant)
-		{
-			return;
-		}
-
 		this.repopulateNamedLoot(_lairObject);
 	}
 };
