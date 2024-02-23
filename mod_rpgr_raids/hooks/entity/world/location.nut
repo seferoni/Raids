@@ -1,6 +1,22 @@
 local Raids = ::RPGR_Raids;
 ::mods_hookExactClass("entity/world/location", function( _object )
 {
+	Raids.Standard.wrap(_object, "createDefenders", function()
+	{
+		if (!Raids.Lairs.isLocationViable(this, false))
+		{
+			return;
+		}
+
+		if (!Raids.Standard.getFlag("DefenderSpawnsForbidden", this))
+		{
+			::logInfo("cannot spawn defenders atm") // TODO
+			return;
+		}
+
+		return Raids.Internal.TERMINATE;
+	}, "overrideMethod");
+
 	Raids.Standard.wrap(_object, "dropTreasure", function( _num, _items, _lootTable )
 	{
 		if (!Raids.Lairs.isLocationViable(this))
@@ -26,7 +42,7 @@ local Raids = ::RPGR_Raids;
 
 	Raids.Standard.wrap(_object, "getTooltip", function( _tooltipArray )
 	{
-		if (!Raids.Lairs.isLocationViable(this, false, true))
+		if (!Raids.Lairs.isLocationViable(this, true, true))
 		{
 			return;
 		}
@@ -41,7 +57,7 @@ local Raids = ::RPGR_Raids;
 
 	Raids.Standard.wrap(_object, "onCombatStarted", function()
 	{
-		if (!Raids.Lairs.isLocationViable(this, false, true))
+		if (!Raids.Lairs.isLocationViable(this, true, true))
 		{
 			return;
 		}
@@ -51,7 +67,7 @@ local Raids = ::RPGR_Raids;
 
 	Raids.Standard.wrap(_object, "onDropLootForPlayer", function( _lootTable )
 	{
-		if (!Raids.Lairs.isLocationViable(this, false, false, false))
+		if (!Raids.Lairs.isLocationViable(this, true, false, false))
 		{
 			return;
 		}
@@ -80,5 +96,17 @@ local Raids = ::RPGR_Raids;
 		{
 			Raids.Lairs.depopulateNamedLoot(this, Raids.Lairs.Parameters.NamedItemRemovalChanceOnSpawn);
 		}
+	});
+
+	Raids.Standard.wrap(_object, "setLastSpawnTimeToNow", function()
+	{
+		if (!Raids.Lairs.isLocationViable(this))
+		{
+			return;
+		}
+
+		local spawnTime = this.getLastSpawnTime(),
+		offset = Raids.Lairs.getSpawnTimeOffset(this);
+		this.m.LastSpawnTime = ::Math.max(0.0, spawnTime + offset);
 	});
 });

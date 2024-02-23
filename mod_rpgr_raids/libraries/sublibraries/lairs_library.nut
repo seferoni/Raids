@@ -253,6 +253,56 @@ Raids.Lairs <-
 		return lairs[0];
 	}
 
+	function getCandidateByContract( _contract )
+	{
+		if (!("Destination" in _contract.m))
+		{
+			return null;
+		}
+
+		local candidate = _contract.m.Destination;
+
+		if (candidate == null || candidate.isNull())
+		{
+			return null;
+		}
+
+		if (!::isKindOf(candidate.get(), "location"))
+		{
+			return null;
+		}
+
+		if (!this.isLocationTypeViable(candidate.getLocationType()))
+		{
+			return null;
+		}
+
+		return candidate;
+	}
+
+	function getCandidatesByFaction( _faction )
+	{
+		local lairs = [];
+
+		if (_faction.getSettlements().len() == 0)
+		{
+			return lairs;
+		}
+
+		local Lairs = this;
+		lairs.extend(_faction.getSettlements().filter(function( _index, _location )
+		{
+			if (!Lairs.isLocationViable(_location, true, true))
+			{
+				return false;
+			}
+
+			return true;
+		}));
+
+		return lairs;
+	}
+
 	function getCandidatesWithin( _tile, _distance = 6 )
 	{
 		local Lairs = this,
@@ -270,29 +320,6 @@ Raids.Lairs <-
 
 			return true;
 		});
-
-		return lairs;
-	}
-
-	function getCandidatesByFaction( _faction )
-	{
-		local lairs = [];
-
-		if (_faction.getSettlements().len() == 0)
-		{
-			return lairs;
-		}
-
-		local Lairs = this;
-		lairs.extend(_faction.getSettlements().filter(function( _index, _location )
-		{
-			if (!Lairs.isLocationViable(_location, false, true))
-			{
-				return false;
-			}
-
-			return true;
-		}));
 
 		return lairs;
 	}
@@ -376,6 +403,20 @@ Raids.Lairs <-
 		}
 
 		return closestSettlement;
+	}
+
+	function getSpawnTimeOffset( _lairObject )
+	{
+		local offset = 0.0,
+		agitation = Raids.Standard.getFlag("Agitation", _lairObject);
+
+		if (agitation == this.AgitationDescriptors.Relaxed)
+		{
+			return offset;
+		}
+
+		offset += agitation * this.Parameters.SpawnTimeOffsetInterval;
+		return offset;
 	}
 
 	function getTimeModifier()
@@ -483,7 +524,7 @@ Raids.Lairs <-
 		return _locationType == ::Const.World.LocationType.Passive || _locationType == (::Const.World.LocationType.Lair | ::Const.World.LocationType.Passive);
 	}
 
-	function isLocationViable( _location, _checkContract = false, _checkProximity = false, _checkType = true )
+	function isLocationViable( _location, _checkContract = true, _checkProximity = false, _checkType = true )
 	{
 		if (_checkType && !this.isLocationTypeViable(_location.getLocationType()))
 		{
@@ -541,6 +582,13 @@ Raids.Lairs <-
 		}
 	}
 
+	function resetAgitation( _lairObject )
+	{
+		Raids.Standard.setFlag("Agitation", this.AgitationDescriptors.Relaxed, _lairObject);
+		Raids.Edicts.clearEdicts(_lairObject);
+		Raids.Edicts.clearHistory(_lairObject);
+	}
+
 	function setAgitation( _lairObject, _procedure )
 	{
 		if (!this.isLairViableForProcedure(_lairObject, _procedure))
@@ -552,11 +600,15 @@ Raids.Lairs <-
 		{
 			case (this.Procedures.Increment): Raids.Standard.incrementFlag("Agitation", 1, _lairObject); break;
 			case (this.Procedures.Decrement): Raids.Standard.incrementFlag("Agitation", -1, _lairObject); break;
-			case (this.Procedures.Reset): Raids.Standard.setFlag("Agitation", this.AgitationDescriptors.Relaxed, _lairObject); break;
+			case (this.Procedures.Reset): this.resetAgitation(_lairObject); break;
 		}
 
 		Raids.Standard.setFlag("LastAgitationUpdate", ::World.getTime().Days, _lairObject);
-		this.updateProperties(_lairObject, _procedure);
+
+		if (_procedure != this.Procedures.Reset)
+		{
+			this.updateProperties(_lairObject, _procedure);
+		}
 	}
 
 	function setResources( _lairObject, _newResources )
@@ -629,12 +681,6 @@ Raids.Lairs <-
 
 	function updateProperties( _lairObject, _procedure )
 	{
-		if (_procedure == this.Procedures.Reset)
-		{
-			Raids.Edicts.clearEdicts(_lairObject);
-			return;
-		}
-
 		if (_procedure != this.Procedures.Increment)
 		{
 			Raids.Edicts.clearHistory(_lairObject);
