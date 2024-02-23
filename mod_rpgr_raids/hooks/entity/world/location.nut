@@ -81,16 +81,4 @@ local Raids = ::RPGR_Raids;
 			Raids.Lairs.depopulateNamedLoot(this, Raids.Lairs.Parameters.NamedItemRemovalChanceOnSpawn);
 		}
 	});
-
-	Raids.Standard.wrap(_object, "setLastSpawnTimeToNow", function()
-	{
-		if (!Raids.Lairs.isLocationViable(this))
-		{
-			return;
-		}
-
-		local spawnTime = this.getLastSpawnTime(),
-		offset = Raids.Lairs.getSpawnTimeOffset(this);
-		this.m.LastSpawnTime = ::Math.max(0.0, spawnTime + offset);
-	});
 });

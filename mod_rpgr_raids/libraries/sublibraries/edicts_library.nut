@@ -414,11 +414,6 @@ Raids.Edicts <-
 
 	function isLairViable( _lairObject )
 	{
-		if (!_lairObject.m.IsShowingBanner)
-		{
-			return false;
-		}
-
 		# Retrieve faction type from faction manager.
 		local factionType = ::World.FactionManager.getFaction(_lairObject.getFaction()).getType();
 

@@ -1,6 +1,6 @@
 local Raids = ::RPGR_Raids;
 Raids.Lairs <-
-{	// TODO: need some way to revert resources after contracts do their business. hook into tooltip, figure that out (updateResources)
+{
 	AgitationDescriptors =
 	{
 		Relaxed = 1,
@@ -378,20 +378,6 @@ Raids.Lairs <-
 		return closestSettlement;
 	}
 
-	function getSpawnTimeOffset( _lairObject )
-	{
-		local offset = 0.0,
-		agitation = Raids.Standard.getFlag("Agitation", _lairObject);
-
-		if (agitation == this.AgitationDescriptors.Relaxed)
-		{
-			return offset;
-		}
-
-		offset += agitation * this.Parameters.SpawnTimeOffsetInterval;
-		return offset;
-	}
-
 	function getTimeModifier()
 	{
 		# The arbitrary coefficients and constants used here are extrapolated from the vanilla codebase.
@@ -586,11 +572,6 @@ Raids.Lairs <-
 
 	function synchroniseResources( _lairObject )
 	{
-		if (!this.isActiveContractLocation(_lairObject))
-		{
-			return;
-		}
-
 		local targetResources = this.getResourcesByAgitation(_lairObject);
 
 		if (Raids.Edicts.findEdictInHistory("Diminution", _lairObject))
@@ -598,8 +579,6 @@ Raids.Lairs <-
 			targetResources *= Raids.Edicts.getResourcesModifier(_lairObject);
 		}
 
-		::logInfo(_lairObject.getResources());
-		::logInfo(targetResources); // TODO
 		if (_lairObject.getResources() == targetResources)
 		{
 			return;
