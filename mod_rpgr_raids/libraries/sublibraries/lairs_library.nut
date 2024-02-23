@@ -202,7 +202,7 @@ Raids.Lairs <-
 	}
 
 	function getBaseResourceModifier( _resources )
-	{	
+	{
 		# The arbitrary coefficients and constants used here are calibrated to ensure smooth scaling behaviour between resource breakpoints.
 		local modifier = 1.0;
 
@@ -308,7 +308,7 @@ Raids.Lairs <-
 	}
 
 	function getNaiveNamedLootChance( _lairObject )
-	{	
+	{
 		# The arbitrary coefficients and constants used here are taken verbatim from the vanilla codebase.
 		local tile = _lairObject.getTile(), settlement = this.getSettlementClosestTo(tile);
 		return (_lairObject.getResources() + tile.getDistanceTo(settlement.getTile()) * 4) / 5.0 - 37.0;
@@ -339,6 +339,26 @@ Raids.Lairs <-
 		return baseResourceModifier * configurableModifier * timeModifier * resources;
 	}
 
+	function getResourcesByAgitation( _lairObject )
+	{
+		# Get current lair Agitation.
+		local agitation = Raids.Standard.getFlag("Agitation", _lairObject);
+
+		# Get resources assigned to the lair upon creation.
+		local baseResources = Raids.Standard.getFlag("BaseResources", _lairObject);
+
+		# Create a modifier meant to modulate resource scaling behaviour at both extremes.
+		local interpolatedModifier = -0.0006 * baseResources + 0.6;
+
+		# Get configured resources modifier.
+		local configurableModifier = Raids.Standard.getPercentageSetting("AgitationResourceModifier");
+
+		# Apply factors as appropriate to produce a new value for resources, scaled by Agitation.
+		local newResources = ::Math.floor(baseResources + (interpolatedModifier * (agitation - 1) * configurableModifier * baseResources));
+
+		return newResources;
+	}
+
 	function getSettlementClosestTo( _tile )
 	{
 		local closestSettlement = null,
@@ -352,7 +372,7 @@ Raids.Lairs <-
 			{
 				closestDistance = distance;
 				closestSettlement = settlement;
-			} 
+			}
 		}
 
 		return closestSettlement;
@@ -373,7 +393,7 @@ Raids.Lairs <-
 	}
 
 	function getTimeModifier()
-	{	
+	{
 		# The arbitrary coefficients and constants used here are extrapolated from the vanilla codebase.
 		return (0.9 + ::Math.minf(2.0, ::World.getTime().Days * 0.014) * ::Const.Difficulty.EnemyMult[::World.Assets.getCombatDifficulty()]);
 	}
@@ -553,25 +573,39 @@ Raids.Lairs <-
 		this.updateProperties(_lairObject, _procedure);
 	}
 
+	function setResources( _lairObject, _newResources )
+	{
+		_lairObject.setResources(::Math.min(_newResources, this.Parameters.ResourcesCeiling));
+	}
+
 	function setResourcesByAgitation( _lairObject )
 	{
-		# Get current lair Agitation.
-		local agitation = Raids.Standard.getFlag("Agitation", _lairObject);
+		local newResources = this.getResourcesByAgitation(_lairObject);
+		this.setResources(_lairObject, newResources);
+	}
 
-		# Get resources assigned to the lair upon creation.
-		local baseResources = Raids.Standard.getFlag("BaseResources", _lairObject);
+	function synchroniseResources( _lairObject )
+	{
+		if (!this.isActiveContractLocation(_lairObject))
+		{
+			return;
+		}
 
-		# Create a modifier meant to modulate resource scaling behaviour at both extremes.
-		local interpolatedModifier = -0.0006 * baseResources + 0.6;
+		local targetResources = this.getResourcesByAgitation(_lairObject);
 
-		# Get configured resources modifier.
-		local configurableModifier = Raids.Standard.getPercentageSetting("AgitationResourceModifier");
+		if (Raids.Edicts.findEdictInHistory("Diminution", _lairObject))
+		{
+			targetResources *= Raids.Edicts.getResourcesModifier(_lairObject);
+		}
 
-		# Apply factors as appropriate to produce a new value for resources, scaled by Agitation.
-		local newResources = ::Math.floor(baseResources + (interpolatedModifier * (agitation - 1) * configurableModifier * baseResources));
+		::logInfo(_lairObject.getResources());
+		::logInfo(targetResources); // TODO
+		if (_lairObject.getResources() == targetResources)
+		{
+			return;
+		}
 
-		# Set new resources value.
-		_lairObject.setResources(::Math.min(newResources, this.Parameters.ResourcesCeiling));
+		this.setResources(_lairObject, targetResources);
 	}
 
 	function updateCombatStatistics( _isParty )

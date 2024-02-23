@@ -133,8 +133,7 @@ Raids.Edicts <-
 
 	function executeDiminutionProcedure( _lairObject )
 	{
-		local modifier = this.Parameters.DiminutionModifier - (this.Internal.ResourcesPrefactor * _lairObject.getResources());
-		_lairObject.setResources(::Math.max(Raids.Standard.getFlag("BaseResources", _lairObject) / 2, ::Math.floor(modifier * _lairObject.getResources())));
+		Raids.Lairs.setResources(_lairObject, _lairObject.getResources() * this.getResourcesModifier(_lairObject));
 		_lairObject.createDefenders();
 	}
 
@@ -154,7 +153,8 @@ Raids.Edicts <-
 
 	function findEdict( _edictName, _lairObject, _filterActive = false )
 	{
-		local edictID = this.getEdictID(_edictName), edictContainer = false;
+		local edictContainer = false,
+		edictID = this.getEdictID(_edictName);
 
 		foreach( container in this.Containers )
 		{
@@ -358,6 +358,29 @@ Raids.Edicts <-
 		return occupiedContainers;
 	}
 
+	function getResourcesModifier( _lairObject )
+	{
+		local currentResources = _lair.getResources();
+
+		# Set threshold to be half the base resources of the lair.
+		local thresholdResources = Raids.Standard.getFlag("BaseResources", _lairObject) / 2;
+
+		# Scale modifier by the lair's current resources.
+		local modifier = this.Parameters.DiminutionModifier - (this.Internal.ResourcesPrefactor * _lairObject.getResources());
+
+		# Find projected value if modifier is applied.
+		local newResources = modifier * _lairObject.getResources();
+
+		# If projected value remains above the threshold, return it.
+		if (newResources > thresholdResources)
+		{
+			return modifier;
+		}
+
+		# Else, return a modifier that, when applied, will change the current resources to half the base resources of the lair.
+		return (thresholdResources / currentResources); // TODO: double check
+	}
+
 	function getSpecialEntries( _lairObject )
 	{
 		local entries = [this.getNamedLootEntry(_lairObject)];
@@ -396,10 +419,14 @@ Raids.Edicts <-
 			return false;
 		}
 
-		local Lairs = Raids.Lairs,
-		factionType = ::World.FactionManager.getFaction(_lairObject.getFaction()).getType(),
-		factions = this.findEdict("Legibility", _lairObject, true) != false ? Lairs.Factions : this.Factions,
-		viableFactions = factions.map(@(_factionName) Lairs.getFactionType(_factionName));
+		# Retrieve faction type from faction manager.
+		local factionType = ::World.FactionManager.getFaction(_lairObject.getFaction()).getType();
+
+		# If an Edict of Legibility is not present, revert to native Edict-viable faction pool.
+		local factions = this.findEdict("Legibility", _lairObject, true) != false ? Raids.Lairs.Factions : this.Factions;
+
+		# Retrieve corresponding faction types from the ::Const table.
+		local viableFactions = factions.map(@(_factionName) Raids.Lairs.getFactionType(_factionName));
 
 		if (viableFactions.find(factionType) != null)
 		{
@@ -416,7 +443,7 @@ Raids.Edicts <-
 			return;
 		}
 
-		local Edicts = this, viableEdicts = this.CycledEdicts.filter(@(_index, _edictName) Edicts.findEdictInHistory(_edictName, _lairObject));
+		local viableEdicts = this.CycledEdicts.filter(@(_index, _edictName) Raids.Edicts.findEdictInHistory(_edictName, _lairObject));
 
 		foreach( edictName in viableEdicts )
 		{
