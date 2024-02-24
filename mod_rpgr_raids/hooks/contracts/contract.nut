@@ -29,5 +29,6 @@ local Raids = ::RPGR_Raids;
 		}
 
 		Raids.Standard.setFlag("DefenderSpawnsForbidden", false, candidate);
+		Raids.Lairs.updateProperties(candidate, null);
 	});
 });

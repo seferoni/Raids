@@ -10,7 +10,6 @@ local Raids = ::RPGR_Raids;
 
 		if (!Raids.Standard.getFlag("DefenderSpawnsForbidden", this))
 		{
-			::logInfo("cannot spawn defenders atm") // TODO
 			return;
 		}
 

@@ -31,7 +31,8 @@ Raids.Edicts <-
 	{
 		AbundanceCeiling = 3,
 		AbundanceOffset = 1,
-		DiminutionModifier = 0.90,
+		DiminutionModifier = 0.9,
+		DiminutionModifierFloor = 0.5,
 		ProspectingOffset = 8.0,
 		RetentionOffset = -8.0,
 		StasisOffset = 2
@@ -360,25 +361,8 @@ Raids.Edicts <-
 
 	function getResourcesModifier( _lairObject )
 	{
-		local currentResources = _lair.getResources();
-
-		# Set threshold to be half the base resources of the lair.
-		local thresholdResources = Raids.Standard.getFlag("BaseResources", _lairObject) / 2;
-
-		# Scale modifier by the lair's current resources.
-		local modifier = this.Parameters.DiminutionModifier - (this.Internal.ResourcesPrefactor * _lairObject.getResources());
-
-		# Find projected value if modifier is applied.
-		local newResources = modifier * _lairObject.getResources();
-
-		# If projected value remains above the threshold, return it.
-		if (newResources > thresholdResources)
-		{
-			return modifier;
-		}
-
-		# Else, return a modifier that, when applied, will change the current resources to half the base resources of the lair.
-		return (thresholdResources / currentResources); // TODO: double check
+		local modifier = this.Parameters.DiminutionModifier - (this.Internal.ResourcesPrefactor * _lair.getResources());
+		return ::Math.max(this.Parameters.DiminutionModifierFloor, modifier);
 	}
 
 	function getSpecialEntries( _lairObject )

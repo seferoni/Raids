@@ -664,7 +664,7 @@ Raids.Lairs <-
 
 	function updateProperties( _lairObject, _procedure )
 	{
-		if (_procedure != this.Procedures.Increment)
+		if (_procedure == this.Procedures.Decrement)
 		{
 			Raids.Edicts.clearHistory(_lairObject);
 			this.depopulateNamedLoot(_lairObject);
