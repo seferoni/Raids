@@ -622,28 +622,6 @@ Raids.Lairs <-
 		this.setResources(_lairObject, newResources);
 	}
 
-	function synchroniseResources( _lairObject )
-	{
-		local targetResources = this.getResourcesByAgitation(_lairObject);
-
-		if (Raids.Edicts.findEdictInHistory("Diminution", _lairObject))
-		{
-			targetResources *= Raids.Edicts.getResourcesModifier(_lairObject);
-		}
-
-		if (_lairObject.getResources() == targetResources)
-		{
-			return;
-		}
-
-		this.setResources(_lairObject, targetResources);
-	}
-
-	function updateCombatStatistics( _isParty )
-	{
-		Raids.Standard.setFlag("LastFoeWasParty", _isParty, ::World.Statistics);
-	}
-
 	function updateAgitation( _lairObject )
 	{
 		local lastUpdateTimeDays = Raids.Standard.getFlag("LastAgitationUpdate", _lairObject);
@@ -677,6 +655,11 @@ Raids.Lairs <-
 				break;
 			}
 		}
+	}
+
+	function updateCombatStatistics( _isParty )
+	{
+		Raids.Standard.setFlag("LastFoeWasParty", _isParty, ::World.Statistics);
 	}
 
 	function updateProperties( _lairObject, _procedure )

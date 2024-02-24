@@ -2,7 +2,7 @@
 {
 	ID = "mod_rpgr_raids",
 	Name = "RPG Rebalance - Raids",
-	Version = "4.0.0",
+	Version = "3.1.0",
 	Internal =
 	{
 		TERMINATE = "__end"
