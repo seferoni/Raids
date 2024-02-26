@@ -361,7 +361,7 @@ Raids.Edicts <-
 
 	function getResourcesModifier( _lairObject )
 	{
-		local modifier = this.Parameters.DiminutionModifier - (this.Internal.ResourcesPrefactor * _lair.getResources());
+		local modifier = this.Parameters.DiminutionModifier - (this.Internal.ResourcesPrefactor * _lairObject.getResources());
 		return ::Math.max(this.Parameters.DiminutionModifierFloor, modifier);
 	}
 
