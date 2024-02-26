@@ -40,5 +40,6 @@ local Raids = ::RPGR_Raids;
 		}
 
 		this.m.Score = 10;
+		return Raids.Internal.TERMINATE;
 	}, "overrideMethod");
 });
