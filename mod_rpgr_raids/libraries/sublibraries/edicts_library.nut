@@ -108,6 +108,13 @@ Raids.Edicts <-
 		Raids.Lairs.setAgitation(_lairObject, Raids.Lairs.Procedures.Increment);
 	}
 
+	function executeDiminutionProcedure( _lairObject )
+	{
+		local newResources = _lairObject.getResources() * this.getResourcesModifier(_lairObject);
+		Raids.Lairs.setResources(_lairObject, newResources);
+		_lairObject.createDefenders();
+	}
+
 	function executeEdictProcedure( _container, _lairObject )
 	{
 		local edictID = Raids.Standard.getFlag(_container, _lairObject),
@@ -130,12 +137,6 @@ Raids.Edicts <-
 		}
 
 		this[procedure](_lairObject);
-	}
-
-	function executeDiminutionProcedure( _lairObject )
-	{
-		Raids.Lairs.setResources(_lairObject, _lairObject.getResources() * this.getResourcesModifier(_lairObject));
-		_lairObject.createDefenders();
 	}
 
 	function executeNullificationProcedure( _lairObject )
@@ -362,7 +363,7 @@ Raids.Edicts <-
 	function getResourcesModifier( _lairObject )
 	{
 		local modifier = this.Parameters.DiminutionModifier - (this.Internal.ResourcesPrefactor * _lairObject.getResources());
-		return ::Math.max(this.Parameters.DiminutionModifierFloor, modifier);
+		return ::Math.maxf(this.Parameters.DiminutionModifierFloor, modifier);
 	}
 
 	function getSpecialEntries( _lairObject )
@@ -398,6 +399,11 @@ Raids.Edicts <-
 
 	function isLairViable( _lairObject )
 	{
+		if (!_lairObject.m.IsShowingBanner)
+		{
+			return false;
+		}
+		
 		# Retrieve faction type from faction manager.
 		local factionType = ::World.FactionManager.getFaction(_lairObject.getFaction()).getType();
 

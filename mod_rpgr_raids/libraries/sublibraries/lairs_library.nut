@@ -613,7 +613,8 @@ Raids.Lairs <-
 
 	function setResources( _lairObject, _newResources )
 	{
-		_lairObject.setResources(::Math.min(_newResources, this.Parameters.ResourcesCeiling));
+		local newResources = ::Math.floor(_newResources);
+		_lairObject.setResources(::Math.min(newResources, this.Parameters.ResourcesCeiling));
 	}
 
 	function setResourcesByAgitation( _lairObject )
