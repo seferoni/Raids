@@ -44,15 +44,20 @@ this.edict_of_legibility <- ::inherit("scripts/items/special/edict_item",
 			return naiveLairs;
 		}
 
-		local Edicts = Raids.Edicts, edictName = Edicts.getEdictName(this.getID()),
+		local edictName = Raids.Edicts.getEdictName(this.getID()),
 		lairs = naiveLairs.filter(function( _index, _lair )
 		{
-			if (Edicts.isLairViable(_lair))
+			if (!_lair.m.IsShowingBanner)
 			{
 				return false;
 			}
 
-			if (Edicts.findEdict(edictName, _lair) != false)
+			if (Raids.Edicts.isLairViable(_lair))
+			{
+				return false;
+			}
+
+			if (Raids.Edicts.findEdict(edictName, _lair) != false)
 			{
 				return false;
 			}
