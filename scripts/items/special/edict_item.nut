@@ -110,7 +110,7 @@ this.edict_item <- ::inherit("scripts/items/item",
 	{
 		local discoveryDuration = this.getDiscoveryDuration(),
 		discoveryText = Raids.Standard.colourWrap(discoveryDuration, Raids.Standard.Colour.Green);
-		return format("This edict takes effect in %s %s.", discoveryText, discoveryDuration > 1 ? "days" : "day");
+		return format("This Edict takes effect in %s %s.", discoveryText, discoveryDuration > 1 ? "days" : "day");
 	}
 
 	function getEffectText()
@@ -126,7 +126,7 @@ this.edict_item <- ::inherit("scripts/items/item",
 	function getPersistenceText()
 	{
 		local descriptor = Raids.Standard.colourWrap(this.isCycled() ? "temporary" : "permanent", Raids.Standard.Colour.Red);
-		return format("This edict's effects are %s.", descriptor);
+		return format("This Edict's effects are %s.", descriptor);
 	}
 
 	function getScalingModality()
@@ -137,8 +137,8 @@ this.edict_item <- ::inherit("scripts/items/item",
 	function getScalingText()
 	{
 		local scaling = this.m.ScalingModality, modalities = this.ScalingModalities;
-		if (scaling == modalities.Static) return format("This edict's effects are %s.", Raids.Standard.colourWrap("static", Raids.Standard.Colour.Green));
-		return format("This edict's effects scale with lair %s.", Raids.Standard.colourWrap(scaling == modalities.Agitation ? "Agitation" : "resources", Raids.Standard.Colour.Red));
+		if (scaling == modalities.Static) return format("This Edict's effects are %s.", Raids.Standard.colourWrap("static", Raids.Standard.Colour.Green));
+		return format("This Edict's effects scale with lair %s.", Raids.Standard.colourWrap(scaling == modalities.Agitation ? "Agitation" : "resources", Raids.Standard.Colour.Red));
 	}
 
 	function getTooltip()
