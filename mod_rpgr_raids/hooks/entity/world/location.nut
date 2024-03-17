@@ -8,11 +8,12 @@ local Raids = ::RPGR_Raids;
 			return;
 		}
 
-		if (!Raids.Standard.getFlag("DefenderSpawnsForbidden", this))
+		if (Raids.Standard.getFlag("DefenderSpawnsForbidden", this))
 		{
-			return;
+			return Raids.Internal.TERMINATE;
 		}
 
+		Raids.Lairs.Defenders.createDefenders(this);
 		return Raids.Internal.TERMINATE;
 	}, "overrideMethod");
 
@@ -39,7 +40,7 @@ local Raids = ::RPGR_Raids;
 		return [count, _lootTable];
 	}, "overrideArguments");
 
-	Raids.Standard.wrap(_object, "getTooltip", function( _tooltipArray )
+	Raids.Standard.wrap(_object, "getTooltip", function()
 	{
 		if (!Raids.Lairs.isLocationViable(this, true, true))
 		{
@@ -48,6 +49,15 @@ local Raids = ::RPGR_Raids;
 
 		Raids.Lairs.updateAgitation(this);
 		Raids.Edicts.updateEdicts(this);
+	}, "overrideArguments");
+
+	Raids.Standard.wrap(_object, "getTooltip", function( _tooltipArray )
+	{
+		if (!Raids.Lairs.isLocationViable(this, true, true))
+		{
+			return;
+		}
+
 		_tooltipArray.extend(Raids.Lairs.getTooltipEntries(this));
 		_tooltipArray.extend(Raids.Edicts[format("get%sEntries", Raids.Edicts.isLairViable(this) ? "Tooltip" : "Nonviable")](this));
 		return _tooltipArray;
