@@ -3,7 +3,6 @@ Raids.Lairs.Defenders <-
 {
 	Parameters =
 	{
-		ResourcesThresholdPrefactorCeiling = 2.0,
 		ResourcesThresholdPrefactorFloor = 0.75,
 		SpawnListLengthPrefactor = 0.25,
 		TimeScalePrefactorCeiling = 1.5
@@ -49,9 +48,7 @@ Raids.Lairs.Defenders <-
 		}
 
 		# Return a random candidate from this list.
-		local candidate = candidates[::Math.rand(0, candidates.len() - 1)];
-		
-		return candidate;
+		return candidates[::Math.rand(0, candidates.len() - 1)];
 	}
 
 	function getNaiveCandidate( _lairObject )
@@ -61,6 +58,7 @@ Raids.Lairs.Defenders <-
 		# Cap template candidates to the bottom fourth of the total entries in the spawnlist.
 		local ceiling = ::Math.floor((spawnList.len() - 1) * this.Parameters.SpawnListLengthPrefactor);
 
+		# Return random party from within partitioned spawnlist.
 		return spawnList[::Math.rand(0, ceiling)];
 	}
 

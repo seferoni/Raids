@@ -27,12 +27,17 @@ Raids.Edicts <-
 		ResourcesPrefactor = 0.001,
 		WritingInstrumentsChance = 66
 	},
+	Overrides = 
+	[
+		"location.undead_crypt"
+	],
 	Parameters =
 	{
 		AbundanceCeiling = 3,
 		AbundanceOffset = 1,
 		DiminutionModifier = 0.9,
 		DiminutionModifierFloor = 0.5,
+		DiminutionResourcesMinimum = 75,
 		ProspectingOffset = 8.0,
 		RetentionOffset = -8.0,
 		StasisOffset = 2
@@ -110,7 +115,7 @@ Raids.Edicts <-
 
 	function executeDiminutionProcedure( _lairObject )
 	{
-		local newResources = _lairObject.getResources() * this.getResourcesModifier(_lairObject);
+		local newResources = ::Math.max(this.Parameters.DiminutionResourcesMinimum, _lairObject.getResources() * this.getResourcesModifier(_lairObject));
 		Raids.Lairs.setResources(_lairObject, newResources);
 		_lairObject.createDefenders();
 	}
@@ -368,7 +373,12 @@ Raids.Edicts <-
 
 	function getSpecialEntries( _lairObject )
 	{
-		local entries = [this.getNamedLootEntry(_lairObject)];
+		local entries = [];
+
+		if (Raids.Standard.getSetting("ShowNamedLootEntry"))
+		{
+			entries.push(this.getNamedLootEntry(_lairObject));
+		}
 
 		if (Raids.Standard.getFlag("EdictHistory", _lairObject) != false)
 		{
@@ -414,6 +424,11 @@ Raids.Edicts <-
 		local viableFactions = factions.map(@(_factionName) Raids.Lairs.getFactionType(_factionName));
 
 		if (viableFactions.find(factionType) != null)
+		{
+			return true;
+		}
+
+		if (this.Overrides.find(_lairObject.getTypeID()) != null)
 		{
 			return true;
 		}
