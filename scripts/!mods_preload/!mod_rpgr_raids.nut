@@ -2,7 +2,7 @@
 {
 	ID = "mod_rpgr_raids",
 	Name = "RPG Rebalance - Raids",
-	Version = "3.0.2",
+	Version = "3.1.0",
 	Internal =
 	{
 		TERMINATE = "__end"
@@ -18,7 +18,8 @@
 		RoamerScaleChance = 100,
 		RoamerResourceModifier = 70,
 		RoamerScaleAgitationRequirement = true,
-		ShowNamedLootEntry = true
+		ShowNamedLootEntry = true,
+		TimeScalePrefactorCeiling = 150
 	}
 }
 
@@ -58,7 +59,7 @@ if (!Raids.Internal.MSUFound)
 	local agitationIncrementChance = pageLairs.addRangeSetting("AgitationIncrementChance", Defaults.AgitationIncrementChance, 0, 100, 1, "Agitation Increment Chance");
 	agitationIncrementChance.setDescription("Determines the chance for a lair's Agitation value to increase upon engagement with a roaming party, if within proximity.");
 
-	local agitationResourceModifier = pageLairs.addRangeSetting("AgitationResourceModifier", Defaults.AgitationResourceModifier, 50, 100, 10, "Agitation Resource Modifier");
+	local agitationResourceModifier = pageLairs.addRangeSetting("AgitationResourceModifier", Defaults.AgitationResourceModifier, 50, 150, 10, "Agitation Resource Modifier");
 	agitationResourceModifier.setDescription("Controls how lair resource calculation is handled after each Agitation update. Higher percentage values result in greater resources, and therefore more powerful garrisoned troops and more loot.");
 
 	local roamerScaleChance = pageLairs.addRangeSetting("RoamerScaleChance", Defaults.RoamerScaleChance, 0, 100, 5, "Roamer Scale Chance");
@@ -66,6 +67,9 @@ if (!Raids.Internal.MSUFound)
 
 	local roamerResourceModifier = pageLairs.addRangeSetting("RoamerResourceModifier", Defaults.RoamerResourceModifier, 50, 100, 10, "Roamer Resource Modifier");
 	roamerResourceModifier.setDescription("Controls how resource calculation is handled for roaming parties. Higher percentage values result in greater resources, and therefore more powerful roaming troops. Does nothing if roamer scale chance is set to zero.");
+
+	local timeScalePrefactorCeiling = pageLairs.addRangeSetting("TimeScalePrefactorCeiling", Defaults.TimeScalePrefactorCeiling, 100, 300, 10, "Time Scaling Modifier");
+	timeScalePrefactorCeiling.setDescription("Determines the maximum value beyond which the further passage of time no longer affects location strength. In the base game, this is at 300. This has a very significant effect on location difficulty.");
 
 	# Assign caravan settings.
 	local caravanReinforcementChance = pageCaravans.addRangeSetting("CaravanReinforcementChance", Defaults.CaravanReinforcementChance, 0, 100, 5, "Caravan Reinforcement Chance");

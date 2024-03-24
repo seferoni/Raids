@@ -14,15 +14,29 @@ this.edict_of_agitation <- ::inherit("scripts/items/special/edict_item",
 
 	function getViableLairs()
 	{
-		local Raids = ::RPGR_Raids,
-		naiveLairs = this.edict_item.getViableLairs();
+		local naiveLairs = Raids.Lairs.getCandidatesWithin(::World.State.getPlayer().getTile());
 
 		if (naiveLairs.len() == 0)
 		{
 			return naiveLairs;
 		}
 
-		local lairs = naiveLairs.filter(@(_index, _lair) Raids.Standard.getFlag("Agitation", _lair) != Raids.Lairs.AgitationDescriptors.Militant);
+		local edictName = Raids.Edicts.getEdictName(this.getID()),
+		lairs = naiveLairs.filter(function( _index, _lair )
+		{
+			if (!Raids.Edicts.isLairViable(_lair))
+			{
+				return false;
+			}
+
+			if (Raids.Standard.getFlag("Agitation", _lair) == Raids.Lairs.AgitationDescriptors.Militant)
+			{
+				return false;
+			}
+
+			return true;
+		});
+
 		return lairs;
 	}
 

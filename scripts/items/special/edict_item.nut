@@ -188,20 +188,20 @@ this.edict_item <- ::inherit("scripts/items/item",
 			return naiveLairs;
 		}
 
-		local Edicts = Raids.Edicts, edictName = Edicts.getEdictName(this.getID()),
+		local edictName = Raids.Edicts.getEdictName(this.getID()),
 		lairs = naiveLairs.filter(function( _index, _lair )
 		{
-			if (!Edicts.isLairViable(_lair))
+			if (!Raids.Edicts.isLairViable(_lair))
 			{
 				return false;
 			}
 
-			if (Edicts.findEdict(edictName, _lair) != false)
+			if (Raids.Edicts.findEdict(edictName, _lair) != false)
 			{
 				return false;
 			}
 
-			if (Edicts.findEdictInHistory(edictName, _lair) != false)
+			if (Raids.Edicts.findEdictInHistory(edictName, _lair) != false)
 			{
 				return false;
 			}

@@ -28,7 +28,8 @@ local Raids = ::RPGR_Raids;
 			return;
 		}
 
+		# Named loot depopulation is not carried out here.
 		Raids.Standard.setFlag("DefenderSpawnsForbidden", false, candidate);
-		Raids.Lairs.updateProperties(candidate, null);
+		Raids.Lairs.updateProperties(candidate);
 	});
 });

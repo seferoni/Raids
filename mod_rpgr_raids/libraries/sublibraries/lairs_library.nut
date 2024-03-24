@@ -36,13 +36,12 @@ Raids.Lairs <-
 		ResourceModifierCeiling = 0.25,
 		ResourceModifierLowerBound = 200,
 		ResourceModifierUpperBound = 350,
-		SpawnTimeOffsetInterval = -50.0,
+		SpawnTimeOffsetInterval = -50.0
 	},
 	Procedures =
 	{
 		Increment = 1,
-		Decrement = 2,
-		Reset = 3
+		Reset = 2
 	},
 	Tooltip =
 	{
@@ -452,6 +451,15 @@ Raids.Lairs <-
 		return ::Math.ceil(_lairObject.getResources() / 100.0);
 	}
 
+	function increaseAgitation( _lairObject )
+	{
+		Raids.Standard.incrementFlag("Agitation", 1, _lairObject);
+		this.updateProperties(_lairObject, false);
+		Raids.Edicts.refreshEdicts(_lairObject);
+		this.Defenders.reinforceDefenders(_lairObject);
+		this.repopulateNamedLoot(_lairObject);
+	}
+
 	function initialiseLairParameters( _lairObject )
 	{
 		Raids.Standard.setFlag("BaseResources", _lairObject.getResources(), _lairObject);
@@ -490,9 +498,8 @@ Raids.Lairs <-
 
 	function isFactionViable( _faction )
 	{
-		local Lairs = this,
-		factionType = _faction.getType(),
-		viableFactions = this.Factions.map(@(_factionName) Lairs.getFactionType(_factionName));
+		local factionType = _faction.getType(),
+		viableFactions = this.Factions.map(@(_factionName) Raids.Lairs.getFactionType(_factionName));
 
 		if (viableFactions.find(factionType) != null)
 		{
@@ -507,11 +514,6 @@ Raids.Lairs <-
 		local agitation = Raids.Standard.getFlag("Agitation", _lairObject);
 
 		if (_procedure == this.Procedures.Increment && agitation >= this.AgitationDescriptors.Militant)
-		{
-			return false;
-		}
-
-		if (_procedure == this.Procedures.Decrement && agitation <= this.AgitationDescriptors.Relaxed)
 		{
 			return false;
 		}
@@ -598,17 +600,11 @@ Raids.Lairs <-
 
 		switch (_procedure)
 		{
-			case (this.Procedures.Increment): Raids.Standard.incrementFlag("Agitation", 1, _lairObject); break;
-			case (this.Procedures.Decrement): Raids.Standard.incrementFlag("Agitation", -1, _lairObject); break;
+			case (this.Procedures.Increment): this.increaseAgitation(_lairObject); break;
 			case (this.Procedures.Reset): this.resetAgitation(_lairObject); break;
 		}
 
 		Raids.Standard.setFlag("LastAgitationUpdate", ::World.getTime().Days, _lairObject);
-
-		if (_procedure != this.Procedures.Reset)
-		{
-			this.updateProperties(_lairObject, _procedure);
-		}
 	}
 
 	function setResources( _lairObject, _newResources )
@@ -640,22 +636,9 @@ Raids.Lairs <-
 			return;
 		}
 
-		local iterations = ::Math.floor(timeDifference / decayInterval);
-
-		if (iterations == 0)
-		{
-			return;
-		}
-
-		for( local i = 0; i < iterations; i++ )
-		{
-			this.setAgitation(_lairObject, this.Procedures.Decrement);
-
-			if (Raids.Standard.getFlag("Agitation", _lairObject) == this.AgitationDescriptors.Relaxed)
-			{
-				break;
-			}
-		}
+		this.setAgitation(_lairObject, this.Procedures.Reset);
+		this.depopulateNamedLoot(_lairObject);
+		this.updateProperties(_lairObject);
 	}
 
 	function updateCombatStatistics( _isParty )
@@ -663,24 +646,15 @@ Raids.Lairs <-
 		Raids.Standard.setFlag("LastFoeWasParty", _isParty, ::World.Statistics);
 	}
 
-	function updateProperties( _lairObject, _procedure )
+	function updateProperties( _lairObject, _createDefenders = true )
 	{
-		if (_procedure == this.Procedures.Decrement)
-		{
-			Raids.Edicts.clearHistory(_lairObject);
-			this.depopulateNamedLoot(_lairObject);
-		}
-
 		this.setResourcesByAgitation(_lairObject);
-		_lairObject.createDefenders();
-		_lairObject.setLootScaleBasedOnResources(_lairObject.getResources());
 
-		if (_procedure != this.Procedures.Increment)
+		if (_createDefenders)
 		{
-			return;
+			this.Defenders.createDefenders(_lairObject, true);
 		}
 
-		Raids.Edicts.refreshEdicts(_lairObject);
-		this.repopulateNamedLoot(_lairObject);
+		_lairObject.setLootScaleBasedOnResources(_lairObject.getResources());
 	}
 };
