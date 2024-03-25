@@ -26,11 +26,6 @@ Raids.Lairs.Defenders <-
 	{
 		::logInfo("createDefenders called for " + _lairObject.getName() + "with overrideAgitation " + _overrideAgitation)
 
-		if (_lairObject.getName() == "Forefathers' Gathering")
-		{	// TODO: clean up
-			::MSU.Log.printStackTrace()
-		}
-
 		if (Raids.Standard.getFlag("Agitation", _lairObject) != Raids.Lairs.AgitationDescriptors.Relaxed && !_overrideAgitation)
 		{
 			return;
@@ -217,11 +212,13 @@ Raids.Lairs.Defenders <-
 		allocatedResources = ::Math.floor(this.getResourcesForReinforcement(_lairObject) / troopPool.len());
 
 		foreach( troopTable in troopPool )
-		{
+		{	// TODO: clean
 			local newTroop = {};
 
+			# Ensure at least one of the chosen troop type, if nominally affordable, can be added.
 			local troopCount = ::Math.max(1, ::Math.floor(allocatedResources / troopTable.Cost));
 
+			# Assign fields for the addTroops method to reference.
 			newTroop.Type <- troopTable.Type;
 			newTroop.Num <- ::Math.min(troopTable.MaxCount, troopCount);
 			::logInfo("adding " + troopTable.Type.Script + " with count " + newTroop.Num);
