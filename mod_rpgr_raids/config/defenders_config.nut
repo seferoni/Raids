@@ -172,7 +172,7 @@ Raids.Config.Defenders <-
 				MaxCount = 8,
 				Agitation =
 				{
-					Floor = 3
+					Ceiling = 3
 				}
 			},
 			{
@@ -196,7 +196,7 @@ Raids.Config.Defenders <-
 			{
 				Type = ::Const.World.Spawn.Troops.ZombieKnight,
 				Cost = 50,
-				MaxCount = 5,
+				MaxCount = 6,
 				Agitation = 
 				{
 					Floor = 3

@@ -90,7 +90,7 @@ Raids.Lairs.Defenders <-
 	}
 
 	function getTroopChoices()
-	{
+	{	// TODO: i think it's unsatisfying to pick out one troop for agitation 4 etc, esp when that troop is capped to 1 anyway
 		return ::Math.rand(this.Parameters.TroopChoicesFloor, this.Parameters.TroopChoicesCeiling);
 	}
 
