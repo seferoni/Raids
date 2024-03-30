@@ -55,8 +55,7 @@ this.edict_item <- ::inherit("scripts/items/item",
 		entry.icon = this.Tooltip.Icons.Warning;
 
 		# Define colour wrap lambda to ease readability.
-		local Standard = Raids.Standard,
-		colourWrap = @(_string) Standard.colourWrap(_string, Standard.Colour.Red);
+		local colourWrap = @(_string) Raids.Standard.colourWrap(_string, Raids.Standard.Colour.Red);
 
 		# Create sentence fragments for text field.
 		local fragmentA = format("There are no %s.", colourWrap("viable lairs within proximity"));
