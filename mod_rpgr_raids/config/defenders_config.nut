@@ -159,8 +159,8 @@ Raids.Config.Defenders <-
 		[
 			{
 				Type = ::Const.World.Spawn.Troops.Zombie,
-				Cost = 25,
-				MaxCount = 7,
+				Cost = 15,
+				MaxCount = 9,
 				Agitation =
 				{
 					Ceiling = 2
@@ -168,7 +168,7 @@ Raids.Config.Defenders <-
 			}
 			{
 				Type = ::Const.World.Spawn.Troops.ZombieYeoman,
-				Cost = 35,
+				Cost = 25,
 				MaxCount = 8,
 				Agitation =
 				{
@@ -217,12 +217,16 @@ Raids.Config.Defenders <-
 			{
 				Type = ::Const.World.Spawn.Troops.OrcBerserker,
 				Cost = 50,
-				MaxCount = 4
+				MaxCount = 5,
+				Agitation = 
+				{
+					Ceiling = 3
+				}
 			},
 			{
 				Type = ::Const.World.Spawn.Troops.OrcWarrior,
 				Cost = 65,
-				MaxCount = 4,
+				MaxCount = 5,
 				Agitation = 
 				{
 					Floor = 3
@@ -323,7 +327,7 @@ Raids.Config.Defenders <-
 			{
 				Type = ::Const.World.Spawn.Troops.Vampire,
 				Cost = 65,
-				MaxCount = 2,
+				MaxCount = 3,
 				Agitation = 
 				{
 					Floor = 3

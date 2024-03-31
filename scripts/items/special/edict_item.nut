@@ -195,6 +195,11 @@ this.edict_item <- ::inherit("scripts/items/item",
 				return false;
 			}
 
+			if (Raids.Edicts.getOccupiedContainers(_lair).len() == Raids.Edicts.Containers.len())
+			{
+				return false;
+			}
+
 			if (Raids.Edicts.findEdict(edictName, _lair) != false)
 			{
 				return false;

@@ -24,7 +24,6 @@ Raids.Lairs.Defenders <-
 
 	function createDefenders( _lairObject, _overrideAgitation = false )
 	{
-		::logInfo("createDefenders called for " + _lairObject.getName() + "with overrideAgitation " + _overrideAgitation)
 		if (Raids.Standard.getFlag("Agitation", _lairObject) != Raids.Lairs.AgitationDescriptors.Relaxed && !_overrideAgitation)
 		{
 			return;
@@ -132,19 +131,18 @@ Raids.Lairs.Defenders <-
 	}
 
 	function getViableTroopCandidates( _lairObject )
-	{	// TODO: clean this up when done
-		::logInfo("getting candidates for " + _lairObject.getName())
+	{
 		local agitation = Raids.Standard.getFlag("Agitation", _lairObject);
-		::logInfo("finding candidates with agitation " + agitation);
 
+		# Get time-agnostic resources value scaled by configurable modifier.
 		local resources = this.getResourcesForReinforcement(_lairObject);
-		::logInfo("got resources " + resources)
 
+		# Randomly roll troop choices between 1 and 3.
 		local troopChoices = this.getTroopChoices();
-		::logInfo("choices at " + troopChoices)
 
 		local factionName = this.getFactionName(_lairObject);
 
+		# Handle unexpected factions.
 		if (!(factionName in Raids.Config.Defenders.Troops))
 		{
 			return null;
@@ -152,35 +150,25 @@ Raids.Lairs.Defenders <-
 
 		local candidates = Raids.Config.Defenders.Troops[factionName].filter(function( _index, _troopTable )
 		{
-			::logInfo("looping over " + _troopTable.Type.Script)
 			if (_troopTable.Cost > resources)
 			{
 				return false;
 			}
 
-			::logInfo("can afford " + _troopTable.Type.Script);
-
 			if (!("Agitation" in _troopTable))
 			{
-				::logInfo("cant find agitation for " + _troopTable.Type.Script)
 				return true;
 			}
 
 			if ("Floor" in _troopTable.Agitation && agitation < _troopTable.Agitation.Floor)
 			{
-				::logInfo("below floor for " + _troopTable.Type.Script)
 				return false;
 			}
-
-			::logInfo("floor is okie dokie for " + _troopTable.Type.Script)
 
 			if ("Ceiling" in _troopTable.Agitation && agitation > _troopTable.Agitation.Ceiling)
 			{
-				::logInfo("above ceiling for " + _troopTable.Type.Script)
 				return false;
 			}
-
-			::logInfo("ceiling is okie dokie for " + _troopTable.Type.Script)
 
 			return true;
 		});
@@ -200,7 +188,6 @@ Raids.Lairs.Defenders <-
 
 		if (troopPool == null || troopPool.len() == 0)
 		{
-			::logInfo("ruh roh")
 			return;
 		}
 
@@ -211,7 +198,7 @@ Raids.Lairs.Defenders <-
 		allocatedResources = ::Math.floor(this.getResourcesForReinforcement(_lairObject) / troopPool.len());
 
 		foreach( troopTable in troopPool )
-		{	// TODO: clean
+		{
 			local newTroop = {};
 
 			# Ensure at least one of the chosen troop type, if nominally affordable, can be added.
@@ -220,7 +207,6 @@ Raids.Lairs.Defenders <-
 			# Assign fields for the addTroops method to reference.
 			newTroop.Type <- troopTable.Type;
 			newTroop.Num <- ::Math.min(troopTable.MaxCount, troopCount);
-			::logInfo("adding " + troopTable.Type.Script + " with count " + newTroop.Num);
 			selection.Troops.push(newTroop);
 		}
 

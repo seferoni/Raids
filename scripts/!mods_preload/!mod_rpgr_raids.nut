@@ -10,7 +10,7 @@
 	Defaults =
 	{
 		AgitationIncrementChance = 100,
-		AgitationResourceModifier = 65,
+		AgitationResourceModifier = 90,
 		CaravanReinforcementChance = 100,
 		DepopulateLairLootOnSpawn = true,
 		FactionSpecificNamedLootChance = 35,

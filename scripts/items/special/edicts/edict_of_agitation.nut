@@ -51,6 +51,11 @@ this.edict_of_agitation <- ::inherit("scripts/items/special/edict_item",
 				return false;
 			}
 
+			if (Raids.Edicts.getOccupiedContainers(_lair).len() == Raids.Edicts.Containers.len())
+			{
+				return false;
+			}
+
 			if (!self.isLairViable(_lair))
 			{
 				return false;
