@@ -27,7 +27,7 @@ Raids.Lairs <-
 	],
 	Parameters =
 	{
-		AgitationDecayInterval = 7,
+		AgitationDecayDaysCeiling = 7,
 		MaximumLootOffset = 3,
 		NamedItemChancePerAgitationTier = 13.33,
 		NamedItemRemovalChanceOnSpawn = 90,
@@ -200,7 +200,7 @@ Raids.Lairs <-
 
 		if (agitation <= this.AgitationDescriptors.Cautious)
 		{
-			return this.Parameters.AgitationDecayInterval;
+			return this.Parameters.AgitationDecayDaysCeiling;
 		}
 
 		local decayInterval = (agitation * -2) + 10;
