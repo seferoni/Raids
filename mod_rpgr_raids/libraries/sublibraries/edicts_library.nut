@@ -40,7 +40,7 @@ Raids.Edicts <-
 		DiminutionResourcesMinimum = 75,
 		ProspectingOffset = 8.0,
 		RetentionOffset = -8.0,
-		StasisOffset = 2
+		StasisOffset = 1
 	},
 	Tooltip =
 	{

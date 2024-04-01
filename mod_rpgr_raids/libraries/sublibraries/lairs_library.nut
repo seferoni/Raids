@@ -196,8 +196,15 @@ Raids.Lairs <-
 
 	function getAgitationDecayInterval( _lairObject )
 	{
-		local decayInterval = this.Parameters.AgitationDecayInterval + Raids.Edicts.getAgitationDecayOffset(_lairObject);
-		return decayInterval;
+		local agitation = Raids.Standard.getFlag("Agitation", _lairObject);
+
+		if (agitation <= this.AgitationDescriptors.Cautious)
+		{
+			return this.Parameters.AgitationDecayInterval;
+		}
+
+		local decayInterval = ::Math.ceil(this.Parameters.AgitationDecayInterval / (agitation - 1));
+		return decayInterval + Raids.Edicts.getAgitationDecayOffset(_lairObject);
 	}
 
 	function getBaseResourceModifier( _resources )
@@ -621,6 +628,11 @@ Raids.Lairs <-
 
 	function updateAgitation( _lairObject )
 	{
+		if (Raids.Standard.getFlag("Agitation", _lairObject) == this.AgitationDescriptors.Relaxed)
+		{
+			return;
+		}
+
 		local lastUpdateTimeDays = Raids.Standard.getFlag("LastAgitationUpdate", _lairObject);
 
 		if (!lastUpdateTimeDays)
