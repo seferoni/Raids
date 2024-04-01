@@ -163,21 +163,9 @@ Raids.Lairs <-
 		return entry;
 	}
 
-	function depopulateNamedLoot( _lairObject, _chance = null )
+	function depopulateNamedLoot( _lairObject, _chance = 100 )
 	{
 		if (_lairObject.getLoot().isEmpty())
-		{
-			return;
-		}
-
-		local namedLootChance = _chance;
-
-		if (_chance == null)
-		{
-			namedLootChance = this.getNamedLootChance(_lairObject) + Raids.Edicts.getNamedLootChanceOffset(_lairObject, true);
-		}
-
-		if (namedLootChance <= 0)
 		{
 			return;
 		}
@@ -187,7 +175,7 @@ Raids.Lairs <-
 
 		foreach( item in loot )
 		{
-			if (::Math.rand(1, 100) < namedLootChance)
+			if (::Math.rand(1, 100) <= _chance)
 			{
 				stash.remove(item);
 			}
@@ -594,7 +582,6 @@ Raids.Lairs <-
 	function resetAgitation( _lairObject )
 	{
 		Raids.Standard.setFlag("Agitation", this.AgitationDescriptors.Relaxed, _lairObject);
-		Raids.Edicts.clearEdicts(_lairObject);
 		Raids.Edicts.clearHistory(_lairObject);
 	}
 

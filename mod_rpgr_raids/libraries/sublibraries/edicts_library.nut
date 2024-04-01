@@ -39,7 +39,6 @@ Raids.Edicts <-
 		DiminutionModifierFloor = 0.5,
 		DiminutionResourcesMinimum = 75,
 		ProspectingOffset = 8.0,
-		RetentionOffset = -8.0,
 		StasisOffset = 1
 	},
 	Tooltip =
@@ -114,10 +113,18 @@ Raids.Edicts <-
 	}
 
 	function executeDiminutionProcedure( _lairObject )
-	{
+	{	// TODO: diminution needs to be rewritten. it should simply remove the toughest troops?
+		# Calculate new resources, ensuring that the acquired resources value does not fall below the lowest base lair resources value in the game.
 		local newResources = ::Math.max(this.Parameters.DiminutionResourcesMinimum, _lairObject.getResources() * this.getResourcesModifier(_lairObject));
+		
+		# Set new resources value.
 		Raids.Lairs.setResources(_lairObject, newResources);
-		_lairObject.createDefenders();
+
+		Raids.Lairs.Defenders.createDefenders(_lairObject, true); // TODO: this is a problem. diminution reduces actual resources, whereas 
+
+		local agitation = Raids.Standard.getFlag("Agitation", _lairObject);
+
+		
 	}
 
 	function executeEdictProcedure( _container, _lairObject )
@@ -148,9 +155,7 @@ Raids.Edicts <-
 	{
 		this.clearEdicts(_lairObject);
 		this.clearHistory(_lairObject);
-		Raids.Lairs.setResourcesByAgitation(_lairObject);
-		_lairObject.createDefenders();
-		_lairObject.setLootScaleBasedOnResources(_lairObject.getResources());
+		Raids.Lairs.updateProperties(_lairObject);
 	}
 
 	function executeOpportunismProcedure( _lairObject )
@@ -285,16 +290,12 @@ Raids.Edicts <-
 		return entry;
 	}
 
-	function getNamedLootChanceOffset( _lairObject, _depopulate = false )
+	function getNamedLootChanceOffset( _lairObject )
 	{
 		local offset = 0.0,
 		agitation = Raids.Standard.getFlag("Agitation", _lairObject);
 
-		if (_depopulate && this.findEdict("Retention", _lairObject, true) != false)
-		{
-			offset = this.Parameters.RetentionOffset * agitation;
-		}
-		else if (this.findEdict("Prospecting", _lairObject, true) != false)
+		if (this.findEdict("Prospecting", _lairObject, true) != false)
 		{
 			offset = this.Parameters.ProspectingOffset * agitation;
 		}
@@ -310,9 +311,8 @@ Raids.Edicts <-
 		# Get naive named loot chance.
 		local naiveNamedLootChance = Raids.Lairs.getNamedLootChance(_lairObject);
 
-		# Get post-offset named loot chance values.
-		local namedLootChance = naiveNamedLootChance + this.getNamedLootChanceOffset(_lairObject),
-		namedLootRemovalChance =  naiveNamedLootChance + this.getNamedLootChanceOffset(_lairObject, true);
+		# Get post-offset named loot chance.
+		local namedLootChance = naiveNamedLootChance + this.getNamedLootChanceOffset(_lairObject);
 
 		# Get contents of lair stash.
 		local loot = _lairObject.getLoot().getItems();
@@ -327,14 +327,10 @@ Raids.Edicts <-
 		local fragmentA = Raids.Standard.colourWrap(format("Famed (%i)", count), Raids.Standard.Colour[count == 0 ? "Red" : "Green"]);
 
 		# Assign text fragment corresponding to current named loot chance.
-		local fragmentB = Raids.Standard.colourWrap(format("(%i%%", namedLootChance), Raids.Standard.Colour.Green);
-
-		# Assign text fragment corresponding to current named loot removal chance.
-		local fragmentC = Raids.Standard.colourWrap(format("%i%%)", namedLootRemovalChance), Raids.Standard.Colour.Red);
-
+		local fragmentB = Raids.Standard.colourWrap(format("%i%%", namedLootChance), Raids.Standard.Colour.Green);
 		# Create entry.
 		entry.icon = format(this.Tooltip.Icons[count == 0 ? "NamedEmpty" : "NamedPresent"]);
-		entry.text = format("%s %s|%s", fragmentA, fragmentB, fragmentC);
+		entry.text = format("%s (%s)", fragmentA, fragmentB);
 
 		return entry;
 	}

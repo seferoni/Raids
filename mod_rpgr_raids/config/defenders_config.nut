@@ -14,8 +14,8 @@ Raids.Config.Defenders <-
 		[
 			{
 				Type = ::Const.World.Spawn.Troops.BanditThug,
-				Cost = 25,
-				MaxCount = 6,
+				Cost = 15,
+				MaxCount = 9,
 				Agitation = 
 				{
 					Ceiling = 2
@@ -23,7 +23,7 @@ Raids.Config.Defenders <-
 			},
 			{
 				Type = ::Const.World.Spawn.Troops.BanditRaider,
-				Cost = 40,
+				Cost = 35,
 				MaxCount = 7,
 				Agitation = 
 				{
