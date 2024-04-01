@@ -33,6 +33,12 @@ this.edict_of_agitation <- ::inherit("scripts/items/special/edict_item",
 		return entry;
 	}
 
+	function getEffectText()
+	{
+		local text = this.edict_item.getEffectText();
+		return format("%s This Edict can occupy %s.", text, Raids.Standard.colourWrap("multiple slots at once", Raids.Standard.Colour.Green));
+	}
+
 	function getViableLairs()
 	{
 		local naiveLairs = Raids.Lairs.getCandidatesWithin(::World.State.getPlayer().getTile());
@@ -42,7 +48,7 @@ this.edict_of_agitation <- ::inherit("scripts/items/special/edict_item",
 			return naiveLairs;
 		}
 
-		local self = this, 
+		local self = this,
 		edictName = Raids.Edicts.getEdictName(this.getID()),
 		lairs = naiveLairs.filter(function( _index, _lair )
 		{

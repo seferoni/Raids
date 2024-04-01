@@ -203,7 +203,7 @@ Raids.Lairs <-
 			return this.Parameters.AgitationDecayInterval;
 		}
 
-		local decayInterval = ::Math.ceil(this.Parameters.AgitationDecayInterval / (agitation - 1));
+		local decayInterval = (agitation * -2) + 10;
 		return decayInterval + Raids.Edicts.getAgitationDecayOffset(_lairObject);
 	}
 
