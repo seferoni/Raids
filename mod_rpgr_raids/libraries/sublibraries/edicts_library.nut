@@ -35,9 +35,7 @@ Raids.Edicts <-
 	{
 		AbundanceCeiling = 3,
 		AbundanceOffset = 1,
-		DiminutionModifier = 0.9,
-		DiminutionModifierFloor = 0.5,
-		DiminutionResourcesMinimum = 75,
+		DiminutionPrefactor = 0.06,
 		ProspectingOffset = 8.0,
 		StasisOffset = 1
 	},
@@ -113,18 +111,39 @@ Raids.Edicts <-
 	}
 
 	function executeDiminutionProcedure( _lairObject )
-	{	// TODO: diminution needs to be rewritten. it should simply remove the toughest troops?
-		# Calculate new resources, ensuring that the acquired resources value does not fall below the lowest base lair resources value in the game.
-		local newResources = ::Math.max(this.Parameters.DiminutionResourcesMinimum, _lairObject.getResources() * this.getResourcesModifier(_lairObject));
-		
-		# Set new resources value.
-		Raids.Lairs.setResources(_lairObject, newResources);
+	{
+		local garbage = [];
 
-		Raids.Lairs.Defenders.createDefenders(_lairObject, true); // TODO: this is a problem. diminution reduces actual resources, whereas 
+		# Get currently stationed troops.
+		local troops = _lairObject.getTroops();
 
-		local agitation = Raids.Standard.getFlag("Agitation", _lairObject);
+		# Calculate removal count scaled by current lair Agitation.
+		local removalCount = ::Math.ceil(this.Parameters.DiminutionPrefactor * Raids.Standard.getFlag("Agitation", _lairObject) * troops.len());
 
-		
+		# Handling for extreme edge cases.
+		if (removalCount >= troops.len() || removalCount == 0)
+		{
+			return;
+		}
+
+		# Mark troops at random for removal.
+		while( garbage.len() < removalCount )
+		{
+			garbage.push(troops[::Math.rand(0, troops.len() - 1)]);
+		}
+
+		# Remove troops.
+		foreach( troop in garbage )
+		{
+			local index = troops.find(troop);
+
+			if (index != null)
+			{
+				troops.remove(index);
+			}
+		}
+
+		_lairObject.updateStrength();
 	}
 
 	function executeEdictProcedure( _container, _lairObject )
@@ -359,12 +378,6 @@ Raids.Edicts <-
 		}
 
 		return occupiedContainers;
-	}
-
-	function getResourcesModifier( _lairObject )
-	{
-		local modifier = this.Parameters.DiminutionModifier - (this.Internal.ResourcesPrefactor * _lairObject.getResources());
-		return ::Math.maxf(this.Parameters.DiminutionModifierFloor, modifier);
 	}
 
 	function getSpecialEntries( _lairObject )
