@@ -188,7 +188,7 @@ Raids.Lairs <-
 
 		if (agitation <= this.AgitationDescriptors.Cautious)
 		{
-			return this.Parameters.AgitationDecayDaysCeiling;
+			return this.Parameters.AgitationDecayDaysCeiling + Raids.Edicts.getAgitationDecayOffset(_lairObject);
 		}
 
 		local decayInterval = (agitation * -2) + 10;
