@@ -73,7 +73,7 @@ if (!Raids.Internal.MSUFound)
 
 	# Assign caravan settings.
 	local caravanReinforcementChance = pageCaravans.addRangeSetting("CaravanReinforcementChance", Defaults.CaravanReinforcementChance, 0, 100, 5, "Caravan Reinforcement Chance");
-	caravanReinforcementChance.setDescription("Determines the percentage change for caravan troop count and composition reinforcement based on caravan wealth, and in special cases, cargo type.");
+	caravanReinforcementChance.setDescription("Determines the percentage change for caravan troop count and composition reinforcement based on caravan wealth, and in special cases, cargo type. Caravans that are not reinforced can never carry named items.");
 
 	local factionSpecificNamedLootChance = pageLairs.addRangeSetting("FactionSpecificNamedLootChance", Defaults.FactionSpecificNamedLootChance, 0, 100, 5, "Faction Specific Named Loot Chance");
 	factionSpecificNamedLootChance.setDescription("Determines the percentage chance for lairs to drop faction-specific named loot only, when conditions obtain.");
