@@ -540,7 +540,7 @@ Raids.Caravans <-
 		this.addTroops(_caravanObject, {Type = eliteTroops[::Math.rand(0, eliteTroops.len() - 1)]}, iterations);
 	}
 
-	function setCaravanCargo( _caravanObject, _settlement )
+	function setCaravanCargo( _caravanObject, _settlementObject )
 	{
 		local randomNumber = ::Math.rand(1, 100),
 		diceRoll = @(_value) randomNumber <= _value;
@@ -548,7 +548,7 @@ Raids.Caravans <-
 		# Assume default value.
 		local cargoType = this.CargoDescriptors.Trade;
 
-		if (diceRoll(this.CargoDistribution.Assortment) || _settlement.getProduce().len() == 0)
+		if (diceRoll(this.CargoDistribution.Assortment) || _settlementObject.getProduce().len() == 0)
 		{
 			cargoType = this.CargoDescriptors.Assortment;
 		}
@@ -560,29 +560,29 @@ Raids.Caravans <-
 		Raids.Standard.setFlag("CaravanCargo", cargoType, _caravanObject);
 	}
 
-	function setCaravanOrigin( _caravanObject, _settlement )
+	function setCaravanOrigin( _caravanObject, _settlementObject )
 	{
-		Raids.Standard.setFlag("CaravanOrigin", _settlement.getFaction(), _caravanObject);
+		Raids.Standard.setFlag("CaravanOrigin", _settlementObject.getFaction(), _caravanObject);
 	}
 
-	function setCaravanWealth( _caravanObject, _settlement )
+	function setCaravanWealth( _caravanObject, _settlementObject )
 	{
 		local caravanWealth = ::Math.rand(1, 2);
 
 		# Emulating clamp functionality.
 		local normalise = @(_value) ::Math.min(::Math.max(_value, this.WealthDescriptors.Meager), this.WealthDescriptors.Abundant);
 
-		if (_settlement.isSouthern() || ::World.FactionManager.getFaction(_caravanObject.getFaction()).getType() == ::Const.FactionType.NobleHouse)
+		if (_settlementObject.isSouthern() || ::World.FactionManager.getFaction(_caravanObject.getFaction()).getType() == ::Const.FactionType.NobleHouse)
 		{
 			caravanWealth += 1;
 		}
 
-		if (_settlement.getSize() >= 3)
+		if (_settlementObject.getSize() >= 3)
 		{
 			caravanWealth += 1;
 		}
 
-		caravanWealth += this.getSituationOffset(_settlement);
+		caravanWealth += this.getSituationOffset(_settlementObject);
 		Raids.Standard.setFlag("CaravanWealth", normalise(caravanWealth), _caravanObject);
 	}
 
