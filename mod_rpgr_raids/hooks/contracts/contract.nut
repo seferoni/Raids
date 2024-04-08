@@ -12,7 +12,7 @@ local Raids = ::RPGR_Raids;
 
 		Raids.Standard.setFlag("DefenderSpawnsForbidden", true, candidate);
 		Raids.Lairs.setAgitation(candidate, Raids.Lairs.Procedures.Reset);
-		Raids.Edicts.clearEdicts(_lairObject);
+		Raids.Edicts.clearEdicts(candidate);
 	});
 
 	Raids.Standard.wrap(_object, "onClear", function()
