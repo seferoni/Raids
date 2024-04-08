@@ -127,6 +127,14 @@ Raids.Caravans <-
 		Abundant = 4
 	}
 
+	function addNamedCargo( _lootArray )
+	{
+		local namedCargo = this.createNamedLoot(),
+		namedItem = ::new(format("scripts/items/%s", namedCargo[::Math.rand(0, namedCargo.len() - 1)]));
+		namedItem.onAddedToStash(null);
+		_lootArray.push(namedItem);
+	}
+
 	function addToInventory( _caravanObject, _goodsArray )
 	{
 		local iterations = Raids.Standard.getFlag("CaravanWealth", _caravanObject) - 1;
@@ -135,14 +143,6 @@ Raids.Caravans <-
 		{
 			_caravanObject.addToInventory(_goodsArray[::Math.rand(0, _goodsArray.len() - 1)]);
 		}
-	}
-
-	function addNamedCargo( _lootArray )
-	{
-		local namedCargo = this.createNamedLoot(),
-		namedItem = ::new(format("scripts/items/%s", namedCargo[::Math.rand(0, namedCargo.len() - 1)]));
-		namedItem.onAddedToStash(null);
-		_lootArray.push(namedItem);
 	}
 
 	function addTroops( _caravanObject, _troopType, _count )
