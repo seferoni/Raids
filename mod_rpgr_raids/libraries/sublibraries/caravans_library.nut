@@ -175,7 +175,7 @@ Raids.Caravans <-
 		return produce;
 	}
 
-	function createCaravanTroops( _wealth, _factionType )
+	function createCaravanTroops( _factionType )
 	{
 		local troops = [];
 
@@ -510,7 +510,7 @@ Raids.Caravans <-
 		local factionType = ::World.FactionManager.getFaction(_caravanObject.getFaction()).getType();
 
 		# Get eligible troop types.
-		local mundaneTroops = this.createCaravanTroops(wealth, factionType);
+		local mundaneTroops = this.createCaravanTroops(factionType);
 
 		# Add troops.
 		this.addTroops(_caravanObject, {Type = mundaneTroops[::Math.rand(0, mundaneTroops.len() - 1)]}, iterations);
