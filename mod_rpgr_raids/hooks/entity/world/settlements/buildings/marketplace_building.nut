@@ -3,7 +3,7 @@ local Raids = ::RPGR_Raids;
 {
 	Raids.Standard.wrap(_object, "fillStash", function( _list, _stash, _priceMult, _allowDamagedEquipment = false )
 	{
-		if (this.m.Settlement.getSize() < 3)
+		if (this.getSettlement().getSize() < 3)
 		{
 			return;
 		}
