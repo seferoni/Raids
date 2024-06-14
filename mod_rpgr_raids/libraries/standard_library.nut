@@ -1,12 +1,12 @@
 local Raids = ::RPGR_Raids;
 Raids.Standard <-
 {
-	Colour = 
+	Colour =
 	{
 		Green = "PositiveValue",
 		Red = "NegativeValue"
 	}
-	
+
 	function appendToStringList( _targetString, _string )
 	{
 		local newString = _targetString == "" ? format("%s", _string) : format("%s, %s", _targetString, _string);
@@ -52,7 +52,7 @@ Raids.Standard <-
 	{
 		local flagValue = _object.getFlags().get(format("mod_rpgr_raids.%s", _string));
 
-		if (!flagValue)
+		if (flagValue == false)
 		{
 			flagValue = _object.getFlags().get(format("%s", _string));
 		}
