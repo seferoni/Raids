@@ -1,6 +1,6 @@
-::mods_hookBaseClass("factions/faction", function( _object )
+::Raids.Patcher.hookTree("factions/faction", function( p )
 {
-	::Raids.Standard.wrap(_object, "spawnEntity", function( _tile, _name, _uniqueName, _template, _resources )
+	::Raids.Patcher.wrap(p, "spawnEntity", function( _tile, _name, _uniqueName, _template, _resources )
 	{
 		if (::Math.rand(1, 100) > ::Raids.Standard.getSetting("RoamerScaleChance"))
 		{

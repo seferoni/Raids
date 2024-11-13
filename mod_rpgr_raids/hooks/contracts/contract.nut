@@ -1,6 +1,6 @@
-::mods_hookBaseClass("contracts/contract", function( _object )
+::Raids.Patcher.hookTree("contracts/contract", function( p )
 {
-	::Raids.Standard.wrap(_object, "start", function()
+	::Raids.Patcher.wrap(p, "start", function()
 	{
 		local candidate = ::Raids.Lairs.getCandidateByContract(this);
 
@@ -14,7 +14,7 @@
 		::Raids.Edicts.clearEdicts(candidate);
 	});
 
-	::Raids.Standard.wrap(_object, "onClear", function()
+	::Raids.Patcher.wrap(p, "onClear", function()
 	{
 		if (!this.isActive())
 		{
@@ -28,7 +28,6 @@
 			return;
 		}
 
-		# Named loot depopulation is not carried out here.
 		::Raids.Standard.setFlag("DefenderSpawnsForbidden", false, candidate);
 		::Raids.Lairs.updateProperties(candidate);
 	});

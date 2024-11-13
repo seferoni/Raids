@@ -1,6 +1,6 @@
-::mods_hookExactClass("factions/actions/send_caravan_action", function( _object )
+::Raids.Patcher.hook("factions/actions/send_caravan_action", function( p )
 {
-	::Raids.Standard.wrap(_object, "onExecute", function( _faction )
+	::Raids.Patcher.wrap(p, "onExecute", function( _faction )
 	{
 		local grossEntities = ::World.getAllEntitiesAtPos(this.m.Start.getPos(), 1.0), caravan = null;
 

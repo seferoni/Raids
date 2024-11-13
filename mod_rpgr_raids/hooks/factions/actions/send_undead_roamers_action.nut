@@ -1,6 +1,6 @@
-::mods_hookExactClass("factions/actions/send_undead_roamers_action", function( _object )
+::Raids.Patcher.hook("factions/actions/send_undead_roamers_action", function( p )
 {
-	::Raids.Standard.wrap(_object, "onUpdate", function( _faction )
+	::Raids.Patcher.wrap(p, "onUpdate", function( _faction )
 	{
 		if (::World.getTime().Days >= 20)
 		{

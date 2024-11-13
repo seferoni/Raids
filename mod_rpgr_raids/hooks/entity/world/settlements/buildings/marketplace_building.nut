@@ -1,6 +1,6 @@
-::mods_hookExactClass("entity/world/settlements/buildings/marketplace_building", function( _object )
+::Raids.Patcher.hook("entity/world/settlements/buildings/marketplace_building", function( p )
 {
-	::Raids.Standard.wrap(_object, "fillStash", function( _list, _stash, _priceMult, _allowDamagedEquipment = false )
+	::Raids.Patcher.wrap(p, "fillStash", function( _list, _stash, _priceMult, _allowDamagedEquipment = false )
 	{
 		if (this.getSettlement().getSize() < 3)
 		{

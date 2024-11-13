@@ -1,6 +1,6 @@
-::mods_hookExactClass("entity/world/party", function( _object )
+::Raids.Patcher.hook("entity/world/party", function( p )
 {
-	::Raids.Standard.wrap(_object, "onCombatStarted", function()
+	::Raids.Patcher.wrap(p, "onCombatStarted", function()
 	{
 		if (!::Raids.Lairs.isPlayerInProximityTo(this.getTile(), 1))
 		{
@@ -15,7 +15,7 @@
 		::Raids.Lairs.updateCombatStatistics(true);
 	});
 
-	::Raids.Standard.wrap(_object, "onDropLootForPlayer", function( _lootTable )
+	::Raids.Patcher.wrap(p, "onDropLootForPlayer", function( _lootTable )
 	{
 		if (!::Raids.Caravans.isPartyViable(this))
 		{
@@ -36,7 +36,7 @@
 		return [_lootTable];
 	}, "overrideArguments");
 
-	::Raids.Standard.wrap(_object, "getTooltip", function( _tooltipArray )
+	::Raids.Patcher.wrap(p, "getTooltip", function( _tooltipArray )
 	{
 		if (!::Raids.Caravans.isPartyViable(this))
 		{

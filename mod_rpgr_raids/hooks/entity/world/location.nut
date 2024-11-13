@@ -1,6 +1,6 @@
-::mods_hookExactClass("entity/world/location", function( _object )
+::Raids.Patcher.hook("entity/world/location", function( p )
 {
-	::Raids.Standard.wrap(_object, "createDefenders", function()
+	::Raids.Patcher.wrap(p, "createDefenders", function()
 	{
 		if (!::Raids.Lairs.isLocationViable(this, false))
 		{
@@ -12,11 +12,11 @@
 			return ::Raids.Internal.TERMINATE;
 		}
 
-		::Raids.Lairs.Defenders.createDefenders(this);
+		::Raids.Defenders.createDefenders(this);
 		return ::Raids.Internal.TERMINATE;
 	}, "overrideMethod");
 
-	::Raids.Standard.wrap(_object, "dropTreasure", function( _num, _items, _lootTable )
+	::Raids.Patcher.wrap(p, "dropTreasure", function( _num, _items, _lootTable )
 	{
 		if (!::Raids.Lairs.isLocationViable(this))
 		{
@@ -28,7 +28,7 @@
 		return [count + offset, _items, _lootTable];
 	}, "overrideArguments");
 
-	::Raids.Standard.wrap(_object, "dropMoney", function( _num, _lootTable )
+	::Raids.Patcher.wrap(p, "dropMoney", function( _num, _lootTable )
 	{
 		if (!::Raids.Lairs.isLocationViable(this))
 		{
@@ -39,7 +39,7 @@
 		return [count, _lootTable];
 	}, "overrideArguments");
 
-	::Raids.Standard.wrap(_object, "getTooltip", function()
+	::Raids.Patcher.wrap(p, "getTooltip", function()
 	{
 		if (!::Raids.Lairs.isLocationViable(this, true, true))
 		{
@@ -50,7 +50,7 @@
 		::Raids.Edicts.updateEdicts(this);
 	}, "overrideArguments");
 
-	::Raids.Standard.wrap(_object, "getTooltip", function( _tooltipArray )
+	::Raids.Patcher.wrap(p, "getTooltip", function( _tooltipArray )
 	{
 		if (!::Raids.Lairs.isLocationViable(this, true, true))
 		{
@@ -62,7 +62,7 @@
 		return _tooltipArray;
 	});
 
-	::Raids.Standard.wrap(_object, "onCombatStarted", function()
+	::Raids.Patcher.wrap(p, "onCombatStarted", function()
 	{
 		if (!::Raids.Lairs.isLocationViable(this, true, true))
 		{
@@ -72,7 +72,7 @@
 		::Raids.Lairs.updateCombatStatistics(false);
 	});
 
-	::Raids.Standard.wrap(_object, "onDropLootForPlayer", function( _lootTable )
+	::Raids.Patcher.wrap(p, "onDropLootForPlayer", function( _lootTable )
 	{
 		if (!::Raids.Lairs.isLocationViable(this, true, false, false))
 		{
@@ -90,7 +90,7 @@
 		return [_lootTable];
 	}, "overrideArguments");
 
-	::Raids.Standard.wrap(_object, "onSpawned", function()
+	::Raids.Patcher.wrap(p, "onSpawned", function()
 	{
 		if (!::Raids.Lairs.isLocationViable(this))
 		{
@@ -105,7 +105,7 @@
 		}
 	});
 
-	::Raids.Standard.wrap(_object, "setLastSpawnTimeToNow", function()
+	::Raids.Patcher.wrap(p, "setLastSpawnTimeToNow", function()
 	{
 		if (!::Raids.Lairs.isLocationViable(this))
 		{

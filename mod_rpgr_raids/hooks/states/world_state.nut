@@ -1,6 +1,6 @@
-::mods_hookExactClass("states/world_state", function( _object )
+::Raids.Patcher.hook("states/world_state", function( p )
 {
-	::Raids.Standard.wrap(_object, "onCombatFinished", function()
+	::Raids.Patcher.wrap(p, "onCombatFinished", function()
 	{
 		if (!::Raids.Standard.getFlag("LastFoeWasParty", ::World.Statistics))
 		{
