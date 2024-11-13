@@ -1,4 +1,4 @@
-::Raids.Patcher.hook("entity/world/settlements/buildings/marketplace_building", function( p )
+::Raids.Patcher.hook("scripts/entity/world/settlements/buildings/marketplace_building", function( p )
 {
 	::Raids.Patcher.wrap(p, "fillStash", function( _list, _stash, _priceMult, _allowDamagedEquipment = false )
 	{

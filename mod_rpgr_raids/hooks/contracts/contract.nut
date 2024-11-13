@@ -1,4 +1,4 @@
-::Raids.Patcher.hookTree("contracts/contract", function( p )
+::Raids.Patcher.hookTree("scripts/contracts/contract", function( p )
 {
 	::Raids.Patcher.wrap(p, "start", function()
 	{

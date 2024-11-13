@@ -1,4 +1,4 @@
-::Raids.Patcher.hook("entity/world/location", function( p )
+::Raids.Patcher.hook("scripts/entity/world/location", function( p )
 {
 	::Raids.Patcher.wrap(p, "createDefenders", function()
 	{

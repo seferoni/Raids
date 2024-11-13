@@ -1,4 +1,4 @@
-::Raids.Patcher.hook("entity/world/party", function( p )
+::Raids.Patcher.hook("scripts/entity/world/party", function( p )
 {
 	::Raids.Patcher.wrap(p, "onCombatStarted", function()
 	{

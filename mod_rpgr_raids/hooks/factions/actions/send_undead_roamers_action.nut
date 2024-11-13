@@ -1,4 +1,4 @@
-::Raids.Patcher.hook("factions/actions/send_undead_roamers_action", function( p )
+::Raids.Patcher.hook("scripts/factions/actions/send_undead_roamers_action", function( p )
 {
 	::Raids.Patcher.wrap(p, "onUpdate", function( _faction )
 	{

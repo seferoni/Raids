@@ -1,4 +1,4 @@
-::Raids.Patcher.hook("states/world_state", function( p )
+::Raids.Patcher.hook("scripts/states/world_state", function( p )
 {
 	::Raids.Patcher.wrap(p, "onCombatFinished", function()
 	{

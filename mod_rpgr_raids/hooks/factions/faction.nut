@@ -1,4 +1,4 @@
-::Raids.Patcher.hookTree("factions/faction", function( p )
+::Raids.Patcher.hookTree("scripts/factions/faction", function( p )
 {
 	::Raids.Patcher.wrap(p, "spawnEntity", function( _tile, _name, _uniqueName, _template, _resources )
 	{
