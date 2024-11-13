@@ -1,5 +1,4 @@
-local Raids = ::RPGR_Raids;
-Raids.Caravans <-
+::Raids.Caravans <-
 {
 	AntagonisticSituations =
 	[
@@ -137,7 +136,7 @@ Raids.Caravans <-
 
 	function addToInventory( _caravanObject, _goodsArray )
 	{
-		local iterations = Raids.Standard.getFlag("CaravanWealth", _caravanObject) - 1;
+		local iterations = ::Raids.Standard.getFlag("CaravanWealth", _caravanObject) - 1;
 
 		for( local i = 0; i < iterations; i++ )
 		{
@@ -156,7 +155,7 @@ Raids.Caravans <-
 	function createCaravanCargo( _caravanObject, _settlementObject )
 	{
 		local produce = _settlementObject.getProduce(),
-		descriptor = Raids.Standard.getDescriptor(Raids.Standard.getFlag("CaravanCargo", _caravanObject), this.CargoDescriptors).tolower(),
+		descriptor = ::Raids.Standard.getDescriptor(::Raids.Standard.getFlag("CaravanCargo", _caravanObject), this.CargoDescriptors).tolower(),
 		actualProduce = produce.filter(@(_index,_value) _value.find(descriptor) != null);
 
 		if (actualProduce.len() != 0)
@@ -165,7 +164,7 @@ Raids.Caravans <-
 		}
 
 		local newCargoType = ::Math.rand(1, 100) <= 50 ? this.CargoDescriptors.Assortment : this.CargoDescriptors.Unassorted;
-		Raids.Standard.setFlag("CaravanCargo", newCargoType, _caravanObject);
+		::Raids.Standard.setFlag("CaravanCargo", newCargoType, _caravanObject);
 
 		if (newCargoType == this.CargoDescriptors.Assortment)
 		{
@@ -202,7 +201,7 @@ Raids.Caravans <-
 	function createCargoEntry( _caravanObject )
 	{
 		# Get cargo descriptor from enumerated cargo value.
-		local cargoDescriptor = Raids.Standard.getDescriptor(Raids.Standard.getFlag("CaravanCargo", _caravanObject), this.CargoDescriptors);
+		local cargoDescriptor = ::Raids.Standard.getDescriptor(::Raids.Standard.getFlag("CaravanCargo", _caravanObject), this.CargoDescriptors);
 
 		# Create entry.
 		local entry = clone this.Tooltip.Template;
@@ -277,8 +276,8 @@ Raids.Caravans <-
 	function createWealthEntry( _caravanObject )
 	{
 		# Get wealth and corresponding 'descriptor' key.
-		local caravanWealth = Raids.Standard.getFlag("CaravanWealth", _caravanObject),
-		wealthDescriptor = Raids.Standard.getDescriptor(caravanWealth, this.WealthDescriptors);
+		local caravanWealth = ::Raids.Standard.getFlag("CaravanWealth", _caravanObject),
+		wealthDescriptor = ::Raids.Standard.getDescriptor(caravanWealth, this.WealthDescriptors);
 
 		# Create entry.
 		local entry = clone this.Tooltip.Template;
@@ -303,10 +302,10 @@ Raids.Caravans <-
 	function getEliteReinforcementCount( _caravanObject )
 	{
 		local iterations = 0,
-		wealth = Raids.Standard.getFlag("CaravanWealth", _caravanObject),
+		wealth = ::Raids.Standard.getFlag("CaravanWealth", _caravanObject),
 		score = this.Parameters.EliteTroopScore * (wealth - 1);
 
-		if (Raids.Standard.getFlag("CaravanHasNamedItems", _caravanObject))
+		if (::Raids.Standard.getFlag("CaravanHasNamedItems", _caravanObject))
 		{
 			iterations += 1;
 		}
@@ -332,7 +331,7 @@ Raids.Caravans <-
 	function getReinforcementCount( _caravanObject )
 	{
 		# Get caravan wealth value.
-		local wealth = Raids.Standard.getFlag("CaravanWealth", _caravanObject);
+		local wealth = ::Raids.Standard.getFlag("CaravanWealth", _caravanObject);
 
 		# Get time offset if current time exceeds pre-defined threshold.
 		local timeOffset = ::World.getTime().Days >= this.Parameters.ReinforcementThresholdDays ? this.Parameters.TroopTimeOffset : 0;
@@ -353,7 +352,7 @@ Raids.Caravans <-
 			return offset;
 		}
 
-		local settlementSituations = grossSituations.map(@(_situation) Raids.Caravans.formatSituationID(_situation.getID()));
+		local settlementSituations = grossSituations.map(@(_situation) ::Raids.Caravans.formatSituationID(_situation.getID()));
 
 		if (settlementSituations.len() == 0)
 		{
@@ -386,7 +385,7 @@ Raids.Caravans <-
 		# Create wealth entry.
 		push(this.createWealthEntry(_caravanObject));
 
-		if (!Raids.Standard.getFlag("CaravanHasNamedItems", _caravanObject))
+		if (!::Raids.Standard.getFlag("CaravanHasNamedItems", _caravanObject))
 		{
 			return entries;
 		}
@@ -404,13 +403,13 @@ Raids.Caravans <-
 		this.setCaravanOrigin(_caravanObject, _settlementObject);
 		this.populateInventory(_caravanObject, _settlementObject);
 
-		if (::Math.rand(1, 100) > Raids.Standard.getSetting("CaravanReinforcementChance"))
+		if (::Math.rand(1, 100) > ::Raids.Standard.getSetting("CaravanReinforcementChance"))
 		{
 			return;
 		}
 
 		# Assess wealth for named loot viability.
-		local isAbundant = Raids.Standard.getFlag("CaravanWealth", _caravanObject) == this.WealthDescriptors.Abundant;
+		local isAbundant = ::Raids.Standard.getFlag("CaravanWealth", _caravanObject) == this.WealthDescriptors.Abundant;
 
 		# Evaluate current time progression for named loot viability.
 		local exceedsThreshold = ::World.getTime().Days >= this.Parameters.ReinforcementThresholdDays;
@@ -418,7 +417,7 @@ Raids.Caravans <-
 		# Flag as viable if the previous conditions obtain.
 		if (isAbundant && exceedsThreshold && ::Math.rand(1, 100) <= this.Parameters.NamedItemChance)
 		{
-			Raids.Standard.setFlag("CaravanHasNamedItems", true, _caravanObject);
+			::Raids.Standard.setFlag("CaravanHasNamedItems", true, _caravanObject);
 		}
 
 		# Troop reinforcement is partially contingent on named item presence, and so must be called after the prior checks.
@@ -427,25 +426,25 @@ Raids.Caravans <-
 
 	function isPartyInitialised( _partyObject )
 	{
-		local isInitialised = @(_flag) Raids.Standard.getFlag(_flag, _partyObject) != false;
+		local isInitialised = @(_flag) ::Raids.Standard.getFlag(_flag, _partyObject) != false;
 
-		# All three conditions must be evaluated, as the initial release build of Raids did not track caravan origin.
+		# All three conditions must be evaluated, as the initial release build of ::Raids did not track caravan origin.
 		return isInitialised("CaravanWealth") && isInitialised("CaravanCargo") && isInitialised("CaravanOrigin");
 	}
 
 	function isPartyViable( _partyObject )
 	{
-		return Raids.Standard.getFlag("IsCaravan", _partyObject);
+		return ::Raids.Standard.getFlag("IsCaravan", _partyObject);
 	}
 
 	function populateInventory( _caravanObject, _settlementObject )
 	{
-		if (Raids.Standard.getFlag("CaravanWealth", _caravanObject) == this.WealthDescriptors.Meager)
+		if (::Raids.Standard.getFlag("CaravanWealth", _caravanObject) == this.WealthDescriptors.Meager)
 		{
 			return;
 		}
 
-		if (Raids.Standard.getFlag("CaravanCargo", _caravanObject) == this.CargoDescriptors.Assortment)
+		if (::Raids.Standard.getFlag("CaravanCargo", _caravanObject) == this.CargoDescriptors.Assortment)
 		{
 			this.addToInventory(_caravanObject, this.createNaiveCaravanCargo(_caravanObject));
 			return;
@@ -457,8 +456,8 @@ Raids.Caravans <-
 
 	function populateOfficialDocuments( _caravanObject )
 	{
-		local documentChance = Raids.Standard.getSetting("OfficialDocumentDropChance"),
-		wealth = Raids.Standard.getFlag("CaravanWealth", _caravanObject);
+		local documentChance = ::Raids.Standard.getSetting("OfficialDocumentDropChance"),
+		wealth = ::Raids.Standard.getFlag("CaravanWealth", _caravanObject);
 
 		if (::World.FactionManager.getFaction(_caravanObject.getFaction()).getType() == ::Const.FactionType.NobleHouse)
 		{
@@ -495,7 +494,7 @@ Raids.Caravans <-
 
 	function reinforceTroops( _caravanObject )
 	{
-		local wealth = Raids.Standard.getFlag("CaravanWealth", _caravanObject);
+		local wealth = ::Raids.Standard.getFlag("CaravanWealth", _caravanObject);
 
 		# Low wealth caravans are exempt from reinforcement.
 		if (wealth == this.WealthDescriptors.Meager)
@@ -557,12 +556,12 @@ Raids.Caravans <-
 			cargoType = this.CargoDescriptors.Supplies;
 		}
 
-		Raids.Standard.setFlag("CaravanCargo", cargoType, _caravanObject);
+		::Raids.Standard.setFlag("CaravanCargo", cargoType, _caravanObject);
 	}
 
 	function setCaravanOrigin( _caravanObject, _settlementObject )
 	{
-		Raids.Standard.setFlag("CaravanOrigin", _settlementObject.getFaction(), _caravanObject);
+		::Raids.Standard.setFlag("CaravanOrigin", _settlementObject.getFaction(), _caravanObject);
 	}
 
 	function setCaravanWealth( _caravanObject, _settlementObject )
@@ -583,12 +582,12 @@ Raids.Caravans <-
 		}
 
 		caravanWealth += this.getSituationOffset(_settlementObject);
-		Raids.Standard.setFlag("CaravanWealth", normalise(caravanWealth), _caravanObject);
+		::Raids.Standard.setFlag("CaravanWealth", normalise(caravanWealth), _caravanObject);
 	}
 
 	function updateOrigin( _caravanObject )
 	{
-		local settlementIndex = Raids.Standard.getFlag("CaravanOrigin", _caravanObject);
+		local settlementIndex = ::Raids.Standard.getFlag("CaravanOrigin", _caravanObject);
 
 		# Extreme edge-case handling.
 		if (!(settlementIndex in ::World.FactionManager.m.Factions))

@@ -1,5 +1,4 @@
-local Raids = ::RPGR_Raids;
-Raids.Edicts <-
+::Raids.Edicts <-
 {
 	Containers =
 	[
@@ -27,7 +26,7 @@ Raids.Edicts <-
 		ResourcesPrefactor = 0.001,
 		WritingInstrumentsChance = 66
 	},
-	Overrides = 
+	Overrides =
 	[
 		"location.undead_crypt"
 	],
@@ -63,9 +62,9 @@ Raids.Edicts <-
 
 	function addToHistory( _edictName, _lairObject )
 	{
-		local history = Raids.Standard.getFlag("EdictHistory", _lairObject),
+		local history = ::Raids.Standard.getFlag("EdictHistory", _lairObject),
 		newHistory = format("%s%s", !history ? "" : format("%s, ", history), _edictName);
-		Raids.Standard.setFlag("EdictHistory", newHistory, _lairObject);
+		::Raids.Standard.setFlag("EdictHistory", newHistory, _lairObject);
 	}
 
 	function createEdict( _writingInstruments = null )
@@ -84,12 +83,12 @@ Raids.Edicts <-
 
 	function clearHistory( _lairObject )
 	{
-		Raids.Standard.setFlag("EdictHistory", false, _lairObject);
+		::Raids.Standard.setFlag("EdictHistory", false, _lairObject);
 	}
 
 	function createHistoryEntry( _lairObject )
 	{
-		local history = Raids.Standard.colourWrap(Raids.Standard.getFlag("EdictHistory", _lairObject), Raids.Standard.Colour.Red),
+		local history = ::Raids.Standard.colourWrap(::Raids.Standard.getFlag("EdictHistory", _lairObject), ::Raids.Standard.Colour.Red),
 		entry = clone this.Tooltip.Template;
 		entry.icon = this.Tooltip.Icons.History;
 		entry.text = history;
@@ -107,7 +106,7 @@ Raids.Edicts <-
 	function executeAgitationProcedure( _lairObject )
 	{
 		this.resetContainer(this.findEdict("Agitation", _lairObject), _lairObject, false);
-		Raids.Lairs.setAgitation(_lairObject, Raids.Lairs.Procedures.Increment);
+		::Raids.Lairs.setAgitation(_lairObject, ::Raids.Lairs.Procedures.Increment);
 	}
 
 	function executeDiminutionProcedure( _lairObject )
@@ -118,7 +117,7 @@ Raids.Edicts <-
 		local troops = _lairObject.getTroops();
 
 		# Calculate removal count scaled by current lair Agitation.
-		local removalCount = ::Math.ceil(this.Parameters.DiminutionPrefactor * Raids.Standard.getFlag("Agitation", _lairObject) * troops.len());
+		local removalCount = ::Math.ceil(this.Parameters.DiminutionPrefactor * ::Raids.Standard.getFlag("Agitation", _lairObject) * troops.len());
 
 		# Handling for extreme edge cases.
 		if (removalCount >= troops.len() || removalCount == 0)
@@ -148,7 +147,7 @@ Raids.Edicts <-
 
 	function executeEdictProcedure( _container, _lairObject )
 	{
-		local edictID = Raids.Standard.getFlag(_container, _lairObject),
+		local edictID = ::Raids.Standard.getFlag(_container, _lairObject),
 		edictName = this.getEdictName(edictID),
 		procedure = format("execute%sProcedure", edictName);
 
@@ -174,12 +173,12 @@ Raids.Edicts <-
 	{
 		this.clearEdicts(_lairObject);
 		this.clearHistory(_lairObject);
-		Raids.Lairs.updateProperties(_lairObject);
+		::Raids.Lairs.updateProperties(_lairObject);
 	}
 
 	function executeOpportunismProcedure( _lairObject )
 	{
-		Raids.Lairs.repopulateNamedLoot(_lairObject);
+		::Raids.Lairs.repopulateNamedLoot(_lairObject);
 	}
 
 	function findEdict( _edictName, _lairObject, _filterActive = false )
@@ -189,7 +188,7 @@ Raids.Edicts <-
 
 		foreach( container in this.Containers )
 		{
-			if (Raids.Standard.getFlag(container, _lairObject) == edictID)
+			if (::Raids.Standard.getFlag(container, _lairObject) == edictID)
 			{
 				edictContainer = container;
 				break;
@@ -201,7 +200,7 @@ Raids.Edicts <-
 			return false;
 		}
 
-		if (!_filterActive || !Raids.Standard.getFlag(format("%sTime", edictContainer), _lairObject))
+		if (!_filterActive || !::Raids.Standard.getFlag(format("%sTime", edictContainer), _lairObject))
 		{
 			return edictContainer;
 		}
@@ -211,7 +210,7 @@ Raids.Edicts <-
 
 	function findEdictInHistory( _edictName, _lairObject )
 	{
-		local history = Raids.Standard.getFlag("EdictHistory", _lairObject);
+		local history = ::Raids.Standard.getFlag("EdictHistory", _lairObject);
 
 		if (!history)
 		{
@@ -232,7 +231,7 @@ Raids.Edicts <-
 
 		if (this.findEdict("Stasis", _lairObject, true) != false)
 		{
-			offset = this.Parameters.StasisOffset * (Raids.Standard.getFlag("Agitation", _lairObject) - 1);
+			offset = this.Parameters.StasisOffset * (::Raids.Standard.getFlag("Agitation", _lairObject) - 1);
 		}
 
 		return offset;
@@ -254,8 +253,8 @@ Raids.Edicts <-
 		foreach( container in occupiedContainers )
 		{
 			# Prepare variables in local environment.
-			local inDiscovery = Raids.Standard.getFlag(format("%sTime", container), _lairObject) != false,
-			edictName = this.getEdictName(Raids.Standard.getFlag(container, _lairObject));
+			local inDiscovery = ::Raids.Standard.getFlag(format("%sTime", container), _lairObject) != false,
+			edictName = this.getEdictName(::Raids.Standard.getFlag(container, _lairObject));
 
 			# Create tooltip entry.
 			local iconPath = this.Tooltip.Icons.Contracted[inDiscovery ? "Discovery" : "Active"],
@@ -280,7 +279,7 @@ Raids.Edicts <-
 	function getEdictFileName( _edictName )
 	{
 		local prependedString = format("%s%s", this.Internal.DirectoryPath, "edict_of_"),
-		edictFileName = format("%s%s", prependedString, Raids.Standard.setCase(_edictName, "tolower"));
+		edictFileName = format("%s%s", prependedString, ::Raids.Standard.setCase(_edictName, "tolower"));
 		return edictFileName;
 	}
 
@@ -292,14 +291,14 @@ Raids.Edicts <-
 	function getEdictID( _edictName )
 	{
 		local prependedString = "special.edict_of_",
-		edictID = format("%s%s", prependedString,  Raids.Standard.setCase(_edictName, "tolower"));
+		edictID = format("%s%s", prependedString,  ::Raids.Standard.setCase(_edictName, "tolower"));
 		return edictID;
 	}
 
 	function getEdictName( _edictID, _isFileName = false )
 	{
 		local culledString = _isFileName ? format("%s%s", this.Internal.DirectoryPath, "edict_of_") : "special.edict_of_",
-		edictName = Raids.Standard.setCase(_edictID.slice(culledString.len()), "toupper");
+		edictName = ::Raids.Standard.setCase(_edictID.slice(culledString.len()), "toupper");
 		return edictName;
 	}
 
@@ -312,7 +311,7 @@ Raids.Edicts <-
 	function getNamedLootChanceOffset( _lairObject )
 	{
 		local offset = 0.0,
-		agitation = Raids.Standard.getFlag("Agitation", _lairObject);
+		agitation = ::Raids.Standard.getFlag("Agitation", _lairObject);
 
 		if (this.findEdict("Prospecting", _lairObject, true) != false)
 		{
@@ -328,7 +327,7 @@ Raids.Edicts <-
 		count = 0;
 
 		# Get naive named loot chance.
-		local naiveNamedLootChance = Raids.Lairs.getNamedLootChance(_lairObject);
+		local naiveNamedLootChance = ::Raids.Lairs.getNamedLootChance(_lairObject);
 
 		# Get post-offset named loot chance.
 		local namedLootChance = naiveNamedLootChance + this.getNamedLootChanceOffset(_lairObject);
@@ -343,10 +342,10 @@ Raids.Edicts <-
 		}
 
 		# Assign text fragment corresponding to currently housed named items.
-		local fragmentA = Raids.Standard.colourWrap(format("Famed (%i)", count), Raids.Standard.Colour[count == 0 ? "Red" : "Green"]);
+		local fragmentA = ::Raids.Standard.colourWrap(format("Famed (%i)", count), ::Raids.Standard.Colour[count == 0 ? "Red" : "Green"]);
 
 		# Assign text fragment corresponding to current named loot chance.
-		local fragmentB = Raids.Standard.colourWrap(format("%i%%", namedLootChance), Raids.Standard.Colour.Green);
+		local fragmentB = ::Raids.Standard.colourWrap(format("%i%%", namedLootChance), ::Raids.Standard.Colour.Green);
 		# Create entry.
 		entry.icon = format(this.Tooltip.Icons[count == 0 ? "NamedEmpty" : "NamedPresent"]);
 		entry.text = format("%s (%s)", fragmentA, fragmentB);
@@ -370,7 +369,7 @@ Raids.Edicts <-
 	function getOccupiedContainers( _lairObject )
 	{
 		local occupiedContainers = [],
-		occupied = @(_container) Raids.Standard.getFlag(_container, _lairObject) != false;
+		occupied = @(_container) ::Raids.Standard.getFlag(_container, _lairObject) != false;
 
 		foreach( container in this.Containers )
 		{
@@ -384,12 +383,12 @@ Raids.Edicts <-
 	{
 		local entries = [];
 
-		if (Raids.Standard.getSetting("ShowNamedLootEntry"))
+		if (::Raids.Standard.getSetting("ShowNamedLootEntry"))
 		{
 			entries.push(this.getNamedLootEntry(_lairObject));
 		}
 
-		if (Raids.Standard.getFlag("EdictHistory", _lairObject) != false)
+		if (::Raids.Standard.getFlag("EdictHistory", _lairObject) != false)
 		{
 			entries.push(this.createHistoryEntry(_lairObject));
 		}
@@ -403,7 +402,7 @@ Raids.Edicts <-
 
 		if (this.findEdictInHistory("Abundance", _lairObject) != false)
 		{
-			offset = ::Math.min(this.Parameters.AbundanceCeiling, this.Parameters.AbundanceOffset * Raids.Standard.getFlag("Agitation", _lairObject));
+			offset = ::Math.min(this.Parameters.AbundanceCeiling, this.Parameters.AbundanceOffset * ::Raids.Standard.getFlag("Agitation", _lairObject));
 		}
 
 		return offset;
@@ -422,15 +421,15 @@ Raids.Edicts <-
 		{
 			return false;
 		}
-		
+
 		# Retrieve faction type from faction manager.
 		local factionType = ::World.FactionManager.getFaction(_lairObject.getFaction()).getType();
 
 		# If an Edict of Legibility is not present, revert to native Edict-viable faction pool.
-		local factions = this.findEdict("Legibility", _lairObject, true) != false ? Raids.Lairs.Factions : this.Factions;
+		local factions = this.findEdict("Legibility", _lairObject, true) != false ? ::Raids.Lairs.Factions : this.Factions;
 
 		# Retrieve corresponding faction types from the ::Const table.
-		local viableFactions = factions.map(@(_factionName) Raids.Lairs.getFactionType(_factionName));
+		local viableFactions = factions.map(@(_factionName) ::Raids.Lairs.getFactionType(_factionName));
 
 		if (viableFactions.find(factionType) != null)
 		{
@@ -447,12 +446,12 @@ Raids.Edicts <-
 
 	function refreshEdicts( _lairObject )
 	{
-		if (!Raids.Standard.getFlag("EdictHistory", _lairObject))
+		if (!::Raids.Standard.getFlag("EdictHistory", _lairObject))
 		{
 			return;
 		}
 
-		local viableEdicts = this.CycledEdicts.filter(@(_index, _edictName) Raids.Edicts.findEdictInHistory(_edictName, _lairObject));
+		local viableEdicts = this.CycledEdicts.filter(@(_index, _edictName) ::Raids.Edicts.findEdictInHistory(_edictName, _lairObject));
 
 		foreach( edictName in viableEdicts )
 		{
@@ -469,13 +468,13 @@ Raids.Edicts <-
 
 	function resetContainer( _container, _lairObject, _resetTime = true )
 	{
-		Raids.Standard.setFlag(_container, false, _lairObject);
+		::Raids.Standard.setFlag(_container, false, _lairObject);
 		if (_resetTime) this.resetContainerTime(_container, _lairObject);
 	}
 
 	function resetContainerTime( _container, _lairObject )
 	{
-		Raids.Standard.setFlag(format("%sTime", _container), false, _lairObject);
+		::Raids.Standard.setFlag(format("%sTime", _container), false, _lairObject);
 	}
 
 	function updateEdicts( _lairObject )
@@ -487,8 +486,8 @@ Raids.Edicts <-
 			return;
 		}
 
-		local edictDates = occupiedContainers.map(@(_container) Raids.Standard.getFlag(format("%sTime", _container), _lairObject)),
-		edictDurations = occupiedContainers.map(@(_container) Raids.Standard.getFlag(format("%sDuration", _container), _lairObject));
+		local edictDates = occupiedContainers.map(@(_container) ::Raids.Standard.getFlag(format("%sTime", _container), _lairObject)),
+		edictDurations = occupiedContainers.map(@(_container) ::Raids.Standard.getFlag(format("%sDuration", _container), _lairObject));
 
 		for( local i = 0; i < occupiedContainers.len(); i++ )
 		{

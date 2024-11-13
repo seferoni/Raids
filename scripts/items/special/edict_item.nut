@@ -1,4 +1,3 @@
-local Raids = ::RPGR_Raids;
 this.edict_item <- ::inherit("scripts/items/item",
 {
 	m = {},
@@ -17,13 +16,13 @@ this.edict_item <- ::inherit("scripts/items/item",
 		this.m.InstructionText <- "Right-click to dispatch within proximity of a lair. This Edict will be consumed in the process.";
 		this.m.ShowWarning <- false;
 	},
-	ScalingModalities = 
+	ScalingModalities =
 	{
 		Static = 0,
-		Agitation = 1, 
+		Agitation = 1,
 		Resources = 2
 	},
-	Sounds = 
+	Sounds =
 	{
 		Move = "sounds/cloth_01.wav",
 		Use = "sounds/cloth_01.wav",
@@ -55,7 +54,7 @@ this.edict_item <- ::inherit("scripts/items/item",
 		entry.icon = this.Tooltip.Icons.Warning;
 
 		# Define colour wrap lambda to ease readability.
-		local colourWrap = @(_string) Raids.Standard.colourWrap(_string, Raids.Standard.Colour.Red);
+		local colourWrap = @(_string) ::Raids.Standard.colourWrap(_string, ::Raids.Standard.Colour.Red);
 
 		# Create sentence fragments for text field.
 		local fragmentA = format("There are no %s.", colourWrap("viable lairs within proximity"));
@@ -75,8 +74,8 @@ this.edict_item <- ::inherit("scripts/items/item",
 
 		foreach( lair in _lairs )
 		{
-			local vacantContainers = clone Raids.Edicts.Containers;
-			Raids.Standard.removeFromArray(Raids.Edicts.getOccupiedContainers(lair), vacantContainers);
+			local vacantContainers = clone ::Raids.Edicts.Containers;
+			::Raids.Standard.removeFromArray(::Raids.Edicts.getOccupiedContainers(lair), vacantContainers);
 
 			if (vacantContainers.len() == 0)
 			{
@@ -94,8 +93,8 @@ this.edict_item <- ::inherit("scripts/items/item",
 		if (!isValid)
 		{
 			return false;
-		} 
-		
+		}
+
 		this.playUseSound();
 		return true;
 	}
@@ -108,7 +107,7 @@ this.edict_item <- ::inherit("scripts/items/item",
 	function getDiscoveryText()
 	{
 		local discoveryDuration = this.getDiscoveryDuration(),
-		discoveryText = Raids.Standard.colourWrap(discoveryDuration, Raids.Standard.Colour.Green);
+		discoveryText = ::Raids.Standard.colourWrap(discoveryDuration, ::Raids.Standard.Colour.Green);
 		return format("This Edict takes effect in %s %s.", discoveryText, discoveryDuration > 1 ? "days" : "day");
 	}
 
@@ -124,7 +123,7 @@ this.edict_item <- ::inherit("scripts/items/item",
 
 	function getPersistenceText()
 	{
-		local descriptor = Raids.Standard.colourWrap(this.isCycled() ? "temporary" : "permanent", Raids.Standard.Colour.Red);
+		local descriptor = ::Raids.Standard.colourWrap(this.isCycled() ? "temporary" : "permanent", ::Raids.Standard.Colour.Red);
 		return format("This Edict's effects are %s.", descriptor);
 	}
 
@@ -136,8 +135,8 @@ this.edict_item <- ::inherit("scripts/items/item",
 	function getScalingText()
 	{
 		local scaling = this.m.ScalingModality, modalities = this.ScalingModalities;
-		if (scaling == modalities.Static) return format("This Edict's effects are %s.", Raids.Standard.colourWrap("static", Raids.Standard.Colour.Green));
-		return format("This Edict's effects scale with lair %s.", Raids.Standard.colourWrap(scaling == modalities.Agitation ? "Agitation" : "resources", Raids.Standard.Colour.Red));
+		if (scaling == modalities.Static) return format("This Edict's effects are %s.", ::Raids.Standard.colourWrap("static", ::Raids.Standard.Colour.Green));
+		return format("This Edict's effects scale with lair %s.", ::Raids.Standard.colourWrap(scaling == modalities.Agitation ? "Agitation" : "resources", ::Raids.Standard.Colour.Red));
 	}
 
 	function getTooltip()
@@ -180,32 +179,32 @@ this.edict_item <- ::inherit("scripts/items/item",
 
 	function getViableLairs()
 	{
-		local naiveLairs = Raids.Lairs.getCandidatesWithin(::World.State.getPlayer().getTile());
+		local naiveLairs = ::Raids.Lairs.getCandidatesWithin(::World.State.getPlayer().getTile());
 
 		if (naiveLairs.len() == 0)
 		{
 			return naiveLairs;
 		}
 
-		local edictName = Raids.Edicts.getEdictName(this.getID()),
+		local edictName = ::Raids.Edicts.getEdictName(this.getID()),
 		lairs = naiveLairs.filter(function( _index, _lair )
 		{
-			if (!Raids.Edicts.isLairViable(_lair))
+			if (!::Raids.Edicts.isLairViable(_lair))
 			{
 				return false;
 			}
 
-			if (Raids.Edicts.getOccupiedContainers(_lair).len() == Raids.Edicts.Containers.len())
+			if (::Raids.Edicts.getOccupiedContainers(_lair).len() == ::Raids.Edicts.Containers.len())
 			{
 				return false;
 			}
 
-			if (Raids.Edicts.findEdict(edictName, _lair) != false)
+			if (::Raids.Edicts.findEdict(edictName, _lair) != false)
 			{
 				return false;
 			}
 
-			if (Raids.Edicts.findEdictInHistory(edictName, _lair) != false)
+			if (::Raids.Edicts.findEdictInHistory(edictName, _lair) != false)
 			{
 				return false;
 			}
@@ -223,14 +222,14 @@ this.edict_item <- ::inherit("scripts/items/item",
 
 	function initialiseContainer( _container, _lair )
 	{
-		Raids.Standard.setFlag(_container, this.getID(), _lair);
-		Raids.Standard.setFlag(format("%sTime", _container), ::World.getTime().Days, _lair);
-		Raids.Standard.setFlag(format("%sDuration", _container), this.getDiscoveryDuration(), _lair);
+		::Raids.Standard.setFlag(_container, this.getID(), _lair);
+		::Raids.Standard.setFlag(format("%sTime", _container), ::World.getTime().Days, _lair);
+		::Raids.Standard.setFlag(format("%sDuration", _container), this.getDiscoveryDuration(), _lair);
 	}
 
 	function isCycled()
 	{
-		return Raids.Edicts.CycledEdicts.find(Raids.Edicts.getEdictName(this.getID())) != null;
+		return ::Raids.Edicts.CycledEdicts.find(::Raids.Edicts.getEdictName(this.getID())) != null;
 	}
 
 	function playInventorySound( _eventType )

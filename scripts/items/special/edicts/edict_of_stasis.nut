@@ -1,4 +1,3 @@
-local Raids = ::RPGR_Raids;
 this.edict_of_stasis <- ::inherit("scripts/items/special/edict_item",
 {
 	m = {},

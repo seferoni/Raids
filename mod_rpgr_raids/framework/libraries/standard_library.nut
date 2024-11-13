@@ -1,5 +1,4 @@
-local Raids = ::RPGR_Raids;
-Raids.Standard <-
+::Raids.Standard <-
 {
 	Colour =
 	{
@@ -79,18 +78,18 @@ Raids.Standard <-
 
 	function getSetting( _settingID )
 	{
-		if (Raids.Internal.MSUFound)
+		if (::Raids.Internal.MSUFound)
 		{
-			return Raids.Mod.ModSettings.getSetting(_settingID).getValue();
+			return ::Raids.Mod.ModSettings.getSetting(_settingID).getValue();
 		}
 
-		if (!(_settingID in Raids.Defaults))
+		if (!(_settingID in ::Raids.Defaults))
 		{
 			this.log(format("Invalid settingID %s passed to getSetting.", _settingID), true);
 			return;
 		}
 
-		return Raids.Defaults[_settingID];
+		return ::Raids.Defaults[_settingID];
 	}
 
 	function includeFiles( _path )
@@ -128,11 +127,11 @@ Raids.Standard <-
 	{
 		if (_isError)
 		{
-			::logError(format("[Raids] %s", _string));
+			::logError(format("[::Raids] %s", _string));
 			return;
 		}
 
-		::logInfo(format("[Raids] %s", _string));
+		::logInfo(format("[::Raids] %s", _string));
 	}
 
 	function overrideArguments( _object, _function, _originalMethod, _argumentsArray )
@@ -146,7 +145,7 @@ Raids.Standard <-
 	function overrideMethod( _object, _function, _originalMethod, _argumentsArray )
 	{	# Calls and returns new method; if return value is null, calls and returns original method.
 		local returnValue = _function.acall(_argumentsArray);
-		return returnValue == null ? _originalMethod.acall(_argumentsArray) : (returnValue == Raids.Internal.TERMINATE ? null : returnValue);
+		return returnValue == null ? _originalMethod.acall(_argumentsArray) : (returnValue == ::Raids.Internal.TERMINATE ? null : returnValue);
 	}
 
 	function overrideReturn( _object, _function, _originalMethod, _argumentsArray )
@@ -155,7 +154,7 @@ Raids.Standard <-
 		local originalValue = _originalMethod.acall(_argumentsArray);
 		if (originalValue != null) _argumentsArray.insert(1, originalValue);
 		local returnValue = _function.acall(_argumentsArray);
-		return returnValue == null ? originalValue : (returnValue == Raids.Internal.TERMINATE ? null : returnValue);
+		return returnValue == null ? originalValue : (returnValue == ::Raids.Internal.TERMINATE ? null : returnValue);
 	}
 
 	function parseSemVer( _version )

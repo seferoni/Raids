@@ -1,4 +1,3 @@
-local Raids = ::RPGR_Raids;
 this.edict_of_legibility <- ::inherit("scripts/items/special/edict_item",
 {
 	m = {},
@@ -19,7 +18,7 @@ this.edict_of_legibility <- ::inherit("scripts/items/special/edict_item",
 		entry.icon = this.Tooltip.Icons.Warning;
 
 		# Define colour wrap lambda to ease readability.
-		local colourWrap = @(_string) Raids.Standard.colourWrap(_string, Raids.Standard.Colour.Red);
+		local colourWrap = @(_string) ::Raids.Standard.colourWrap(_string, ::Raids.Standard.Colour.Red);
 
 		# Create sentence fragments for text field.
 		local fragmentA = format("There are no %s.", colourWrap("viable lairs within proximity"));
@@ -35,14 +34,14 @@ this.edict_of_legibility <- ::inherit("scripts/items/special/edict_item",
 
 	function getViableLairs()
 	{
-		local naiveLairs = Raids.Lairs.getCandidatesWithin(::World.State.getPlayer().getTile());
+		local naiveLairs = ::Raids.Lairs.getCandidatesWithin(::World.State.getPlayer().getTile());
 
 		if (naiveLairs.len() == 0)
 		{
 			return naiveLairs;
 		}
 
-		local edictName = Raids.Edicts.getEdictName(this.getID()),
+		local edictName = ::Raids.Edicts.getEdictName(this.getID()),
 		lairs = naiveLairs.filter(function( _index, _lair )
 		{
 			if (!_lair.m.IsShowingBanner)
@@ -50,12 +49,12 @@ this.edict_of_legibility <- ::inherit("scripts/items/special/edict_item",
 				return false;
 			}
 
-			if (Raids.Edicts.isLairViable(_lair))
+			if (::Raids.Edicts.isLairViable(_lair))
 			{
 				return false;
 			}
 
-			if (Raids.Edicts.findEdict(edictName, _lair) != false)
+			if (::Raids.Edicts.findEdict(edictName, _lair) != false)
 			{
 				return false;
 			}

@@ -1,7 +1,6 @@
-local Raids = ::RPGR_Raids;
 ::mods_hookExactClass("factions/actions/send_undead_roamers_action", function( _object )
 {
-	Raids.Standard.wrap(_object, "onUpdate", function( _faction )
+	::Raids.Standard.wrap(_object, "onUpdate", function( _faction )
 	{
 		if (::World.getTime().Days >= 20)
 		{
@@ -40,6 +39,6 @@ local Raids = ::RPGR_Raids;
 		}
 
 		this.m.Score = 10;
-		return Raids.Internal.TERMINATE;
+		return ::Raids.Internal.TERMINATE;
 	}, "overrideMethod");
 });

@@ -1,8 +1,7 @@
-local Raids = ::RPGR_Raids;
 this.official_document_item <- ::inherit("scripts/items/item",
 {
 	m = {},
-	Sounds = 
+	Sounds =
 	{
 		Move = "sounds/cloth_01.wav",
 		Use = "sounds/cloth_01.wav",
@@ -95,7 +94,7 @@ this.official_document_item <- ::inherit("scripts/items/item",
 		this.playUseSound();
 
 		# Create and add produced Edict to stash.
-		::World.Assets.getStash().add(Raids.Edicts.createEdict(writingInstruments));
+		::World.Assets.getStash().add(::Raids.Edicts.createEdict(writingInstruments));
 
 		# Terminate execution if there are no writing instruments.
 		if (writingInstruments == null)

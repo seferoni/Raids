@@ -1,11 +1,10 @@
-local Raids = ::RPGR_Raids;
 this.writing_instruments_item <- ::inherit("scripts/items/item",
 {
 	m =
 	{
 		MaximumUses = 3,
 	},
-	Excluded = 
+	Excluded =
 	[
 		"Agitation"
 	],
@@ -19,7 +18,7 @@ this.writing_instruments_item <- ::inherit("scripts/items/item",
 	Sounds =
 	{
 		Move = "sounds/move_pot_clay_01.wav",
-		Use = 
+		Use =
 		[
 			"sounds/raids.paper_01.wav",
 			"sounds/raids.paper_02.wav",
@@ -70,12 +69,12 @@ this.writing_instruments_item <- ::inherit("scripts/items/item",
 
 	function getEdictCandidates()
 	{
-		local edicts = Raids.Edicts.getEdictFiles(),
+		local edicts = ::Raids.Edicts.getEdictFiles(),
 		selectedEdicts = [];
 
-		while (selectedEdicts.len() < Raids.Edicts.Internal.EdictSelectionSize)
+		while (selectedEdicts.len() < ::Raids.Edicts.Internal.EdictSelectionSize)
 		{
-			local candidate = Raids.Edicts.getEdictName(edicts[::Math.rand(0, edicts.len() - 1)], true);
+			local candidate = ::Raids.Edicts.getEdictName(edicts[::Math.rand(0, edicts.len() - 1)], true);
 
 			if (selectedEdicts.find(candidate) != null)
 			{
@@ -95,7 +94,7 @@ this.writing_instruments_item <- ::inherit("scripts/items/item",
 
 	function getEdictSelection()
 	{
-		return Raids.Standard.getFlag("EdictSelection", this);
+		return ::Raids.Standard.getFlag("EdictSelection", this);
 	}
 
 	function getEdictSelectionAsArray()
@@ -110,7 +109,7 @@ this.writing_instruments_item <- ::inherit("scripts/items/item",
 		local edictFiles = [];
 
 		# Prepare variables in local environment.
-		local Edicts = Raids.Edicts,
+		local Edicts = ::Raids.Edicts,
 		selectionMode = this.getEdictSelectionMode();
 
 		# Write function to map Edict names to their corresponding file names.
@@ -119,7 +118,7 @@ this.writing_instruments_item <- ::inherit("scripts/items/item",
 		# Handle selection mode cases.
 		switch (selectionMode)
 		{
-			case this.SelectionModes.Indiscriminate: 
+			case this.SelectionModes.Indiscriminate:
 			{
 				edictFiles.extend(Edicts.getEdictFiles());
 				break;
@@ -128,17 +127,17 @@ this.writing_instruments_item <- ::inherit("scripts/items/item",
 			{
 				edictFiles.push(Edicts.getEdictFileName("Agitation"));
 				break;
-			}; 
+			};
 			case this.SelectionModes.Selective:
 			{
 				edictFiles.extend(toFileName(this.getEdictSelectionAsArray()));
 				break;
-			}; 
+			};
 			case this.SelectionModes.Inverted:
 			{
 				# Remove selected files from Edict pool.
 				local naiveEdicts = Edicts.getEdictFiles();
-				Raids.Standard.removeFromArray(toFileName(this.getEdictSelectionAsArray()), naiveEdicts);
+				::Raids.Standard.removeFromArray(toFileName(this.getEdictSelectionAsArray()), naiveEdicts);
 				edictFiles.extend(naiveEdicts);
 			};
 		}
@@ -148,7 +147,7 @@ this.writing_instruments_item <- ::inherit("scripts/items/item",
 
 	function getEdictSelectionMode()
 	{
-		return Raids.Standard.getFlag("EdictSelectionMode", this);
+		return ::Raids.Standard.getFlag("EdictSelectionMode", this);
 	}
 
 	function getEdictSelectionText()
@@ -157,12 +156,12 @@ this.writing_instruments_item <- ::inherit("scripts/items/item",
 
 		if (selectionMode != this.SelectionModes.Indiscriminate && selectionMode != this.SelectionModes.Agitation)
 		{
-			local colourValue = Raids.Standard.Colour[format("%s", selectionMode == this.SelectionModes.Selective ? "Green" : "Red")],
-			selection = Raids.Standard.colourWrap(this.getEdictSelection(), colourValue);
-			return format("%s: %s", Raids.Standard.getDescriptor(selectionMode, this.SelectionModes), selection);
+			local colourValue = ::Raids.Standard.Colour[format("%s", selectionMode == this.SelectionModes.Selective ? "Green" : "Red")],
+			selection = ::Raids.Standard.colourWrap(this.getEdictSelection(), colourValue);
+			return format("%s: %s", ::Raids.Standard.getDescriptor(selectionMode, this.SelectionModes), selection);
 		}
 
-		return Raids.Standard.colourWrap(Raids.Standard.getDescriptor(selectionMode, this.SelectionModes), Raids.Standard.Colour.Red);
+		return ::Raids.Standard.colourWrap(::Raids.Standard.getDescriptor(selectionMode, this.SelectionModes), ::Raids.Standard.Colour.Red);
 	}
 
 	function getFlags()
@@ -240,7 +239,7 @@ this.writing_instruments_item <- ::inherit("scripts/items/item",
 		push({id = 3, type = "image", image = this.getIcon()});
 
 		# Create warning entry.
-		push({id = 6, type = "text", icon = this.Tooltip.Icons.Warning, text = format("Has %s uses remaining.", Raids.Standard.colourWrap(this.getUses(), Raids.Standard.Colour.Red))});
+		push({id = 6, type = "text", icon = this.Tooltip.Icons.Warning, text = format("Has %s uses remaining.", ::Raids.Standard.colourWrap(this.getUses(), ::Raids.Standard.Colour.Red))});
 
 		# Evaluate if this instance is queued first.
 		if (this.isFirstInQueue())
@@ -259,22 +258,22 @@ this.writing_instruments_item <- ::inherit("scripts/items/item",
 
 	function getUses()
 	{
-		return Raids.Standard.getFlag("Uses", this);
+		return ::Raids.Standard.getFlag("Uses", this);
 	}
 
 	function initialiseEdictSelection()
 	{
-		local Edicts = Raids.Edicts,
+		local Edicts = ::Raids.Edicts,
 		edictCandidates = this.getEdictCandidates(),
 		selection = "";
 
 		foreach( edictName in edictCandidates )
 		{
-			selection = Raids.Standard.appendToStringList(selection, edictName);
+			selection = ::Raids.Standard.appendToStringList(selection, edictName);
 		}
 
-		Raids.Standard.setFlag("EdictSelection", selection, this);
-		Raids.Standard.setFlag("EdictSelectionMode", this.SelectionModes.Selective, this);
+		::Raids.Standard.setFlag("EdictSelection", selection, this);
+		::Raids.Standard.setFlag("EdictSelectionMode", this.SelectionModes.Selective, this);
 	}
 
 	function onAddedToStash( _stashID )
@@ -286,8 +285,8 @@ this.writing_instruments_item <- ::inherit("scripts/items/item",
 			return;
 		}
 
-		Raids.Standard.setFlag("ShowQueueState", true, this);
-		Raids.Standard.setFlag("EdictSelectionMode", this.SelectionModes.Indiscriminate, this);
+		::Raids.Standard.setFlag("ShowQueueState", true, this);
+		::Raids.Standard.setFlag("EdictSelectionMode", this.SelectionModes.Indiscriminate, this);
 	}
 
 	function onDeserialize( _in )
@@ -305,7 +304,7 @@ this.writing_instruments_item <- ::inherit("scripts/items/item",
 			return;
 		}
 
-		Raids.Standard.setFlag("ShowQueueState", false, this);
+		::Raids.Standard.setFlag("ShowQueueState", false, this);
 	}
 
 	function onSerialize( _out )
@@ -345,21 +344,21 @@ this.writing_instruments_item <- ::inherit("scripts/items/item",
 
 	function setEdictSelection( _selection )
 	{
-		Raids.Standard.setFlag("EdictSelection", _selection, this);
+		::Raids.Standard.setFlag("EdictSelection", _selection, this);
 	}
 
 	function setEdictSelectionMode( _selectionMode )
 	{
-		Raids.Standard.setFlag("EdictSelectionMode", _selectionMode, this);
+		::Raids.Standard.setFlag("EdictSelectionMode", _selectionMode, this);
 	}
 
 	function setUses( _integer )
 	{
-		Raids.Standard.setFlag("Uses", _integer, this);
+		::Raids.Standard.setFlag("Uses", _integer, this);
 	}
 
 	function isShowingQueueState()
 	{
-		return Raids.Standard.getFlag("ShowQueueState", this);
+		return ::Raids.Standard.getFlag("ShowQueueState", this);
 	}
 });

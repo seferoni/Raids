@@ -1,5 +1,4 @@
-local Raids = ::RPGR_Raids;
-Raids.Lairs.Defenders <-
+::Raids.Defenders <-
 {
 	Parameters =
 	{
@@ -7,7 +6,14 @@ Raids.Lairs.Defenders <-
 		SpawnListLengthPrefactor = 0.25,
 		TroopChoicesFloor = 1,
 		TroopChoicesCeiling = 3
-	}
+	},
+	Overrides =
+	[
+		{
+			TypeID = "location.undead_crypt",
+			Faction = "Zombies"
+		}
+	],
 
 	function addTroops( _troopTable, _lairObject )
 	{
@@ -24,7 +30,7 @@ Raids.Lairs.Defenders <-
 
 	function createDefenders( _lairObject, _overrideAgitation = false )
 	{
-		if (Raids.Standard.getFlag("Agitation", _lairObject) != Raids.Lairs.AgitationDescriptors.Relaxed && !_overrideAgitation)
+		if (::Raids.Standard.getFlag("Agitation", _lairObject) != ::Raids.Lairs.AgitationDescriptors.Relaxed && !_overrideAgitation)
 		{
 			return;
 		}
@@ -36,14 +42,9 @@ Raids.Lairs.Defenders <-
 
 	function getCandidate( _lairObject )
 	{
-		# Prepare variables associated with lair properties.
-		local spawnList = _lairObject.getDefenderSpawnList(),
-		thresholdPrefactor = this.Parameters.ResourcesThresholdPrefactorFloor;
-
-		# Get base resources scaled in a fashion similar to the vanilla algorithm.
-		local resources = Raids.Standard.getFlag("BaseResources", _lairObject) * this.getResourcesPrefactor(_lairObject);
-
-		# Retrieve all candidate templates from the spawnlist that are above 75% and below 100% of the scaled resources value.
+		local spawnList = _lairObject.getDefenderSpawnList();
+		local thresholdPrefactor = this.Parameters.ResourcesThresholdPrefactorFloor;
+		local resources = ::Raids.Standard.getFlag("BaseResources", _lairObject) * this.getResourcesPrefactor(_lairObject);
 		local candidates = spawnList.filter(@(_index, _party) _party.Cost <= resources && _party.Cost >= resources * thresholdPrefactor);
 
 		if (candidates.len() == 0)
@@ -51,7 +52,6 @@ Raids.Lairs.Defenders <-
 			return this.getNaiveCandidate(_lairObject);
 		}
 
-		# Return a random candidate from this list.
 		return candidates[::Math.rand(0, candidates.len() - 1)];
 	}
 
@@ -59,14 +59,14 @@ Raids.Lairs.Defenders <-
 	{
 		local typeID = _lairObject.getTypeID();
 
-		foreach( overrideTable in Raids.Config.Defenders.Overrides )
+		foreach( overrideTable in ::Raids.Defenders.Overrides )
 		{
 			if (overrideTable.TypeID == typeID)
 			{
 				return overrideTable.Faction;
 			}
 		}
-		
+
 		return this.getFactionNameFromType(this.getFactionType(_lairObject));
 	}
 
@@ -83,8 +83,7 @@ Raids.Lairs.Defenders <-
 
 	function getFactionType( _lairObject )
 	{
-		local factionType = ::World.FactionManager.getFaction(_lairObject.getFaction()).getType();
-		return factionType;
+		return ::World.FactionManager.getFaction(_lairObject.getFaction()).getType();
 	}
 
 	function getTroopChoices()
@@ -105,7 +104,7 @@ Raids.Lairs.Defenders <-
 
 	function getResourcesForReinforcement( _lairObject )
 	{
-		return ::Math.floor(_lairObject.getResources() * Raids.Standard.getPercentageSetting("AgitationResourceModifier"));
+		return ::Math.floor(_lairObject.getResources() * ::Raids.Standard.getPercentageSetting("AgitationResourceModifier"));
 	}
 
 	function getResourcesPrefactor( _lairObject )
@@ -114,7 +113,7 @@ Raids.Lairs.Defenders <-
 
 		if (_lairObject.m.IsScalingDefenders)
 		{
-			prefactor *= ::Math.minf(Raids.Standard.getPercentageSetting("TimeScalePrefactorCeiling"), this.getTimeScalePrefactor());
+			prefactor *= ::Math.minf(::Raids.Standard.getPercentageSetting("TimeScalePrefactorCeiling"), this.getTimeScalePrefactor());
 		}
 
 		if (!_lairObject.isAlliedWithPlayer())
@@ -132,23 +131,17 @@ Raids.Lairs.Defenders <-
 
 	function getViableTroopCandidates( _lairObject )
 	{
-		local agitation = Raids.Standard.getFlag("Agitation", _lairObject);
-
-		# Get time-agnostic resources value scaled by configurable modifier.
+		local agitation = ::Raids.Standard.getFlag("Agitation", _lairObject);
 		local resources = this.getResourcesForReinforcement(_lairObject);
-
-		# Randomly roll troop choices between 1 and 3.
 		local troopChoices = this.getTroopChoices();
-
 		local factionName = this.getFactionName(_lairObject);
 
-		# Handle unexpected factions.
-		if (!(factionName in Raids.Config.Defenders.Troops))
+		if (!(factionName in ::Raids.Database.Troops))
 		{
 			return null;
 		}
 
-		local candidates = Raids.Config.Defenders.Troops[factionName].filter(function( _index, _troopTable )
+		local candidates = ::Raids.Database.Troops[factionName].filter(function( _index, _troopTable )
 		{
 			if (_troopTable.Cost > resources)
 			{
@@ -179,7 +172,7 @@ Raids.Lairs.Defenders <-
 
 	function reinforceDefenders( _lairObject )
 	{
-		if (Raids.Standard.getFlag("Agitation", _lairObject) == Raids.Lairs.AgitationDescriptors.Relaxed)
+		if (::Raids.Standard.getFlag("Agitation", _lairObject) == ::Raids.Lairs.AgitationDescriptors.Relaxed)
 		{
 			return;
 		}
@@ -191,11 +184,11 @@ Raids.Lairs.Defenders <-
 			return;
 		}
 
-		local selection = 
+		local allocatedResources = ::Math.floor(this.getResourcesForReinforcement(_lairObject) / troopPool.len());
+		local selection =
 		{
 			Troops = []
-		},
-		allocatedResources = ::Math.floor(this.getResourcesForReinforcement(_lairObject) / troopPool.len());
+		};
 
 		foreach( troopTable in troopPool )
 		{
@@ -231,7 +224,6 @@ Raids.Lairs.Defenders <-
 			return 1;
 		});
 
-		# Continue reducing troop array size until the desired size is reached.
 		while( _troopArray.len() > _newSize )
 		{
 			_troopArray.pop();
