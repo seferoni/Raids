@@ -1,48 +1,5 @@
 ::Raids.Caravans <-
 {
-	AntagonisticSituations =
-	[
-		"ambushed_trade_routes",
-		"draught",
-		"greenskins",
-		"mine_cavein",
-		"moving_sands",
-		"raided",
-		"short_on_food",
-		"sickness",
-		"slave_revolt",
-		"snow_storms",
-		"warehouse_burned_down"
-	],
-	CargoDescriptors =
-	{
-		Supplies = 1,
-		Trade = 2,
-		Assortment = 3,
-		Unassorted = 4
-	},
-	CargoDistribution =
-	{
-		Supplies = 50,
-		Trade = 100,
-		Assortment = 20
-	},
-	ExcludedGoods =
-	[
-		"supplies/food_item",
-		"supplies/money_item",
-		"trade/trading_good_item",
-		"supplies/strange_meat_item",
-		"supplies/fermented_unhold_heart_item",
-		"supplies/black_marsh_stew_item"
-	],
-	NamedItemKeys =
-	[
-		"NamedArmors",
-		"NamedWeapons",
-		"NamedHelmets",
-		"NamedShields"
-	],
 	Parameters =
 	{
 		EliteTroopNobleOffset = 10,
@@ -58,72 +15,6 @@
 		SupplyCaravanDocumentChanceOffset = 35,
 		TroopTimeOffset = 1,
 		WealthDocumentChanceOffset = 10
-	},
-	SouthernGoods =
-	[
-		"supplies/dates_item",
-		"supplies/rice_item",
-		"trade/silk_item",
-		"trade/spices_item",
-		"trade/incense_item"
-	],
-	SynergisticSituations =
-	[
-		"bread_and_games",
-		"full_nets",
-		"good_harvest",
-		"rich_veins",
-		"safe_roads",
-		"seasonal_fair",
-		"well_supplied"
-	],
-	Tooltip =
-	{
-		Icons =
-		{
-			Assortment = "ui/icons/asset_money.png",
-			Famed = "ui/icons/special.png",
-			Supplies = "ui/icons/asset_food.png"
-			Trade = "ui/icons/money.png",
-			Unassorted = "ui/icons/bag.png",
-			Wealth = "ui/icons/money2.png"
-		},
-		Template =
-		{
-			id = 2,
-			type = "hint",
-			icon = "",
-			text = ""
-		}
-	},
-	TroopTypes =
-	{
-		Generic =
-		{
-			Conventional = ["CaravanGuard"]
-		},
-		Mercenaries =
-		{
-			Conventional = ["Mercenary", "MercenaryLOW", "MercenaryRanged"],
-			Elite = ["HedgeKnight", "MasterArcher", "Swordmaster"]
-		},
-		NobleHouse =
-		{
-			Conventional = ["Arbalester", "Billman", "Footman"],
-			Elite = ["Greatsword", "Knight", "Sergeant"]
-		},
-		OrientalCityState =
-		{
-			Conventional = ["Conscript", "ConscriptPolearm", "Gunner"],
-			Elite = ["Assassin", "DesertDevil", "DesertStalker"]
-		}
-	},
-	WealthDescriptors =
-	{
-		Meager = 1,
-		Moderate = 2,
-		Plentiful = 3,
-		Abundant = 4
 	}
 
 	function addNamedCargo( _lootArray )
@@ -582,7 +473,7 @@
 	{
 		local settlementIndex = ::Raids.Standard.getFlag("CaravanOrigin", _caravanObject);
 
-		# Extreme edge-case handling.
+		# Edge-case handling.
 		if (!(settlementIndex in ::World.FactionManager.m.Factions))
 		{
 			return;
