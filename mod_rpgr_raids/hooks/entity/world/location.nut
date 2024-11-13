@@ -99,7 +99,7 @@
 
 		::Raids.Lairs.initialiseLairParameters(this);
 
-		if (::Raids.Standard.getSetting("DepopulateLairLootOnSpawn"))
+		if (::Raids.Standard.getParameter("DepopulateLairLootOnSpawn"))
 		{
 			::Raids.Lairs.depopulateNamedLoot(this, ::Raids.Lairs.Parameters.NamedItemRemovalChanceOnSpawn);
 		}

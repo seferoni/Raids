@@ -32,7 +32,7 @@
 			return;
 		}
 
-		if (::Math.rand(1, 100) > ::Raids.Standard.getSetting("AgitationIncrementChance"))
+		if (::Math.rand(1, 100) > ::Raids.Standard.getParameter("AgitationIncrementChance"))
 		{
 			return;
 		}

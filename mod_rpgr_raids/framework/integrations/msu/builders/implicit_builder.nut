@@ -34,7 +34,7 @@
 
 	function buildPages()
 	{
-		local pageCategories = ::Raids.Database.getSettingCategories();
+		local pageCategories = ::Raids.Database.getParameterCategories();
 
 		foreach( category in pageCategories )
 		{

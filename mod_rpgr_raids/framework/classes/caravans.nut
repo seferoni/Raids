@@ -19,8 +19,8 @@
 
 	function addNamedCargo( _lootArray )
 	{
-		local namedCargo = this.createNamedLoot(),
-		namedItem = ::new(format("scripts/items/%s", namedCargo[::Math.rand(0, namedCargo.len() - 1)]));
+		local namedCargo = this.createNamedLoot();
+		local namedItem = ::new(format("scripts/items/%s", namedCargo[::Math.rand(0, namedCargo.len() - 1)]));
 		namedItem.onAddedToStash(null);
 		_lootArray.push(namedItem);
 	}
@@ -45,9 +45,9 @@
 
 	function createCaravanCargo( _caravanObject, _settlementObject )
 	{
-		local produce = _settlementObject.getProduce(),
-		descriptor = ::Raids.Standard.getDescriptor(::Raids.Standard.getFlag("CaravanCargo", _caravanObject), this.CargoDescriptors).tolower(),
-		actualProduce = produce.filter(@(_index,_value) _value.find(descriptor) != null);
+		local produce = _settlementObject.getProduce();
+		local descriptor = ::Raids.Standard.getDescriptor(::Raids.Standard.getFlag("CaravanCargo", _caravanObject), this.CargoDescriptors).tolower();
+		local actualProduce = produce.filter(@(_index,_value) _value.find(descriptor) != null);
 
 		if (actualProduce.len() != 0)
 		{
@@ -90,7 +90,7 @@
 	}
 
 	function createCargoEntry( _caravanObject )
-	{
+	{	// TODO: rewrite this to use our new constructEntry method!
 		# Get cargo descriptor from enumerated cargo value.
 		local cargoDescriptor = ::Raids.Standard.getDescriptor(::Raids.Standard.getFlag("CaravanCargo", _caravanObject), this.CargoDescriptors);
 
@@ -128,19 +128,21 @@
 			return this.SouthernGoods;
 		}
 
-		local exclusionList = clone this.ExcludedGoods;
-		exclusionList.extend(this.SouthernGoods);
+		local exclusionList = this.getExcludedGoodsList();
 		local scriptFiles = ::IO.enumerateFiles("scripts/items/trade");
 		scriptFiles.extend(::IO.enumerateFiles("scripts/items/supplies"));
 
 		foreach( filePath in exclusionList )
 		{
 			local index = scriptFiles.find(format("scripts/items/%s", filePath));
-			if (index != null) scriptFiles.remove(index);
+
+			if (index != null)
+			{
+				scriptFiles.remove(index);
+			}
 		}
 
-		local culledString = "scripts/items/",
-		goods = scriptFiles.map(@(_stringPath) _stringPath.slice(culledString.len()));
+		local goods = scriptFiles.map(@(_stringPath) _stringPath.slice("scripts/items/".len()));
 		return goods;
 	}
 
@@ -184,6 +186,13 @@
 		return situationString;
 	}
 
+	function getExcludedGoodsList()
+	{
+		local excludedGoods = clone ::Raids.Database.Caravans.Goods.Excluded;
+		excludedGoods.extend(::Raids.Database.Caravans.Goods.Southern);
+		return excludedGoods;
+	}
+
 	function formatTroopType( _troopArray )
 	{
 		local troops = _troopArray.map(@(_troopString) ::Const.World.Spawn.Troops[_troopString]);
@@ -192,9 +201,9 @@
 
 	function getEliteReinforcementCount( _caravanObject )
 	{
-		local iterations = 0,
-		wealth = ::Raids.Standard.getFlag("CaravanWealth", _caravanObject),
-		score = this.Parameters.EliteTroopScore * (wealth - 1);
+		local iterations = 0;
+		local wealth = ::Raids.Standard.getFlag("CaravanWealth", _caravanObject);
+		local score = this.Parameters.EliteTroopScore * (wealth - 1);
 
 		if (::Raids.Standard.getFlag("CaravanHasNamedItems", _caravanObject))
 		{
@@ -260,13 +269,10 @@
 
 	function getTooltipEntries( _caravanObject )
 	{
-		local entries = [],
-		push = @(_entry) entries.push(_entry);
+		local entries = [];
+		local push = @(_entry) ::Raids.Standard.push(_entry, entries);
 
-		# Create cargo entry.
 		push(this.createCargoEntry(_caravanObject));
-
-		# Create wealth entry.
 		push(this.createWealthEntry(_caravanObject));
 
 		if (!::Raids.Standard.getFlag("CaravanHasNamedItems", _caravanObject))
@@ -274,9 +280,7 @@
 			return entries;
 		}
 
-		# Create famed item entry.
 		push(this.createNamedLootEntry(_caravanObject));
-
 		return entries;
 	}
 
@@ -287,7 +291,7 @@
 		this.setCaravanOrigin(_caravanObject, _settlementObject);
 		this.populateInventory(_caravanObject, _settlementObject);
 
-		if (::Math.rand(1, 100) > ::Raids.Standard.getSetting("CaravanReinforcementChance"))
+		if (::Math.rand(1, 100) > ::Raids.Standard.getParameter("CaravanReinforcementChance"))
 		{
 			return;
 		}
@@ -311,8 +315,6 @@
 	function isPartyInitialised( _partyObject )
 	{
 		local isInitialised = @(_flag) ::Raids.Standard.getFlag(_flag, _partyObject) != false;
-
-		# All three conditions must be evaluated, as the initial release build of ::Raids did not track caravan origin.
 		return isInitialised("CaravanWealth") && isInitialised("CaravanCargo") && isInitialised("CaravanOrigin");
 	}
 
@@ -340,7 +342,7 @@
 
 	function populateOfficialDocuments( _caravanObject )
 	{
-		local documentChance = ::Raids.Standard.getSetting("OfficialDocumentDropChance"),
+		local documentChance = ::Raids.Standard.getParameter("OfficialDocumentDropChance"),
 		wealth = ::Raids.Standard.getFlag("CaravanWealth", _caravanObject);
 
 		if (::World.FactionManager.getFaction(_caravanObject.getFaction()).getType() == ::Const.FactionType.NobleHouse)

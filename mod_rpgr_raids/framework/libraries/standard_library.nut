@@ -1,14 +1,32 @@
 ::Raids.Standard <-
 {
+	Case =
+	{
+		Upper = "toupper",
+		Lower = "tolower"
+	},
 	Colour =
 	{
-		Green = "PositiveValue",
-		Red = "NegativeValue"
+		Green = "#2a5424",
+		Red = "#691a1a"
+	},
+	Procedures =
+	{
+		Reset = 0,
+		Increase = 1,
+		Decrease = 2
+	},
+	Tooltip =
+	{
+		id = 7,
+		type = "text",
+		icon = "",
+		text = ""
 	}
 
-	function appendToStringList( _targetString, _string )
+	function appendToStringList( _string, _list )
 	{
-		local newString = _targetString == "" ? format("%s", _string) : format("%s, %s", _targetString, _string);
+		local newString = _list == "" ? format("%s", _string) : format("%s, %s", _list, _string);
 		return newString;
 	}
 
@@ -33,23 +51,46 @@
 			string = _text.tostring();
 		}
 
-		return format("[color=%s]%s[/color]", ::Const.UI.Color[_colour], string)
+		return format("[color=%s]%s[/color]", _colour, string)
 	}
 
-	function getDescriptor( _valueToMatch, _referenceTable )
+	function constructEntry( _icon, _text, _parentArray = null )
 	{
-		foreach( descriptor, value in _referenceTable )
+		local entry = clone this.Tooltip;
+		entry.icon <- ::Raids.Database.getIcon(_icon);
+		entry.text <- _text;
+
+		if (_parentArray == null)
 		{
-			if (value == _valueToMatch)
-			{
-				return descriptor;
-			}
+			return entry;
 		}
+
+		_parentArray.push(entry);
+	}
+
+	function extendTable( _table, _targetTable )
+	{
+		foreach( key, value in _table )
+		{
+			_targetTable[key] <- value;
+		}
+	}
+
+	function getArrayAsList( _array )
+	{
+		local list = "";
+
+		foreach( entry in _array )
+		{
+			list = this.appendToStringList(entry, list);
+		}
+
+		return list;
 	}
 
 	function getFlag( _string, _object )
 	{
-		local flagValue = _object.getFlags().get(format("mod_rpgr_raids.%s", _string));
+		local flagValue = _object.getFlags().get(format("%s.%s", ::Raids.ID, _string));
 
 		if (flagValue == false)
 		{
@@ -61,7 +102,7 @@
 
 	function getFlagAsInt( _string, _object )
 	{
-		local flagValue = _object.getFlags().getAsInt(format("mod_rpgr_raids.%s", _string));
+		local flagValue = _object.getFlags().getAsInt(format("%s.%s", ::Raids.ID, _string));
 
 		if (flagValue == 0)
 		{
@@ -71,25 +112,75 @@
 		return flagValue;
 	}
 
-	function getPercentageSetting( _settingID )
+	function getKey( _valueToMatch, _table )
 	{
-		return (this.getSetting(_settingID) / 100.0)
+		foreach( key, value in _table )
+		{
+			if (value == _valueToMatch)
+			{
+				return key;
+			}
+		}
 	}
 
-	function getSetting( _settingID )
+	function getKeys( _table )
 	{
-		if (::Raids.Internal.MSUFound)
+		local returnArray = [];
+
+		foreach( key, value in _table )
 		{
-			return ::Raids.Mod.ModSettings.getSetting(_settingID).getValue();
+			returnArray.push(key);
 		}
 
-		if (!(_settingID in ::Raids.Defaults))
+		return returnArray;
+	}
+
+	function getPlayerByID( _playerID )
+	{
+		local roster = ::World.getPlayerRoster().getAll();
+
+		foreach( player in roster )
 		{
-			this.log(format("Invalid settingID %s passed to getSetting.", _settingID), true);
-			return;
+			local candidateID = player.getID();
+
+			if (_playerID == candidateID)
+			{
+				return player;
+			}
 		}
 
-		return ::Raids.Defaults[_settingID];
+		return null;
+	}
+
+	function getParameter( _parameterID )
+	{
+		if (::Raids.Manager.isMSUInstalled())
+		{
+			return ::Raids.Interfaces.MSU.ModSettings.getParameter(_parameterID).getValue();
+		}
+
+		local parameters = ::Raids.Database.getParameters();
+
+		foreach( parameterKey, parameterTable in parameters )
+		{
+			if (_parameterID == parameterKey)
+			{
+				return parameterTable.Default;
+			}
+		}
+
+		this.log(format("Invalid parameter key %s passed to getParameter.", _parameterKey), true);
+	}
+
+	function getPercentageParameter( _parameterID )
+	{
+		return (this.getParameter(_parameterID) / 100.0);
+	}
+
+	function getListAsArray( _string )
+	{
+		local entries = split(_string, ", ");
+		return entries;
 	}
 
 	function includeFiles( _path )
@@ -104,7 +195,7 @@
 
 	function incrementFlag( _string, _value, _object, _isNative = false )
 	{
-		local flag = _isNative ? format("%s", _string) : format("mod_rpgr_raids.%s", _string);
+		local flag = _isNative ? format("%s", _string) : format("%s.%s", ::Raids.ID, _string);
 		_object.getFlags().increment(flag, _value);
 	}
 
@@ -127,69 +218,54 @@
 	{
 		if (_isError)
 		{
-			::logError(format("[::Raids] %s", _string));
+			::logError(format("[Survival] %s", _string));
 			return;
 		}
 
-		::logInfo(format("[::Raids] %s", _string));
+		::logInfo(format("[Survival] %s", _string));
 	}
 
-	function overrideArguments( _object, _function, _originalMethod, _argumentsArray )
-	{	# Calls new method and passes result onto original method; if null, calls original method with original arguments.
-		# It is the responsibility of the overriding function to return appropriate arguments.
-		local returnValue = _function.acall(_argumentsArray),
-		newArguments = returnValue == null ? _argumentsArray : this.prependContextObject(_object, returnValue);
-		return _originalMethod.acall(newArguments);
-	}
-
-	function overrideMethod( _object, _function, _originalMethod, _argumentsArray )
-	{	# Calls and returns new method; if return value is null, calls and returns original method.
-		local returnValue = _function.acall(_argumentsArray);
-		return returnValue == null ? _originalMethod.acall(_argumentsArray) : (returnValue == ::Raids.Internal.TERMINATE ? null : returnValue);
-	}
-
-	function overrideReturn( _object, _function, _originalMethod, _argumentsArray )
-	{	# Calls original method and passes result onto new method, returns new result.
-		# It is the responsibility of the overriding function to ensure it takes on the appropriate arguments and returns appropriate values.
-		local originalValue = _originalMethod.acall(_argumentsArray);
-		if (originalValue != null) _argumentsArray.insert(1, originalValue);
-		local returnValue = _function.acall(_argumentsArray);
-		return returnValue == null ? originalValue : (returnValue == ::Raids.Internal.TERMINATE ? null : returnValue);
-	}
-
-	function parseSemVer( _version )
+	function push( _object, _targetArray )
 	{
-		local versionArray = split(_version, ".");
-		if (versionArray.len() > 3) versionArray.resize(3);
-		return format("%s.%s%s", versionArray[0], versionArray[1], versionArray[2]).tofloat();
-	}
-
-	function prependContextObject( _object, _arguments )
-	{
-		local array = [_object];
-
-		if (typeof _arguments != "array")
+		if (_object == null)
 		{
-			array.push(_arguments);
-			return array;
+			return;
 		}
 
-		foreach( entry in _arguments )
+		local entry = _object;
+
+		if (typeof entry != "array")
 		{
-			array.push(entry);
+			entry = [_object];
 		}
 
-		return array;
+		_targetArray.extend(entry);
 	}
 
-	function removeFromArray( _object, _target )
+	function replaceSubstring( _substring, _newSubstring, _targetString )
 	{
-		local culledObjects = typeof _object == "array" ? _object : [_object];
+		local startIndex = _targetString.find(_substring);
 
-		foreach( entry in culledObjects )
+		if (startIndex == null)
 		{
-			local index = _target.find(entry);
-			if (index != null) _target.remove(index);
+			return _targetString;
+		}
+
+		return format("%s%s%s", _targetString.slice(0, startIndex), _newSubstring, _targetString.slice(startIndex + _substring.len()));
+	}
+
+	function removeFromArray( _target, _array )
+	{
+		local targetArray = typeof _target == "array" ? _target : [_target];
+
+		foreach( entry in targetArray )
+		{
+			local index = _array.find(entry);
+
+			if (index != null)
+			{
+				_array.remove(index);
+			}
 		}
 	}
 
@@ -201,46 +277,7 @@
 
 	function setFlag( _string, _value, _object, _isNative = false )
 	{
-		local flag = _isNative ? format("%s", _string) : format("mod_rpgr_raids.%s", _string);
+		local flag = _isNative ? format("%s", _string) : format("%s.%s", ::Raids.ID, _string);
 		_object.getFlags().set(flag, _value);
-	}
-
-	function validateParameters( _originalFunction, _newParameters )
-	{
-		local originalInfo = _originalFunction.getinfos(), originalParameters = originalInfo.parameters;
-
-		if (originalParameters[originalParameters.len() - 1] == "...")
-		{
-			return true;
-		}
-
-		local newLength = _newParameters.len() + 1;
-
-		if (newLength <= originalParameters.len() && newLength >= originalParameters.len() - originalInfo.defparams.len())
-		{
-			return true;
-		}
-
-		return false;
-	}
-
-	function wrap( _object, _methodName, _function, _procedure = "overrideReturn" )
-	{
-		local cachedMethod = this.cacheHookedMethod(_object, _methodName),
-		Standard = this, parentName = _object.SuperName;
-
-		_object.rawset(_methodName, function( ... )
-		{
-			local originalMethod = cachedMethod == null ? this[parentName][_methodName] : cachedMethod;
-
-			if (!Standard.validateParameters(originalMethod, vargv))
-			{
-				Standard.log(format("An invalid number of parameters were passed to %s, aborting wrap procedure.", _methodName), true);
-				return;
-			}
-
-			local argumentsArray = Standard.prependContextObject(this, vargv);
-			return Standard[_procedure](this, _function, originalMethod, argumentsArray);
-		});
 	}
 };

@@ -383,7 +383,7 @@
 	{
 		local entries = [];
 
-		if (::Raids.Standard.getSetting("ShowNamedLootEntry"))
+		if (::Raids.Standard.getParameter("ShowNamedLootEntry"))
 		{
 			entries.push(this.getNamedLootEntry(_lairObject));
 		}

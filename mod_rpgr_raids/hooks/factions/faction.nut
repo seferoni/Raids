@@ -2,7 +2,7 @@
 {
 	::Raids.Patcher.wrap(p, "spawnEntity", function( _tile, _name, _uniqueName, _template, _resources )
 	{
-		if (::Math.rand(1, 100) > ::Raids.Standard.getSetting("RoamerScaleChance"))
+		if (::Math.rand(1, 100) > ::Raids.Standard.getParameter("RoamerScaleChance"))
 		{
 			return;
 		}
@@ -24,7 +24,7 @@
 			return;
 		}
 
-		if (::Raids.Standard.getSetting("RoamerScaleAgitationRequirement") && ::Raids.Standard.getFlag("Agitation", lair) == ::Raids.Lairs.AgitationDescriptors.Relaxed)
+		if (::Raids.Standard.getParameter("RoamerScaleAgitationRequirement") && ::Raids.Standard.getFlag("Agitation", lair) == ::Raids.Lairs.AgitationDescriptors.Relaxed)
 		{
 			return;
 		}

@@ -108,7 +108,7 @@
 
 	function createNamedLoot( _lairObject )
 	{
-		if (::Math.rand(1, 100) > ::Raids.Standard.getSetting("FactionSpecificNamedLootChance"))
+		if (::Math.rand(1, 100) > ::Raids.Standard.getParameter("FactionSpecificNamedLootChance"))
 		{
 			return this.createNaiveNamedLoot();
 		}

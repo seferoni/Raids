@@ -27,7 +27,7 @@
 		return agglomeratedParameters;
 	}
 
-	function getSettingCategories()
+	function getParameterCategories()
 	{
 		return ::Raids.Standard.getKeys(this.Settings);
 	}
