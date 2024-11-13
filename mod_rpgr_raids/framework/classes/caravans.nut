@@ -330,16 +330,9 @@
 
 	function getReinforcementCount( _caravanObject )
 	{
-		# Get caravan wealth value.
 		local wealth = ::Raids.Standard.getFlag("CaravanWealth", _caravanObject);
-
-		# Get time offset if current time exceeds pre-defined threshold.
 		local timeOffset = ::World.getTime().Days >= this.Parameters.ReinforcementThresholdDays ? this.Parameters.TroopTimeOffset : 0;
-
-		# Define total troop count based on wealth and time.
 		local naiveIterations = wealth + ::Math.rand(wealth - this.WealthDescriptors.Moderate, wealth) + timeOffset;
-
-		# Ensure return value remains short of the pre-defined troop reinforcement ceiling.
 		return ::Math.min(this.Parameters.MaximumTroopOffset, naiveIterations);
 	}
 
