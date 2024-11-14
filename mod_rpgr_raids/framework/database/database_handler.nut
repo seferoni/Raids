@@ -4,8 +4,14 @@
 	{
 		this.Parameters <- {};
 		this.Parameters.Caravans <- {};
+		this.Parameters.Defenders <- {};
 		this.Parameters.Edicts <- {};
 		this.Parameters.Lairs <- {};
+	}
+
+	function getTopLevelField( _className, _fieldName )
+	{
+		return this[_className][_fieldName];
 	}
 
 	function getIcon( _iconKey )

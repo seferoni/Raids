@@ -90,7 +90,7 @@
 		# Create Agitation entry.
 		local entry = clone this.Tooltip.Text;
 		entry.icon = iconPath;
-		entry.text = ::Raids.Standard.colourWrap(format("%s (%i)", ::Raids.Standard.getDescriptor(agitation, this.AgitationDescriptors), agitation), textColour);
+		entry.text = ::Raids.Standard.colourWrap(format("%s (%i)", ::Raids.Standard.getKey(agitation, this.AgitationDescriptors), agitation), textColour);
 		return entry;
 	}
 

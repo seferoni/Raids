@@ -158,10 +158,10 @@ this.writing_instruments_item <- ::inherit("scripts/items/item",
 		{
 			local colourValue = ::Raids.Standard.Colour[format("%s", selectionMode == this.SelectionModes.Selective ? "Green" : "Red")],
 			selection = ::Raids.Standard.colourWrap(this.getEdictSelection(), colourValue);
-			return format("%s: %s", ::Raids.Standard.getDescriptor(selectionMode, this.SelectionModes), selection);
+			return format("%s: %s", ::Raids.Standard.getKey(selectionMode, this.SelectionModes), selection);
 		}
 
-		return ::Raids.Standard.colourWrap(::Raids.Standard.getDescriptor(selectionMode, this.SelectionModes), ::Raids.Standard.Colour.Red);
+		return ::Raids.Standard.colourWrap(::Raids.Standard.getKey(selectionMode, this.SelectionModes), ::Raids.Standard.Colour.Red);
 	}
 
 	function getFlags()

@@ -1,4 +1,4 @@
-::Raids.Database.Troops <-
+::Raids.Database.Defenders.Troops <-
 {
 	Bandits =
 	[

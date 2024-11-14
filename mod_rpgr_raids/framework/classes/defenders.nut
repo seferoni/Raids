@@ -6,14 +6,7 @@
 		SpawnListLengthPrefactor = 0.25,
 		TroopChoicesFloor = 1,
 		TroopChoicesCeiling = 3
-	},
-	Overrides =
-	[
-		{
-			TypeID = "location.undead_crypt",
-			Faction = "Zombies"
-		}
-	],
+	}
 
 	function addTroops( _troopTable, _lairObject )
 	{
@@ -28,9 +21,9 @@
 		_lairObject.updateStrength();
 	}
 
-	function createDefenders( _lairObject, _overrideAgitation = false )
+	function createDefenders( _lairObject, _overrideAgitationRequirement = false )
 	{
-		if (::Raids.Standard.getFlag("Agitation", _lairObject) != ::Raids.Lairs.AgitationDescriptors.Relaxed && !_overrideAgitation)
+		if (!isLairAgitated(_lairObject) && !_overrideAgitationRequirement)
 		{
 			return;
 		}
@@ -84,6 +77,11 @@
 	function getFactionType( _lairObject )
 	{
 		return ::World.FactionManager.getFaction(_lairObject.getFaction()).getType();
+	}
+
+	function getField( _fieldName )
+	{
+		return ::Raids.Database.getTopLevelField("Defenders", _fieldName);
 	}
 
 	function getTroopChoices()
@@ -141,7 +139,8 @@
 			return null;
 		}
 
-		local candidates = ::Raids.Database.Troops[factionName].filter(function( _index, _troopTable )
+		local troopPool = this.getField("Troops");
+		local candidates = troopPool[factionName].filter(function( _index, _troopTable )
 		{
 			if (_troopTable.Cost > resources)
 			{
@@ -170,9 +169,15 @@
 		return candidates;
 	}
 
+	function isLairAgitated( _lairObject )
+	{
+		local agitationDescriptors = ::Raids.Database.getTopLevelField("Lairs", "AgitationDescriptors");
+		return ::Raids.Standard.getFlag("Agitation", _lairObject) > agitationDescriptors.Relaxed;
+	}
+
 	function reinforceDefenders( _lairObject )
 	{
-		if (::Raids.Standard.getFlag("Agitation", _lairObject) == ::Raids.Lairs.AgitationDescriptors.Relaxed)
+		if (!isLairAgitated(_lairObject))
 		{
 			return;
 		}

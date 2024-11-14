@@ -46,18 +46,20 @@
 	function createCaravanCargo( _caravanObject, _settlementObject )
 	{
 		local produce = _settlementObject.getProduce();
-		local descriptor = ::Raids.Standard.getDescriptor(::Raids.Standard.getFlag("CaravanCargo", _caravanObject), this.CargoDescriptors).tolower();
-		local actualProduce = produce.filter(@(_index,_value) _value.find(descriptor) != null);
+		local descriptors = this.getField("CargoDescriptors");
+		local cargoEnum =  ::Raids.Standard.getFlag("CaravanCargo", _caravanObject);
+		local cargoString = ::Raids.Standard.getKey(cargoEnum, descriptors).tolower();
+		local actualProduce = produce.filter(@(_index,_value) _value.find(cargoString) != null);
 
 		if (actualProduce.len() != 0)
 		{
 			return actualProduce;
 		}
 
-		local newCargoType = ::Math.rand(1, 100) <= 50 ? this.CargoDescriptors.Assortment : this.CargoDescriptors.Unassorted;
+		local newCargoType = ::Math.rand(1, 100) <= 50 ? descriptors.Assortment : descriptors.Unassorted;
 		::Raids.Standard.setFlag("CaravanCargo", newCargoType, _caravanObject);
 
-		if (newCargoType == this.CargoDescriptors.Assortment)
+		if (newCargoType == descriptors.Assortment)
 		{
 			return this.createNaiveCaravanCargo(_caravanObject);
 		}
@@ -68,56 +70,56 @@
 	function createCaravanTroops( _factionType )
 	{
 		local troops = [];
+		local troopTypes = this.getField("Troops");
 
 		if (_factionType == ::Const.FactionType.NobleHouse)
 		{
-			troops.extend(this.formatTroopType(this.TroopTypes.NobleHouse.Conventional))
+			troops.extend(troopTypes.NobleHouse.Conventional)
 			return troops;
 		}
 
-		troops.extend(this.formatTroopType(this.TroopTypes.Mercenaries.Conventional));
+		troops.extend(troopTypes.Mercenaries.Conventional);
 
 		if (_factionType == ::Const.FactionType.OrientalCityState)
 		{
-			troops.extend(this.formatTroopType(this.TroopTypes.OrientalCityState.Conventional));
+			troops.extend(troopTypes.OrientalCityState.Conventional);
 		}
 		else
 		{
-			troops.extend(this.formatTroopType(this.TroopTypes.Generic.Conventional));
+			troops.extend(troopTypes.Generic.Conventional);
 		}
 
 		return troops;
 	}
 
 	function createCargoEntry( _caravanObject )
-	{	// TODO: rewrite this to use our new constructEntry method!
-		# Get cargo descriptor from enumerated cargo value.
-		local cargoDescriptor = ::Raids.Standard.getDescriptor(::Raids.Standard.getFlag("CaravanCargo", _caravanObject), this.CargoDescriptors);
-
-		# Create entry.
-		local entry = clone this.Tooltip.Template;
-		entry.icon = format(this.Tooltip.Icons[cargoDescriptor]);
-		entry.text = format("%s", cargoDescriptor);
-		return entry;
+	{
+		local cargoDescriptor = ::Raids.Standard.getKey(::Raids.Standard.getFlag("CaravanCargo", _caravanObject), this.getField("CargoDescriptors"));
+		return ::Raids.Standard.constructEntry
+		(
+			cargoDescriptor,
+			cargoDescriptor
+		);
 	}
 
 	function createEliteCaravanTroops( _factionType )
 	{
 		local troops = [];
+		local troopTypes = this.getField("Troops");
 
 		if (_factionType == ::Const.FactionType.NobleHouse)
 		{
-			troops.extend(this.formatTroopType(this.TroopTypes.NobleHouse.Elite));
+			troops.extend(troopTypes.NobleHouse.Elite);
 			return troops;
 		}
 
 		if (_factionType == ::Const.FactionType.OrientalCityState)
 		{
-			troops.extend(this.formatTroopType(this.TroopTypes.OrientalCityState.Elite));
+			troops.extend(troopTypes.OrientalCityState.Elite);
 			return troops;
 		}
 
-		troops.extend(this.formatTroopType(this.TroopTypes.Mercenaries.Elite));
+		troops.extend(troopTypes.Mercenaries.Elite);
 		return troops;
 	}
 
@@ -160,43 +162,39 @@
 
 	function createNamedLootEntry( _caravanObject )
 	{
-		local entry = clone this.Tooltip.Template;
-		entry.icon = this.Tooltip.Icons.Famed;
-		entry.text = "Famed";
-		return entry;
+		return ::Raids.Standard.constructEntry
+		(
+			"Famed",
+			"Famed"
+		);
 	}
 
 	function createWealthEntry( _caravanObject )
 	{
-		# Get wealth and corresponding 'descriptor' key.
-		local caravanWealth = ::Raids.Standard.getFlag("CaravanWealth", _caravanObject),
-		wealthDescriptor = ::Raids.Standard.getDescriptor(caravanWealth, this.WealthDescriptors);
-
-		# Create entry.
-		local entry = clone this.Tooltip.Template;
-		entry.icon = this.Tooltip.Icons.Wealth;
-		entry.text = format("%s (%i)", wealthDescriptor, caravanWealth);
-		return entry;
+		local wealthDescriptor = ::Raids.Standard.getKey(::Raids.Standard.getFlag("CaravanWealth", _caravanObject), this.getField("WealthDescriptors"));
+		return ::Raids.Standard.constructEntry
+		(
+			"Wealth",
+			format("%s (%i)", wealthDescriptor, caravanWealth)
+		);
 	}
 
 	function formatSituationID( _situationID )
 	{
-		local culledString = "situation.",
-		situationString = _situationID.slice(culledString.len());
-		return situationString;
+		return _situationID.slice("situation.".len());
 	}
 
 	function getExcludedGoodsList()
 	{
-		local excludedGoods = clone ::Raids.Database.Caravans.Goods.Excluded;
-		excludedGoods.extend(::Raids.Database.Caravans.Goods.Southern);
+		local goods = this.getField("Goods");
+		local excludedGoods = clone goods.Excluded;
+		excludedGoods.extend(goods.Southern);
 		return excludedGoods;
 	}
 
-	function formatTroopType( _troopArray )
+	function getField( _fieldName )
 	{
-		local troops = _troopArray.map(@(_troopString) ::Const.World.Spawn.Troops[_troopString]);
-		return troops;
+		return ::Raids.Database.getTopLevelField("Caravans", _fieldName);
 	}
 
 	function getEliteReinforcementCount( _caravanObject )
@@ -238,7 +236,8 @@
 
 	function getSituationOffset( _settlementObject )
 	{
-		local offset = 0, grossSituations = _settlementObject.getSituations();
+		local offset = 0;
+		local grossSituations = _settlementObject.getSituations();
 
 		if (grossSituations.len() == 0)
 		{
@@ -325,12 +324,14 @@
 
 	function populateInventory( _caravanObject, _settlementObject )
 	{
-		if (::Raids.Standard.getFlag("CaravanWealth", _caravanObject) == this.WealthDescriptors.Meager)
+		local wealthDescriptors = this.getField("WealthDescriptors");
+
+		if (::Raids.Standard.getFlag("CaravanWealth", _caravanObject) == wealthDescriptors.Meager)
 		{
 			return;
 		}
 
-		if (::Raids.Standard.getFlag("CaravanCargo", _caravanObject) == this.CargoDescriptors.Assortment)
+		if (::Raids.Standard.getFlag("CaravanCargo", _caravanObject) == wealthDescriptors.Assortment)
 		{
 			this.addToInventory(_caravanObject, this.createNaiveCaravanCargo(_caravanObject));
 			return;
@@ -342,8 +343,8 @@
 
 	function populateOfficialDocuments( _caravanObject )
 	{
-		local documentChance = ::Raids.Standard.getParameter("OfficialDocumentDropChance"),
-		wealth = ::Raids.Standard.getFlag("CaravanWealth", _caravanObject);
+		local documentChance = ::Raids.Standard.getParameter("OfficialDocumentDropChance");
+		local wealth = ::Raids.Standard.getFlag("CaravanWealth", _caravanObject);
 
 		if (::World.FactionManager.getFaction(_caravanObject.getFaction()).getType() == ::Const.FactionType.NobleHouse)
 		{
@@ -381,31 +382,23 @@
 	function reinforceTroops( _caravanObject )
 	{
 		local wealth = ::Raids.Standard.getFlag("CaravanWealth", _caravanObject);
+		local wealthDescriptors = this.getField("WealthDescriptors");
 
-		# Low wealth caravans are exempt from reinforcement.
-		if (wealth == this.WealthDescriptors.Meager)
+		if (wealth == wealthDescriptors.Meager)
 		{
 			return;
 		}
 
-		# Calculate reinforcement count based on wealth and time.
 		local iterations = this.getReinforcementCount(_caravanObject);
-
-		# Get faction type.
 		local factionType = ::World.FactionManager.getFaction(_caravanObject.getFaction()).getType();
-
-		# Get eligible troop types.
 		local mundaneTroops = this.createCaravanTroops(factionType);
-
-		# Add troops.
 		this.addTroops(_caravanObject, {Type = mundaneTroops[::Math.rand(0, mundaneTroops.len() - 1)]}, iterations);
 
-		if (wealth < this.WealthDescriptors.Plentiful)
+		if (wealth < wealthDescriptors.Plentiful)
 		{
 			return;
 		}
 
-		# Evaluate time progression for elite troop reinforcement eligibility.
 		if (::World.getTime().Days < this.Parameters.ReinforcementThresholdDays)
 		{
 			return;
@@ -418,26 +411,24 @@
 			return;
 		}
 
-		# Get eligible 'elite' troop types.
 		local eliteTroops = this.createEliteCaravanTroops(factionType);
-
-		# Add troops.
 		this.addTroops(_caravanObject, {Type = eliteTroops[::Math.rand(0, eliteTroops.len() - 1)]}, iterations);
 	}
 
 	function setCaravanCargo( _caravanObject, _settlementObject )
 	{
-		local randomNumber = ::Math.rand(1, 100),
-		diceRoll = @(_value) randomNumber <= _value;
+		local cargoDescriptors = this.getField("CargoDescriptors");
+		local randomNumber = ::Math.rand(1, 100);
+		local isEligible = @(_value) randomNumber <= _value;
 
 		# Assume default value.
 		local cargoType = this.CargoDescriptors.Trade;
 
-		if (diceRoll(this.CargoDistribution.Assortment) || _settlementObject.getProduce().len() == 0)
+		if (isEligible(this.CargoDistribution.Assortment) || _settlementObject.getProduce().len() == 0)
 		{
 			cargoType = this.CargoDescriptors.Assortment;
 		}
-		else if (diceRoll(this.CargoDistribution.Supplies))
+		else if (isEligible(this.CargoDistribution.Supplies))
 		{
 			cargoType = this.CargoDescriptors.Supplies;
 		}

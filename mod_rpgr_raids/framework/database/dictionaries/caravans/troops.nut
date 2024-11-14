@@ -2,21 +2,53 @@
 {
 	Generic =
 	{
-		Conventional = ["CaravanGuard"]
+		Conventional =
+		[
+			::Const.World.Spawn.Troops.CaravanGuard
+		]
 	},
 	Mercenaries =
 	{
-		Conventional = ["Mercenary", "MercenaryLOW", "MercenaryRanged"],
-		Elite = ["HedgeKnight", "MasterArcher", "Swordmaster"]
+		Conventional =
+		[
+			::Const.World.Spawn.Troops.Mercenary,
+			::Const.World.Spawn.Troops.MercenaryLOW,
+			::Const.World.Spawn.Troops.MercenaryRanged
+		],
+		Elite =
+		[
+			::Const.World.Spawn.Troops.HedgeKnight,
+			::Const.World.Spawn.Troops.MasterArcher,
+			::Const.World.Spawn.Troops.Swordmaster]
 	},
 	NobleHouse =
 	{
-		Conventional = ["Arbalester", "Billman", "Footman"],
-		Elite = ["Greatsword", "Knight", "Sergeant"]
+		Conventional =
+		[
+			::Const.World.Spawn.Troops.Arbalester,
+			::Const.World.Spawn.Troops.Billman,
+			::Const.World.Spawn.Troops.Footman
+		],
+		Elite =
+		[
+			::Const.World.Spawn.Troops.Greatsword,
+			::Const.World.Spawn.Troops.Knight,
+			::Const.World.Spawn.Troops.Sergeant
+		]
 	},
 	OrientalCityState =
 	{
-		Conventional = ["Conscript", "ConscriptPolearm", "Gunner"],
-		Elite = ["Assassin", "DesertDevil", "DesertStalker"]
+		Conventional =
+		[
+			::Const.World.Spawn.Troops.Conscript,
+			::Const.World.Spawn.Troops.ConscriptPolearm,
+			::Const.World.Spawn.Troops.Gunner
+		],
+		Elite =
+		[
+			::Const.World.Spawn.Troops.Assassin,
+			::Const.World.Spawn.Troops.DesertDevil,
+			::Const.World.Spawn.Troops.DesertStalker
+		]
 	}
 };

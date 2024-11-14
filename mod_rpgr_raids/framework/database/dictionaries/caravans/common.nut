@@ -1,5 +1,5 @@
 ::Raids.Database.Caravans.Common <-
-{	// TODO: there needs to be a much more efficient way of sweeping out particular fields. make it a function
+{
 	CargoDescriptors =
 	{
 		Supplies = 1,
