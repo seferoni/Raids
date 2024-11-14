@@ -1,11 +1,8 @@
 ::Raids.Database.Icons <-
 {
+	Active = "scroll_01_b.png",
 	Assortment = "ui/icons/asset_money.png",
-	Contracted =
-	{
-		Active = "scroll_01_b.png",
-		Discovery = "scroll_02_sw.png"
-	},
+	Discovery = "scroll_02_sw.png"
 	NamedEmpty = "ui/icons/cancel.png",
 	NamedPresent = "ui/icons/special.png",
 	History = "ui/icons/papers.png",

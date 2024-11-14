@@ -41,15 +41,15 @@
 
 	function createHistoryEntry( _lairObject )
 	{
-		local history = ::Raids.Standard.colourWrap(::Raids.Standard.getFlag("EdictHistory", _lairObject), ::Raids.Standard.Colour.Red),
-		entry = clone this.Tooltip.Template;
-		entry.icon = this.Tooltip.Icons.History;
-		entry.text = history;
-		return entry;
+		return ::Raids.Standard.constructEntry
+		(
+			"History",
+			::Raids.Standard.colourWrap(::Raids.Standard.getFlag("EdictHistory", _lairObject), ::Raids.Standard.Colour.Red)
+		);
 	}
 
 	function createTooltipEntry( _lairObject, _iconPath, _edictName, _activityState )
-	{
+	{	// TODO: get rid of this. replace it with the constructEntry method in Standard
 		local entry = clone this.Tooltip.Template;
 		entry.icon = format("ui/icons/%s", _iconPath);
 		entry.text = format("Edict: %s (%s)", _edictName, _activityState);
@@ -196,8 +196,8 @@
 
 		foreach( container in occupiedContainers )
 		{
-			local inDiscovery = ::Raids.Standard.getFlag(format("%sTime", container), _lairObject) != false,
-			edictName = this.getEdictName(::Raids.Standard.getFlag(container, _lairObject));
+			local inDiscovery = ::Raids.Standard.getFlag(format("%sTime", container), _lairObject) != false;
+			local edictName = this.getEdictName(::Raids.Standard.getFlag(container, _lairObject));
 
 			# Create tooltip entry.
 			local iconPath = this.Tooltip.Icons.Contracted[inDiscovery ? "Discovery" : "Active"],
@@ -242,6 +242,11 @@
 		local culledString = _isFileName ? format("%s%s", this.Parameters.DirectoryPath, "edict_of_") : "special.edict_of_";
 		local edictName = ::Raids.Standard.setCase(_edictID.slice(culledString.len()), "toupper");
 		return edictName;
+	}
+
+	function getField( _fieldName )
+	{
+		return ::Raids.Database.getTopLevelField("Edicts", _fieldName);
 	}
 
 	function getLegibilityEntry( _lairObject )
@@ -364,13 +369,8 @@
 			return false;
 		}
 
-		# Retrieve faction type from faction manager.
 		local factionType = ::World.FactionManager.getFaction(_lairObject.getFaction()).getType();
-
-		# If an Edict of Legibility is not present, revert to native Edict-viable faction pool.
-		local factions = this.findEdict("Legibility", _lairObject, true) != false ? ::Raids.Lairs.Factions : this.Factions;
-
-		# Retrieve corresponding faction types from the ::Const table.
+		local factions = this.findEdict("Legibility", _lairObject, true) != false ? ::Raids.Lairs.Factions : this.getField("Factions");
 		local viableFactions = factions.map(@(_factionName) ::Raids.Lairs.getFactionType(_factionName));
 
 		if (viableFactions.find(factionType) != null)
@@ -378,7 +378,7 @@
 			return true;
 		}
 
-		if (this.Overrides.find(_lairObject.getTypeID()) != null)
+		if (this.getField("Overrides").find(_lairObject.getTypeID()) != null)
 		{
 			return true;
 		}
@@ -393,7 +393,7 @@
 			return;
 		}
 
-		local viableEdicts = this.CycledEdicts.filter(@(_index, _edictName) ::Raids.Edicts.findEdictInHistory(_edictName, _lairObject));
+		local viableEdicts = this.getField("CycledEdicts").filter(@(_index, _edictName) ::Raids.Edicts.findEdictInHistory(_edictName, _lairObject));
 
 		foreach( edictName in viableEdicts )
 		{
