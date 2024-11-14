@@ -3,6 +3,9 @@
 	function createTables()
 	{
 		this.Parameters <- {};
+		this.Parameters.Caravans <- {};
+		this.Parameters.Edicts <- {};
+		this.Parameters.Lairs <- {};
 	}
 
 	function getIcon( _iconKey )

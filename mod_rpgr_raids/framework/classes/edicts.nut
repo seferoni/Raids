@@ -1,69 +1,22 @@
 ::Raids.Edicts <-
 {
-	Containers =
-	[
-		"EdictContainerA",
-		"EdictContainerB",
-		"EdictContainerC"
-	],
-	CycledEdicts =
-	[
-		"Abundance",
-		"Diminution",
-		"Opportunism"
-	],
-	Factions =
-	[
-		"Bandits",
-		"Barbarians",
-		"OrientalBandits",
-		"Zombies"
-	],
-	Internal =
-	{
-		DirectoryPath = "scripts/items/special/edicts/",
-		EdictSelectionSize = 3,
-		ResourcesPrefactor = 0.001,
-		WritingInstrumentsChance = 66
-	},
-	Overrides =
-	[
-		"location.undead_crypt"
-	],
 	Parameters =
 	{
 		AbundanceCeiling = 3,
 		AbundanceOffset = 1,
+		DirectoryPath = "scripts/items/special/edicts/",
 		DiminutionPrefactor = 0.06,
+		EdictSelectionSize = 3,
 		ProspectingOffset = 8.0,
+		ResourcesPrefactor = 0.001,
 		StasisOffset = 1
-	},
-	Tooltip =
-	{
-		Icons =
-		{
-			Contracted =
-			{
-				Active = "scroll_01_b.png",
-				Discovery = "scroll_02_sw.png"
-			},
-			NamedEmpty = "ui/icons/cancel.png",
-			NamedPresent = "ui/icons/special.png",
-			History = "ui/icons/papers.png"
-		},
-		Template =
-		{
-			id = 20,
-			type = "text",
-			icon = "ui/icons/unknown_traits.png",
-			text = "Edict: Vacant"
-		}
+		WritingInstrumentsChance = 66
 	}
 
 	function addToHistory( _edictName, _lairObject )
 	{
-		local history = ::Raids.Standard.getFlag("EdictHistory", _lairObject),
-		newHistory = format("%s%s", !history ? "" : format("%s, ", history), _edictName);
+		local history = ::Raids.Standard.getFlag("EdictHistory", _lairObject);
+		local newHistory = format("%s%s", history == false ? "" : format("%s, ", history), _edictName);
 		::Raids.Standard.setFlag("EdictHistory", newHistory, _lairObject);
 	}
 
@@ -112,26 +65,19 @@
 	function executeDiminutionProcedure( _lairObject )
 	{
 		local garbage = [];
-
-		# Get currently stationed troops.
 		local troops = _lairObject.getTroops();
-
-		# Calculate removal count scaled by current lair Agitation.
 		local removalCount = ::Math.ceil(this.Parameters.DiminutionPrefactor * ::Raids.Standard.getFlag("Agitation", _lairObject) * troops.len());
 
-		# Handling for extreme edge cases.
 		if (removalCount >= troops.len() || removalCount == 0)
 		{
 			return;
 		}
 
-		# Mark troops at random for removal.
 		while( garbage.len() < removalCount )
 		{
 			garbage.push(troops[::Math.rand(0, troops.len() - 1)]);
 		}
 
-		# Remove troops.
 		foreach( troop in garbage )
 		{
 			local index = troops.find(troop);
@@ -147,9 +93,9 @@
 
 	function executeEdictProcedure( _container, _lairObject )
 	{
-		local edictID = ::Raids.Standard.getFlag(_container, _lairObject),
-		edictName = this.getEdictName(edictID),
-		procedure = format("execute%sProcedure", edictName);
+		local edictID = ::Raids.Standard.getFlag(_container, _lairObject);
+		local edictName = this.getEdictName(edictID);
+		local procedure = format("execute%sProcedure", edictName);
 
 		if (this.CycledEdicts.find(edictName) != null)
 		{
@@ -183,8 +129,8 @@
 
 	function findEdict( _edictName, _lairObject, _filterActive = false )
 	{
-		local edictContainer = false,
-		edictID = this.getEdictID(_edictName);
+		local edictContainer = false;
+		local edictID = this.getEdictID(_edictName);
 
 		foreach( container in this.Containers )
 		{
@@ -212,7 +158,7 @@
 	{
 		local history = ::Raids.Standard.getFlag("EdictHistory", _lairObject);
 
-		if (!history)
+		if (history == false)
 		{
 			return false;
 		}
@@ -239,20 +185,17 @@
 
 	function getContainerEntries( _lairObject )
 	{
-		local entries = [],
-		occupiedContainers = this.getOccupiedContainers(_lairObject);
+		local entries = [];
+		local occupiedContainers = this.getOccupiedContainers(_lairObject);
 
-		# Handle case where all containers are vacant.
 		if (occupiedContainers.len() == 0)
 		{
 			entries.resize(this.Containers.len(), this.Tooltip.Template);
 			return entries;
 		}
 
-		# Create entries for occupied containers.
 		foreach( container in occupiedContainers )
 		{
-			# Prepare variables in local environment.
 			local inDiscovery = ::Raids.Standard.getFlag(format("%sTime", container), _lairObject) != false,
 			edictName = this.getEdictName(::Raids.Standard.getFlag(container, _lairObject));
 
@@ -262,7 +205,6 @@
 			entries.push(this.createTooltipEntry(_lairObject, iconPath, edictName, activityState));
 		}
 
-		# Create entries for vacant containers.
 		if (entries.len() < this.Containers.len())
 		{
 			local iterations = this.Containers.len() - entries.len();
@@ -278,27 +220,27 @@
 
 	function getEdictFileName( _edictName )
 	{
-		local prependedString = format("%s%s", this.Internal.DirectoryPath, "edict_of_"),
-		edictFileName = format("%s%s", prependedString, ::Raids.Standard.setCase(_edictName, "tolower"));
+		local prependedString = format("%s%s", this.Parameters.DirectoryPath, "edict_of_");
+		local edictFileName = format("%s%s", prependedString, ::Raids.Standard.setCase(_edictName, "tolower"));
 		return edictFileName;
 	}
 
 	function getEdictFiles()
 	{
-		return ::IO.enumerateFiles(this.Internal.DirectoryPath);
+		return ::IO.enumerateFiles(this.Parameters.DirectoryPath);
 	}
 
 	function getEdictID( _edictName )
 	{
-		local prependedString = "special.edict_of_",
-		edictID = format("%s%s", prependedString,  ::Raids.Standard.setCase(_edictName, "tolower"));
+		local prependedString = "special.edict_of_";
+		local edictID = format("%s%s", prependedString,  ::Raids.Standard.setCase(_edictName, "tolower"));
 		return edictID;
 	}
 
 	function getEdictName( _edictID, _isFileName = false )
 	{
-		local culledString = _isFileName ? format("%s%s", this.Internal.DirectoryPath, "edict_of_") : "special.edict_of_",
-		edictName = ::Raids.Standard.setCase(_edictID.slice(culledString.len()), "toupper");
+		local culledString = _isFileName ? format("%s%s", this.Parameters.DirectoryPath, "edict_of_") : "special.edict_of_";
+		local edictName = ::Raids.Standard.setCase(_edictID.slice(culledString.len()), "toupper");
 		return edictName;
 	}
 
@@ -310,8 +252,8 @@
 
 	function getNamedLootChanceOffset( _lairObject )
 	{
-		local offset = 0.0,
-		agitation = ::Raids.Standard.getFlag("Agitation", _lairObject);
+		local offset = 0.0;
+		local agitation = ::Raids.Standard.getFlag("Agitation", _lairObject);
 
 		if (this.findEdict("Prospecting", _lairObject, true) != false)
 		{
@@ -323,8 +265,8 @@
 
 	function getNamedLootEntry( _lairObject )
 	{
-		local entry = clone this.Tooltip.Template,
-		count = 0;
+		local entry = clone this.Tooltip.Template;
+		local count = 0;
 
 		# Get naive named loot chance.
 		local naiveNamedLootChance = ::Raids.Lairs.getNamedLootChance(_lairObject);
@@ -368,8 +310,8 @@
 
 	function getOccupiedContainers( _lairObject )
 	{
-		local occupiedContainers = [],
-		occupied = @(_container) ::Raids.Standard.getFlag(_container, _lairObject) != false;
+		local occupiedContainers = [];
+		local occupied = @(_container) ::Raids.Standard.getFlag(_container, _lairObject) != false;
 
 		foreach( container in this.Containers )
 		{
