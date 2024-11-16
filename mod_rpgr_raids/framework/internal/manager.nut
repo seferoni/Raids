@@ -93,7 +93,8 @@
 
 	function loadFiles()
 	{
-		this.includeFiles("mod_rpgr_raids/framework/classes");
+		this.includeFiles("mod_rpgr_raids/framework/classes/main");
+		this.includeFiles("mod_rpgr_raids/framework/classes/utils");
 		this.includeFiles("mod_rpgr_raids/hooks");
 	}
 
