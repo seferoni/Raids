@@ -72,7 +72,7 @@
 		local edictName = this.getEdictName(edictID);
 		local procedure = format("execute%sProcedure", edictName);
 
-		if (this.CycledEdicts.find(edictName) != null)
+		if (this.getField("CycledEdicts").find(edictName) != null)
 		{
 			this.resetContainer(_container, _lairObject);
 			this.addToHistory(edictName, _lairObject);
