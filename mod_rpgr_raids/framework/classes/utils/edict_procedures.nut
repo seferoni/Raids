@@ -1,4 +1,4 @@
-Raids.Edicts.Procedures <-
+::Raids.Edicts.Procedures <-
 {
 	function executeAgitationProcedure( _lairObject )
 	{
