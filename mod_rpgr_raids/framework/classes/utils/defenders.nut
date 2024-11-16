@@ -1,4 +1,4 @@
-::Raids.Defenders <-
+::Raids.Lairs.Defenders <-
 {
 	Parameters =
 	{
