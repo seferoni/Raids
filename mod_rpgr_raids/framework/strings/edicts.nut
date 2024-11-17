@@ -1,0 +1,4 @@
+::Raids.Strings.Edicts <-
+{
+
+};
