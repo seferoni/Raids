@@ -91,7 +91,7 @@
 		local agitation = ::Raids.Standard.getFlag("Agitation", _lairObject);
 		local lastUpdateDays = ::Raids.Standard.getFlag("LastAgitationUpdate", _lairObject);
 
-		if (lastUpdateDays == false || agitation == this.AgitationDescriptors.Relaxed)
+		if (lastUpdateDays == false || agitation == this.getField("AgitationDescriptors").Relaxed)
 		{
 			return null;
 		}
@@ -127,7 +127,7 @@
 	{
 		local agitation = ::Raids.Standard.getFlag("Agitation", _lairObject);
 
-		if (agitation <= this.AgitationDescriptors.Cautious)
+		if (agitation <= this.getField("AgitationDescriptors").Cautious)
 		{
 			return this.Parameters.AgitationDecayDaysCeiling + ::Raids.Edicts.getAgitationDecayOffset(_lairObject);
 		}
@@ -334,7 +334,7 @@
 		local offset = 0.0;
 		local agitation = ::Raids.Standard.getFlag("Agitation", _lairObject);
 
-		if (agitation == this.AgitationDescriptors.Relaxed)
+		if (agitation == this.getField("AgitationDescriptors").Relaxed)
 		{
 			return offset;
 		}
@@ -377,7 +377,7 @@
 	function initialiseLairParameters( _lairObject )
 	{
 		::Raids.Standard.setFlag("BaseResources", _lairObject.getResources(), _lairObject);
-		::Raids.Standard.setFlag("Agitation", this.AgitationDescriptors.Relaxed, _lairObject);
+		::Raids.Standard.setFlag("Agitation", this.getField("AgitationDescriptors").Relaxed, _lairObject);
 		::Raids.Standard.setFlag("BaseNamedItemChance", this.getNaiveNamedLootChance(_lairObject), _lairObject);
 	}
 
@@ -427,7 +427,7 @@
 	{
 		local agitation = ::Raids.Standard.getFlag("Agitation", _lairObject);
 
-		if (_procedure == this.Procedures.Increment && agitation >= this.getField("AgitationDescriptors").Militant)
+		if (_procedure == this.getField("Procedures").Increment && agitation >= this.getField("AgitationDescriptors").Militant)
 		{
 			return false;
 		}
@@ -511,7 +511,7 @@
 
 	function resetAgitation( _lairObject )
 	{
-		::Raids.Standard.setFlag("Agitation", this.AgitationDescriptors.Relaxed, _lairObject);
+		::Raids.Standard.setFlag("Agitation", this.getField("AgitationDescriptors").Relaxed, _lairObject);
 		::Raids.Edicts.clearHistory(_lairObject);
 	}
 
@@ -522,10 +522,12 @@
 			return;
 		}
 
+		local procedures = this.getField("Procedures");
+
 		switch (_procedure)
 		{
-			case (this.Procedures.Increment): this.increaseAgitation(_lairObject); break;
-			case (this.Procedures.Reset): this.resetAgitation(_lairObject); break;
+			case (procedures.Increment): this.increaseAgitation(_lairObject); break;
+			case (procedures.Reset): this.resetAgitation(_lairObject); break;
 		}
 
 		::Raids.Standard.setFlag("LastAgitationUpdate", ::World.getTime().Days, _lairObject);
@@ -545,7 +547,7 @@
 
 	function updateAgitation( _lairObject )
 	{
-		if (::Raids.Standard.getFlag("Agitation", _lairObject) == this.AgitationDescriptors.Relaxed)
+		if (::Raids.Standard.getFlag("Agitation", _lairObject) == this.getField("AgitationDescriptors").Relaxed)
 		{
 			return;
 		}
@@ -565,7 +567,7 @@
 			return;
 		}
 
-		this.setAgitation(_lairObject, this.Procedures.Reset);
+		this.setAgitation(_lairObject, this.getField("Procedures").Reset);
 		this.depopulateNamedLoot(_lairObject);
 		this.updateProperties(_lairObject);
 	}
