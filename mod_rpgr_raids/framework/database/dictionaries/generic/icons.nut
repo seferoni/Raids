@@ -1,4 +1,4 @@
-::Raids.Database.Icons <-
+::Raids.Database.Generic.Icons <-
 {
 	Agitated = "ui/icons/miniboss.png",
 	Active = "ui/icons/scroll_01_b.png",

@@ -1,4 +1,4 @@
-::Raids.Database.Parameters.Generic.Common <-
+::Raids.Database.Generic.Common <-
 {
 	NamedItemKeys =
 	[

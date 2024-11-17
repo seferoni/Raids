@@ -1,4 +1,4 @@
-::Raids.Database.Edicts.Parameters <-
+::Raids.Database.Edicts.Properties <-
 {
 	AbundanceCeiling = 3,
 	AbundanceOffset = 1,

@@ -1,5 +1,5 @@
 this.writing_instruments_item <- ::inherit("scripts/items/item",
-{
+{	// TODO: need to abstract item complexity!
 	m =
 	{
 		MaximumUses = 3,

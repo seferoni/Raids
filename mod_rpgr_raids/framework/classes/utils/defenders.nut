@@ -52,7 +52,7 @@
 	{
 		local typeID = _lairObject.getTypeID();
 
-		foreach( overrideTable in ::Raids.Defenders.Overrides )
+		foreach( overrideTable in this.getField("Overrides") )
 		{
 			if (overrideTable.TypeID == typeID)
 			{
