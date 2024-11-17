@@ -2,14 +2,9 @@
 {
 	Parameters =
 	{
-		AbundanceCeiling = 3,
-		AbundanceOffset = 1,
 		DirectoryPath = "scripts/items/special/edicts/",
-		DiminutionPrefactor = 0.06,
 		EdictSelectionSize = 3,
-		ProspectingOffset = 8.0,
 		ResourcesPrefactor = 0.001,
-		StasisOffset = 1
 		WritingInstrumentsChance = 66
 	}
 
@@ -206,9 +201,14 @@
 		return edictName;
 	}
 
+	function getEdictProperties()
+	{
+		return ::Raids.Database.getToplevelField("Edicts", "Properties");
+	}
+
 	function getField( _fieldName )
 	{
-		return ::Raids.Database.getTopLevelField("Edicts", _fieldName);
+		return ::Raids.Database.getSublevelField("Edicts", _fieldName);
 	}
 
 	function getLegibilityEntry( _lairObject )

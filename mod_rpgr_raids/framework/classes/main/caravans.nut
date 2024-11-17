@@ -194,7 +194,7 @@
 
 	function getField( _fieldName )
 	{
-		return ::Raids.Database.getTopLevelField("Caravans", _fieldName);
+		return ::Raids.Database.getToplevelField("Caravans", _fieldName);
 	}
 
 	function getEliteReinforcementCount( _caravanObject )

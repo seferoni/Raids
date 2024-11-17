@@ -1,29 +1,5 @@
 ::Raids.Lairs <-
 {
-	AgitationDescriptors =
-	{
-		Relaxed = 1,
-		Cautious = 2,
-		Vigilant = 3,
-		Militant = 4
-	},
-	Factions =
-	[
-		"Bandits",
-		"Barbarians",
-		"Goblins",
-		"Orcs",
-		"OrientalBandits",
-		"Undead",
-		"Zombies"
-	],
-	NamedItemKeys =
-	[
-		"NamedArmors",
-		"NamedWeapons",
-		"NamedHelmets",
-		"NamedShields"
-	],
 	Parameters =
 	{
 		AgitationDecayDaysCeiling = 7,
@@ -36,27 +12,6 @@
 		ResourceModifierLowerBound = 200,
 		ResourceModifierUpperBound = 350,
 		SpawnTimeOffsetInterval = -50.0
-	},
-	Procedures =
-	{
-		Increment = 1,
-		Reset = 2
-	},
-	Tooltip =
-	{
-		Icons =
-		{
-			Agitated = "ui/icons/miniboss.png",
-			Relaxed = "ui/icons/vision.png",
-			Resources = "ui/icons/asset_money.png"
-		},
-		Text =
-		{
-			id = 20,
-			type = "text",
-			icon = "",
-			text = ""
-		}
 	}
 
 	function addLoot( _lootTable, _locationObject )

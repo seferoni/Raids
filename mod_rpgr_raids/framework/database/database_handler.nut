@@ -9,9 +9,27 @@
 		this.Parameters.Lairs <- {};
 	}
 
-	function getTopLevelField( _className, _fieldName )
+	function getToplevelField( _className, _fieldName )
 	{
+		if (!(_fieldName in this[_className]))
+		{
+			return null;
+		}
+
 		return this[_className][_fieldName];
+	}
+
+	function getSublevelField( _className, _fieldName )
+	{
+		foreach( subtableName, nestedTable in this[_className] )
+		{
+			if (!(_fieldName in nestedTable))
+			{
+				continue;
+			}
+
+			return this[_className][subtableName][_fieldName];
+		}
 	}
 
 	function getIcon( _iconKey )
@@ -49,6 +67,7 @@
 	function loadFiles()
 	{
 		this.loadFolder("dictionaries");
+		this.loadFolder("parameters");
 	}
 
 	function initialise()

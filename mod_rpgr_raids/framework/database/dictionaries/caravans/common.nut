@@ -13,13 +13,6 @@
 		Trade = 100,
 		Assortment = 20
 	},
-	NamedItemKeys =
-	[
-		"NamedArmors",
-		"NamedWeapons",
-		"NamedHelmets",
-		"NamedShields"
-	],
 	WealthDescriptors =
 	{
 		Meager = 1,
