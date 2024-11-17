@@ -1,4 +1,4 @@
-::Raids.Database.Parameters.Lairs.Common <-
+::Raids.Database.Lairs.Common <-
 {
 	AgitationDescriptors =
 	{

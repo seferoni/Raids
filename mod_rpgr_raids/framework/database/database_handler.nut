@@ -9,32 +9,32 @@
 		this.Parameters.Lairs <- {};
 	}
 
-	function getToplevelField( _className, _fieldName )
+	function getTopLevelField( _tableName, _fieldName )
 	{
-		if (!(_fieldName in this[_className]))
+		if (!(_fieldName in this[_tableName]))
 		{
 			return null;
 		}
 
-		return this[_className][_fieldName];
+		return this[_tableName][_fieldName];
 	}
 
-	function getSublevelField( _className, _fieldName )
+	function getSubLevelField( _tableName, _fieldName )
 	{
-		foreach( subtableName, nestedTable in this[_className] )
+		foreach( subtableName, nestedTable in this[_tableName] )
 		{
 			if (!(_fieldName in nestedTable))
 			{
 				continue;
 			}
 
-			return this[_className][subtableName][_fieldName];
+			return this[_tableName][subtableName][_fieldName];
 		}
 	}
 
 	function getIcon( _iconKey )
 	{
-		if (!_iconKey in this.Icons)
+		if (!_iconKey in this.Generic.Icons)
 		{
 			return null;
 		}

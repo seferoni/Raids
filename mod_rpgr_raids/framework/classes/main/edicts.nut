@@ -203,12 +203,12 @@
 
 	function getEdictProperties()
 	{
-		return ::Raids.Database.getToplevelField("Edicts", "Properties");
+		return ::Raids.Database.getTopLevelField("Edicts", "Properties");
 	}
 
 	function getField( _fieldName )
 	{
-		return ::Raids.Database.getSublevelField("Edicts", _fieldName);
+		return ::Raids.Database.getSubLevelField("Edicts", _fieldName);
 	}
 
 	function getLegibilityEntry( _lairObject )
