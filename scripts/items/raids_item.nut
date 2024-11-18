@@ -199,13 +199,13 @@ this.raids_item <- ::inherit("scripts/items/item",
 	function setIDByName( _properName )
 	{
 		local formattedName = this.formatName(_properName, "_");
-		this.m.ID = format("misc.survival_%s_item", formattedName.tolower());
+		this.m.ID = format("misc.raids_%s_item", formattedName.tolower());
 	}
 
 	function setIconByName( _properName )
 	{
 		local formattedName = this.formatName(_properName, "_");
-		this.m.Icon = format("%s/survival_%s_item.png", this.m.GFXPathPrefix, formattedName.tolower());
+		this.m.Icon = format("%s/raids_%s_item.png", this.m.GFXPathPrefix, formattedName.tolower());
 	}
 
 	function setName( _properName )

@@ -12,8 +12,10 @@
 	Vacant = "ui/icons/unknown_traits.png",
 	Famed = "ui/icons/special.png",
 	Supplies = "ui/icons/asset_food.png",
+	Selection = "ui/icons/special.png",
 	Time = "ui/icons/action_points.png",
 	Trade = "ui/icons/money.png",
 	Unassorted = "ui/icons/bag.png",
+	Warning = "ui/icons/warning.png",
 	Wealth = "ui/icons/money2.png"
 };

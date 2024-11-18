@@ -57,7 +57,12 @@
 	function constructEntry( _icon, _text, _parentArray = null )
 	{
 		local entry = clone this.Tooltip;
-		entry.icon <- ::Raids.Database.getIcon(_icon);
+
+		if (_icon != null)
+		{
+			entry.icon <- ::Raids.Database.getIcon(_icon);
+		}
+
 		entry.text <- _text;
 
 		if (_parentArray == null)
