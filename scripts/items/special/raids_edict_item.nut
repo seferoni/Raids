@@ -1,15 +1,10 @@
-this.edict_item <- ::inherit("scripts/items/item",
+this.raids_edict_item <- ::inherit("scripts/items/raids_item",
 {
 	m = {},
 	function create()
 	{
-		this.item.create();
+		this.raids_item.create();
 		this.m.Icon = "special/edict_item.png";
-		this.m.SlotType = ::Const.ItemSlot.None;
-		this.m.ItemType = ::Const.Items.ItemType.Usable;
-		this.m.IsDroppedAsLoot = true;
-		this.m.IsAllowedInBag = false;
-		this.m.IsUsable = true;
 		this.m.DiscoveryDays <- 1;
 		this.m.ScalingModality <- this.ScalingModalities.Static;
 		this.m.EffectText <- null;
@@ -26,25 +21,6 @@ this.edict_item <- ::inherit("scripts/items/item",
 	{
 		Move = "sounds/cloth_01.wav",
 		Use = "sounds/cloth_01.wav",
-		Warning = "sounds/move_pot_clay_01.wav"
-	},
-	Tooltip =
-	{
-		Icons =
-		{
-			Effect = "ui/icons/special.png",
-			Discovery = "ui/icons/action_points.png",
-			Persistence = "ui/icons/scroll_01.png",
-			Scaling = "ui/icons/level.png",
-			Warning = "ui/icons/warning.png"
-		},
-		Template =
-		{
-			id = 6,
-			type = "text",
-			icon = "",
-			text = ""
-		}
 	}
 
 	function createWarningEntry()
@@ -157,7 +133,7 @@ this.edict_item <- ::inherit("scripts/items/item",
 		push({id = 6, type = "text", icon = this.Tooltip.Icons.Persistence, text = this.getPersistenceText()});
 
 		# Create discovery time entry.
-		push({id = 6, type = "text", icon = this.Tooltip.Icons.Discovery, text = this.getDiscoveryText()});
+		push({id = 6, type = "text", icon = this.Tooltip.Icons.Time, text = this.getDiscoveryText()});
 
 		# Create scaling modality entry.
 		push({id = 6, type = "text", icon = this.Tooltip.Icons.Scaling, text = this.getScalingText()});

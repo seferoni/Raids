@@ -247,7 +247,7 @@
 		local fragmentB = ::Raids.Standard.colourWrap(format("%i%%", namedLootChance), ::Raids.Standard.Colour.Green);
 		return ::Raids.Standard.constructEntry
 		(
-			count == 0 ? "NamedEmpty" : "NamedPresent",
+			count == 0 ? "False" : "Special",
 			format("%s (%s)", fragmentA, fragmentB)
 		);
 	}

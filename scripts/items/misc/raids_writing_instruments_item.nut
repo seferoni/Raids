@@ -47,7 +47,7 @@ this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_item",
 	{
 		return ::Raids.Standard.constructEntry
 		(
-			"Selection",
+			"Special",
 			this.getEdictSelectionText()
 		);
 	}

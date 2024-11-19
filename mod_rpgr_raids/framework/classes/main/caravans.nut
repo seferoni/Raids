@@ -164,7 +164,7 @@
 	{
 		return ::Raids.Standard.constructEntry
 		(
-			"Famed",
+			"Special",
 			"Famed"
 		);
 	}
