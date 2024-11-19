@@ -1,5 +1,5 @@
 this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_item",
-{	// TODO: need to abstract item complexity!
+{
 	m = {},
 	function create()
 	{
@@ -30,6 +30,7 @@ this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_item",
 	{
 		return ::Raids.Standard.constructEntry
 		(
+			null,
 			::Raids.Strings.Edicts.WritingInstrumentsInstructionText
 		);
 	}

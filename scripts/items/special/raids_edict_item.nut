@@ -4,44 +4,93 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_item",
 	function create()
 	{
 		this.raids_item.create();
-		this.m.Icon = "special/edict_item.png";
+		this.assignEdictProperties();
+	}
+
+	function assignGenericProperties()
+	{
+		this.raids_item.assignGenericProperties();
+		this.m.Icon = "special/raids_edict_item.png";
+	}
+
+	function assignEdictProperties()
+	{
 		this.m.DiscoveryDays <- 1;
-		this.m.ScalingModality <- this.ScalingModalities.Static;
-		this.m.EffectText <- null;
-		this.m.InstructionText <- "Right-click to dispatch within proximity of a lair. This Edict will be consumed in the process.";
+		this.m.ScalingModality <- this.getScalingModalities().Static;
 		this.m.ShowWarning <- false;
-	},
-	ScalingModalities =
+		this.m.EffectText <- "";
+	}
+
+	function assignPropertiesByName( _properName )
 	{
-		Static = 0,
-		Agitation = 1,
-		Resources = 2
-	},
-	Sounds =
+		this.setIDByName(_properName);
+		this.setDescription(_properName);
+		this.setName(_properName);
+		this.setEffectTextByName(_properName);
+	}
+
+	function assignSoundProperties()
 	{
-		Move = "sounds/cloth_01.wav",
-		Use = "sounds/cloth_01.wav",
+		this.raids_item.assignSoundProperties();
+		this.m.UseSound = "sounds/cloth_01.wav";
+		this.m.InventorySound = "sounds/cloth_01.wav";
+	}
+
+	function createDiscoveryEntry()
+	{
+		return ::Raids.Standard.constructEntry
+		(
+			"Time",
+			this.getDiscoveryText()
+		);
+	}
+
+	function createEffectEntry()
+	{
+		return ::Raids.Standard.constructEntry
+		(
+			"Special",
+			this.m.EffectText
+		);
+	}
+
+	function createInstructionEntry()
+	{
+		return ::Raids.Standard.constructEntry
+		(
+			null,
+			::Raids.Strings.Edicts.EdictInstructionText
+		);
+	}
+
+	function createPersistenceEntry()
+	{
+		return ::Raids.Standard.constructEntry
+		(
+			"Persistence",
+			this.getPersistenceText()
+		);
+	}
+
+	function createScalingEntry()
+	{
+		return ::Raids.Standard.constructEntry
+		(
+			"Scaling",
+			this.getScalingText()
+		);
 	}
 
 	function createWarningEntry()
 	{
-		# Define entry from template.
-		local entry = clone this.Tooltip.Template;
-		entry.icon = this.Tooltip.Icons.Warning;
-
-		# Define colour wrap lambda to ease readability.
 		local colourWrap = @(_string) ::Raids.Standard.colourWrap(_string, ::Raids.Standard.Colour.Red);
-
-		# Create sentence fragments for text field.
-		local fragmentA = format("There are no %s.", colourWrap("viable lairs within proximity"));
-
-		# Highlight sections of text most relevant to a prospective reader.
-		local fragmentB =  format("Lairs that are viable and within proximity %s.", colourWrap("will display Edict slots on their tooltip"));
-
-		# Concatenate fragments.
-		entry.text = format("%s %s", fragmentA, fragmentB);
-
-		return entry;
+		local fragmentA = format(::Raids.Strings.Edicts.EdictWarningFragmentA, colourWrap(::Raids.Strings.Edicts.EdictWarningFragmentB));
+		local fragmentB =  format(::Raids.Strings.Edicts.EdictWarningFragmentC, colourWrap(::Raids.Strings.Edicts.EdictWarningFragmentD));
+		return ::Raids.Standard.constructEntry
+		(
+			"Warning",
+			format("%s %s", fragmentA, fragmentB)
+		);
 	}
 
 	function executeEdictProcedure( _lairs )
@@ -50,7 +99,7 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_item",
 
 		foreach( lair in _lairs )
 		{
-			local vacantContainers = clone ::Raids.Edicts.Containers;
+			local vacantContainers = clone ::Raids.Edicts.getField("Containers");
 			::Raids.Standard.removeFromArray(::Raids.Edicts.getOccupiedContainers(lair), vacantContainers);
 
 			if (vacantContainers.len() == 0)
@@ -59,14 +108,10 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_item",
 			}
 
 			this.initialiseContainer(vacantContainers[0], lair);
-
-			if (!isValid)
-			{
-				isValid = true;
-			}
+			isValid = true;
 		}
 
-		if (!isValid)
+		if (isValid == false)
 		{
 			return false;
 		}
@@ -75,81 +120,52 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_item",
 		return true;
 	}
 
-	function getDiscoveryDuration()
-	{
-		return this.m.DiscoveryDays;
-	}
-
 	function getDiscoveryText()
 	{
-		local discoveryDuration = this.getDiscoveryDuration(),
-		discoveryText = ::Raids.Standard.colourWrap(discoveryDuration, ::Raids.Standard.Colour.Green);
+		local discoveryText = ::Raids.Standard.colourWrap(this.m.DiscoveryDays, ::Raids.Standard.Colour.Green);
 		return format("This Edict takes effect in %s %s.", discoveryText, discoveryDuration > 1 ? "days" : "day");
-	}
-
-	function getEffectText()
-	{
-		return this.m.EffectText;
-	}
-
-	function getInstructionText()
-	{
-		return this.m.InstructionText;
 	}
 
 	function getPersistenceText()
 	{
-		local descriptor = ::Raids.Standard.colourWrap(this.isCycled() ? "temporary" : "permanent", ::Raids.Standard.Colour.Red);
-		return format("This Edict's effects are %s.", descriptor);
+		local descriptor = ::Raids.Standard.colourWrap(::Raids.Strings.Generic[this.isCycled() ? "Temporary" : "Permanent"], ::Raids.Standard.Colour.Red);
+		return format(::Raids.Strings.Edicts.EdictPersistenceText, descriptor);
 	}
 
-	function getScalingModality()
+	function getScalingModalities()
 	{
-		return this.m.ScalingModality;
+		return ::Raids.Edicts.getField("ScalingModalities");
 	}
 
 	function getScalingText()
 	{
-		local scaling = this.m.ScalingModality, modalities = this.ScalingModalities;
-		if (scaling == modalities.Static) return format("This Edict's effects are %s.", ::Raids.Standard.colourWrap("static", ::Raids.Standard.Colour.Green));
-		return format("This Edict's effects scale with lair %s.", ::Raids.Standard.colourWrap(scaling == modalities.Agitation ? "Agitation" : "resources", ::Raids.Standard.Colour.Red));
+		local modalities = this.getScalingModalities();
+
+		if (this.m.ScalingModality == modalities.Static)
+		{
+			return format(::Raids.Strings.Edicts.EdictScalingTextStatic, ::Raids.Standard.colourWrap("static", ::Raids.Standard.Colour.Green));
+		}
+
+		return format(::Raids.Strings.Edicts.EdictScalingText, ::Raids.Standard.colourWrap(this.m.ScalingModality == modalities.Agitation ? "Agitation" : "resources", ::Raids.Standard.Colour.Red));
 	}
 
 	function getTooltip()
 	{
-		local tooltipArray = [],
-		push = @(_entry) tooltipArray.push(_entry);
+		local tooltipArray = this.raids_item.getTooltip();
+		local push = @(_entry) ::Raids.Standard.push(_entry, tooltipArray);
 
-		# Create generic entries.
-		push({id = 1, type = "title", text = this.getName()});
-		push({id = 2, type = "description", text = this.getDescription()});
-		push({id = 66, type = "text", text = this.getValueString()});
-		push({id = 3, type = "image", image = this.getIcon()});
+		push(this.createEffectEntry());
+		push(this.createPersistenceEntry());
+		push(this.createDiscoveryEntry());
+		push(this.createScalingEntry());
 
-		# Create effect entry.
-		push({id = 6, type = "text", icon = this.Tooltip.Icons.Effect, text = this.getEffectText()});
-
-		# Create persistence entry.
-		push({id = 6, type = "text", icon = this.Tooltip.Icons.Persistence, text = this.getPersistenceText()});
-
-		# Create discovery time entry.
-		push({id = 6, type = "text", icon = this.Tooltip.Icons.Time, text = this.getDiscoveryText()});
-
-		# Create scaling modality entry.
-		push({id = 6, type = "text", icon = this.Tooltip.Icons.Scaling, text = this.getScalingText()});
-
-		# Evaluate viability for appending warning entry.
-		if (this.getWarningState())
-		{	# Create warning entry.
+		if (this.m.ShowWarning)
+		{
 			push(this.createWarningEntry());
-
-			# Reset warning state.
 			this.setWarningState(false);
 		}
 
-		# Create hint entry.
-		push({id = 65, type = "text", text = this.getInstructionText()});
-
+		push(this.createInstructionEntry());
 		return tooltipArray;
 	}
 
@@ -162,15 +178,15 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_item",
 			return naiveLairs;
 		}
 
-		local edictName = ::Raids.Edicts.getEdictName(this.getID()),
-		lairs = naiveLairs.filter(function( _index, _lair )
+		local edictName = ::Raids.Edicts.getEdictName(this.getID()); // TODO: again with the edict name?
+		local lairs = naiveLairs.filter(function( _index, _lair )
 		{
 			if (!::Raids.Edicts.isLairViable(_lair))
 			{
 				return false;
 			}
 
-			if (::Raids.Edicts.getOccupiedContainers(_lair).len() == ::Raids.Edicts.Containers.len())
+			if (::Raids.Edicts.getOccupiedContainers(_lair).len() == ::Raids.Edicts.getField("Containers").len())
 			{
 				return false;
 			}
@@ -191,36 +207,34 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_item",
 		return lairs;
 	}
 
-	function getWarningState()
-	{
-		return this.m.ShowWarning;
-	}
-
 	function initialiseContainer( _container, _lair )
 	{
 		::Raids.Standard.setFlag(_container, this.getID(), _lair);
 		::Raids.Standard.setFlag(format("%sTime", _container), ::World.getTime().Days, _lair);
-		::Raids.Standard.setFlag(format("%sDuration", _container), this.getDiscoveryDuration(), _lair);
+		::Raids.Standard.setFlag(format("%sDuration", _container), this.m.DiscoveryDays, _lair);
 	}
 
 	function isCycled()
 	{
-		return ::Raids.Edicts.CycledEdicts.find(::Raids.Edicts.getEdictName(this.getID())) != null;
+		local edictName = ::Raids.Edicts.getEdictName(this.getID()); // TODO: what precisely is 'edict name'? is it an internally tracked name?
+		return ::Raids.Edicts.getField("CycledEdicts").find(edictName) != null;
 	}
 
-	function playInventorySound( _eventType )
+	function setEffectTextByName( _properName )
 	{
-		::Sound.play(this.Sounds.Move, ::Const.Sound.Volume.Inventory);
+		// TODO:
 	}
 
-	function playUseSound()
+	function setIDByName( _properName )
 	{
-		::Sound.play(this.Sounds.Use, ::Const.Sound.Volume.Inventory);
+		local formattedName = this.formatName(_properName, "_");
+		this.m.ID = format("special.raids_%s_item", formattedName.tolower());
 	}
 
-	function playWarningSound()
+	function setName( _properName )
 	{
-		::Sound.play(this.Sounds.Warning, ::Const.Sound.Volume.Inventory);
+		local key = this.formatName(_properName);
+		this.m.Name = ::Raids.Strings.Edicts[format("%sName", key)];
 	}
 
 	function setWarningState( _bool )
@@ -228,13 +242,8 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_item",
 		this.m.ShowWarning = _bool;
 	}
 
-	function setDescription( _string )
-	{
-		this.m.Description = format("A thoroughly illegal facsimile of official correspondence. %s", _string);
-	}
-
 	function onUse( _actor, _item = null )
-	{
+	{	// TODO: may want to have handle valid and invalid use methods here
 		local lairs = this.getViableLairs();
 
 		if (lairs.len() == 0)

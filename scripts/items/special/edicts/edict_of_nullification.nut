@@ -1,4 +1,4 @@
-this.edict_of_nullification <- ::inherit("scripts/items/special/edict_item",
+this.edict_of_nullification <- ::inherit("scripts/items/special/raids_edict_item",
 {
 	m = {},
 	function create()

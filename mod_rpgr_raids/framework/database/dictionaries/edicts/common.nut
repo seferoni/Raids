@@ -22,5 +22,11 @@
 	Overrides =
 	[
 		"location.undead_crypt"
-	]
+	],
+	ScalingModalities =
+	{
+		Static = 0,
+		Agitation = 1,
+		Resources = 2
+	},
 };
