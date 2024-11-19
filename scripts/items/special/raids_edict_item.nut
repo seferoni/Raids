@@ -123,7 +123,7 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_item",
 	function getDiscoveryText()
 	{
 		local discoveryText = ::Raids.Standard.colourWrap(this.m.DiscoveryDays, ::Raids.Standard.Colour.Green);
-		return format("This Edict takes effect in %s %s.", discoveryText, discoveryDuration > 1 ? "days" : "day");
+		return format(::Raids.Strings.Edicts.EdictDiscoveryText, discoveryText, ::Raids.Strings.Generic[discoveryDuration > 1 ? "Days" : "Day"]);
 	}
 
 	function getPersistenceText()
@@ -139,14 +139,15 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_item",
 
 	function getScalingText()
 	{
+		local colourWrap = @(_text, _colour) ::Raids.Standard.colourWrap(_text, ::Raids.Standard.Colour[_colour]);
 		local modalities = this.getScalingModalities();
 
 		if (this.m.ScalingModality == modalities.Static)
 		{
-			return format(::Raids.Strings.Edicts.EdictScalingTextStatic, ::Raids.Standard.colourWrap("static", ::Raids.Standard.Colour.Green));
+			return format(::Raids.Strings.Edicts.EdictScalingTextStatic, colourWrap(::Raids.Strings.Generic.Static, "Green"));
 		}
 
-		return format(::Raids.Strings.Edicts.EdictScalingText, ::Raids.Standard.colourWrap(this.m.ScalingModality == modalities.Agitation ? "Agitation" : "resources", ::Raids.Standard.Colour.Red));
+		return format(::Raids.Strings.Edicts.EdictScalingText, colourWrap(::Raids.Strings.Generic[this.m.ScalingModality == modalities.Agitation ? "Agitation" : "resources"], "Red"));
 	}
 
 	function getTooltip()
@@ -228,7 +229,7 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_item",
 	function setIDByName( _properName )
 	{
 		local formattedName = this.formatName(_properName, "_");
-		this.m.ID = format("special.raids_%s_item", formattedName.tolower());
+		this.m.ID = format("special.raids_edict_of_%s_item", formattedName.tolower());
 	}
 
 	function setName( _properName )
