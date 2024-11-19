@@ -3,7 +3,7 @@ this.raids_edict_of_agitation <- ::inherit("scripts/items/special/raids_edict_it
 	m = {},
 	function create()
 	{
-		this.edict_item.create();
+		this.raids_edict_item.create();
 		this.assignPropertiesByName("Agitation");
 	}
 
