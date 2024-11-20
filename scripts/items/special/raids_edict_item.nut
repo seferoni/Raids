@@ -59,7 +59,7 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_item",
 		return ::Raids.Standard.constructEntry
 		(
 			null,
-			::Raids.Strings.Edicts.EdictInstructionText
+			::Raids.Strings.Edicts.EdictInstruction
 		);
 	}
 
@@ -223,7 +223,8 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_item",
 
 	function setEffectTextByName( _properName )
 	{
-		// TODO:
+		local formattedName = this.formatName(_properName, "_");
+		this.m.EffectText = ::Raids.Strings.Edicts[key].Effect;
 	}
 
 	function setIDByName( _properName )
@@ -235,7 +236,7 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_item",
 	function setName( _properName )
 	{
 		local key = this.formatName(_properName);
-		this.m.Name = ::Raids.Strings.Edicts[format("%sName", key)];
+		this.m.Name = ::Raids.Strings.Edicts[key].Name;
 	}
 
 	function setWarningState( _bool )

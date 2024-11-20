@@ -1,4 +1,4 @@
-this.official_document_item <- ::inherit("scripts/items/item",
+this.raids_official_document_item <- ::inherit("scripts/items/raids_item",
 {
 	m = {},
 	Sounds =
@@ -20,7 +20,7 @@ this.official_document_item <- ::inherit("scripts/items/item",
 		this.m.IsAllowedInBag = false;
 		this.m.IsUsable = true;
 		this.m.EffectText <- "Will produce a counterfeit Edict upon use. The resulting Edict type can be modulated by a set of writing instruments, if present.";
-		this.m.InstructionText <- "Right-click to modify its contents.";
+		this.m.Instruction <- "Right-click to modify its contents.";
 	}
 
 	function findWritingInstruments()
@@ -52,7 +52,7 @@ this.official_document_item <- ::inherit("scripts/items/item",
 
 	function getInstruction()
 	{
-		return this.m.InstructionText;
+		return this.m.Instruction;
 	}
 
 	function getTooltip()

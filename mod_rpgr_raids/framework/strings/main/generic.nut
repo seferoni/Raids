@@ -3,9 +3,9 @@
 	Agitation = "Agitation",
 	Day = "day",
 	Days = "days",
+	Permanent = "permanent",
 	Resources = "resources",
 	Static = "static",
-	UsesRemaining = "Has %s uses remaining."
 	Temporary = "temporary",
-	Permanent = "permanent",
+	UsesRemaining = "Has %s uses remaining."
 };

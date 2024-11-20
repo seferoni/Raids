@@ -82,7 +82,8 @@
 
 	function loadStrings()
 	{
-		this.includeFiles("mod_rpgr_raids/framework/strings");
+		this.includeFiles("mod_rpgr_raids/framework/strings/main");
+		this.includeFiles("mod_rpgr_raids/framework/strings/edicts");
 	}
 
 	function loadLibraries()
