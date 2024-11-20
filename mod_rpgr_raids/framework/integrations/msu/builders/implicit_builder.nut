@@ -39,7 +39,7 @@
 		foreach( category in pageCategories )
 		{
 			local pageID = format("Page%s", category);
-			local pageName = ::Raids.Integrations.MSU.getElementName(pageID);
+			local pageName = ::Raids.Integrations.MSU.getElementName(pageID); // TODO: the pages are not built yet. you cannot retrieve their name in this way.
 			::Raids.Integrations.MSU.addPage(pageID, pagename);
 		}
 	}
