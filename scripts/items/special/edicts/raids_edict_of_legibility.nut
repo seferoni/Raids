@@ -34,7 +34,7 @@ this.raids_edict_of_legibility <- ::inherit("scripts/items/special/raids_edict_i
 			return naiveLairs;
 		}
 
-		local edictName = ::Raids.Edicts.getEdictName(this.getID()); // TODO: again with the edict name?
+		local edictName = ::Raids.Edicts.getSugaredID(this.getID()); // TODO: again with the edict name?
 		local lairs = naiveLairs.filter(function( _index, _lair )
 		{
 			if (!_lair.m.IsShowingBanner)

@@ -1,6 +1,7 @@
 ::Raids.Strings.Edicts.Agitation <-
 {
 	Name = "Edict of Agitation",
+	NameAbbreviated = "Agitation",
 	Description = "It specifies the date, time, and mustered strength of a scheduled raid.",
 	Effect = "Will Agitate nearby lairs."
 	EffectFragmentA = "%s This Edict can occupy %s.",

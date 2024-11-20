@@ -8,9 +8,10 @@
 	],
 	CycledEdicts =
 	[
-		"Abundance",
-		"Diminution",
-		"Opportunism"
+		"special.edict_of_abundance_item",
+		"special.edict_of_agitation_item",
+		"special.edict_of_diminution_item",
+		"special.edict_of_opportunism_item",
 	],
 	Factions =
 	[

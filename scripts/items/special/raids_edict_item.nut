@@ -1,5 +1,5 @@
 this.raids_edict_item <- ::inherit("scripts/items/raids_item",
-{
+{	// TODO: all edicts require a NameAbbreviated field
 	m = {},
 	function create()
 	{
@@ -18,6 +18,7 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_item",
 		this.m.DiscoveryDays <- 1;
 		this.m.ScalingModality <- this.getScalingModalities().Static;
 		this.m.ShowWarning <- false;
+		this.m.AbbreviatedName <- "";
 		this.m.EffectText <- "";
 	}
 
@@ -179,7 +180,7 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_item",
 			return naiveLairs;
 		}
 
-		local edictName = ::Raids.Edicts.getEdictName(this.getID()); // TODO: again with the edict name?
+		local edictName = ::Raids.Edicts.getSugaredID(this.getID()); // TODO: again with the edict name?
 		local lairs = naiveLairs.filter(function( _index, _lair )
 		{
 			if (!::Raids.Edicts.isLairViable(_lair))
@@ -217,8 +218,7 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_item",
 
 	function isCycled()
 	{
-		local edictName = ::Raids.Edicts.getEdictName(this.getID()); // TODO: what precisely is 'edict name'? is it an internally tracked name?
-		return ::Raids.Edicts.getField("CycledEdicts").find(edictName) != null;
+		return ::Raids.Edicts.getField("CycledEdicts").find(this.getID()) != null;
 	}
 
 	function setEffectTextByName( _properName )
@@ -237,6 +237,7 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_item",
 	{
 		local key = this.formatName(_properName);
 		this.m.Name = ::Raids.Strings.Edicts[key].Name;
+		this.m.AbbreviatedName = ::Raids.Strings.Edicts[key].AbbreviatedName;
 	}
 
 	function setWarningState( _bool )

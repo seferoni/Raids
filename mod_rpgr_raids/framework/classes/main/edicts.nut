@@ -64,10 +64,10 @@
 	function executeEdictProcedure( _container, _lairObject )
 	{
 		local edictID = ::Raids.Standard.getFlag(_container, _lairObject);
-		local edictName = this.getEdictName(edictID);
+		local edictName = PLACEHOLDER; // TODO: this needs a sugared, short form edict name. we should define this separately in strings
 		local procedure = format("execute%sProcedure", edictName);
 
-		if (this.getField("CycledEdicts").find(edictName) != null)
+		if (this.getField("CycledEdicts").find(edictID) != null)
 		{
 			this.resetContainer(_container, _lairObject);
 			this.addToHistory(edictName, _lairObject);
@@ -157,7 +157,7 @@
 		foreach( container in occupiedContainers )
 		{
 			local inDiscovery = ::Raids.Standard.getFlag(format("%sTime", container), _lairObject) != false;
-			local edictName = this.getEdictName(::Raids.Standard.getFlag(container, _lairObject));
+			local edictName = this.getSugaredID(::Raids.Standard.getFlag(container, _lairObject));
 			local activeState = inDiscovery ? "Discovery" : "Active";
 			entries.push(this.createTooltipEntry(edictName, activeState));
 		}
@@ -188,17 +188,10 @@
 	}
 
 	function getEdictID( _edictName )
-	{
-		local prependedString = "special.edict_of_";
+	{	// TODO: questionable if this should exist
+		local prependedString = "special.raids_edict_of_";
 		local edictID = format("%s%s", prependedString,  ::Raids.Standard.setCase(_edictName, "tolower"));
 		return edictID;
-	}
-
-	function getEdictName( _edictID, _isFileName = false )
-	{
-		local culledString = _isFileName ? format("%s%s", this.Parameters.DirectoryPath, "edict_of_") : "special.edict_of_";
-		local edictName = ::Raids.Standard.setCase(_edictID.slice(culledString.len()), ::Raids.Standard.Case.Upper);
-		return edictName;
 	}
 
 	function getEdictProperties()
@@ -293,6 +286,13 @@
 		}
 
 		return entries;
+	}
+
+	function getSugaredID( _edictID, _isFileName = false )
+	{
+		local culledString = _isFileName ? format("%s%s", this.Parameters.DirectoryPath, "raids_edict_of_") : "special.raids_edict_of_";
+		local edictName = ::Raids.Standard.setCase(_edictID.slice(culledString.len()), ::Raids.Standard.Case.Upper);
+		return edictName;
 	}
 
 	function getTreasureOffset( _lairObject )

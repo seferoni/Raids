@@ -41,7 +41,7 @@ this.raids_edict_of_agitation <- ::inherit("scripts/items/special/raids_edict_it
 		}
 
 		local self = this;
-		local edictName = ::Raids.Edicts.getEdictName(this.getID());
+		local edictName = ::Raids.Edicts.getSugaredID(this.getID());
 		local lairs = naiveLairs.filter(function( _index, _lair )
 		{
 			if (!::Raids.Edicts.isLairViable(_lair))
@@ -97,10 +97,5 @@ this.raids_edict_of_agitation <- ::inherit("scripts/items/special/raids_edict_it
 		}
 
 		return false;
-	}
-
-	function isCycled()
-	{	// TODO: is this necessary?
-		return true;
 	}
 });

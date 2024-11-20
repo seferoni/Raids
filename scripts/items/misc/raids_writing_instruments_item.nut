@@ -69,7 +69,7 @@ this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_item",
 
 		while (selectedEdicts.len() < ::Raids.Edicts.Parameters.EdictSelectionSize)
 		{
-			local candidate = ::Raids.Edicts.getEdictName(edicts[::Math.rand(0, edicts.len() - 1)], true);
+			local candidate = ::Raids.Edicts.getSugaredID(edicts[::Math.rand(0, edicts.len() - 1)], true);
 
 			if (selectedEdicts.find(candidate) != null)
 			{
