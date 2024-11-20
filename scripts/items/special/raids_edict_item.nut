@@ -211,7 +211,7 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_item",
 
 	function initialiseContainer( _container, _lair )
 	{
-		::Raids.Standard.setFlag(_container, this.getID(), _lair);
+		::Raids.Standard.setFlag(_container, this.getID(), _lair); // TODO: it may be more useful to assign this to the sugared name, instead. have greater access to associated fields that way.
 		::Raids.Standard.setFlag(format("%sTime", _container), ::World.getTime().Days, _lair);
 		::Raids.Standard.setFlag(format("%sDuration", _container), this.m.DiscoveryDays, _lair);
 	}
