@@ -3,10 +3,11 @@
 	function createTables()
 	{
 		this.Parameters <- {};
-		this.Parameters.Caravans <- {};
-		this.Parameters.Defenders <- {};
-		this.Parameters.Edicts <- {};
-		this.Parameters.Lairs <- {};
+		this.Generic <- {};
+		this.Caravans <- {};
+		this.Defenders <- {};
+		this.Edicts <- {};
+		this.Lairs <- {};
 	}
 
 	function getTopLevelField( _tableName, _fieldName )
