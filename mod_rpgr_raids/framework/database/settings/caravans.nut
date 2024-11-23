@@ -1,4 +1,4 @@
-::Raids.Database.Parameters.Caravans <-
+::Raids.Database.Settings.Caravans <-
 {
 	CaravanReinforcementChance =
 	{

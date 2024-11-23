@@ -2,7 +2,7 @@
 {
 	function createTables()
 	{
-		this.Parameters <- {};
+		this.Settings <- {};
 		this.Generic <- {};
 		this.Caravans <- {};
 		this.Defenders <- {};
@@ -43,11 +43,11 @@
 		return format("ui/icons/%s", this.Icons[_iconKey]);
 	}
 
-	function getParameters()
+	function getSettingParameters()
 	{
 		local agglomeratedParameters = {};
 
-		foreach( parameterType, parameterTable in this.Parameters )
+		foreach( parameterType, parameterTable in this.Settings )
 		{
 			::Raids.Standard.extendTable(parameterDictionary, agglomeratedParameters);
 		}
@@ -55,7 +55,7 @@
 		return agglomeratedParameters;
 	}
 
-	function getParameterCategories()
+	function getSettingCategories()
 	{
 		return ::Raids.Standard.getKeys(this.Settings);
 	}
@@ -68,7 +68,7 @@
 	function loadFiles()
 	{
 		this.loadFolder("dictionaries");
-		this.loadFolder("parameters");
+		this.loadFolder("settings");
 	}
 
 	function initialise()

@@ -1,4 +1,4 @@
-::Raids.Database.Parameters.Lairs <-
+::Raids.Database.Settings.Lairs <-
 {
 	AgitationIncrementChance =
 	{

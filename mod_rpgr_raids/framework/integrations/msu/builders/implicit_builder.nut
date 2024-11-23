@@ -25,7 +25,7 @@
 	{
 		this.buildPages();
 
-		foreach( category, settingGroup in ::Raids.Database.Parameters )
+		foreach( category, settingGroup in ::Raids.Database.Settings )
 		{
 			local pageID = format("Page%s", category);
 			this.buildImplicitly(pageID, settingGroup);
@@ -34,13 +34,13 @@
 
 	function buildPages()
 	{
-		local pageCategories = ::Raids.Database.getParameterCategories();
+		local pageCategories = ::Raids.Database.getSettingCategories();
 
 		foreach( category in pageCategories )
 		{
 			local pageID = format("Page%s", category);
 			local pageName = ::Raids.Strings.Settings[format("%sName", pageID)];
-			::Raids.Integrations.MSU.addPage(pageID, pagename);
+			::Raids.Integrations.MSU.addPage(pageID, pageName);
 		}
 	}
 

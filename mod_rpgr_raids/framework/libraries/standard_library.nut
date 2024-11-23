@@ -164,7 +164,7 @@
 			return ::Raids.Interfaces.MSU.ModSettings.getParameter(_parameterID).getValue();
 		}
 
-		local parameters = ::Raids.Database.getParameters();
+		local parameters = ::Raids.Database.getSettingParameters();
 
 		foreach( parameterKey, parameterTable in parameters )
 		{
