@@ -10,7 +10,7 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_item",
 	function assignGenericProperties()
 	{
 		this.raids_item.assignGenericProperties();
-		this.m.Icon = "special/raids_edict_item.png";
+		this.m.Icon = "special/raids_edict_item.png"; // TODO: if this is to inherit from raids_stackable_item, this needs to be functionalised
 	}
 
 	function assignEdictProperties()
