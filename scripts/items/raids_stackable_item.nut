@@ -4,7 +4,17 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 	function create()
 	{
 		this.raids_item.create();
-		// TODO: initialise stack functionality
+		this.assignStackableProperties();
+	}
+
+	function assignStackableProperties()
+	{
+		local currentStacks = this.getStacks();
+
+		if (currentStacks == false)
+		{
+			this.setStacks(this.getProcedures().Override, 1);
+		}
 	}
 
 	function decrementStacks()
@@ -20,6 +30,12 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 		this.setStacks(currentStacks - 1);
 	}
 
+	function onStackUpdate()
+	{	// TODO: may need to move this to whatever handles stack updates
+		this.refreshIcon();
+		this.recalculateValue();
+	}
+
 	function refreshIcon()
 	{
 		// TODO:
@@ -27,7 +43,7 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 
 	function recalculateValue()
 	{
-
+		// TODO: getting the default value of m.Value might be a pickle. might also not be a pickle, since stackable properties can initialise on added to stash, ie, well after create()?
 	}
 
 	function getItemInstancesInStash()
@@ -61,11 +77,17 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 	function onAddedToStash( _stashID )
 	{
 		this.raids_item.onAddedToStash(_stashID);
+		this.updateStacks();
 	}
 
 	function onUse( _actor, _item = null )
 	{
 		this.raids_item.onUse(_actor, _item);
+	}
+
+	function overrideStacks( _newValue )
+	{
+		::Raids.Standard.setFlag("Stacks", _newValue, this);
 	}
 
 	function incrementStacks()
@@ -74,7 +96,7 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 		this.setStacks(currentStacks + 1);
 	}
 
-	function setStacks( _procedure )
+	function setStacks( _procedure, _newValue = null )
 	{
 		local procedures = this.getProcedures();
 
@@ -82,9 +104,26 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 		{
 			case (procedures.Increment): this.incrementStacks(); break;
 			case (procedures.Decrement): this.decrementStacks(); break;
+			case (procedures.Override): this.overrideStacks(_newValue); break;
 		}
 
 		this.refreshIcon();
 		this.recalculateValue();
+	}
+
+	function updateStacks()
+	{	// TODO: unfinished. shouldn't this responsibility be delegated to another handler? couupling it to the item itself seems short-sighted
+		local instances = this.getItemInstancesInStash();
+		local tally = instances.len();
+
+		if (tally <= 1)
+		{
+			return;
+		}
+
+		local proxy = instances.pop();
+
+
+		this.onStackUpdate();
 	}
 });
