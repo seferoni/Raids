@@ -11,7 +11,6 @@
 	{
 		Increment = 1,
 		Reset = 2,
-		Decrement = 3,
-		Override = 4
+		Decrement = 3
 	}
 };

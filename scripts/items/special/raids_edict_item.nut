@@ -1,15 +1,15 @@
-this.raids_edict_item <- ::inherit("scripts/items/raids_item",
+this.raids_edict_item <- ::inherit("scripts/items/raids_stackable_item",
 {	// TODO: all edicts require a NameAbbreviated field
 	m = {},
 	function create()
 	{
-		this.raids_item.create();
+		this.raids_stackable_item.create();
 		this.assignEdictProperties();
 	}
 
 	function assignGenericProperties()
 	{
-		this.raids_item.assignGenericProperties();
+		this.raids_stackable_item.assignGenericProperties();
 		this.m.Icon = "special/raids_edict_item.png"; // TODO: if this is to inherit from raids_stackable_item, this needs to be functionalised
 	}
 
@@ -32,7 +32,7 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_item",
 
 	function assignSoundProperties()
 	{
-		this.raids_item.assignSoundProperties();
+		this.raids_stackable_item.assignSoundProperties();
 		this.m.UseSound = "sounds/cloth_01.wav";
 		this.m.InventorySound = "sounds/cloth_01.wav";
 	}
@@ -95,7 +95,7 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_item",
 	}
 
 	function executeEdictProcedure( _lairs )
-	{
+	{	// TODO: this should not return anything.
 		local isValid = false;
 
 		foreach( lair in _lairs )
@@ -153,7 +153,7 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_item",
 
 	function getTooltip()
 	{
-		local tooltipArray = this.raids_item.getTooltip();
+		local tooltipArray = this.raids_stackable_item.getTooltip();
 		local push = @(_entry) ::Raids.Standard.push(_entry, tooltipArray);
 
 		push(this.createEffectEntry());
@@ -257,6 +257,7 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_item",
 			return false;
 		}
 
-		return this.executeEdictProcedure(lairs);
+		return this.executeEdictProcedure(lairs); // TODO: this is a pickle to parse and make cohere with our removeIfQueued method structure
+		// could potentially do a try catch? might not be a valid/legal use
 	}
 });

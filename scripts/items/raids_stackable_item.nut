@@ -4,7 +4,6 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 	function create()
 	{
 		this.raids_item.create();
-		this.assignStackableProperties();
 	}
 
 	function assignStackableProperties()
@@ -13,7 +12,7 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 
 		if (currentStacks == false)
 		{
-			this.setStacks(this.getProcedures().Override, 1);
+			this.overrideStacks(1);
 		}
 	}
 
@@ -23,15 +22,15 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 
 		if (currentStacks - 1 <= 0)
 		{
-			this.removeSelf();
+			this.queueForRemoval();
 			return;
 		}
 
-		this.setStacks(currentStacks - 1);
+		this.overrideStacks(currentStacks - 1);
 	}
 
 	function onStackUpdate()
-	{	// TODO: may need to move this to whatever handles stack updates
+	{
 		this.refreshIcon();
 		this.recalculateValue();
 	}
@@ -83,6 +82,7 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 	function onUse( _actor, _item = null )
 	{
 		this.raids_item.onUse(_actor, _item);
+		this.setStacks(this.getProcedures().Decrement);
 	}
 
 	function overrideStacks( _newValue )
@@ -93,10 +93,30 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 	function incrementStacks()
 	{
 		local currentStacks = this.getStacks();
-		this.setStacks(currentStacks + 1);
+		this.overrideStacks(currentStacks + 1);
 	}
 
-	function setStacks( _procedure, _newValue = null )
+	function isQueuedForRemoval()
+	{
+		return ::Raids.Standard.getFlag("QueuedForRemoval", this);
+	}
+
+	function queueForRemoval()
+	{
+		::Raids.Standard.setFlag("QueuedForRemoval", this, true);
+	}
+
+	function removeIfQueued()
+	{
+		if (!this.isQueuedForRemoval())
+		{
+			return;
+		}
+
+		this.removeSelf();
+	}
+
+	function setStacks( _procedure )
 	{
 		local procedures = this.getProcedures();
 
@@ -104,26 +124,22 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 		{
 			case (procedures.Increment): this.incrementStacks(); break;
 			case (procedures.Decrement): this.decrementStacks(); break;
-			case (procedures.Override): this.overrideStacks(_newValue); break;
 		}
 
-		this.refreshIcon();
-		this.recalculateValue();
+		this.onStackUpdate();
 	}
 
 	function updateStacks()
-	{	// TODO: unfinished. shouldn't this responsibility be delegated to another handler? couupling it to the item itself seems short-sighted
+	{
 		local instances = this.getItemInstancesInStash();
-		local tally = instances.len();
 
-		if (tally <= 1)
+		if (instances.len() == 0)
 		{
+			this.assignStackableProperties();
 			return;
 		}
 
-		local proxy = instances.pop();
-
-
-		this.onStackUpdate();
+		instances[0].setStacks(this.getProcedures().Increment);
+		this.removeSelf();
 	}
 });
