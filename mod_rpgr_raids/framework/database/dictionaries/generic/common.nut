@@ -6,5 +6,11 @@
 		"NamedWeapons",
 		"NamedHelmets",
 		"NamedShields"
-	]
+	],
+	Procedures =
+	{
+		Increment = 1,
+		Reset = 2,
+		Decrement = 3
+	}
 };

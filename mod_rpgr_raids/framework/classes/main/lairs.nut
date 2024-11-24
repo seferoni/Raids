@@ -299,6 +299,11 @@
 		return _lairObject.getResources() * this.getTimeModifier() * baseResourceModifier * configurableModifier;
 	}
 
+	function getProcedures()
+	{
+		return ::Raids.Database.getSubLevelField("Generic", "Procedures");
+	}
+
 	function getResourcesByAgitation( _lairObject )
 	{
 		local agitation = ::Raids.Standard.getFlag("Agitation", _lairObject);
@@ -427,7 +432,7 @@
 	{
 		local agitation = ::Raids.Standard.getFlag("Agitation", _lairObject);
 
-		if (_procedure == this.getField("Procedures").Increment && agitation >= this.getField("AgitationDescriptors").Militant)
+		if (_procedure == this.getProcedures().Increment && agitation >= this.getField("AgitationDescriptors").Militant)
 		{
 			return false;
 		}
@@ -522,7 +527,7 @@
 			return;
 		}
 
-		local procedures = this.getField("Procedures");
+		local procedures = this.getProcedures();
 
 		switch (_procedure)
 		{
@@ -567,7 +572,7 @@
 			return;
 		}
 
-		this.setAgitation(_lairObject, this.getField("Procedures").Reset);
+		this.setAgitation(_lairObject, this.getProcedures().Reset);
 		this.depopulateNamedLoot(_lairObject);
 		this.updateProperties(_lairObject);
 	}

@@ -16,10 +16,5 @@
 		"OrientalBandits",
 		"Undead",
 		"Zombies"
-	],
-	Procedures =
-	{
-		Increment = 1,
-		Reset = 2
-	}
+	]
 };
