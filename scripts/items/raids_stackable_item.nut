@@ -6,9 +6,16 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 		this.raids_item.create();
 	}
 
+	function assignSpecialProperties()
+	{
+		this.raids_item.assignSpecialProperties();
+		this.m.IconNative <- "";
+		this.m.ValueNative <- "";
+	}
+
 	function assignStackableProperties()
 	{
-		local currentStacks = this.getStacks();
+		local currentStacks = this.getCurrentStacks();
 
 		if (currentStacks == false)
 		{
@@ -18,7 +25,7 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 
 	function decrementStacks()
 	{
-		local currentStacks = this.getStacks();
+		local currentStacks = this.getCurrentStacks();
 
 		if (currentStacks - 1 <= 0)
 		{
@@ -37,12 +44,25 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 
 	function refreshIcon()
 	{
-		// TODO:
+		local currentStacks = this.getCurrentStacks();
+		local stackThresholds = this.getIconStackThresholds();
+
+		foreach( thresholdDescriptor, thresholdTable in stackThresholds )
+		{
+			if (thresholdTable.MaximumStacks < currentStacks)
+			{
+				continue;
+			}
+
+			this.setIconWithSuffix(threshold.IconSuffix);
+			break;
+		}
 	}
 
 	function recalculateValue()
 	{
-		// TODO: getting the default value of m.Value might be a pickle. might also not be a pickle, since stackable properties can initialise on added to stash, ie, well after create()?
+		local currentStacks = this.getCurrentStacks();
+		this.m.Value = currentStacks * this.m.ValueNative;
 	}
 
 	function getItemInstancesInStash()
@@ -63,12 +83,17 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 		return instances;
 	}
 
+	function getIconStackThresholds()
+	{
+		return ::Raids.Database.getSubLevelField("Stackables", "IconStackThresholds");
+	}
+
 	function getProcedures()
 	{
 		return ::Raids.Database.getSubLevelField("Generic", "Procedures");
 	}
 
-	function getStacks()
+	function getCurrentStacks()
 	{
 		return ::Raids.Standard.getFlag("Stacks", this);
 	}
@@ -92,7 +117,7 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 
 	function incrementStacks()
 	{
-		local currentStacks = this.getStacks();
+		local currentStacks = this.getCurrentStacks();
 		this.overrideStacks(currentStacks + 1);
 	}
 
@@ -114,6 +139,23 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 		}
 
 		this.removeSelf();
+	}
+
+	function setIconWithSuffix( _suffixString )
+	{
+		this.m.Icon = format("%s_%s", this.m.IconNative, _suffixString);
+	}
+
+	function setNativeIcon( _iconPath )
+	{
+		this.m.Icon = _iconPath;
+		this.m.IconNative = _iconPath;
+	}
+
+	function setNativeValue( _value )
+	{
+		this.m.Value = _value;
+		this.m.ValueNative = _value;
 	}
 
 	function setStacks( _procedure )
