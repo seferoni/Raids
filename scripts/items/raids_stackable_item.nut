@@ -6,9 +6,9 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 		this.raids_item.create();
 	}
 
-	function assignSpecialProperties()
+	function assignGenericProperties()
 	{
-		this.raids_item.assignSpecialProperties();
+		this.raids_item.assignGenericProperties();
 		this.m.IconNative <- "";
 		this.m.ValueNative <- "";
 	}

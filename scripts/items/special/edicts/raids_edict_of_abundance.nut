@@ -10,7 +10,7 @@ this.raids_edict_of_abundance <- ::inherit("scripts/items/special/raids_edict_it
 	function assignGenericProperties()
 	{
 		this.raids_edict_item.assignGenericProperties();
-		this.m.Value = 50;
+		this.setNativeValue(50);
 	}
 
 	function assignEdictProperties()

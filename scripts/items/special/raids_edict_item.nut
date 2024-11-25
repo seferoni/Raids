@@ -1,5 +1,5 @@
 this.raids_edict_item <- ::inherit("scripts/items/raids_stackable_item",
-{	// TODO: all edicts require a NameAbbreviated field
+{	// TODO: all edicts require a NameAbbreviated field, and need setNativeValue implementations
 	m = {},
 	function create()
 	{
@@ -10,7 +10,7 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_stackable_item",
 	function assignGenericProperties()
 	{
 		this.raids_stackable_item.assignGenericProperties();
-		this.m.Icon = "special/raids_edict_item.png"; // TODO: if this is to inherit from raids_stackable_item, this needs to be functionalised
+		this.setNativeIcon("special/raids_edict_item.png");
 	}
 
 	function assignEdictProperties()
