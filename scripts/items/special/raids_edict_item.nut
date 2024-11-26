@@ -181,7 +181,7 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_stackable_item",
 			return naiveLairs;
 		}
 
-		local edictName = ::Raids.Edicts.getSugaredID(this.getID()); // TODO: again with the edict name?
+		local edictName = ::Raids.Edicts.getSugaredID(this.getID());
 		local lairs = naiveLairs.filter(function( _index, _lair )
 		{
 			if (!::Raids.Edicts.isLairViable(_lair))
