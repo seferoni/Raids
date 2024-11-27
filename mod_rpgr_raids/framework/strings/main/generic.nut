@@ -5,6 +5,7 @@
 	Days = "days",
 	Permanent = "permanent",
 	Resources = "resources",
+	Stacks = "Stacks: %s",
 	Static = "static",
 	Temporary = "temporary",
 	UsesRemaining = "Has %s uses remaining."

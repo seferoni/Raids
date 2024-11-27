@@ -4,6 +4,7 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 	function create()
 	{
 		this.raids_item.create();
+		this.assignStackableProperties();
 	}
 
 	function assignGenericProperties()
@@ -23,17 +24,40 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 		}
 	}
 
+	function createStackEntry()
+	{
+		return ::Raids.Standard.constructEntry
+		(
+			"Stacks",
+			format(::Raids.Strings.Generic.Stacks, ::Raids.Standard.colourWrap(this.getCurrentStacks(), ::Raids.Standard.Colour.Green))
+		);
+	}
+
 	function decrementStacks()
 	{
 		local currentStacks = this.getCurrentStacks();
 
 		if (currentStacks - 1 <= 0)
 		{
-			this.queueForRemoval();
+			this.flagForRemoval();
 			return;
 		}
 
 		this.overrideStacks(currentStacks - 1);
+	}
+
+	function flagForRemoval()
+	{
+		::Raids.Standard.setFlag("FlaggedForRemoval", this, true);
+	}
+
+	function getTooltip()
+	{
+		local tooltipArray = this.raids_item.getTooltip();
+		local push = @(_entry) ::Raids.Standard.push(_entry, tooltipArray);
+
+		push(this.createStackEntry());
+		return tooltipArray;
 	}
 
 	function onStackUpdate()
@@ -49,7 +73,7 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 
 		foreach( thresholdDescriptor, thresholdTable in stackThresholds )
 		{
-			if (thresholdTable.MaximumStacks < currentStacks)
+			if ("MaximumStacks" in thresholdTable && thresholdTable.MaximumStacks < currentStacks)
 			{
 				continue;
 			}
@@ -121,19 +145,14 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 		this.overrideStacks(currentStacks + 1);
 	}
 
-	function isQueuedForRemoval()
+	function isFlaggedForRemoval()
 	{
-		return ::Raids.Standard.getFlag("QueuedForRemoval", this);
-	}
-
-	function queueForRemoval()
-	{
-		::Raids.Standard.setFlag("QueuedForRemoval", this, true);
+		return ::Raids.Standard.getFlag("FlaggedForRemoval", this);
 	}
 
 	function removeIfQueued()
 	{
-		if (!this.isQueuedForRemoval())
+		if (!this.isFlaggedForRemoval())
 		{
 			return;
 		}
@@ -143,7 +162,7 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 
 	function setIconWithSuffix( _suffixString )
 	{
-		this.m.Icon = format("%s_%s", this.m.IconNative, _suffixString);
+		this.m.Icon = format("%s%s", this.m.IconNative, _suffixString);
 	}
 
 	function setNativeIcon( _iconPath )
@@ -177,7 +196,6 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 
 		if (instances.len() == 0)
 		{
-			this.assignStackableProperties();
 			return;
 		}
 

@@ -10,11 +10,11 @@
 		Multiple =
 		{
 			MaximumStacks = 5,
-			IconSuffix = "multiple"
+			IconSuffix = "_multiple"
 		},
 		Plentiful =
 		{
-			IconSuffix = "plentiful"
+			IconSuffix = "_plentiful"
 		}
 	}
 };

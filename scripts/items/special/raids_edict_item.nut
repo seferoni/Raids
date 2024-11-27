@@ -83,6 +83,16 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_stackable_item",
 	}
 
 	function createWarningEntry()
+	{
+		local compiledString = ::Raids.Strings.getFragmentsAsCompiledString("EdictWarningFragment", "Edicts");
+		return ::Raids.Standard.constructEntry
+		(
+			"Warning",
+			compiledString
+		);
+	}
+
+	function createWarningEntry()
 	{	// TODO: need a string handler to formalise this sorta logic.
 		local colourWrap = @(_string) ::Raids.Standard.colourWrap(_string, ::Raids.Standard.Colour.Red);
 		local getFragment = @(_fragmentIndex) ::Raids.Strings.Edicts[format("EdictWarningFragment%s", _fragmentIndex)];

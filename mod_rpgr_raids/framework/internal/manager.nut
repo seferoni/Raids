@@ -20,7 +20,6 @@
 	function createTables()
 	{
 		::Raids.Interfaces <- {};
-		::Raids.Strings <- {};
 	}
 
 	function formatVersion()
@@ -52,7 +51,6 @@
 	{
 		this.createMSUInterface();
 		this.loadLibraries();
-		this.loadStrings();
 		this.loadHandlers();
 		this.initialiseHandlers();
 		this.loadFiles();
@@ -61,6 +59,7 @@
 	function initialiseHandlers()
 	{
 		::Raids.Database.initialise();
+		::Raids.Strings.initialise();
 		::Raids.Integrations.initialise();
 	}
 
@@ -77,13 +76,8 @@
 	function loadHandlers()
 	{
 		::include("mod_rpgr_raids/framework/database/database_handler.nut");
+		::include("mod_rpgr_raids/framework/strings/string_handler.nut");
 		::include("mod_rpgr_raids/framework/integrations/mod_integration.nut");
-	}
-
-	function loadStrings()
-	{
-		this.includeFiles("mod_rpgr_raids/framework/strings/main");
-		this.includeFiles("mod_rpgr_raids/framework/strings/edicts");
 	}
 
 	function loadLibraries()
