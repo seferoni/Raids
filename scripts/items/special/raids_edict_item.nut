@@ -92,19 +92,6 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_stackable_item",
 		);
 	}
 
-	function createWarningEntry()
-	{	// TODO: need a string handler to formalise this sorta logic.
-		local colourWrap = @(_string) ::Raids.Standard.colourWrap(_string, ::Raids.Standard.Colour.Red);
-		local getFragment = @(_fragmentIndex) ::Raids.Strings.Edicts[format("EdictWarningFragment%s", _fragmentIndex)];
-		local fragmentA = format(getFragment("A"), colourWrap(getFragment("B")));
-		local fragmentB =  format(getFragment("C"), colourWrap(getFragment("D")));
-		return ::Raids.Standard.constructEntry
-		(
-			"Warning",
-			format("%s %s", fragmentA, fragmentB)
-		);
-	}
-
 	function executeEdictProcedure( _lairs )
 	{	// TODO: this should not return anything.
 		local isValid = false;
