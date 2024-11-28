@@ -64,13 +64,13 @@
 	function executeEdictProcedure( _container, _lairObject )
 	{
 		local edictID = ::Raids.Standard.getFlag(_container, _lairObject);
-		local edictName = PLACEHOLDER; // TODO: this needs a sugared, short form edict name. we should define this separately in strings
-		local procedure = format("execute%sProcedure", edictName);
+		local sugaredID = this.getSugaredID(edictID);
+		local procedure = format("execute%sProcedure", sugaredID);
 
 		if (this.getField("CycledEdicts").find(edictID) != null)
 		{
 			this.resetContainer(_container, _lairObject);
-			this.addToHistory(edictName, _lairObject);
+			this.addToHistory(sugaredID, _lairObject);
 		}
 		else
 		{
@@ -88,7 +88,7 @@
 	function findEdict( _edictName, _lairObject, _filterActive = false )
 	{
 		local edictContainer = false;
-		local edictID = this.getEdictID(_edictName);
+		local edictID = this.getEdictIDByName(_edictName);
 
 		foreach( container in this.getField("Containers") )
 		{
@@ -187,8 +187,8 @@
 		return ::IO.enumerateFiles(this.Parameters.DirectoryPath);
 	}
 
-	function getEdictID( _edictName )
-	{	// TODO: questionable if this should exist
+	function getEdictIDByName( _edictName )
+	{
 		local prependedString = "special.raids_edict_of_";
 		local edictID = format("%s%s", prependedString,  ::Raids.Standard.setCase(_edictName, "tolower"));
 		return edictID;
