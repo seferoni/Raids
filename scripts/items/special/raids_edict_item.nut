@@ -93,7 +93,7 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_stackable_item",
 	}
 
 	function executeEdictProcedure( _lairs )
-	{	// TODO: this should not return anything.
+	{
 		local isValid = false;
 
 		foreach( lair in _lairs )
@@ -110,13 +110,13 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_stackable_item",
 			isValid = true;
 		}
 
-		if (isValid == false)
+		if (!isValid)
 		{
-			return false;
+			return;
 		}
 
 		this.playUseSound();
-		return true;
+		this.setStacks(this.getProcedures().Decrement);
 	}
 
 	function getDiscoveryText()
@@ -146,7 +146,12 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_stackable_item",
 			return format(::Raids.Strings.Edicts.EdictScalingTextStatic, colourWrap(::Raids.Strings.Generic.Static, "Green"));
 		}
 
-		return format(::Raids.Strings.Edicts.EdictScalingText, colourWrap(::Raids.Strings.Generic[this.m.ScalingModality == modalities.Agitation ? "Agitation" : "resources"], "Red"));
+		return format(::Raids.Strings.Edicts.EdictScalingText, colourWrap(::Raids.Strings.Generic[this.m.ScalingModality == modalities.Agitation ? "Agitation" : "Resources"], "Red"));
+	}
+
+	function getSugaredID()
+	{
+		return ::Raids.Edicts.getSugaredID(this.getID());
 	}
 
 	function getTooltip()
@@ -178,7 +183,7 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_stackable_item",
 			return naiveLairs;
 		}
 
-		local edictName = ::Raids.Edicts.getSugaredID(this.getID());
+		local sugaredID = this.getSugaredID();
 		local lairs = naiveLairs.filter(function( _index, _lair )
 		{
 			if (!::Raids.Edicts.isLairViable(_lair))
@@ -191,12 +196,12 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_stackable_item",
 				return false;
 			}
 
-			if (::Raids.Edicts.findEdict(edictName, _lair) != false)
+			if (::Raids.Edicts.findEdict(sugaredID, _lair) != false)
 			{
 				return false;
 			}
 
-			if (::Raids.Edicts.findEdictInHistory(edictName, _lair) != false)
+			if (::Raids.Edicts.findEdictInHistory(sugaredID, _lair) != false)
 			{
 				return false;
 			}
@@ -207,16 +212,34 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_stackable_item",
 		return lairs;
 	}
 
+	function handleInvalidUse()
+	{
+		this.setWarningState(true);
+		this.playWarningSound();
+		::Tooltip.reload();
+		return false;
+	}
+
+	function handleValidUse()
+	{
+		if (this.isFlaggedForRemoval())
+		{
+			return true;
+		}
+
+		return false;
+	}
+
 	function initialiseContainer( _container, _lair )
 	{
-		::Raids.Standard.setFlag(_container, this.getID(), _lair); // TODO: it may be more useful to assign this to the sugared name, instead. have greater access to associated fields that way.
+		::Raids.Standard.setFlag(_container, this.getSugaredID(), _lair);
 		::Raids.Standard.setFlag(format("%sTime", _container), ::World.getTime().Days, _lair);
 		::Raids.Standard.setFlag(format("%sDuration", _container), this.m.DiscoveryDays, _lair);
 	}
 
 	function isCycled()
 	{
-		return ::Raids.Edicts.getField("CycledEdicts").find(this.getID()) != null;
+		return ::Raids.Edicts.getField("CycledEdicts").find(this.getSugaredID()) != null;
 	}
 
 	function setEffectTextByName( _properName )
@@ -244,18 +267,15 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_stackable_item",
 	}
 
 	function onUse( _actor, _item = null )
-	{	// TODO: may want to have handle valid and invalid use methods here
+	{
 		local lairs = this.getViableLairs();
 
 		if (lairs.len() == 0)
 		{
-			this.setWarningState(true);
-			this.playWarningSound();
-			::Tooltip.reload();
-			return false;
+			return this.handleInvalidUse();
 		}
 
-		return this.executeEdictProcedure(lairs); // TODO: this is a pickle to parse and make cohere with our removeIfQueued method structure
-		// could potentially do a try catch? might not be a valid/legal use
+		this.executeEdictProcedure(lairs);
+		return this.handleValidUse();
 	}
 });

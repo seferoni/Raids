@@ -150,7 +150,7 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 		return ::Raids.Standard.getFlag("FlaggedForRemoval", this);
 	}
 
-	function removeIfQueued()
+	function removeIfFlagged()
 	{
 		if (!this.isFlaggedForRemoval())
 		{

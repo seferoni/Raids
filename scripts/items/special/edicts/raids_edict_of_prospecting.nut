@@ -10,7 +10,7 @@ this.raids_edict_of_prospecting <- ::inherit("scripts/items/special/raids_edict_
 	function assignGenericProperties()
 	{
 		this.raids_edict_item.assignGenericProperties();
-		this.m.Value = 150;
+		this.setNativeValue(150);
 	}
 
 	function assignEdictProperties()

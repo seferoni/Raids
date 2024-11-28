@@ -3,15 +3,15 @@
 	Parameters =
 	{
 		DirectoryPath = "scripts/items/special/edicts/",
-		EdictSelectionSize = 3,
 		ResourcesPrefactor = 0.001,
-		WritingInstrumentsChance = 66
+		WritingInstrumentsChance = 66,
+		WritingInstrumentsSelectionSize = 3
 	}
 
-	function addToHistory( _edictName, _lairObject )
+	function addToHistory( _sugaredID, _lairObject )
 	{
 		local history = ::Raids.Standard.getFlag("EdictHistory", _lairObject);
-		local newHistory = format("%s%s", history == false ? "" : format("%s, ", history), _edictName);
+		local newHistory = format("%s%s", history == false ? "" : format("%s, ", history), _sugaredID);
 		::Raids.Standard.setFlag("EdictHistory", newHistory, _lairObject);
 	}
 
@@ -63,11 +63,10 @@
 
 	function executeEdictProcedure( _container, _lairObject )
 	{
-		local edictID = ::Raids.Standard.getFlag(_container, _lairObject);
-		local sugaredID = this.getSugaredID(edictID);
+		local sugaredID = ::Raids.Standard.getFlag(_container, _lairObject);
 		local procedure = format("execute%sProcedure", sugaredID);
 
-		if (this.getField("CycledEdicts").find(edictID) != null)
+		if (this.getField("CycledEdicts").find(sugaredID) != null)
 		{
 			this.resetContainer(_container, _lairObject);
 			this.addToHistory(sugaredID, _lairObject);
@@ -85,14 +84,13 @@
 		this.Procedures[procedure](_lairObject);
 	}
 
-	function findEdict( _edictName, _lairObject, _filterActive = false )
+	function findEdict( _sugaredID, _lairObject, _filterActive = false )
 	{
 		local edictContainer = false;
-		local edictID = this.getEdictIDByName(_edictName);
 
 		foreach( container in this.getField("Containers") )
 		{
-			if (::Raids.Standard.getFlag(container, _lairObject) == edictID)
+			if (::Raids.Standard.getFlag(container, _lairObject) == _sugaredID)
 			{
 				edictContainer = container;
 				break;
@@ -112,7 +110,7 @@
 		return false;
 	}
 
-	function findEdictInHistory( _edictName, _lairObject )
+	function findEdictInHistory( _sugaredID, _lairObject )
 	{
 		local history = ::Raids.Standard.getFlag("EdictHistory", _lairObject);
 
@@ -121,12 +119,17 @@
 			return false;
 		}
 
-		if (history.find(_edictName) != null)
+		if (history.find(_sugaredID) != null)
 		{
 			return true;
 		}
 
 		return false;
+	}
+
+	function getAllWritingInstrumentsInstancesInStash()
+	{
+		return ::World.Assets.getStash().getItems().filter(@(_index, _item) _item != null && _item.getID() == "misc.raids_writing_instruments_item");
 	}
 
 	function getAgitationDecayOffset( _lairObject )
@@ -157,9 +160,9 @@
 		foreach( container in occupiedContainers )
 		{
 			local inDiscovery = ::Raids.Standard.getFlag(format("%sTime", container), _lairObject) != false;
-			local edictName = this.getSugaredID(::Raids.Standard.getFlag(container, _lairObject));
+			local sugaredID = ::Raids.Standard.getFlag(container, _lairObject);
 			local activeState = inDiscovery ? "Discovery" : "Active";
-			entries.push(this.createTooltipEntry(edictName, activeState));
+			entries.push(this.createTooltipEntry(sugaredID, activeState));
 		}
 
 		if (entries.len() < naiveContainers.len())
@@ -175,23 +178,16 @@
 		return entries;
 	}
 
-	function getEdictFileName( _edictName )
+	function getEdictFileName( _sugaredID )
 	{
 		local prependedString = format("%s%s", this.Parameters.DirectoryPath, "edict_of_");
-		local edictFileName = format("%s%s", prependedString, ::Raids.Standard.setCase(_edictName, ::Raids.Standard.Case.Lower));
+		local edictFileName = format("%s%s", prependedString, ::Raids.Standard.setCase(_sugaredID, ::Raids.Standard.Case.Lower));
 		return edictFileName;
 	}
 
 	function getEdictFiles()
 	{
 		return ::IO.enumerateFiles(this.Parameters.DirectoryPath);
-	}
-
-	function getEdictIDByName( _edictName )
-	{
-		local prependedString = "special.raids_edict_of_";
-		local edictID = format("%s%s", prependedString,  ::Raids.Standard.setCase(_edictName, "tolower"));
-		return edictID;
 	}
 
 	function getEdictProperties()
@@ -202,6 +198,28 @@
 	function getField( _fieldName )
 	{
 		return ::Raids.Database.getSubLevelField("Edicts", _fieldName);
+	}
+
+	function getFirstQueuedWritingInstrumentsInstance()
+	{
+		local instances = this.getAllWritingInstrumentsInstancesInStash();
+
+		if (instances.len() == 0)
+		{
+			return null;
+		}
+
+		foreach( candidate in candidates )
+		{
+			local selectionMode = candidate.getEdictSelectionMode();
+
+			if (selectionMode != candidate.SelectionModes.Indiscriminate)
+			{
+				return candidate;
+			}
+		}
+
+		return candidates[0];
 	}
 
 	function getLegibilityEntry( _lairObject )
@@ -291,8 +309,8 @@
 	function getSugaredID( _edictID, _isFileName = false )
 	{
 		local culledString = _isFileName ? format("%s%s", this.Parameters.DirectoryPath, "raids_edict_of_") : "special.raids_edict_of_";
-		local edictName = ::Raids.Standard.setCase(_edictID.slice(culledString.len()), ::Raids.Standard.Case.Upper);
-		return edictName;
+		local sugaredID = ::Raids.Standard.setCase(_edictID.slice(culledString.len()), ::Raids.Standard.Case.Upper);
+		return sugaredID;
 	}
 
 	function getTreasureOffset( _lairObject )
@@ -345,11 +363,11 @@
 			return;
 		}
 
-		local viableEdicts = this.getField("CycledEdicts").filter(@(_index, _edictName) ::Raids.Edicts.findEdictInHistory(_edictName, _lairObject));
+		local viableEdicts = this.getField("CycledEdicts").filter(@(_index, _sugaredID) ::Raids.Edicts.findEdictInHistory(_sugaredID, _lairObject));
 
-		foreach( edictName in viableEdicts )
+		foreach( sugaredID in viableEdicts )
 		{
-			local procedure = format("execute%sProcedure", edictName);
+			local procedure = format("execute%sProcedure", sugaredID);
 
 			if (!(procedure in this.Procedures))
 			{

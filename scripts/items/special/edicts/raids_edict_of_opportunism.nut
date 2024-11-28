@@ -10,7 +10,7 @@ this.raids_edict_of_opportunism <- ::inherit("scripts/items/special/raids_edict_
 	function assignGenericProperties()
 	{
 		this.raids_edict_item.assignGenericProperties();
-		this.m.Value = 50;
+		this.setNativeValue(50);
 	}
 
 	function assignEdictProperties()

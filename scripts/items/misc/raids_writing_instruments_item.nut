@@ -67,7 +67,7 @@ this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_item",
 		local selectedEdicts = [];
 		local edicts = ::Raids.Edicts.getEdictFiles();
 
-		while (selectedEdicts.len() < ::Raids.Edicts.Parameters.EdictSelectionSize)
+		while (selectedEdicts.len() < ::Raids.Edicts.Parameters.WritingInstrumentsSelectionSize)
 		{
 			local candidate = ::Raids.Edicts.getSugaredID(edicts[::Math.rand(0, edicts.len() - 1)], true);
 
@@ -76,7 +76,7 @@ this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_item",
 				continue;
 			}
 
-			if (this.getField("Excluded").find(candidate) != null)
+			if (::Raids.Edicts.getField("Excluded").find(candidate) != null)
 			{
 				continue;
 			}
@@ -94,7 +94,7 @@ this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_item",
 
 	function getEdictSelectionAsArray()
 	{
-		local selectionArray = split(this.getEdictSelection(), ",").map(@(_edictName) strip(_edictName));
+		local selectionArray = split(this.getEdictSelection(), ",").map(@(sugaredID) strip(sugaredID));
 		return selectionArray;
 	}
 
@@ -102,8 +102,8 @@ this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_item",
 	{
 		local edictFiles = [];
 		local selectionMode = this.getEdictSelectionMode();
-		local selectionModes = this.getField("SelectionModes");
-		local toFileName = @(_array) _array.map(@(_edictName) ::Raids.Edicts.getEdictFileName(_edictName));
+		local selectionModes = ::Raids.Edicts.getField("SelectionModes");
+		local toFileName = @(_array) _array.map(@(_sugaredID) ::Raids.Edicts.getEdictFileName(_sugaredID)); // TODO: functionalise this, in conjunction with getEdictSelectionAsArray
 
 		switch (selectionMode)
 		{
@@ -141,7 +141,7 @@ this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_item",
 	function getEdictSelectionText()
 	{
 		local selectionMode = this.getEdictSelectionMode();
-		local selectionModes = this.getField("SelectionModes");
+		local selectionModes = ::Raids.Edicts.getField("SelectionModes");
 
 		if (selectionMode != selectionModes.Indiscriminate && selectionMode != selectionModes.Agitation)
 		{
@@ -155,7 +155,7 @@ this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_item",
 
 	function getField( _fieldName )
 	{
-		return ::Raids.Database.getSubLevelField("Edicts", "WritingInstruments", _fieldName);
+		return ::Raids.Edicts.getField(_fieldName);
 	}
 
 	function isFirstInQueue()
@@ -165,7 +165,7 @@ this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_item",
 			return false;
 		}
 
-		local candidates = ::World.Assets.getStash().getItems().filter(@(_index, _item) _item != null && _item.getID() == "misc.writing_instruments_item");
+		local candidates = ::Raids.Edicts.getAllWritingInstrumentsInstancesInStash();
 
 		# Handle case where the current object is the only valid instance.
 		if (candidates.len() == 1)
@@ -175,7 +175,7 @@ this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_item",
 
 		local currentPosition = candidates.find(this);
 		local selectionMode = this.getEdictSelectionMode();
-		local selectionModes = this.getField("SelectionModes");
+		local selectionModes = ::Raids.Edicts.getField("SelectionModes");
 
 		# Handle case where the current object is unequivocally not first in queue.
 		if (selectionMode == selectionModes.Indiscriminate && currentPosition != 0)
@@ -206,7 +206,7 @@ this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_item",
 	function getTooltip()
 	{
 		local tooltipArray = this.raids_item.getTooltip();
-		local push = @(_entry) ::Raids.Standard.push(_entry);
+		local push = @(_entry) ::Raids.Standard.push(_entry, tooltipArray);
 
 		push(this.createUsesEntry());
 
@@ -229,7 +229,7 @@ this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_item",
 	{
 		local selection = "";
 		local edictCandidates = this.getEdictCandidates();
-		local selectionModes = this.getField("SelectionModes");
+		local selectionModes = ::Raids.Edicts.getField("SelectionModes");
 
 		foreach( edictName in edictCandidates )
 		{
@@ -249,7 +249,7 @@ this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_item",
 			return;
 		}
 
-		::Raids.Standard.setFlag("ShowQueueState", true, this);
+		this.setShowingQueueState();
 		::Raids.Standard.setFlag("EdictSelectionMode", ::Raids.Edicts.getField("Indiscriminate"), this);
 	}
 
@@ -262,13 +262,13 @@ this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_item",
 			return;
 		}
 
-		::Raids.Standard.setFlag("ShowQueueState", false, this);
+		this.setShowingQueueState(false);
 	}
 
 	function onUse( _actor, _item = null )
 	{
 		local selectionMode = this.getEdictSelectionMode();
-		local selectionModes = this.getField("SelectionModes");
+		local selectionModes = ::Raids.Edicts.getField("SelectionModes");
 
 		if (selectionMode == selectionModes.Inverted)
 		{
@@ -278,7 +278,7 @@ this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_item",
 		{
 			selectionMode += 1;
 		}
-
+		// TODO: handle valid use/invalid use implementation here!
 		this.setEdictSelectionMode(selectionMode);
 		this.playUseSound();
 		::Tooltip.reload();
@@ -298,5 +298,10 @@ this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_item",
 	function isShowingQueueState()
 	{
 		return ::Raids.Standard.getFlag("ShowQueueState", this);
+	}
+
+	function setShowingQueueState( _boolean = true )
+	{
+		::Raids.Standard.setFlag("ShowQueueState", _boolean, this);
 	}
 });

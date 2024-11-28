@@ -10,7 +10,7 @@ this.raids_edict_of_agitation <- ::inherit("scripts/items/special/raids_edict_it
 	function assignGenericProperties()
 	{
 		this.raids_edict_item.assignGenericProperties();
-		this.m.Value = 20;
+		this.setNativeValue(20);
 	}
 
 	function createWarningEntry()

@@ -10,7 +10,7 @@ this.raids_edict_of_stasis <- ::inherit("scripts/items/special/raids_edict_item"
 	function assignGenericProperties()
 	{
 		this.raids_edict_item.assignGenericProperties();
-		this.m.Value = 25;
+		this.setNativeValue(25);
 	}
 
 	function assignEdictProperties()

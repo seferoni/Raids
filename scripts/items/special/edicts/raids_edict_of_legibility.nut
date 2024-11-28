@@ -10,7 +10,7 @@ this.raids_edict_of_legibility <- ::inherit("scripts/items/special/raids_edict_i
 	function assignGenericProperties()
 	{
 		this.raids_edict_item.assignGenericProperties();
-		this.m.Value = 100;
+		this.setNativeValue(100);
 	}
 
 	function createWarningEntry()
@@ -34,7 +34,7 @@ this.raids_edict_of_legibility <- ::inherit("scripts/items/special/raids_edict_i
 			return naiveLairs;
 		}
 
-		local edictName = ::Raids.Edicts.getSugaredID(this.getID()); // TODO: again with the edict name?
+		local sugaredID = this.getSugaredID();
 		local lairs = naiveLairs.filter(function( _index, _lair )
 		{
 			if (!_lair.m.IsShowingBanner)
@@ -47,7 +47,7 @@ this.raids_edict_of_legibility <- ::inherit("scripts/items/special/raids_edict_i
 				return false;
 			}
 
-			if (::Raids.Edicts.findEdict(edictName, _lair) != false)
+			if (::Raids.Edicts.findEdict(sugaredID, _lair) != false)
 			{
 				return false;
 			}

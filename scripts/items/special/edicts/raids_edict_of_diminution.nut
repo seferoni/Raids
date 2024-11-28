@@ -10,7 +10,7 @@ this.raids_edict_of_diminution <- ::inherit("scripts/items/special/raids_edict_i
 	function assignGenericProperties()
 	{
 		this.raids_edict_item.assignGenericProperties();
-		this.m.Value = 100;
+		this.setNativeValue(100);
 	}
 
 	function assignEdictProperties()

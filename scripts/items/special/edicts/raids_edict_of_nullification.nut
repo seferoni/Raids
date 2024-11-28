@@ -10,7 +10,7 @@ this.raids_edict_of_nullification <- ::inherit("scripts/items/special/raids_edic
 	function assignGenericProperties()
 	{
 		this.raids_edict_item.assignGenericProperties();
-		this.m.Value = 50;
+		this.setNativeValue(50);
 	}
 
 	function assignEdictProperties()

@@ -92,7 +92,15 @@ this.raids_item <- ::inherit("scripts/items/item",
 
 	function decrementUses()
 	{
-		this.setUses(this.getUses() - 1);
+		local remainingUses = this.getUses();
+
+		if (remainingUses == 1)
+		{
+			this.removeSelf();
+			return;
+		}
+
+		this.setUses(remainingUses - 1);
 	}
 
 	function formatName( _properName, _replacementSubstring = "" )
