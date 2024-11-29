@@ -1,5 +1,5 @@
 this.raids_edict_item <- ::inherit("scripts/items/raids_stackable_item",
-{	// TODO: all edicts require a NameAbbreviated field, and need setNativeValue implementations
+{
 	m = {},
 	function create()
 	{
@@ -18,7 +18,7 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_stackable_item",
 		this.m.DiscoveryDays <- 1;
 		this.m.ScalingModality <- this.getScalingModalities().Static;
 		this.m.ShowWarning <- false;
-		this.m.AbbreviatedName <- "";
+		this.m.NameAbbreviated <- "";
 		this.m.EffectText <- "";
 	}
 
@@ -258,7 +258,7 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_stackable_item",
 	{
 		local key = this.formatName(_properName);
 		this.m.Name = ::Raids.Strings.Edicts[key].Name;
-		this.m.AbbreviatedName = ::Raids.Strings.Edicts[key].AbbreviatedName;
+		this.m.NameAbbreviated = ::Raids.Strings.Edicts[key].NameAbbreviated;
 	}
 
 	function setWarningState( _bool )
