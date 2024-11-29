@@ -62,6 +62,23 @@ this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_item",
 		);
 	}
 
+	function cycleSelectionMode()
+	{
+		local selectionMode = this.getEdictSelectionMode();
+		local selectionModes = ::Raids.Edicts.getField("SelectionModes");
+
+		if (selectionMode == selectionModes.Inverted)
+		{
+			selectionMode = selectionModes.Indiscriminate;
+		}
+		else
+		{
+			selectionMode += 1;
+		}
+
+		this.setEdictSelectionMode(selectionMode);
+	}
+
 	function getEdictCandidates()
 	{
 		local selectedEdicts = [];
@@ -267,19 +284,7 @@ this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_item",
 
 	function onUse( _actor, _item = null )
 	{
-		local selectionMode = this.getEdictSelectionMode();
-		local selectionModes = ::Raids.Edicts.getField("SelectionModes");
-
-		if (selectionMode == selectionModes.Inverted)
-		{
-			selectionMode = selectionModes.Indiscriminate;
-		}
-		else
-		{
-			selectionMode += 1;
-		}
-		// TODO: handle valid use/invalid use implementation here!
-		this.setEdictSelectionMode(selectionMode);
+		this.cycleSelectionMode();
 		this.playUseSound();
 		::Tooltip.reload();
 		return false;
