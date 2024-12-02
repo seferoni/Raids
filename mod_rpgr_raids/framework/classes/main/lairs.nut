@@ -25,7 +25,7 @@
 
 		for( local i = 0; i < count; i++ )
 		{
-			_lootTable.push(::new("scripts/items/special/official_document_item"));
+			_lootTable.push(::new("scripts/items/special/raids_official_document_item"));
 		}
 	}
 

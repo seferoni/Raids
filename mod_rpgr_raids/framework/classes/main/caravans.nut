@@ -380,7 +380,7 @@
 
 		for( local i = 0; i < iterations; i++ )
 		{
-			_caravanObject.addToInventory("special/official_document_item");
+			_caravanObject.addToInventory("special/raids_official_document_item");
 		}
 	}
 
