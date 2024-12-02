@@ -3,7 +3,7 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 	m = {},
 	function create()
 	{
-		this.rids_item.create();
+		this.raids_item.create();
 		this.assignStackableProperties();
 	}
 
@@ -12,6 +12,13 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 		this.raids_item.assignGenericProperties();
 		this.m.IconNative <- "";
 		this.m.ValueNative <- "";
+	}
+
+	function assignPropertiesByName( _properName )
+	{
+		this.setIDByName(_properName);
+		this.setDescription(_properName);
+		this.setName(_properName);
 	}
 
 	function assignStackableProperties()
@@ -58,12 +65,6 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 
 		push(this.createStackEntry());
 		return tooltipArray;
-	}
-
-	function onStackUpdate()
-	{
-		this.refreshIcon();
-		this.recalculateValue();
 	}
 
 	function refreshIcon()
@@ -128,10 +129,10 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 		this.updateStacks();
 	}
 
-	function onUse( _actor, _item = null )
+	function onStackUpdate()
 	{
-		this.raids_item.onUse(_actor, _item);
-		this.setStacks(this.getProcedures().Decrement);
+		this.refreshIcon();
+		this.recalculateValue();
 	}
 
 	function overrideStacks( _newValue )
@@ -148,16 +149,6 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 	function isFlaggedForRemoval()
 	{
 		return ::Raids.Standard.getFlag("FlaggedForRemoval", this);
-	}
-
-	function removeIfFlagged()
-	{
-		if (!this.isFlaggedForRemoval())
-		{
-			return;
-		}
-
-		this.removeSelf();
 	}
 
 	function setIconWithSuffix( _suffixString )

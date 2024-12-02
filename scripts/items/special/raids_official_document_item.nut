@@ -10,6 +10,7 @@ this.raids_official_document_item <- ::inherit("scripts/items/raids_stackable_it
 	function assignGenericProperties()
 	{
 		this.raids_stackable_item.assignGenericProperties();
+		this.setNativeIcon("special/raids_official_document_item.png");
 		this.setNativeValue(150);
 	}
 
@@ -49,23 +50,24 @@ this.raids_official_document_item <- ::inherit("scripts/items/raids_stackable_it
 	}
 
 	function onUse( _actor, _item = null )
-	{
+	{	// TODO: anti-symmetry between this and edict item onUse implementation. not acceptable.
 		local writingInstruments = ::Raids.Edicts.getFirstQueuedWritingInstrumentsInstance();
 		::World.Assets.getStash().add(::Raids.Edicts.createEdict(writingInstruments));
 		this.playUseSound();
 
 		if (writingInstruments == null)
-		{
-			return true;
+		{	// TODO: this is rather ugly. generally dissatisfied with onUse implementations
+			return this.isFlaggedForRemoval();
 		}
 
 		# Terminate execution if the only Writing Instruments instance present is set to indiscriminate Edict selection.
 		if (writingInstruments.getEdictSelectionMode() == ::Raids.Edicts.getField("SelectionModes").Indiscriminate)
 		{
-			return true;
+			return this.isFlaggedForRemoval();
 		}
 
 		writingInstruments.decrementUses();
-		return true;
+		this.setStacks(this.getProcedures().Decrement);
+		return this.isFlaggedForRemoval();
 	}
 });

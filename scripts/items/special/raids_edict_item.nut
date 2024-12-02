@@ -24,9 +24,7 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_stackable_item",
 
 	function assignPropertiesByName( _properName )
 	{
-		this.setIDByName(_properName);
-		this.setDescription(_properName);
-		this.setName(_properName);
+		this.raids_stackable_item.assignPropertiesByName(_properName);
 		this.setEffectTextByName(_properName);
 	}
 
@@ -268,6 +266,7 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_stackable_item",
 
 	function onUse( _actor, _item = null )
 	{
+		this.raids_stackable_item.onUse(_actor, _item);
 		local lairs = this.getViableLairs();
 
 		if (lairs.len() == 0)
