@@ -161,7 +161,7 @@
 	{
 		if (::Raids.Manager.isMSUInstalled())
 		{
-			return ::Raids.Interfaces.MSU.ModSettings.getParameter(_parameterID).getValue();
+			return ::Raids.Interfaces.MSU.ModSettings.getSetting(_parameterID).getValue();
 		}
 
 		local parameters = ::Raids.Database.getSettingParameters();

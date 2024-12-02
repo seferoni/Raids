@@ -57,7 +57,6 @@
 
 	function initialise()
 	{
-		this.createTables();
 		this.loadFiles();
 	}
 };

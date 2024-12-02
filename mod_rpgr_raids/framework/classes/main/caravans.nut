@@ -152,7 +152,7 @@
 	{
 		local namedLoot = [];
 
-		foreach( key in this.NamedItemKeys )
+		foreach( key in this.getNamedItemKeys() )
 		{
 			namedLoot.extend(::Const.Items[key]);
 		}
@@ -192,11 +192,6 @@
 		return excludedGoods;
 	}
 
-	function getField( _fieldName )
-	{
-		return ::Raids.Database.getTopLevelField("Caravans", _fieldName);
-	}
-
 	function getEliteReinforcementCount( _caravanObject )
 	{
 		local iterations = 0;
@@ -224,6 +219,16 @@
 		}
 
 		return iterations;
+	}
+
+	function getField( _fieldName )
+	{
+		return ::Raids.Database.getTopLevelField("Caravans", _fieldName);
+	}
+
+	function getNamedItemKeys()
+	{
+		return ::Raids.Database.getTopLevelField("Generic", "NamedItemKeys");
 	}
 
 	function getReinforcementCount( _caravanObject )
