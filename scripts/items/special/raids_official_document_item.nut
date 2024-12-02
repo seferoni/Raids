@@ -10,7 +10,7 @@ this.raids_official_document_item <- ::inherit("scripts/items/raids_stackable_it
 	function assignGenericProperties()
 	{
 		this.raids_stackable_item.assignGenericProperties();
-		this.setNativeIcon("special/raids_official_document_item.png");
+		this.setNativeIcon("special/raids_official_document_item.png"); // TODO: note that this icon, when scaled up to its multiple and plentiful variants, is a placeholder!
 		this.setNativeValue(150);
 	}
 
