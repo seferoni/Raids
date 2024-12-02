@@ -32,7 +32,7 @@
 	}
 
 	function getFragmentsAsCompiledString( _fragmentBase, _tableKey, _fragmentCount  = 4, _colour = "Red")
-	{	// TODO: implement this
+	{
 		local fragmentsArray = this.getFragmentsAsArray(_fragmentBase, _tableKey, _fragmentCount);
 		return this.compileFragments(fragmentsArray, _colour);
 	}

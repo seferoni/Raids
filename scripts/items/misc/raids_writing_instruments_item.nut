@@ -82,7 +82,7 @@ this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_item",
 	function getEdictCandidates()
 	{
 		local selectedEdicts = [];
-		local edicts = ::Raids.Edicts.getEdictFiles();
+		local edicts = ::Raids.Edicts.getAllEdictsAsFiles();
 
 		while (selectedEdicts.len() < ::Raids.Edicts.Parameters.WritingInstrumentsSelectionSize)
 		{
@@ -104,15 +104,15 @@ this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_item",
 		return selectedEdicts;
 	}
 
-	function getEdictSelection()
+	function getNaiveEdictSelection()
 	{
 		return ::Raids.Standard.getFlag("EdictSelection", this);
 	}
 
-	function getEdictSelectionAsArray()
+	function getNaiveEdictSelectionAsFiles()
 	{
-		local selectionArray = split(this.getEdictSelection(), ",").map(@(sugaredID) strip(sugaredID));
-		return selectionArray;
+		local selectionArray = split(this.getNaiveEdictSelection(), ",").map(@(sugaredID) strip(sugaredID));
+		return selectionArray.map(@(_sugaredID) ::Raids.Edicts.getEdictFileNameBySugaredID(_sugaredID));
 	}
 
 	function getEdictSelectionAsFiles()
@@ -120,29 +120,28 @@ this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_item",
 		local edictFiles = [];
 		local selectionMode = this.getEdictSelectionMode();
 		local selectionModes = ::Raids.Edicts.getField("SelectionModes");
-		local toFileName = @(_array) _array.map(@(_sugaredID) ::Raids.Edicts.getEdictFileName(_sugaredID)); // TODO: functionalise this, in conjunction with getEdictSelectionAsArray
 
 		switch (selectionMode)
 		{
 			case selectionModes.Indiscriminate:
 			{
-				edictFiles.extend(::Raids.Edicts.getEdictFiles());
+				edictFiles.extend(::Raids.Edicts.getAllEdictsAsFiles());
 				break;
 			};
 			case selectionModes.Agitation:
 			{
-				edictFiles.push(::Raids.Edicts.getEdictFileName("Agitation"));
+				edictFiles.push(::Raids.Edicts.getEdictFileNameBySugaredID("Agitation"));
 				break;
 			};
 			case selectionModes.Selective:
 			{
-				edictFiles.extend(toFileName(this.getEdictSelectionAsArray()));
+				edictFiles.extend(this.getNaiveEdictSelectionAsFiles());
 				break;
 			};
 			case selectionModes.Inverted:
 			{
-				local naiveEdicts = ::Raids.Edicts.getEdictFiles();
-				::Raids.Standard.removeFromArray(toFileName(this.getEdictSelectionAsArray()), naiveEdicts);
+				local naiveEdicts = ::Raids.Edicts.getAllEdictsAsFiles();
+				::Raids.Standard.removeFromArray(this.getNaiveEdictSelectionAsFiles(), naiveEdicts);
 				edictFiles.extend(naiveEdicts);
 			};
 		}
@@ -163,7 +162,7 @@ this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_item",
 		if (selectionMode != selectionModes.Indiscriminate && selectionMode != selectionModes.Agitation)
 		{
 			local colourValue = ::Raids.Standard.Colour[selectionMode == selectionModes.Selective ? "Green" : "Red"];
-			local selection = ::Raids.Standard.colourWrap(this.getEdictSelection(), colourValue);
+			local selection = ::Raids.Standard.colourWrap(this.getNaiveEdictSelection(), colourValue);
 			return format("%s: %s", ::Raids.Standard.getKey(selectionMode, selectionModes), selection);
 		}
 
@@ -253,8 +252,8 @@ this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_item",
 			selection = ::Raids.Standard.appendToStringList(selection, edictName);
 		}
 
-		::Raids.Standard.setFlag("EdictSelection", selection, this);
-		::Raids.Standard.setFlag("EdictSelectionMode", selectionModes.Selective, this);
+		this.setEdictSelection(selection);
+		this.setEdictSelectionMode(selectionModes.Selective);
 	}
 
 	function onAddedToStash( _stashID )

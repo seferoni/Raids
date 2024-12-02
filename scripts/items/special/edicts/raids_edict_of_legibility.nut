@@ -15,13 +15,11 @@ this.raids_edict_of_legibility <- ::inherit("scripts/items/special/raids_edict_i
 
 	function createWarningEntry()
 	{
-		local colourWrap = @(_string) ::Raids.Standard.colourWrap(_string, ::Raids.Standard.Colour.Red);
-		local fragmentA = format(::Raids.Strings.Edicts.LegibilityWarningFragmentA, colourWrap(::Raids.Strings.Edicts.LegibilityWarningFragmentB));
-		local fragmentB =  format(::Raids.Strings.Edicts.LegibilityWarningFragmentC, colourWrap(::Raids.Strings.Edicts.LegibilityWarningFragmentD));
+		local compiledString = ::Raids.Strings.getFragmentsAsCompiledString("LegibilityWarningFragment", "Edicts");
 		return ::Raids.Standard.constructEntry
 		(
 			"Warning",
-			format("%s %s", fragmentA, fragmentB)
+			compiledString
 		);
 	}
 

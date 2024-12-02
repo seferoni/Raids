@@ -3,7 +3,7 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 	m = {},
 	function create()
 	{
-		this.raids_item.create();
+		this.rids_item.create();
 		this.assignStackableProperties();
 	}
 
@@ -29,7 +29,7 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 		return ::Raids.Standard.constructEntry
 		(
 			"Stacks",
-			format(::Raids.Strings.Generic.Stacks, ::Raids.Standard.colourWrap(this.getCurrentStacks(), ::Raids.Standard.Colour.Green))
+			format(::Raids.Strings.Generic.StacksCount, ::Raids.Standard.colourWrap(this.getCurrentStacks(), ::Raids.Standard.Colour.Green))
 		);
 	}
 

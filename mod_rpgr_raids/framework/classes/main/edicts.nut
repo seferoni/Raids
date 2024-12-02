@@ -17,7 +17,7 @@
 
 	function createEdict( _writingInstruments = null )
 	{
-		local edicts = _writingInstruments == null ? this.getEdictFiles() : _writingInstruments.getEdictSelectionAsFiles();
+		local edicts = _writingInstruments == null ? this.getAllEdictsAsFiles() : _writingInstruments.getEdictSelectionAsFiles();
 		return ::new(edicts[::Math.rand(0, edicts.len() - 1)]);
 	}
 
@@ -178,16 +178,16 @@
 		return entries;
 	}
 
-	function getEdictFileName( _sugaredID )
+	function getAllEdictsAsFiles()
+	{
+		return ::IO.enumerateFiles(this.Parameters.DirectoryPath);
+	}
+
+	function getEdictFileNameBySugaredID( _sugaredID )
 	{
 		local prependedString = format("%s%s", this.Parameters.DirectoryPath, "edict_of_");
 		local edictFileName = format("%s%s", prependedString, ::Raids.Standard.setCase(_sugaredID, ::Raids.Standard.Case.Lower));
 		return edictFileName;
-	}
-
-	function getEdictFiles()
-	{
-		return ::IO.enumerateFiles(this.Parameters.DirectoryPath);
 	}
 
 	function getEdictProperties()
@@ -254,7 +254,7 @@
 			}
 		}
 
-		local fragmentA = ::Raids.Standard.colourWrap(format("Famed (%i)", count), ::Raids.Standard.Colour[count == 0 ? "Red" : "Green"]);
+		local fragmentA = ::Raids.Standard.colourWrap(format(::Raids.Strings.Generic.NamedCount, count), ::Raids.Standard.Colour[count == 0 ? "Red" : "Green"]);
 		local fragmentB = ::Raids.Standard.colourWrap(format("%i%%", namedLootChance), ::Raids.Standard.Colour.Green);
 		return ::Raids.Standard.constructEntry
 		(
