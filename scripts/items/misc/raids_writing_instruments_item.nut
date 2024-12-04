@@ -161,8 +161,8 @@ this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_item",
 
 		if (selectionMode != selectionModes.Indiscriminate && selectionMode != selectionModes.Agitation)
 		{
-			local colourValue = ::Raids.Standard.Colour[selectionMode == selectionModes.Selective ? "Green" : "Red"];
-			local selection = ::Raids.Standard.colourWrap(this.getNaiveEdictSelection(), colourValue);
+			local colour = ::Raids.Standard.Colour[selectionMode == selectionModes.Selective ? "Green" : "Red"];
+			local selection = ::Raids.Standard.colourWrap(this.getNaiveEdictSelection(), colour);
 			return format("%s: %s", ::Raids.Standard.getKey(selectionMode, selectionModes), selection);
 		}
 
