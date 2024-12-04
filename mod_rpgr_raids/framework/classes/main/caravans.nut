@@ -222,7 +222,7 @@
 	}
 
 	function getField( _fieldName )
-	{
+	{	// TODO: don't much appreciate that sometimes 'getField' accesses top level fields, and sometimes sub level fields.
 		return ::Raids.Database.getTopLevelField("Caravans", _fieldName);
 	}
 
