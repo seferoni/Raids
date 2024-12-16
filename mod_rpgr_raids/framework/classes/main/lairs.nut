@@ -418,7 +418,7 @@
 	function isFactionViable( _faction )
 	{
 		local factionType = _faction.getType();
-		local viableFactions = this.getField("Factions").map(@(_factionName) ::Raids.Lairs.getFactionType(_factionName));
+		local viableFactions = this.getField("ConnateFactions").map(@(_factionName) ::Raids.Lairs.getFactionType(_factionName));
 
 		if (viableFactions.find(factionType) != null)
 		{

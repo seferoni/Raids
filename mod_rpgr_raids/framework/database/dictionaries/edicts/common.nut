@@ -1,5 +1,12 @@
 ::Raids.Database.Edicts.Common <-
 {
+	ConnateFactions =
+	[
+		"Bandits",
+		"Barbarians",
+		"OrientalBandits",
+		"Zombies"
+	],
 	Containers =
 	[
 		"EdictContainerA",
@@ -13,14 +20,7 @@
 		"special.edict_of_diminution_item",
 		"special.edict_of_opportunism_item",
 	],
-	Factions =
-	[
-		"Bandits",
-		"Barbarians",
-		"OrientalBandits",
-		"Zombies"
-	],
-	Overrides =
+	LocationOverrides =
 	[
 		"location.undead_crypt"
 	],

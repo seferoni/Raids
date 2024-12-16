@@ -52,7 +52,7 @@
 	{
 		local typeID = _lairObject.getTypeID();
 
-		foreach( overrideTable in this.getField("Overrides") )
+		foreach( overrideTable in this.getField("LocationOverrides") )
 		{
 			if (overrideTable.TypeID == typeID)
 			{

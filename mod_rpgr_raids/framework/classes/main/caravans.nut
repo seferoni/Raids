@@ -46,7 +46,7 @@
 	function createCaravanCargo( _caravanObject, _settlementObject )
 	{
 		local produce = _settlementObject.getProduce();
-		local descriptors = this.getField("CargoDescriptors");
+		local descriptors = this.getSubLevelField("CargoDescriptors");
 		local cargoEnum =  ::Raids.Standard.getFlag("CaravanCargo", _caravanObject);
 		local cargoString = ::Raids.Standard.getKey(cargoEnum, descriptors).tolower();
 		local actualProduce = produce.filter(@(_index,_value) _value.find(cargoString) != null);
@@ -70,7 +70,7 @@
 	function createCaravanTroops( _factionType )
 	{
 		local troops = [];
-		local troopTypes = this.getField("Troops");
+		local troopTypes = this.getTopLevelField("Troops");
 
 		if (_factionType == ::Const.FactionType.NobleHouse)
 		{
@@ -94,7 +94,7 @@
 
 	function createCargoEntry( _caravanObject )
 	{
-		local cargoDescriptor = ::Raids.Standard.getKey(::Raids.Standard.getFlag("CaravanCargo", _caravanObject), this.getField("CargoDescriptors"));
+		local cargoDescriptor = ::Raids.Standard.getKey(::Raids.Standard.getFlag("CaravanCargo", _caravanObject), this.getSubLevelField("CargoDescriptors"));
 		return ::Raids.Standard.constructEntry
 		(
 			cargoDescriptor,
@@ -105,7 +105,7 @@
 	function createEliteCaravanTroops( _factionType )
 	{
 		local troops = [];
-		local troopTypes = this.getField("Troops");
+		local troopTypes = this.getTopLevelField("Troops");
 
 		if (_factionType == ::Const.FactionType.NobleHouse)
 		{
@@ -171,7 +171,7 @@
 
 	function createWealthEntry( _caravanObject )
 	{
-		local wealthDescriptor = ::Raids.Standard.getKey(::Raids.Standard.getFlag("CaravanWealth", _caravanObject), this.getField("WealthDescriptors"));
+		local wealthDescriptor = ::Raids.Standard.getKey(::Raids.Standard.getFlag("CaravanWealth", _caravanObject), this.getSubLevelField("WealthDescriptors"));
 		return ::Raids.Standard.constructEntry
 		(
 			"Wealth",
@@ -186,7 +186,7 @@
 
 	function getExcludedGoodsList()
 	{
-		local goods = this.getField("Goods");
+		local goods = this.getTopLevelField("Goods");
 		local excludedGoods = clone goods.Excluded;
 		excludedGoods.extend(goods.Southern);
 		return excludedGoods;
@@ -221,8 +221,13 @@
 		return iterations;
 	}
 
-	function getField( _fieldName )
-	{	// TODO: don't much appreciate that sometimes 'getField' accesses top level fields, and sometimes sub level fields.
+	function getSubLevelField( _fieldName )
+	{
+		return ::Raids.Database.getSubLevelField("Caravans", _fieldName);
+	}
+
+	function getTopLevelField( _fieldName )
+	{
 		return ::Raids.Database.getTopLevelField("Caravans", _fieldName);
 	}
 
@@ -235,7 +240,7 @@
 	{
 		local wealth = ::Raids.Standard.getFlag("CaravanWealth", _caravanObject);
 		local timeOffset = ::World.getTime().Days >= this.Parameters.ReinforcementThresholdDays ? this.Parameters.TroopTimeOffset : 0;
-		local naiveIterations = wealth + ::Math.rand(wealth - this.WealthDescriptors.Moderate, wealth) + timeOffset;
+		local naiveIterations = wealth + ::Math.rand(wealth - this.getSubLevelField("WealthDescriptors").Moderate, wealth) + timeOffset;
 		return ::Math.min(this.Parameters.MaximumTroopOffset, naiveIterations);
 	}
 
@@ -301,7 +306,7 @@
 		}
 
 		# Assess wealth for named loot viability.
-		local isAbundant = ::Raids.Standard.getFlag("CaravanWealth", _caravanObject) == this.WealthDescriptors.Abundant;
+		local isAbundant = ::Raids.Standard.getFlag("CaravanWealth", _caravanObject) == this.getSubLevelField("WealthDescriptors").Abundant;
 
 		# Evaluate current time progression for named loot viability.
 		local exceedsThreshold = ::World.getTime().Days >= this.Parameters.ReinforcementThresholdDays;
@@ -329,7 +334,7 @@
 
 	function populateInventory( _caravanObject, _settlementObject )
 	{
-		local wealthDescriptors = this.getField("WealthDescriptors");
+		local wealthDescriptors = this.getSubLevelField("WealthDescriptors");
 
 		if (::Raids.Standard.getFlag("CaravanWealth", _caravanObject) == wealthDescriptors.Meager)
 		{
@@ -356,7 +361,7 @@
 			documentChance += this.Parameters.SupplyCaravanDocumentChanceOffset;
 		}
 
-		if (wealth != this.WealthDescriptors.Meager)
+		if (wealth != this.getSubLevelField("WealthDescriptors").Meager)
 		{
 			documentChance += wealth * this.Parameters.WealthDocumentChanceOffset;
 		}
@@ -387,7 +392,7 @@
 	function reinforceTroops( _caravanObject )
 	{
 		local wealth = ::Raids.Standard.getFlag("CaravanWealth", _caravanObject);
-		local wealthDescriptors = this.getField("WealthDescriptors");
+		local wealthDescriptors = this.getSubLevelField("WealthDescriptors");
 
 		if (wealth == wealthDescriptors.Meager)
 		{
@@ -422,20 +427,20 @@
 
 	function setCaravanCargo( _caravanObject, _settlementObject )
 	{
-		local cargoDescriptors = this.getField("CargoDescriptors");
+		local cargoDescriptors = this.getSubLevelField("CargoDescriptors");
 		local randomNumber = ::Math.rand(1, 100);
 		local isEligible = @(_value) randomNumber <= _value;
 
 		# Assume default value.
-		local cargoType = this.CargoDescriptors.Trade;
+		local cargoType = cargoDescriptors.Trade;
 
-		if (isEligible(this.CargoDistribution.Assortment) || _settlementObject.getProduce().len() == 0)
+		if (isEligible(cargoDescriptors.Assortment) || _settlementObject.getProduce().len() == 0)
 		{
-			cargoType = this.CargoDescriptors.Assortment;
+			cargoType = cargoDescriptors.Assortment;
 		}
-		else if (isEligible(this.CargoDistribution.Supplies))
+		else if (isEligible(cargoDescriptors.Supplies))
 		{
-			cargoType = this.CargoDescriptors.Supplies;
+			cargoType = cargoDescriptors.Supplies;
 		}
 
 		::Raids.Standard.setFlag("CaravanCargo", cargoType, _caravanObject);
@@ -449,9 +454,10 @@
 	function setCaravanWealth( _caravanObject, _settlementObject )
 	{
 		local caravanWealth = ::Math.rand(1, 2);
+		local wealthDescriptors = this.getSubLevelField("WealthDescriptors");
 
 		# Emulating clamp functionality.
-		local normalise = @(_value) ::Math.min(::Math.max(_value, this.WealthDescriptors.Meager), this.WealthDescriptors.Abundant);
+		local normalise = @(_value) ::Math.min(::Math.max(_value, wealthDescriptors.Meager), wealthDescriptors.Abundant);
 
 		if (_settlementObject.isSouthern() || ::World.FactionManager.getFaction(_caravanObject.getFaction()).getType() == ::Const.FactionType.NobleHouse)
 		{

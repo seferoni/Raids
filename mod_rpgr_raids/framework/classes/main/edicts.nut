@@ -23,7 +23,7 @@
 
 	function clearEdicts( _lairObject )
 	{
-		foreach( container in this.getField("Containers") )
+		foreach( container in this.getSubLevelField("Containers") )
 		{
 			this.resetContainer(container, _lairObject);
 		}
@@ -66,7 +66,7 @@
 		local sugaredID = ::Raids.Standard.getFlag(_container, _lairObject);
 		local procedure = format("execute%sProcedure", sugaredID);
 
-		if (this.getField("CycledEdicts").find(sugaredID) != null)
+		if (this.getSubLevelField("CycledEdicts").find(sugaredID) != null)
 		{
 			this.resetContainer(_container, _lairObject);
 			this.addToHistory(sugaredID, _lairObject);
@@ -88,7 +88,7 @@
 	{
 		local edictContainer = false;
 
-		foreach( container in this.getField("Containers") )
+		foreach( container in this.getSubLevelField("Containers") )
 		{
 			if (::Raids.Standard.getFlag(container, _lairObject) == _sugaredID)
 			{
@@ -148,7 +148,7 @@
 	{
 		local entries = [];
 		local vacantEntry = this.createVacantEntry();
-		local naiveContainers = this.getField("Containers");
+		local naiveContainers = this.getSubLevelField("Containers");
 		local occupiedContainers = this.getOccupiedContainers(_lairObject);
 
 		if (occupiedContainers.len() == 0)
@@ -193,11 +193,6 @@
 	function getEdictProperties()
 	{
 		return ::Raids.Database.getTopLevelField("Edicts", "Properties");
-	}
-
-	function getField( _fieldName )
-	{
-		return ::Raids.Database.getSubLevelField("Edicts", _fieldName);
 	}
 
 	function getFirstQueuedWritingInstrumentsInstance()
@@ -281,7 +276,7 @@
 		local occupiedContainers = [];
 		local occupied = @(_container) ::Raids.Standard.getFlag(_container, _lairObject) != false;
 
-		foreach( container in this.getField("Containers") )
+		foreach( container in this.getSubLevelField("Containers") )
 		{
 			if (occupied(container)) occupiedContainers.push(container);
 		}
@@ -306,11 +301,21 @@
 		return entries;
 	}
 
+	function getSubLevelField( _fieldName )
+	{
+		return ::Raids.Database.getSubLevelField("Edicts", _fieldName);
+	}
+
 	function getSugaredID( _edictID, _isFileName = false )
 	{
 		local culledString = _isFileName ? format("%s%s", this.Parameters.DirectoryPath, "raids_edict_of_") : "special.raids_edict_of_";
 		local sugaredID = ::Raids.Standard.setCase(_edictID.slice(culledString.len()), ::Raids.Standard.Case.Upper);
 		return sugaredID;
+	}
+
+	function getTopLevelField( _fieldName )
+	{
+		return ::Raids.Database.getTopLevelField("Edicts", _fieldName);
 	}
 
 	function getTreasureOffset( _lairObject )
@@ -340,7 +345,7 @@
 		}
 
 		local factionType = ::World.FactionManager.getFaction(_lairObject.getFaction()).getType();
-		local factions = this.findEdict("Legibility", _lairObject, true) != false ? ::Raids.Lairs.Factions : this.getField("Factions");
+		local factions = this.findEdict("Legibility", _lairObject, true) != false ? ::Raids.Lairs.Factions : this.getSubLevelField("ConnateFactions");
 		local viableFactions = factions.map(@(_factionName) ::Raids.Lairs.getFactionType(_factionName));
 
 		if (viableFactions.find(factionType) != null)
@@ -348,7 +353,7 @@
 			return true;
 		}
 
-		if (this.getField("Overrides").find(_lairObject.getTypeID()) != null)
+		if (this.getSubLevelField("LocationOverrides").find(_lairObject.getTypeID()) != null)
 		{
 			return true;
 		}
@@ -363,7 +368,7 @@
 			return;
 		}
 
-		local viableEdicts = this.getField("CycledEdicts").filter(@(_index, _sugaredID) ::Raids.Edicts.findEdictInHistory(_sugaredID, _lairObject));
+		local viableEdicts = this.getSubLevelField("CycledEdicts").filter(@(_index, _sugaredID) ::Raids.Edicts.findEdictInHistory(_sugaredID, _lairObject));
 
 		foreach( sugaredID in viableEdicts )
 		{
