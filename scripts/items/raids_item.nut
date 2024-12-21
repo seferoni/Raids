@@ -35,7 +35,7 @@ this.raids_item <- ::inherit("scripts/items/item",
 	function assignSpecialProperties()
 	{
 		this.m.DescriptionPrefix <- "";
-		this.m.GFXPathPrefix <- "ui/items/consumables/";
+		this.m.GFXPathPrefix <- "consumables/";
 		this.m.MaximumUses <- 3;
 		this.m.Warnings <- {};
 	}
