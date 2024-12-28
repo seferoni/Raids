@@ -10,14 +10,16 @@
 		this.Lairs <- {};
 	}
 
-	function getTopLevelField( _tableName, _fieldName )
+	function getField( _tableName, _fieldName )
 	{
-		if (!(_fieldName in this[_tableName]))
+		local field = this.getTopLevelField(_tableName, _fieldName);
+
+		if (field == null)
 		{
-			return null;
+			field = this.getSubLevelField(_tableName, _fieldName);
 		}
 
-		return this[_tableName][_fieldName];
+		return field;
 	}
 
 	function getSubLevelField( _tableName, _fieldName )
@@ -31,6 +33,16 @@
 
 			return this[_tableName][subtableName][_fieldName];
 		}
+	}
+
+	function getTopLevelField( _tableName, _fieldName )
+	{
+		if (!(_fieldName in this[_tableName]))
+		{
+			return null;
+		}
+
+		return this[_tableName][_fieldName];
 	}
 
 	function getIcon( _iconKey )

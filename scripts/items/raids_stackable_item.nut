@@ -70,7 +70,7 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 	function refreshIcon()
 	{
 		local currentStacks = this.getCurrentStacks();
-		local stackThresholds = this.getIconStackThresholds();
+		local stackThresholds = this.getField("IconStackThresholds")
 
 		foreach( thresholdDescriptor, thresholdTable in stackThresholds )
 		{
@@ -88,6 +88,11 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 	{
 		local currentStacks = this.getCurrentStacks();
 		this.m.Value = currentStacks * this.m.ValueNative;
+	}
+
+	function getField( _fieldName )
+	{
+		return ::Raids.Database.getField("Stackables", _fieldName);
 	}
 
 	function getItemInstancesInStash()
@@ -108,14 +113,9 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 		return instances;
 	}
 
-	function getIconStackThresholds()
-	{
-		return ::Raids.Database.getSubLevelField("Stackables", "IconStackThresholds");
-	}
-
 	function getProcedures()
 	{
-		return ::Raids.Database.getSubLevelField("Generic", "Procedures");
+		return ::Raids.Database.getField("Generic", "Procedures");
 	}
 
 	function getCurrentStacks()

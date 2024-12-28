@@ -264,7 +264,7 @@
 
 	function getField( _fieldName )
 	{
-		return ::Raids.Database.getSubLevelField("Lairs", _fieldName);
+		return ::Raids.Database.getField("Lairs", _fieldName);
 	}
 
 	function getMoneyCount( _lairObject )
@@ -282,7 +282,7 @@
 
 	function getNamedItemKeys()
 	{
-		return ::Raids.Database.getTopLevelField("Generic", "NamedItemKeys");
+		return ::Raids.Database.getField("Generic", "NamedItemKeys");
 	}
 
 	function getNamedLootChance( _lairObject )
@@ -301,7 +301,7 @@
 
 	function getProcedures()
 	{
-		return ::Raids.Database.getSubLevelField("Generic", "Procedures");
+		return ::Raids.Database.getField("Generic", "Procedures");
 	}
 
 	function getResourcesByAgitation( _lairObject )

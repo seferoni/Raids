@@ -65,7 +65,7 @@ this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_item",
 	function cycleSelectionMode()
 	{
 		local selectionMode = this.getEdictSelectionMode();
-		local selectionModes = ::Raids.Edicts.getSubLevelField("SelectionModes");
+		local selectionModes = ::Raids.Edicts.getField("SelectionModes");
 
 		if (selectionMode == selectionModes.Inverted)
 		{

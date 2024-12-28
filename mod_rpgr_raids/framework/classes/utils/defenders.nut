@@ -81,7 +81,7 @@
 
 	function getField( _fieldName )
 	{
-		return ::Raids.Database.getTopLevelField("Defenders", _fieldName);
+		return ::Raids.Database.getField("Defenders", _fieldName);
 	}
 
 	function getTroopChoices()
@@ -171,7 +171,7 @@
 
 	function isLairAgitated( _lairObject )
 	{
-		local agitationDescriptors = ::Raids.Database.getTopLevelField("Lairs", "AgitationDescriptors");
+		local agitationDescriptors = ::Raids.Lairs.getField("AgitationDescriptors");
 		return ::Raids.Standard.getFlag("Agitation", _lairObject) > agitationDescriptors.Relaxed;
 	}
 
