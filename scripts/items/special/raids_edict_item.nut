@@ -240,6 +240,12 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_stackable_item",
 		return ::Raids.Edicts.getField("CycledEdicts").find(this.getSugaredID()) != null;
 	}
 
+	function setDescription( _properName )
+	{
+		local key = format("%sDescription", this.formatName(_properName));
+		this.m.Description = format("%s %s", this.m.DescriptionPrefix, ::Raids.Strings.Edicts[key].Description);
+	}
+
 	function setEffectTextByName( _properName )
 	{
 		local formattedName = this.formatName(_properName, "_");

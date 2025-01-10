@@ -52,7 +52,7 @@
 			return null;
 		}
 
-		return format("ui/icons/%s", this.Icons[_iconKey]);
+		return format("ui/icons/%s", this.Generic.Icons[_iconKey]);
 	}
 
 	function getSettingParameters()

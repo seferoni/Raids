@@ -98,7 +98,7 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 	function getItemInstancesInStash()
 	{
 		local instances = [];
-		local stash = ::World.Assets.getStash().filter(@(_index, _item) _item != null);
+		local stash = ::World.Assets.getStash().getItems().filter(@(_index, _item) _item != null);
 
 		foreach( item in stash )
 		{
