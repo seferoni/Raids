@@ -79,7 +79,7 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 				continue;
 			}
 
-			this.setIconWithSuffix(threshold.IconSuffix);
+			this.setIconWithSuffix(thresholdTable.IconSuffix);
 			break;
 		}
 	}
@@ -95,29 +95,6 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 		return ::Raids.Database.getField("Stackables", _fieldName);
 	}
 
-	function getItemInstancesInStash()
-	{
-		local instances = [];
-		local stash = ::World.Assets.getStash().getItems().filter(@(_index, _item) _item != null);
-
-		foreach( item in stash )
-		{
-			if (item.getID() != this.getID())
-			{
-				continue;
-			}
-
-			instances.push(item);
-		}
-
-		return instances;
-	}
-
-	function getProcedures()
-	{
-		return ::Raids.Database.getField("Generic", "Procedures");
-	}
-
 	function getCurrentStacks()
 	{
 		return ::Raids.Standard.getFlag("Stacks", this);
@@ -126,7 +103,7 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 	function onAddedToStash( _stashID )
 	{
 		this.raids_item.onAddedToStash(_stashID);
-		this.updateStacks();
+		::Raids.Edicts.Stackables.updateStash(this.getID());
 	}
 
 	function onStackUpdate()
@@ -170,7 +147,7 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 
 	function setStacks( _procedure )
 	{
-		local procedures = this.getProcedures();
+		local procedures = ::Raids.Standard.getProcedures();
 
 		switch (_procedure)
 		{
@@ -179,18 +156,5 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 		}
 
 		this.onStackUpdate();
-	}
-
-	function updateStacks()
-	{
-		local instances = this.getItemInstancesInStash();
-
-		if (instances.len() == 0)
-		{
-			return;
-		}
-
-		instances[0].setStacks(this.getProcedures().Increment);
-		this.removeSelf();
 	}
 });

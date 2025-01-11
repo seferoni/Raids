@@ -119,14 +119,14 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_stackable_item",
 
 	function getDiscoveryText()
 	{
-		local discoveryText = ::Raids.Standard.colourWrap(this.m.DiscoveryDays, ::Raids.Standard.Colour.Green);
-		return format(::Raids.Strings.Edicts.EdictDiscoveryText, discoveryText, ::Raids.Strings.Generic[discoveryDuration > 1 ? "Days" : "Day"]);
+		local discoveryDays = ::Raids.Standard.colourWrap(this.m.DiscoveryDays, ::Raids.Standard.Colour.Green);
+		return format(::Raids.Strings.Edicts.EdictDiscovery, discoveryDays, ::Raids.Strings.Generic[this.m.DiscoveryDays > 1 ? "Days" : "Day"]);
 	}
 
 	function getPersistenceText()
 	{
 		local descriptor = ::Raids.Standard.colourWrap(::Raids.Strings.Generic[this.isCycled() ? "Temporary" : "Permanent"], ::Raids.Standard.Colour.Red);
-		return format(::Raids.Strings.Edicts.EdictPersistenceText, descriptor);
+		return format(::Raids.Strings.Edicts.EdictPersistence, descriptor);
 	}
 
 	function getScalingModalities()
@@ -141,10 +141,10 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_stackable_item",
 
 		if (this.m.ScalingModality == modalities.Static)
 		{
-			return format(::Raids.Strings.Edicts.EdictScalingTextStatic, colourWrap(::Raids.Strings.Generic.Static, "Green"));
+			return format(::Raids.Strings.Edicts.EdictScalingStatic, colourWrap(::Raids.Strings.Generic.Static, "Green"));
 		}
 
-		return format(::Raids.Strings.Edicts.EdictScalingText, colourWrap(::Raids.Strings.Generic[this.m.ScalingModality == modalities.Agitation ? "Agitation" : "Resources"], "Red"));
+		return format(::Raids.Strings.Edicts.EdictScaling, colourWrap(::Raids.Strings.Generic[this.m.ScalingModality == modalities.Agitation ? "Agitation" : "Resources"], "Red"));
 	}
 
 	function getSugaredID()
@@ -242,13 +242,13 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_stackable_item",
 
 	function setDescription( _properName )
 	{
-		local key = format("%sDescription", this.formatName(_properName));
+		local key = this.formatName(_properName, "_");
 		this.m.Description = format("%s %s", this.m.DescriptionPrefix, ::Raids.Strings.Edicts[key].Description);
 	}
 
 	function setEffectTextByName( _properName )
 	{
-		local formattedName = this.formatName(_properName, "_");
+		local key = this.formatName(_properName, "_");
 		this.m.EffectText = ::Raids.Strings.Edicts[key].Effect;
 	}
 

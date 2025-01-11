@@ -12,7 +12,7 @@
 	Persistence = "ui/icons/scroll_01.png",
 	Scaling = "ui/icons/level.png",
 	Special = "ui/icons/special.png",
-	Stacks = "ui/icons/perk.png",
+	Stacks = "ui/icons/perks.png",
 	Supplies = "ui/icons/asset_food.png",
 	Time = "ui/icons/action_points.png",
 	Trade = "ui/icons/money.png",

@@ -140,23 +140,6 @@
 		return returnArray;
 	}
 
-	function getPlayerByID( _playerID )
-	{
-		local roster = ::World.getPlayerRoster().getAll();
-
-		foreach( player in roster )
-		{
-			local candidateID = player.getID();
-
-			if (_playerID == candidateID)
-			{
-				return player;
-			}
-		}
-
-		return null;
-	}
-
 	function getParameter( _parameterID )
 	{
 		if (::Raids.Manager.isMSUInstalled())
@@ -180,6 +163,28 @@
 	function getPercentageParameter( _parameterID )
 	{
 		return (this.getParameter(_parameterID) / 100.0);
+	}
+
+	function getProcedures()
+	{
+		return ::Raids.Database.getField("Generic", "Procedures");
+	}
+
+	function getPlayerByID( _playerID )
+	{
+		local roster = ::World.getPlayerRoster().getAll();
+
+		foreach( player in roster )
+		{
+			local candidateID = player.getID();
+
+			if (_playerID == candidateID)
+			{
+				return player;
+			}
+		}
+
+		return null;
 	}
 
 	function getListAsArray( _string )

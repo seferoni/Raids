@@ -1,4 +1,4 @@
-::Raids.Database.Generic.Stackables <-
+::Raids.Database.Stackables.Common <-
 {
 	IconStackThresholds =
 	{

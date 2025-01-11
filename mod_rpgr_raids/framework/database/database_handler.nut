@@ -8,6 +8,7 @@
 		this.Defenders <- {};
 		this.Edicts <- {};
 		this.Lairs <- {};
+		this.Stackables <- {};
 	}
 
 	function getField( _tableName, _fieldName )
@@ -52,7 +53,7 @@
 			return null;
 		}
 
-		return format("ui/icons/%s", this.Generic.Icons[_iconKey]);
+		return this.Generic.Icons[_iconKey];
 	}
 
 	function getSettingParameters()
