@@ -28,6 +28,12 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_stackable_item",
 		this.setEffectTextByName(_properName);
 	}
 
+	function assignSpecialProperties()
+	{
+		this.raids_stackable_item.assignSpecialProperties();
+		this.m.DescriptionPrefix = ::Raids.Strings.Edicts.EdictDescriptionPrefix;
+	}
+
 	function assignSoundProperties()
 	{
 		this.raids_stackable_item.assignSoundProperties();
@@ -57,7 +63,7 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_stackable_item",
 	{
 		return ::Raids.Standard.constructEntry
 		(
-			null, // TODO: this logs an "unknown mime type" error
+			null,
 			::Raids.Strings.Edicts.EdictInstruction
 		);
 	}

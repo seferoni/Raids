@@ -223,6 +223,26 @@
 		return true;
 	}
 
+	function isWithinRange( _value, _rangeArray )
+	{
+		if (_value < _rangeArray[0])
+		{
+			return false;
+		}
+
+		if (_rangeArray.len() == 1)
+		{
+			return true;
+		}
+
+		if (_value > _rangeArray[1])
+		{
+			return false;
+		}
+
+		return true;
+	}
+
 	function log( _string, _isError = false )
 	{
 		if (_isError)

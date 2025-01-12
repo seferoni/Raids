@@ -70,17 +70,20 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 	}
 
 	function refreshIcon()
-	{	// TODO: this logic does not produce the desired outcome
+	{
 		local currentStacks = this.getCurrentStacks();
-		local stackThresholds = this.getField("IconStackThresholds")
+		local stackThresholds = this.getField("IconStackThresholds");
 
 		foreach( thresholdDescriptor, thresholdTable in stackThresholds )
 		{
-			if ("MaximumStacks" in thresholdTable && thresholdTable.MaximumStacks < currentStacks)
+			::logInfo("examining " + thresholdDescriptor);
+
+			if (!::Raids.Standard.isWithinRange(currentStacks, thresholdTable.Range))
 			{
 				continue;
 			}
 
+			::logInfo("for current stacks " + currentStacks + ", setting " + thresholdDescriptor)
 			this.setIconWithSuffix(thresholdTable.IconSuffix);
 			break;
 		}

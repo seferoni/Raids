@@ -10,6 +10,7 @@
 	OfficialDocumentEffect = "Will produce a counterfeit Edict upon use. The resulting Edict type can be modulated by a set of writing instruments, if present.",
 	OfficialDocumentInstruction = "Right-click to modify its contents.",
 
+	EdictDescriptionPrefix = "A thoroughly illegal facsimile of official correspondence.",
 	EdictInstruction = "Right-click to dispatch within proximity of a lair. This Edict will be consumed in the process.",
 	EdictScaling = "This Edict's effects scale with lair %s.",
 	EdictScalingStatic = "This Edict's effects are %s.",

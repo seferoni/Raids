@@ -17,6 +17,6 @@ this.raids_edict_of_diminution <- ::inherit("scripts/items/special/raids_edict_i
 	{
 		this.raids_edict_item.assignEdictProperties();
 		this.m.DiscoveryDays = 2;
-		this.m.ScalingModality = this.ScalingModalities.Agitation;
+		this.m.ScalingModality = this.getScalingModalities().Agitation;
 	}
 });
