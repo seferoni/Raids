@@ -30,7 +30,7 @@
 
 		local masterInstance = instances.pop();
 
-		foreach( item in masterInstance )
+		foreach( item in instances )
 		{
 			stash.remove(item);
 		}

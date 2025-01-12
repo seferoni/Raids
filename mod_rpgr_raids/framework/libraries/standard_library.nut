@@ -20,7 +20,6 @@
 	{
 		id = 7,
 		type = "text",
-		icon = "",
 		text = ""
 	}
 
@@ -63,7 +62,7 @@
 			entry.icon <- ::Raids.Database.getIcon(_icon);
 		}
 
-		entry.text <- _text;
+		entry.text = _text;
 
 		if (_parentArray == null)
 		{

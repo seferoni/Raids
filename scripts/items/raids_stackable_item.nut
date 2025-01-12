@@ -29,6 +29,8 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 		{
 			this.overrideStacks(1);
 		}
+		
+		this.onStackUpdate();
 	}
 
 	function createStackEntry()
@@ -68,7 +70,7 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 	}
 
 	function refreshIcon()
-	{
+	{	// TODO: this logic does not produce the desired outcome
 		local currentStacks = this.getCurrentStacks();
 		local stackThresholds = this.getField("IconStackThresholds")
 
@@ -124,18 +126,18 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 	}
 
 	function isFlaggedForRemoval()
-	{
+	{	// TODO: this needn't exist as a flagged property.
 		return ::Raids.Standard.getFlag("FlaggedForRemoval", this);
 	}
 
 	function setIconWithSuffix( _suffixString )
 	{
-		this.m.Icon = format("%s%s", this.m.IconNative, _suffixString);
+		this.m.Icon = format("%s%s%s", this.m.IconNative, _suffixString, ".png");
 	}
 
 	function setNativeIcon( _iconPath )
 	{
-		this.m.Icon = _iconPath;
+		this.m.Icon = format("%s%s", _iconPath, ".png"); // TODO: there needs to be a set icon method that automatically appends the ".png" filetype
 		this.m.IconNative = _iconPath;
 	}
 

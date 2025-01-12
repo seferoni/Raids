@@ -10,7 +10,7 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_stackable_item",
 	function assignGenericProperties()
 	{
 		this.raids_stackable_item.assignGenericProperties();
-		this.setNativeIcon("special/raids_edict_item.png");
+		this.setNativeIcon("special/raids_edict_item");
 	}
 
 	function assignEdictProperties()
@@ -57,7 +57,7 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_stackable_item",
 	{
 		return ::Raids.Standard.constructEntry
 		(
-			null,
+			null, // TODO: this logs an "unknown mime type" error
 			::Raids.Strings.Edicts.EdictInstruction
 		);
 	}
