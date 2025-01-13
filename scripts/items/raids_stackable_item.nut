@@ -76,14 +76,11 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 
 		foreach( thresholdDescriptor, thresholdTable in stackThresholds )
 		{
-			::logInfo("examining " + thresholdDescriptor);
-
 			if (!::Raids.Standard.isWithinRange(currentStacks, thresholdTable.Range))
 			{
 				continue;
 			}
 
-			::logInfo("for current stacks " + currentStacks + ", setting " + thresholdDescriptor)
 			this.setIconWithSuffix(thresholdTable.IconSuffix);
 			break;
 		}
@@ -135,12 +132,12 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 
 	function setIconWithSuffix( _suffixString )
 	{
-		this.m.Icon = format("%s%s%s", this.m.IconNative, _suffixString, ".png");
+		this.m.Icon = format("%s%s.png", this.m.IconNative, _suffixString);
 	}
 
 	function setNativeIcon( _iconPath )
 	{
-		this.m.Icon = format("%s%s", _iconPath, ".png"); // TODO: there needs to be a set icon method that automatically appends the ".png" filetype
+		this.m.Icon = format("%s.png", _iconPath);
 		this.m.IconNative = _iconPath;
 	}
 
