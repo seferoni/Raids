@@ -29,7 +29,7 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 		{
 			this.overrideStacks(1);
 		}
-		
+
 		this.onStackUpdate();
 	}
 
@@ -126,7 +126,7 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 	}
 
 	function isFlaggedForRemoval()
-	{	// TODO: this needn't exist as a flagged property.
+	{
 		return ::Raids.Standard.getFlag("FlaggedForRemoval", this);
 	}
 

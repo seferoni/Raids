@@ -120,7 +120,7 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_stackable_item",
 		}
 
 		this.playUseSound();
-		this.setStacks(this.getProcedures().Decrement);
+		this.setStacks(::Raids.Standard.getProcedures().Decrement);
 	}
 
 	function getDiscoveryText()

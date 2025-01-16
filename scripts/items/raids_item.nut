@@ -27,16 +27,10 @@ this.raids_item <- ::inherit("scripts/items/item",
 		this.m.WarningSound <- "sounds/move_pot_clay_01.wav";
 	}
 
-	function assignSerialisedProperties()
-	{
-		this.setUses(this.m.MaximumUses);
-	}
-
 	function assignSpecialProperties()
 	{
 		this.m.DescriptionPrefix <- "";
 		this.m.GFXPathPrefix <- "consumables/";
-		this.m.MaximumUses <- 3;
 		this.m.Warnings <- {};
 	}
 
@@ -55,15 +49,6 @@ this.raids_item <- ::inherit("scripts/items/item",
 		{
 			return this.m.Flags;
 		}
-	}
-
-	function createUsesEntry()
-	{
-		return ::Raids.Standard.constructEntry
-		(
-			"Warning",
-			format("Has %s uses remaining.", ::Raids.Standard.colourWrap(this.getUses(), ::Raids.Standard.Colour.Red))
-		);
 	}
 
 	function createWarningEntries()
@@ -88,19 +73,6 @@ this.raids_item <- ::inherit("scripts/items/item",
 
 		this.resetWarnings();
 		return entries;
-	}
-
-	function decrementUses()
-	{
-		local remainingUses = this.getUses();
-
-		if (remainingUses == 1)
-		{
-			this.removeSelf();
-			return;
-		}
-
-		this.setUses(remainingUses - 1);
 	}
 
 	function formatName( _properName, _replacementSubstring = "" )
@@ -133,31 +105,6 @@ this.raids_item <- ::inherit("scripts/items/item",
 		push({id = 66, type = "text", text = this.getValueString()});
 		push({id = 3, type = "image", image = this.getIcon()});
 		return tooltipArray;
-	}
-
-	function getUses()
-	{
-		return ::Raids.Standard.getFlag("Uses", this);
-	}
-
-	function handleInvalidUse()
-	{
-		this.playWarningSound();
-		return false;
-	}
-
-	function handleValidUse()
-	{
-		this.playUseSound();
-		this.decrementUses();
-
-		if (this.getUses() == 0)
-		{
-			return true;
-		}
-
-		::Tooltip.reload();
-		return false;
 	}
 
 	function onDeserialize( _in )
@@ -220,11 +167,6 @@ this.raids_item <- ::inherit("scripts/items/item",
 	{
 		local key = this.formatName(_properName);
 		this.m.Name = ::Raids.Strings.Items[format("%sName", key)];
-	}
-
-	function setUses( _integer )
-	{
-		::Raids.Standard.setFlag("Uses", _integer, this);
 	}
 
 	function setWarning( _warning, _boolean = true )

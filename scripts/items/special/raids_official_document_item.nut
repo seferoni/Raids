@@ -7,6 +7,18 @@ this.raids_official_document_item <- ::inherit("scripts/items/raids_stackable_it
 		this.assignPropertiesByName("Official Document");
 	}
 
+	function addEdictToStash()
+	{
+		local writingInstruments = ::Raids.Edicts.getFirstQueuedWritingInstrumentsInstance();
+		local newEdict = ::Raids.Edicts.createEdict(writingInstruments);
+		::World.Assets.getStash().add(newEdict);
+
+		if (writingInstruments != null)
+		{
+			::Raids.Edicts.updateWritingInstruments(writingInstruments);
+		}
+	}
+
 	function assignGenericProperties()
 	{
 		this.raids_stackable_item.assignGenericProperties();
@@ -50,24 +62,10 @@ this.raids_official_document_item <- ::inherit("scripts/items/raids_stackable_it
 	}
 
 	function onUse( _actor, _item = null )
-	{	// TODO: anti-symmetry between this and edict item onUse implementation. not acceptable.
-		local writingInstruments = ::Raids.Edicts.getFirstQueuedWritingInstrumentsInstance();
-		::World.Assets.getStash().add(::Raids.Edicts.createEdict(writingInstruments));
+	{
 		this.playUseSound();
-
-		if (writingInstruments == null)
-		{	// TODO: this is rather ugly. generally dissatisfied with onUse implementations
-			return this.isFlaggedForRemoval();
-		}
-
-		# Terminate execution if the only Writing Instruments instance present is set to indiscriminate Edict selection.
-		if (writingInstruments.getEdictSelectionMode() == ::Raids.Edicts.getField("SelectionModes").Indiscriminate)
-		{
-			return this.isFlaggedForRemoval();
-		}
-
-		writingInstruments.decrementUses();
-		this.setStacks(this.getProcedures().Decrement);
+		this.addEdictToStash();
+		this.setStacks(::Raids.Standard.getProcedures().Decrement);
 		return this.isFlaggedForRemoval();
 	}
 });

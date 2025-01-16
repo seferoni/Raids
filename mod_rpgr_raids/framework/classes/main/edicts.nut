@@ -415,4 +415,20 @@
 			this.executeEdictProcedure(occupiedContainers[i], _lairObject);
 		}
 	}
+
+	function updateWritingInstruments( _writingInstruments )
+	{
+		if (writingInstruments.getEdictSelectionMode() == this.getField("SelectionModes").Indiscriminate)
+		{
+			return;
+		}
+
+		local stash = ::World.Assets.getStash();
+		writingInstruments.setStacks(::Raids.Standard.getProcedures().Decrement);
+
+		if (writingInstruments.isFlaggedForRemoval())
+		{
+			stash.remove(writingInstruments);
+		}
+	}
 };

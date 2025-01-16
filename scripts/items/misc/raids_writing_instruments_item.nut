@@ -1,22 +1,22 @@
-this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_item",
+this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_stackable_item",
 {
 	m = {},
 	function create()
 	{
-		this.raids_item.create();
+		this.raids_stackable_item.create();
 		this.assignPropertiesByName("Writing Instruments");
 		this.initialiseEdictSelection();
 	}
 
 	function assignGenericProperties()
 	{
-		this.raids_item.assignGenericProperties();
+		this.raids_stackable_item.assignGenericProperties();
 		this.m.Value = 300;
 	}
 
 	function assignSoundProperties()
 	{
-		this.raids_item.assignSoundProperties();
+		this.raids_stackable_item.assignSoundProperties();
 		this.m.InventorySound = "sounds/move_pot_clay_01.wav";
 		this.m.UseSound =
 		[
@@ -53,12 +53,12 @@ this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_item",
 		);
 	}
 
-	function createUsesEntry()
+	function createStackEntry()
 	{
 		return ::Raids.Standard.constructEntry
 		(
 			"Warning",
-			format(::Raids.Strings.Generic.UsesRemaining, ::Raids.Standard.colourWrap(this.getUses(), ::Raids.Standard.Colour.Red))
+			format(::Raids.Strings.Generic.UsesRemaining, ::Raids.Standard.colourWrap(this.getCurrentStacks(), ::Raids.Standard.Colour.Red))
 		);
 	}
 
@@ -221,10 +221,8 @@ this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_item",
 
 	function getTooltip()
 	{
-		local tooltipArray = this.raids_item.getTooltip();
+		local tooltipArray = this.raids_stackable_item.getTooltip();
 		local push = @(_entry) ::Raids.Standard.push(_entry, tooltipArray);
-
-		push(this.createUsesEntry());
 
 		if (this.isFirstInQueue())
 		{
@@ -234,11 +232,6 @@ this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_item",
 		push(this.createSelectionModeEntry());
 		push(this.createInstructionEntry());
 		return tooltipArray;
-	}
-
-	function getUses()
-	{
-		return ::Raids.Standard.getFlag("Uses", this);
 	}
 
 	function initialiseEdictSelection()
@@ -258,8 +251,6 @@ this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_item",
 
 	function onAddedToStash( _stashID )
 	{
-		this.raids_item.onAddedToStash(_stashID);
-
 		if (_stashID != "player")
 		{
 			return;
@@ -271,8 +262,6 @@ this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_item",
 
 	function onRemovedFromStash( _stashID )
 	{
-		this.raids_item.onRemovedFromStash(_stashID);
-
 		if (_stashID != "player")
 		{
 			return;
