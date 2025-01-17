@@ -57,7 +57,7 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 
 	function flagForRemoval()
 	{
-		::Raids.Standard.setFlag("FlaggedForRemoval", this, true);
+		::Raids.Standard.setFlag("FlaggedForRemoval", true, this);
 	}
 
 	function getTooltip()
@@ -107,6 +107,7 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 	{
 		this.refreshIcon();
 		this.recalculateValue();
+		::Tooltip.reload();
 	}
 
 	function overrideStacks( _newValue )

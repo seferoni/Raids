@@ -36,10 +36,6 @@ this.raids_item <- ::inherit("scripts/items/item",
 	function createFlags()
 	{
 		this.m.Flags <- ::new("scripts/tools/tag_collection");
-		this.getFlags <- function()
-		{
-			return this.m.Flags;
-		}
 	}
 
 	function createWarningEntries()
@@ -84,6 +80,11 @@ this.raids_item <- ::inherit("scripts/items/item",
 		}
 
 		return warnings;
+	}
+
+	function getFlags()
+	{
+		return this.m.Flags;
 	}
 
 	function getTooltip()
