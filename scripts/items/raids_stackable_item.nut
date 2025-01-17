@@ -107,7 +107,6 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 	{
 		this.refreshIcon();
 		this.recalculateValue();
-		::Tooltip.reload();
 	}
 
 	function overrideStacks( _newValue )
@@ -124,6 +123,11 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 	function isFlaggedForRemoval()
 	{
 		return ::Raids.Standard.getFlag("FlaggedForRemoval", this);
+	}
+
+	function refreshStash()
+	{
+		::World.State.m.CharacterScreen.loadStashList();
 	}
 
 	function setDescription( _properName )

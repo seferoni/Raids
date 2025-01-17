@@ -287,6 +287,7 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_stackable_item",
 		}
 
 		this.executeEdictProcedure(lairs);
+		this.refreshStash();
 		return this.handleValidUse();
 	}
 });

@@ -66,6 +66,7 @@ this.raids_official_document_item <- ::inherit("scripts/items/raids_stackable_it
 		this.playUseSound();
 		this.addEdictToStash();
 		this.setStacks(::Raids.Standard.getProcedures().Decrement);
+		this.refreshStash();
 		return this.isFlaggedForRemoval();
 	}
 });
