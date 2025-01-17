@@ -72,7 +72,7 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 	function refreshIcon()
 	{
 		local currentStacks = this.getCurrentStacks();
-		local stackThresholds = this.getField("IconStackThresholds");
+		local stackThresholds = ::Raids.Edicts.Stackables.getField("IconStackThresholds");
 
 		foreach( thresholdDescriptor, thresholdTable in stackThresholds )
 		{
@@ -90,11 +90,6 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 	{
 		local currentStacks = this.getCurrentStacks();
 		this.m.Value = currentStacks * this.m.ValueNative;
-	}
-
-	function getField( _fieldName )
-	{
-		return ::Raids.Database.getField("Stackables", _fieldName);
 	}
 
 	function getCurrentStacks()
@@ -130,9 +125,21 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 		return ::Raids.Standard.getFlag("FlaggedForRemoval", this);
 	}
 
+	function setDescription( _properName )
+	{
+		local key = format("%sDescription", this.formatName(_properName));
+		this.m.Description = format("%s %s", this.m.DescriptionPrefix, ::Raids.Strings.Edicts[key]);
+	}
+
 	function setIconWithSuffix( _suffixString )
 	{
 		this.m.Icon = format("%s%s.png", this.m.IconNative, _suffixString);
+	}
+
+	function setName( _properName )
+	{
+		local key = format("%sName", this.formatName(_properName));
+		this.m.Name = ::Raids.Strings.Edicts[key];
 	}
 
 	function setNativeIcon( _iconPath )

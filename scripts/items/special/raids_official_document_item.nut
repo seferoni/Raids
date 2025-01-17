@@ -22,7 +22,7 @@ this.raids_official_document_item <- ::inherit("scripts/items/raids_stackable_it
 	function assignGenericProperties()
 	{
 		this.raids_stackable_item.assignGenericProperties();
-		this.setNativeIcon("special/raids_official_document_item.png");
+		this.setNativeIcon("special/raids_official_document_item");
 		this.setNativeValue(150);
 	}
 

@@ -18,6 +18,11 @@
 		return instances;
 	}
 
+	function getField( _fieldName )
+	{
+		return ::Raids.Database.getField("Stackables", _fieldName);
+	}
+
 	function updateStash( _itemID )
 	{
 		local stash = ::World.Assets.getStash();

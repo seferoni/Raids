@@ -14,6 +14,12 @@ this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_stackable_
 		this.m.Value = 300;
 	}
 
+	function assignPropertiesByName( _properName )
+	{
+		this.raids_stackable_item.assignPropertiesByName(_properName);
+		this.setIconByName(_properName);
+	}
+
 	function assignSoundProperties()
 	{
 		this.raids_stackable_item.assignSoundProperties();
@@ -169,11 +175,6 @@ this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_stackable_
 		return ::Raids.Standard.colourWrap(::Raids.Standard.getKey(selectionMode, selectionModes), ::Raids.Standard.Colour.Red);
 	}
 
-	function getField( _fieldName )
-	{
-		return ::Raids.Edicts.getField(_fieldName);
-	}
-
 	function isFirstInQueue()
 	{
 		if (!this.isShowingQueueState())
@@ -256,7 +257,7 @@ this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_stackable_
 			return;
 		}
 
-		this.setShowingQueueState();
+		this.setShowQueueState();
 		::Raids.Standard.setFlag("EdictSelectionMode", ::Raids.Edicts.getField("Indiscriminate"), this);
 	}
 
@@ -267,7 +268,12 @@ this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_stackable_
 			return;
 		}
 
-		this.setShowingQueueState(false);
+		this.setShowQueueState(false);
+	}
+
+	function onStackUpdate()
+	{
+		return;
 	}
 
 	function onUse( _actor, _item = null )
@@ -293,7 +299,7 @@ this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_stackable_
 		return ::Raids.Standard.getFlag("ShowQueueState", this);
 	}
 
-	function setShowingQueueState( _boolean = true )
+	function setShowQueueState( _boolean = true )
 	{
 		::Raids.Standard.setFlag("ShowQueueState", _boolean, this);
 	}

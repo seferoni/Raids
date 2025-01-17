@@ -8,7 +8,6 @@ this.raids_item <- ::inherit("scripts/items/item",
 		this.assignSoundProperties();
 		this.createFlags();
 		this.assignSpecialProperties();
-		this.assignSerialisedProperties();
 	}
 
 	function assignGenericProperties()
@@ -32,14 +31,6 @@ this.raids_item <- ::inherit("scripts/items/item",
 		this.m.DescriptionPrefix <- "";
 		this.m.GFXPathPrefix <- "consumables/";
 		this.m.Warnings <- {};
-	}
-
-	function assignPropertiesByName( _properName )
-	{
-		this.setIDByName(_properName);
-		this.setDescription(_properName);
-		this.setIconByName(_properName);
-		this.setName(_properName);
 	}
 
 	function createFlags()
@@ -145,12 +136,6 @@ this.raids_item <- ::inherit("scripts/items/item",
 		this.playSound(this.m.WarningSound);
 	}
 
-	function setDescription( _properName )
-	{
-		local key = format("%sDescription", this.formatName(_properName));
-		this.m.Description = format("%s %s", this.m.DescriptionPrefix, ::Raids.Strings.Items[key]);
-	}
-
 	function setIDByName( _properName )
 	{
 		local formattedName = this.formatName(_properName, "_");
@@ -161,12 +146,6 @@ this.raids_item <- ::inherit("scripts/items/item",
 	{
 		local formattedName = this.formatName(_properName, "_");
 		this.m.Icon = format("%s/raids_%s_item.png", this.m.GFXPathPrefix, formattedName.tolower());
-	}
-
-	function setName( _properName )
-	{
-		local key = this.formatName(_properName);
-		this.m.Name = ::Raids.Strings.Items[format("%sName", key)];
 	}
 
 	function setWarning( _warning, _boolean = true )
