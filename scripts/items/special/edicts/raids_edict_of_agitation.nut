@@ -26,7 +26,7 @@ this.raids_edict_of_agitation <- ::inherit("scripts/items/special/raids_edict_it
 	function getEffectText()
 	{
 		local text = this.raids_edict_item.getEffectText();
-		return format(::Raids.Strings.Edicts.AgitationEffectFragmentA, text, ::Raids.Standard.colourWrap(::Raids.Strings.Edicts.AgitationEffectFragmentB, ::Raids.Standard.Colour.Green));
+		return format(::Raids.Strings.Edicts.Common.AgitationEffectFragmentA, text, ::Raids.Standard.colourWrap(::Raids.Strings.Edicts.Common.AgitationEffectFragmentB, ::Raids.Standard.Colour.Green));
 	}
 
 	function getViableLairs()

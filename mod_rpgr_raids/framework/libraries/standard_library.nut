@@ -23,9 +23,9 @@
 		text = ""
 	}
 
-	function appendToStringList( _string, _list )
+	function appendToStringList( _string, _list, _separatorString = "," )
 	{
-		local newString = _list == "" ? format("%s", _string) : format("%s, %s", _list, _string);
+		local newString = _list == "" ? format("%s", _string) : format("%s%s %s", _list, _separatorString, _string);
 		return newString;
 	}
 

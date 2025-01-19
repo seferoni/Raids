@@ -1,5 +1,10 @@
 ::Raids.Strings <-
 {
+	function createTables()
+	{
+		this.Edicts <- {};
+	}
+
 	function compileFragments( _fragmentsArray, _colour )
 	{
 		local compiledString = "";
@@ -9,23 +14,35 @@
 			_fragmentsArray.push("");
 		}
 
-		for( local i = 0; i < _fragmentsArray.len() - 1; i + 2 )
+		for( local i = 0; i < _fragmentsArray.len() - 1; i++ )
 		{
-			local concatenatedFragment = format("%s%s", _fragmentsArray[i], ::Raids.Standard.colourWrap(_fragmentsArray[i + 1], ::Raids.Standard.Colour[_colour]));
-			compiledString = compiledString == "" ? concatedFragment : format("%s %s", compiledString, concatenatedFragment);
+			local fragment = i % 2 != 0 ? _fragmentsArray[i] : ::Raids.Standard.colourWrap(_fragmentsArray[i], ::Raids.Standard.Colour[_colour]);
+			compiledString = ::Raids.Standard.appendToStringList(fragment, compiledString, "");
 		}
 
 		return compiledString;
+	}
+
+	function getField( _tableName, _fieldName )
+	{
+		local field = this.getTopLevelField(_tableName, _fieldName);
+
+		if (field == null)
+		{
+			field = this.getSubLevelField(_tableName, _fieldName);
+		}
+
+		return field;
 	}
 
 	function getFragmentsAsArray( _fragmentBase, _tableKey, _fragmentCount )
 	{
 		local fragments = [];
 
-		for( local i = 0; i < _fragmentCount; i++ )
+		for( local i = 0; i <= _fragmentCount; i++ )
 		{
 			local stringKey = format("%s%s", _fragmentBase, this.mapIntegerToAlphabet(i));
-			fragments.push(::Raids.Strings[_tableKey][stringKey]);
+			fragments.push(this.getField(_tableKey, stringKey));
 		}
 
 		return fragments;
@@ -37,10 +54,32 @@
 		return this.compileFragments(fragmentsArray, _colour);
 	}
 
+	function getSubLevelField( _tableName, _fieldName )
+	{
+		foreach( subtableName, nestedTable in this[_tableName] )
+		{
+			if (!(_fieldName in nestedTable))
+			{
+				continue;
+			}
+
+			return this[_tableName][subtableName][_fieldName];
+		}
+	}
+
+	function getTopLevelField( _tableName, _fieldName )
+	{
+		if (!(_fieldName in this[_tableName]))
+		{
+			return null;
+		}
+
+		return this[_tableName][_fieldName];
+	}
+
 	function mapIntegerToAlphabet( _integer )
 	{
-		# Counting up from the ASCII equivalent of the letter "A".
-		local ASCIIValue = 65 + _integer - 1;
+		local ASCIIValue = 65 + _integer;
 		return ASCIIValue.tochar();
 	}
 
@@ -57,6 +96,7 @@
 
 	function initialise()
 	{
+		this.createTables();
 		this.loadFiles();
 	}
 };

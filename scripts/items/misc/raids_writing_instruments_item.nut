@@ -37,7 +37,7 @@ this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_stackable_
 		return ::Raids.Standard.constructEntry
 		(
 			null,
-			::Raids.Strings.Edicts.WritingInstrumentsInstruction
+			::Raids.Strings.Edicts.Common.WritingInstrumentsInstruction
 		);
 	}
 
@@ -46,7 +46,7 @@ this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_stackable_
 		return ::Raids.Standard.constructEntry
 		(
 			"Warning",
-			::Raids.Strings.Edicts.WritingInstrumentsQueueText
+			::Raids.Strings.Edicts.Common.WritingInstrumentsQueueText
 		);
 	}
 

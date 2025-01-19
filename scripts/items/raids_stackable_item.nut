@@ -133,7 +133,7 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 	function setDescription( _properName )
 	{
 		local key = format("%sDescription", this.formatName(_properName));
-		this.m.Description = format("%s %s", this.m.DescriptionPrefix, ::Raids.Strings.Edicts[key]);
+		this.m.Description = format("%s %s", this.m.DescriptionPrefix, ::Raids.Strings.Edicts.Common[key]);
 	}
 
 	function setIconWithSuffix( _suffixString )
@@ -144,7 +144,7 @@ this.raids_stackable_item <- ::inherit("scripts/items/raids_item",
 	function setName( _properName )
 	{
 		local key = format("%sName", this.formatName(_properName));
-		this.m.Name = ::Raids.Strings.Edicts[key];
+		this.m.Name = ::Raids.Strings.Edicts.Common[key];
 	}
 
 	function setNativeIcon( _iconPath )

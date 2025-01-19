@@ -31,7 +31,7 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_stackable_item",
 	function assignSpecialProperties()
 	{
 		this.raids_stackable_item.assignSpecialProperties();
-		this.m.DescriptionPrefix = ::Raids.Strings.Edicts.EdictDescriptionPrefix;
+		this.m.DescriptionPrefix = ::Raids.Strings.Edicts.Common.EdictDescriptionPrefix;
 	}
 
 	function assignSoundProperties()
@@ -64,7 +64,7 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_stackable_item",
 		return ::Raids.Standard.constructEntry
 		(
 			null,
-			::Raids.Strings.Edicts.EdictInstruction
+			::Raids.Strings.Edicts.Common.EdictInstruction
 		);
 	}
 
@@ -126,13 +126,13 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_stackable_item",
 	function getDiscoveryText()
 	{
 		local discoveryDays = ::Raids.Standard.colourWrap(this.m.DiscoveryDays, ::Raids.Standard.Colour.Green);
-		return format(::Raids.Strings.Edicts.EdictDiscovery, discoveryDays, ::Raids.Strings.Generic[this.m.DiscoveryDays > 1 ? "Days" : "Day"]);
+		return format(::Raids.Strings.Edicts.Common.EdictDiscovery, discoveryDays, ::Raids.Strings.Generic[this.m.DiscoveryDays > 1 ? "Days" : "Day"]);
 	}
 
 	function getPersistenceText()
 	{
 		local descriptor = ::Raids.Standard.colourWrap(::Raids.Strings.Generic[this.isCycled() ? "Temporary" : "Permanent"], ::Raids.Standard.Colour.Red);
-		return format(::Raids.Strings.Edicts.EdictPersistence, descriptor);
+		return format(::Raids.Strings.Edicts.Common.EdictPersistence, descriptor);
 	}
 
 	function getScalingModalities()
@@ -147,10 +147,10 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_stackable_item",
 
 		if (this.m.ScalingModality == modalities.Static)
 		{
-			return format(::Raids.Strings.Edicts.EdictScalingStatic, colourWrap(::Raids.Strings.Generic.Static, "Green"));
+			return format(::Raids.Strings.Edicts.Common.EdictScalingStatic, colourWrap(::Raids.Strings.Generic.Static, "Green"));
 		}
 
-		return format(::Raids.Strings.Edicts.EdictScaling, colourWrap(::Raids.Strings.Generic[this.m.ScalingModality == modalities.Agitation ? "Agitation" : "Resources"], "Red"));
+		return format(::Raids.Strings.Edicts.Common.EdictScaling, colourWrap(::Raids.Strings.Generic[this.m.ScalingModality == modalities.Agitation ? "Agitation" : "Resources"], "Red"));
 	}
 
 	function getSugaredID()

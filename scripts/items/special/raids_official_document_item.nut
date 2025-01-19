@@ -38,7 +38,7 @@ this.raids_official_document_item <- ::inherit("scripts/items/raids_stackable_it
 		return ::Raids.Standard.constructEntry
 		(
 			"Special",
-			::Raids.Strings.Edicts.OfficialDocumentEffect
+			::Raids.Strings.Edicts.Common.OfficialDocumentEffect
 		);
 	}
 
@@ -47,7 +47,7 @@ this.raids_official_document_item <- ::inherit("scripts/items/raids_stackable_it
 		return ::Raids.Standard.constructEntry
 		(
 			null,
-			::Raids.Strings.Edicts.OfficialDocumentInstruction
+			::Raids.Strings.Edicts.Common.OfficialDocumentInstruction
 		);
 	}
 
