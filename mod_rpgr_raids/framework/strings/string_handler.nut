@@ -39,7 +39,7 @@
 	{
 		local fragments = [];
 
-		for( local i = 0; i <= _fragmentCount; i++ )
+		for( local i = 0; i < _fragmentCount; i++ )
 		{
 			local stringKey = format("%s%s", _fragmentBase, this.mapIntegerToAlphabet(i));
 			fragments.push(this.getField(_tableKey, stringKey));
@@ -58,6 +58,7 @@
 	{
 		foreach( subtableName, nestedTable in this[_tableName] )
 		{
+			::logInfo("looking for " + _fieldName + " in " + subtableName);
 			if (!(_fieldName in nestedTable))
 			{
 				continue;

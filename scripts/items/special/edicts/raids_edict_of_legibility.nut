@@ -14,8 +14,8 @@ this.raids_edict_of_legibility <- ::inherit("scripts/items/special/raids_edict_i
 	}
 
 	function createWarningEntry()
-	{	// TODO: this is not working
-		local compiledString = ::Raids.Strings.getFragmentsAsCompiledString("LegibilityWarningFragment", "Edicts");
+	{
+		local compiledString = ::Raids.Strings.getFragmentsAsCompiledString("WarningFragment", "Edicts");
 		return ::Raids.Standard.constructEntry
 		(
 			"Warning",
