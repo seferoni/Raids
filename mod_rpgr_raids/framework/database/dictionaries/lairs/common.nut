@@ -9,12 +9,12 @@
 	},
 	Factions =
 	[
-		"Bandits",
-		"Barbarians",
-		"Goblins",
-		"Orcs",
-		"OrientalBandits",
-		"Undead",
-		"Zombies"
+		::Const.FactionType.Bandits,
+		::Const.FactionType.Barbarians,
+		::Const.FactionType.Goblins,
+		::Const.FactionType.Orcs,
+		::Const.FactionType.OrientalBandits,
+		::Const.FactionType.Undead,
+		::Const.FactionType.Zombies
 	]
 };

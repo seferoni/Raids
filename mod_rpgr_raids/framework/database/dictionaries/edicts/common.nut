@@ -2,10 +2,10 @@
 {
 	ConnateFactions =
 	[
-		"Bandits",
-		"Barbarians",
-		"OrientalBandits",
-		"Zombies"
+		::Const.FactionType.Bandits,
+		::Const.FactionType.Barbarians,
+		::Const.FactionType.OrientalBandits,
+		::Const.FactionType.Zombies
 	],
 	Containers =
 	[
@@ -15,10 +15,10 @@
 	],
 	CycledEdicts =
 	[
-		"Abundance",
-		"Agitation",
-		"Diminution",
-		"Opportunism"
+		"special.raids_edict_of_abundance_item",
+		"special.raids_edict_of_agitation_item",
+		"special.raids_edict_of_diminution_item",
+		"special.raids_edict_of_opportunism_item"
 	],
 	LocationOverrides =
 	[

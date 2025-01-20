@@ -40,7 +40,7 @@
 	}
 
 	function getFragmentsAsCompiledString( _fragmentBase, _tableKey, _subTableKey = null, _colour = "Red")
-	{	# NB: Indexed keys must have unique names within the context of the string database.
+	{
 		local fragmentsArray = this.getFragmentsAsArray(_fragmentBase, _tableKey, _subTableKey);
 		return this.compileFragments(fragmentsArray, _colour);
 	}

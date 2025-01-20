@@ -1,4 +1,4 @@
-this.raids_edict_of_agitation <- ::inherit("scripts/items/special/raids_edict_item",
+this.raids_edict_of_agitation_item <- ::inherit("scripts/items/special/raids_edict_item",
 {
 	m = {},
 	function create()

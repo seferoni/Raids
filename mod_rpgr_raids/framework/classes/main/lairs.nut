@@ -257,11 +257,6 @@
 		return lairs;
 	}
 
-	function getFactionType( _factionName )
-	{
-		return ::Const.FactionType[_factionName];
-	}
-
 	function getField( _fieldName )
 	{
 		return ::Raids.Database.getField("Lairs", _fieldName);
@@ -413,7 +408,7 @@
 	function isFactionViable( _faction )
 	{
 		local factionType = _faction.getType();
-		local viableFactions = this.getField("Factions").map(@(_factionName) ::Raids.Lairs.getFactionType(_factionName));
+		local viableFactions = this.getField("Factions");
 
 		if (viableFactions.find(factionType) != null)
 		{

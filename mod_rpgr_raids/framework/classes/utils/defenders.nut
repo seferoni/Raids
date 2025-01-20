@@ -52,7 +52,7 @@
 	{
 		local typeID = _lairObject.getTypeID();
 
-		foreach( overrideTable in this.getField("LocationOverrides") )
+		foreach( overrideTable in this.getField("LocationOverrides") ) // TODO: this will not work! the indexed field does not exist.
 		{
 			if (overrideTable.TypeID == typeID)
 			{
@@ -65,7 +65,7 @@
 
 	function getFactionNameFromType( _factionType )
 	{
-		foreach( factionName, factionEnum in ::Const.FactionType )
+		foreach( factionName, factionEnum in ::Const.FactionType ) // TODO: how does this cohere with translations?
 		{
 			if (factionEnum == _factionType)
 			{

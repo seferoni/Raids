@@ -335,15 +335,14 @@
 		}
 
 		local factionType = ::World.FactionManager.getFaction(_lairObject.getFaction()).getType();
-		local factions = this.findEdict("Legibility", _lairObject, true) != false ? ::Raids.Lairs.Factions : this.getField("ConnateFactions");
-		local viableFactions = factions.map(@(_factionName) ::Raids.Lairs.getFactionType(_factionName));
+		local viableFactions = this.findEdict("Legibility", _lairObject, true) != false ? ::Raids.Lairs.Factions : this.getField("ConnateFactions");
 
 		if (viableFactions.find(factionType) != null)
 		{
 			return true;
 		}
 
-		if (this.getField("LocationOverrides").find(_lairObject.getTypeID()) != null)
+		if (this.getField("LocationOverrides").find(_lairObject.getTypeID()) != null) // TODO: ensure this works with our restructured database.
 		{
 			return true;
 		}

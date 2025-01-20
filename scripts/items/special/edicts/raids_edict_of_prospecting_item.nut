@@ -1,22 +1,22 @@
-this.raids_edict_of_abundance <- ::inherit("scripts/items/special/raids_edict_item",
+this.raids_edict_of_prospecting_item <- ::inherit("scripts/items/special/raids_edict_item",
 {
 	m = {},
 	function create()
 	{
 		this.raids_edict_item.create();
-		this.assignPropertiesByName("Abundance");
+		this.assignPropertiesByName("Prospecting");
 	}
 
 	function assignGenericProperties()
 	{
 		this.raids_edict_item.assignGenericProperties();
-		this.setNativeValue(50);
+		this.setNativeValue(150);
 	}
 
 	function assignEdictProperties()
 	{
 		this.raids_edict_item.assignEdictProperties();
 		this.m.DiscoveryDays = 2;
-		this.m.ScalingModality = this.getScalingModalities().Agitation;
+		this.m.ScalingModality = this.getScalingModalities().Resources;
 	}
 });

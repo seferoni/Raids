@@ -1,22 +1,21 @@
-this.raids_edict_of_diminution <- ::inherit("scripts/items/special/raids_edict_item",
+this.raids_edict_of_stasis_item <- ::inherit("scripts/items/special/raids_edict_item",
 {
 	m = {},
 	function create()
 	{
 		this.raids_edict_item.create();
-		this.assignPropertiesByName("Diminution");
+		this.assignPropertiesByName("Stasis");
 	}
 
 	function assignGenericProperties()
 	{
 		this.raids_edict_item.assignGenericProperties();
-		this.setNativeValue(100);
+		this.setNativeValue(25);
 	}
 
 	function assignEdictProperties()
 	{
 		this.raids_edict_item.assignEdictProperties();
-		this.m.DiscoveryDays = 2;
 		this.m.ScalingModality = this.getScalingModalities().Agitation;
 	}
 });
