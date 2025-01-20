@@ -23,64 +23,26 @@
 		return compiledString;
 	}
 
-	function getField( _tableName, _fieldName )
-	{	// TODO: this is an extremely inefficient solution. we should be supplying a subtable name to the original call, and sweep out fragments using a substring match w keys
-		local field = this.getTopLevelField(_tableName, _fieldName);
-
-		if (field == null)
-		{
-			field = this.getSubLevelField(_tableName, _fieldName);
-		}
-
-		return field;
-	}
-
-	function getFragmentsAsArray( _fragmentBase, _tableKey, _fragmentCount )
+	function getFragmentsAsArray( _fragmentBase, _tableKey, _subTableKey )
 	{
 		local fragments = [];
+		local database = _subTableKey == null ? this[_tableKey] : this[_tableKey][_subTableKey];
 
-		for( local i = 0; i < _fragmentCount; i++ )
+		foreach( key, string in database )
 		{
-			local stringKey = format("%s%s", _fragmentBase, this.mapIntegerToAlphabet(i));
-			fragments.push(this.getField(_tableKey, stringKey));
+			if (key.find(_fragmentBase) != null)
+			{
+				fragments.push(string);
+			}	// TODO: this may need alphabetical sorting?
 		}
 
 		return fragments;
 	}
 
-	function getFragmentsAsCompiledString( _fragmentBase, _tableKey, _fragmentCount = 4, _colour = "Red")
+	function getFragmentsAsCompiledString( _fragmentBase, _tableKey, _subTableKey = null, _colour = "Red")
 	{	# NB: Indexed keys must have unique names within the context of the string database.
-		local fragmentsArray = this.getFragmentsAsArray(_fragmentBase, _tableKey, _fragmentCount);
+		local fragmentsArray = this.getFragmentsAsArray(_fragmentBase, _tableKey, _subTableKey);
 		return this.compileFragments(fragmentsArray, _colour);
-	}
-
-	function getSubLevelField( _tableName, _fieldName )
-	{
-		foreach( subtableName, nestedTable in this[_tableName] )
-		{
-			if (!(_fieldName in nestedTable))
-			{
-				continue;
-			}
-
-			return this[_tableName][subtableName][_fieldName];
-		}
-	}
-
-	function getTopLevelField( _tableName, _fieldName )
-	{
-		if (!(_fieldName in this[_tableName]))
-		{
-			return null;
-		}
-
-		return this[_tableName][_fieldName];
-	}
-
-	function mapIntegerToAlphabet( _integer )
-	{
-		local ASCIIValue = 65 + _integer;
-		return ASCIIValue.tochar();
 	}
 
 	function loadFiles()
