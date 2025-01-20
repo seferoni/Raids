@@ -14,13 +14,9 @@
 			_fragmentsArray.push("");
 		}
 
-		::logInfo("have an array of length " + _fragmentsArray.len())
-		::logInfo("final entry is '" + _fragmentsArray[_fragmentsArray.len() - 1] + "'");
-
 		for( local i = 0; i < _fragmentsArray.len(); i++ )
 		{
 			local fragment = i % 2 == 0 ? _fragmentsArray[i] : ::Raids.Standard.colourWrap(_fragmentsArray[i], ::Raids.Standard.Colour[_colour]);
-			::logInfo("appending '" + fragment + "' to list")
 			compiledString = ::Raids.Standard.appendToStringList(fragment, compiledString, "");
 		}
 
@@ -28,7 +24,7 @@
 	}
 
 	function getField( _tableName, _fieldName )
-	{
+	{	// TODO: this is an extremely inefficient solution. we should be supplying a subtable name to the original call, and sweep out fragments using a substring match w keys
 		local field = this.getTopLevelField(_tableName, _fieldName);
 
 		if (field == null)
@@ -52,7 +48,7 @@
 		return fragments;
 	}
 
-	function getFragmentsAsCompiledString( _fragmentBase, _tableKey, _fragmentCount  = 4, _colour = "Red")
+	function getFragmentsAsCompiledString( _fragmentBase, _tableKey, _fragmentCount = 4, _colour = "Red")
 	{	# NB: Indexed keys must have unique names within the context of the string database.
 		local fragmentsArray = this.getFragmentsAsArray(_fragmentBase, _tableKey, _fragmentCount);
 		return this.compileFragments(fragmentsArray, _colour);
@@ -62,7 +58,6 @@
 	{
 		foreach( subtableName, nestedTable in this[_tableName] )
 		{
-			::logInfo("looking for " + _fieldName + " in " + subtableName);
 			if (!(_fieldName in nestedTable))
 			{
 				continue;
