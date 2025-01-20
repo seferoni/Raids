@@ -57,7 +57,7 @@
 		return ::Raids.Standard.constructEntry
 		(
 			"Vacant",
-			"Edict: Vacant"
+			"Edict: Vacant" // TODO: this needs to be in the string database
 		);
 	}
 
@@ -119,7 +119,7 @@
 			return false;
 		}
 
-		if (history.find(_sugaredID) != null) // TODO: do not use sugared ids for history! it's a pickle bc we can use the sugaredids for indexing stuff
+		if (history.find(_sugaredID) != null)
 		{
 			return true;
 		}
@@ -132,13 +132,19 @@
 		return ::World.Assets.getStash().getItems().filter(@(_index, _item) _item != null && _item.getID() == "misc.raids_writing_instruments_item");
 	}
 
+	function getAgitation( _lairObject )
+	{
+		// TODO: implement this
+		return ::Raids.Standard.getFlag("Agitation", _lairObject);
+	}
+
 	function getAgitationDecayOffset( _lairObject )
 	{
 		local offset = 0;
 
 		if (this.findEdict("Stasis", _lairObject, true) != false)
 		{
-			offset = this.Parameters.StasisOffset * (::Raids.Standard.getFlag("Agitation", _lairObject) - 1);
+			offset = this.getField("StasisOffset") * (::Raids.Standard.getFlag("Agitation", _lairObject) - 1);
 		}
 
 		return offset;
@@ -284,7 +290,10 @@
 
 		foreach( container in this.getField("Containers") )
 		{
-			if (occupied(container)) occupiedContainers.push(container);
+			if (occupied(container))
+			{
+				occupiedContainers.push(container);
+			}
 		}
 
 		return occupiedContainers;
@@ -333,6 +342,11 @@
 		return entries;
 	}
 
+	function hasEdict( _sugaredID, _lairObject )
+	{	// TODO: implement this
+		return ::Raids.Standard.getFlag(format("%sActive", _sugaredID), _lairObject);
+	}
+
 	function isLairViable( _lairObject )
 	{
 		if (!_lairObject.m.IsShowingBanner)
@@ -348,7 +362,7 @@
 			return true;
 		}
 
-		if (this.getField("LocationOverrides").find(_lairObject.getTypeID()) != null) // TODO: ensure this works with our restructured database.
+		if (this.getField("LocationOverrides").find(_lairObject.getTypeID()) != null)
 		{
 			return true;
 		}
@@ -391,6 +405,11 @@
 	function resetContainerTime( _container, _lairObject )
 	{
 		::Raids.Standard.setFlag(format("%sTime", _container), false, _lairObject);
+	}
+
+	function setEdictState( _sugaredID, _lairObject )
+	{	// TODO: implement this
+		::Raids.Standard.setFlag(format("%sActive", _sugaredID), true, _lairObject);
 	}
 
 	function updateEdicts( _lairObject )

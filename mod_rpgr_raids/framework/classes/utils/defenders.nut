@@ -48,11 +48,11 @@
 		return candidates[::Math.rand(0, candidates.len() - 1)];
 	}
 
-	function getFactionName( _lairObject )
+	function getFactionKey( _lairObject )
 	{
 		local typeID = _lairObject.getTypeID();
 
-		foreach( overrideTable in this.getField("LocationOverrides") ) // TODO: this will not work! the indexed field does not exist.
+		foreach( overrideTable in this.getField("Overrides") )
 		{
 			if (overrideTable.TypeID == typeID)
 			{
@@ -60,12 +60,12 @@
 			}
 		}
 
-		return this.getFactionNameFromType(this.getFactionType(_lairObject));
+		return this.getFactionKeyFromType(this.getFactionType(_lairObject));
 	}
 
-	function getFactionNameFromType( _factionType )
+	function getFactionKeyFromType( _factionType )
 	{
-		foreach( factionName, factionEnum in ::Const.FactionType ) // TODO: how does this cohere with translations?
+		foreach( factionName, factionEnum in ::Const.FactionType )
 		{
 			if (factionEnum == _factionType)
 			{
@@ -132,7 +132,7 @@
 		local agitation = ::Raids.Standard.getFlag("Agitation", _lairObject);
 		local resources = this.getResourcesForReinforcement(_lairObject);
 		local troopChoices = this.getTroopChoices();
-		local factionName = this.getFactionName(_lairObject);
+		local factionName = this.getFactionKey(_lairObject);
 
 		if (!(factionName in ::Raids.Database.Troops))
 		{
