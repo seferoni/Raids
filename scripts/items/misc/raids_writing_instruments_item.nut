@@ -118,7 +118,7 @@ this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_stackable_
 	function getNaiveEdictSelectionAsFiles()
 	{
 		local selectionArray = split(this.getNaiveEdictSelection(), ",").map(@(sugaredID) strip(sugaredID));
-		return selectionArray.map(@(_sugaredID) ::Raids.Edicts.getEdictFileNameBySugaredID(_sugaredID));
+		return selectionArray.map(@(_sugaredID) ::Raids.Edicts.getEdictFilePathBySugaredID(_sugaredID));
 	}
 
 	function getEdictSelectionAsFiles()
@@ -136,7 +136,7 @@ this.raids_writing_instruments_item <- ::inherit("scripts/items/raids_stackable_
 			};
 			case selectionModes.Agitation:
 			{
-				edictFiles.push(::Raids.Edicts.getEdictFileNameBySugaredID("Agitation"));
+				edictFiles.push(::Raids.Edicts.getEdictFilePathBySugaredID("Agitation"));
 				break;
 			};
 			case selectionModes.Selective:

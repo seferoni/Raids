@@ -119,7 +119,7 @@
 			return false;
 		}
 
-		if (history.find(_sugaredID) != null)
+		if (history.find(_sugaredID) != null) // TODO: do not use sugared ids for history! it's a pickle bc we can use the sugaredids for indexing stuff
 		{
 			return true;
 		}
@@ -183,10 +183,16 @@
 		return ::IO.enumerateFiles(this.Parameters.DirectoryPath);
 	}
 
-	function getEdictFileNameBySugaredID( _sugaredID )
+	function getEdictIDBySugaredID( _sugaredID )
 	{
-		local prependedString = format("%s%s", this.Parameters.DirectoryPath, "edict_of_");
-		local edictFileName = format("%s%s", prependedString, ::Raids.Standard.setCase(_sugaredID, ::Raids.Standard.Case.Lower));
+		local edictFileName = format("raids_edict_of_%s_item", prependedString, ::Raids.Standard.setCase(_sugaredID, ::Raids.Standard.Case.Lower));
+		return edictFileName;
+	}
+
+	function getEdictFilePathBySugaredID( _sugaredID )
+	{
+		local prependedString = format("%s%s", this.Parameters.DirectoryPath, "raids_edict_of_");
+		local edictFileName = format("%s%s_item", prependedString, ::Raids.Standard.setCase(_sugaredID, ::Raids.Standard.Case.Lower));
 		return edictFileName;
 	}
 
