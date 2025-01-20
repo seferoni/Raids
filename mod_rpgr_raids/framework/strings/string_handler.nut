@@ -14,9 +14,13 @@
 			_fragmentsArray.push("");
 		}
 
-		for( local i = 0; i < _fragmentsArray.len() - 1; i++ )
+		::logInfo("have an array of length " + _fragmentsArray.len())
+		::logInfo("final entry is '" + _fragmentsArray[_fragmentsArray.len() - 1] + "'");
+
+		for( local i = 0; i < _fragmentsArray.len(); i++ )
 		{
-			local fragment = i % 2 != 0 ? _fragmentsArray[i] : ::Raids.Standard.colourWrap(_fragmentsArray[i], ::Raids.Standard.Colour[_colour]);
+			local fragment = i % 2 == 0 ? _fragmentsArray[i] : ::Raids.Standard.colourWrap(_fragmentsArray[i], ::Raids.Standard.Colour[_colour]);
+			::logInfo("appending '" + fragment + "' to list")
 			compiledString = ::Raids.Standard.appendToStringList(fragment, compiledString, "");
 		}
 
@@ -49,7 +53,7 @@
 	}
 
 	function getFragmentsAsCompiledString( _fragmentBase, _tableKey, _fragmentCount  = 4, _colour = "Red")
-	{
+	{	# NB: Indexed keys must have unique names within the context of the string database.
 		local fragmentsArray = this.getFragmentsAsArray(_fragmentBase, _tableKey, _fragmentCount);
 		return this.compileFragments(fragmentsArray, _colour);
 	}
