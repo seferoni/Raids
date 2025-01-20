@@ -133,8 +133,7 @@
 	}
 
 	function getAgitation( _lairObject )
-	{
-		// TODO: implement this
+	{	// TODO: implement this. maybe consider having it return Relaxed if meant to return false, logging an error
 		return ::Raids.Standard.getFlag("Agitation", _lairObject);
 	}
 
@@ -144,7 +143,7 @@
 
 		if (this.findEdict("Stasis", _lairObject, true) != false)
 		{
-			offset = this.getField("StasisOffset") * (::Raids.Standard.getFlag("Agitation", _lairObject) - 1);
+			offset = this.getField("StasisOffset") * (this.getAgitation(_lairObject) - 1);
 		}
 
 		return offset;
@@ -237,7 +236,7 @@
 	function getNamedLootChanceOffset( _lairObject )
 	{
 		local offset = 0.0;
-		local agitation = ::Raids.Standard.getFlag("Agitation", _lairObject);
+		local agitation = this.getAgitation(_lairObject);
 
 		if (this.findEdict("Prospecting", _lairObject, true) != false)
 		{
@@ -329,7 +328,7 @@
 
 		if (this.findEdictInHistory("Abundance", _lairObject) != false)
 		{
-			offset = ::Math.min(this.Parameters.AbundanceCeiling, this.Parameters.AbundanceOffset * ::Raids.Standard.getFlag("Agitation", _lairObject));
+			offset = ::Math.min(this.Parameters.AbundanceCeiling, this.Parameters.AbundanceOffset * this.getAgitation(_lairObject));
 		}
 
 		return offset;
@@ -340,11 +339,6 @@
 		local entries = this.getContainerEntries(_lairObject);
 		entries.extend(this.getSpecialEntries(_lairObject));
 		return entries;
-	}
-
-	function hasEdict( _sugaredID, _lairObject )
-	{	// TODO: implement this
-		return ::Raids.Standard.getFlag(format("%sActive", _sugaredID), _lairObject);
 	}
 
 	function isLairViable( _lairObject )
@@ -405,11 +399,6 @@
 	function resetContainerTime( _container, _lairObject )
 	{
 		::Raids.Standard.setFlag(format("%sTime", _container), false, _lairObject);
-	}
-
-	function setEdictState( _sugaredID, _lairObject )
-	{	// TODO: implement this
-		::Raids.Standard.setFlag(format("%sActive", _sugaredID), true, _lairObject);
 	}
 
 	function updateEdicts( _lairObject )
