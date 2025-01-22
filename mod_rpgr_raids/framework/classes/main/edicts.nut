@@ -48,7 +48,7 @@
 		return ::Raids.Standard.constructEntry
 		(
 			_activeState,
-			format("Edict: %s (%s)", _edictName, _activeState)
+			format(::Raids.Strings.Edicts.Common.LairActiveEdict, _edictName, _activeState)
 		);
 	}
 
@@ -57,7 +57,7 @@
 		return ::Raids.Standard.constructEntry
 		(
 			"Vacant",
-			"Edict: Vacant" // TODO: this needs to be in the string database
+			::Raids.Strings.Edicts.Common.LairVacantEdict
 		);
 	}
 
@@ -134,6 +134,7 @@
 
 	function getAgitation( _lairObject )
 	{	// TODO: implement this. maybe consider having it return Relaxed if meant to return false, logging an error
+		// move this to Lairs!
 		return ::Raids.Standard.getFlag("Agitation", _lairObject);
 	}
 
@@ -240,7 +241,7 @@
 
 		if (this.findEdict("Prospecting", _lairObject, true) != false)
 		{
-			offset = this.Parameters.ProspectingOffset * agitation;
+			offset = this.getField("ProspectingOffset") * agitation;
 		}
 
 		return offset;
@@ -316,7 +317,7 @@
 	}
 
 	function getSugaredID( _edictID, _isFileName = false )
-	{
+	{	// TODO: ensure implementation is consistent. don't use it for more than what's needed
 		local culledString = _isFileName ? format("%s%s", this.Parameters.DirectoryPath, "raids_edict_of_") : "special.raids_edict_of_";
 		local sugaredID = ::Raids.Standard.setCase(_edictID.slice(culledString.len()), ::Raids.Standard.Case.Upper);
 		return sugaredID;
@@ -328,7 +329,7 @@
 
 		if (this.findEdictInHistory("Abundance", _lairObject) != false)
 		{
-			offset = ::Math.min(this.Parameters.AbundanceCeiling, this.Parameters.AbundanceOffset * this.getAgitation(_lairObject));
+			offset = ::Math.min(this.getField("AbundanceCeiling"), this.getField("AbundanceOffset") * this.getAgitation(_lairObject));
 		}
 
 		return offset;
