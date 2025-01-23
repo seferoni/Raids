@@ -23,12 +23,6 @@ this.raids_edict_of_agitation_item <- ::inherit("scripts/items/special/raids_edi
 		);
 	}
 
-	function getEffectText()
-	{
-		local text = this.raids_edict_item.getEffectText(); // TODO: use the string handler for this.
-		return format(::Raids.Strings.Edicts.Agitation.EffectFragmentA, text, ::Raids.Standard.colourWrap(::Raids.Strings.Edicts.Agitation.EffectFragmentB, ::Raids.Standard.Colour.Green));
-	}
-
 	function getViableLairs()
 	{
 		local naiveLairs = ::Raids.Lairs.getCandidatesWithin(::World.State.getPlayer().getTile());
@@ -95,5 +89,10 @@ this.raids_edict_of_agitation_item <- ::inherit("scripts/items/special/raids_edi
 		}
 
 		return false;
+	}
+
+	function setEffectTextByName( _properName )
+	{
+		this.m.EffectText = ::Raids.Strings.getFragmentsAsCompiledString("EffectFragment", "Edicts", "Agitation");
 	}
 });
