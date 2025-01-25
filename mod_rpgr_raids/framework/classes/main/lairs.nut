@@ -16,7 +16,7 @@
 
 	function addLoot( _lootTable, _locationObject )
 	{
-		local count = ::Raids.Standard.getFlag("Agitation", _locationObject);
+		local count = this.getAgitation(_locationObject);
 
 		if (count == false)
 		{
@@ -31,7 +31,7 @@
 
 	function createAgitationEntry( _lairObject )
 	{
-		local agitation = ::Raids.Standard.getFlag("Agitation", _lairObject);
+		local agitation = this.getAgitation(_lairObject);
 		local descriptors = this.getField("AgitationDescriptors");
 		local textColour = ::Raids.Standard.Colour[agitation == descriptors.Relaxed ? "Green" : "Red"];
 		return ::Raids.Standard.constructEntry
@@ -82,13 +82,13 @@
 		return ::Raids.Standard.constructEntry
 		(
 			"Resources",
-			format("%s resource units", ::Raids.Standard.colourWrap(resources, ::Raids.Standard.Colour.Green))
+			format(::Raids.Strings.Generic.ResourcesCount, ::Raids.Standard.colourWrap(resources, ::Raids.Standard.Colour.Green))
 		);
 	}
 
 	function createTimerEntry( _lairObject )
 	{
-		local agitation = ::Raids.Standard.getFlag("Agitation", _lairObject);
+		local agitation = this.getAgitation(_lairObject);
 		local lastUpdateDays = ::Raids.Standard.getFlag("LastAgitationUpdate", _lairObject);
 
 		if (lastUpdateDays == false || agitation == this.getField("AgitationDescriptors").Relaxed)
@@ -100,7 +100,7 @@
 		return ::Raids.Standard.constructEntry
 		(
 			"Time",
-			format("%s day(s)", ::Raids.Standard.colourWrap(timeDifference, ::Raids.Standard.Colour.Red))
+			format("%s %s", ::Raids.Standard.colourWrap(timeDifference, ::Raids.Standard.Colour.Red), ::Raids.Strings.Generic.Days)
 		);
 	}
 
@@ -123,9 +123,14 @@
 		}
 	}
 
+	function getAgitation( _lairObject )
+	{
+		return ::Raids.Standard.getFlag("Agitation", _lairObject);
+	}
+
 	function getAgitationDecayInterval( _lairObject )
 	{
-		local agitation = ::Raids.Standard.getFlag("Agitation", _lairObject);
+		local agitation = this.getAgitation(_lairObject);
 
 		if (agitation <= this.getField("AgitationDescriptors").Cautious)
 		{
@@ -283,7 +288,7 @@
 	function getNamedLootChance( _lairObject )
 	{
 		local baseChance = ::Raids.Standard.getFlag("BaseNamedItemChance", _lairObject);
-		local agitation = ::Raids.Standard.getFlag("Agitation", _lairObject);
+		local agitation = this.getAgitation(_lairObject);
 		return baseChance + ((agitation - 1) * this.Parameters.NamedItemChancePerAgitationTier);
 	}
 
@@ -296,7 +301,7 @@
 
 	function getResourcesByAgitation( _lairObject )
 	{
-		local agitation = ::Raids.Standard.getFlag("Agitation", _lairObject);
+		local agitation = this.getAgitation(_lairObject);
 		local baseResources = ::Raids.Standard.getFlag("BaseResources", _lairObject);
 		local configurableModifier = ::Raids.Standard.getPercentageSetting("AgitationResourceModifier");
 
@@ -327,7 +332,7 @@
 	function getSpawnTimeOffset( _lairObject )
 	{
 		local offset = 0.0;
-		local agitation = ::Raids.Standard.getFlag("Agitation", _lairObject);
+		local agitation = this.getAgitation(_lairObject);
 
 		if (agitation == this.getField("AgitationDescriptors").Relaxed)
 		{
@@ -420,7 +425,7 @@
 
 	function isLairViableForProcedure( _lairObject, _procedure )
 	{
-		local agitation = ::Raids.Standard.getFlag("Agitation", _lairObject);
+		local agitation = this.getAgitation(_lairObject);
 
 		if (_procedure == ::Raids.Standard.getProcedures().Increment && agitation >= this.getField("AgitationDescriptors").Militant)
 		{
@@ -542,7 +547,7 @@
 
 	function updateAgitation( _lairObject )
 	{
-		if (::Raids.Standard.getFlag("Agitation", _lairObject) == this.getField("AgitationDescriptors").Relaxed)
+		if (this.getAgitation(_lairObject) == this.getField("AgitationDescriptors").Relaxed)
 		{
 			return;
 		}

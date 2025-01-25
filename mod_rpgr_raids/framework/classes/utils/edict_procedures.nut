@@ -10,7 +10,7 @@
 	{
 		local garbage = [];
 		local troops = _lairObject.getTroops();
-		local removalCount = ::Math.ceil(this.Parameters.DiminutionPrefactor * ::Raids.Standard.getFlag("Agitation", _lairObject) * troops.len());
+		local removalCount = ::Math.ceil(this.Parameters.DiminutionPrefactor * ::Raids.Lairs.getAgitation(_lairObject) * troops.len());
 
 		if (removalCount >= troops.len() || removalCount == 0)
 		{

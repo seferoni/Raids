@@ -6,6 +6,7 @@
 	NamedCount = "Famed (%i)",
 	Permanent = "permanent",
 	Resources = "resources",
+	ResourcesCount = "%s Resources",
 	StacksCount = "Stacks: %s",
 	Static = "static",
 	Temporary = "temporary",

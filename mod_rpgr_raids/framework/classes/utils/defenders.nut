@@ -129,7 +129,7 @@
 
 	function getViableTroopCandidates( _lairObject )
 	{
-		local agitation = ::Raids.Standard.getFlag("Agitation", _lairObject);
+		local agitation = ::Raids.Lairs.getAgitation(_lairObject);
 		local resources = this.getResourcesForReinforcement(_lairObject);
 		local troopChoices = this.getTroopChoices();
 		local factionName = this.getFactionKey(_lairObject);
@@ -172,7 +172,7 @@
 	function isLairAgitated( _lairObject )
 	{
 		local agitationDescriptors = ::Raids.Lairs.getField("AgitationDescriptors");
-		return ::Raids.Standard.getFlag("Agitation", _lairObject) > agitationDescriptors.Relaxed;
+		return ::Raids.Lairs.getAgitation(_lairObject) > agitationDescriptors.Relaxed;
 	}
 
 	function reinforceDefenders( _lairObject )

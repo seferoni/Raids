@@ -59,7 +59,7 @@ this.raids_edict_of_agitation_item <- ::inherit("scripts/items/special/raids_edi
 
 	function isLairViable( _lairObject )
 	{
-		local agitation = ::Raids.Standard.getFlag("Agitation", _lairObject);
+		local agitation = ::Raids.Lairs.getAgitation(_lairObject);
 		local descriptors = ::Raids.Lairs.getField("AgitationDescriptors");
 
 		if (agitation == descriptors.Militant)

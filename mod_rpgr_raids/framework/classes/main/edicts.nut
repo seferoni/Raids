@@ -132,19 +132,13 @@
 		return ::World.Assets.getStash().getItems().filter(@(_index, _item) _item != null && _item.getID() == "misc.raids_writing_instruments_item");
 	}
 
-	function getAgitation( _lairObject )
-	{	// TODO: implement this. maybe consider having it return Relaxed if meant to return false, logging an error
-		// move this to Lairs!
-		return ::Raids.Standard.getFlag("Agitation", _lairObject);
-	}
-
 	function getAgitationDecayOffset( _lairObject )
 	{
 		local offset = 0;
 
 		if (this.findEdict("Stasis", _lairObject, true) != false)
 		{
-			offset = this.getField("StasisOffset") * (this.getAgitation(_lairObject) - 1);
+			offset = this.getField("StasisOffset") * (::Raids.Lairs.getAgitation(_lairObject) - 1);
 		}
 
 		return offset;
@@ -237,7 +231,7 @@
 	function getNamedLootChanceOffset( _lairObject )
 	{
 		local offset = 0.0;
-		local agitation = this.getAgitation(_lairObject);
+		local agitation = ::Raids.Lairs.getAgitation(_lairObject);
 
 		if (this.findEdict("Prospecting", _lairObject, true) != false)
 		{
@@ -329,7 +323,7 @@
 
 		if (this.findEdictInHistory("Abundance", _lairObject) != false)
 		{
-			offset = ::Math.min(this.getField("AbundanceCeiling"), this.getField("AbundanceOffset") * this.getAgitation(_lairObject));
+			offset = ::Math.min(this.getField("AbundanceCeiling"), this.getField("AbundanceOffset") * ::Raids.Lairs.getAgitation(_lairObject));
 		}
 
 		return offset;
