@@ -32,7 +32,7 @@ this.raids_edict_of_legibility_item <- ::inherit("scripts/items/special/raids_ed
 			return naiveLairs;
 		}
 
-		local sugaredID = this.getSugaredID(); // TODO: are we still using sugared ids? double check.
+		local sugaredID = this.getSugaredID();
 		local lairs = naiveLairs.filter(function( _index, _lair )
 		{
 			if (!_lair.m.IsShowingBanner)

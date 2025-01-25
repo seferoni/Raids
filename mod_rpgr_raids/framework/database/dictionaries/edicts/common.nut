@@ -15,10 +15,10 @@
 	],
 	CycledEdicts =
 	[
-		"special.raids_edict_of_abundance_item",
-		"special.raids_edict_of_agitation_item",
-		"special.raids_edict_of_diminution_item",
-		"special.raids_edict_of_opportunism_item"
+		"Abundance",
+		"Agitation",
+		"Diminution",
+		"Opportunism"
 	],
 	LocationOverrides =
 	[

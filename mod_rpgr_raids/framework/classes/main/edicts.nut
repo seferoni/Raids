@@ -311,7 +311,7 @@
 	}
 
 	function getSugaredID( _edictID, _isFileName = false )
-	{	// TODO: ensure implementation is consistent. don't use it for more than what's needed
+	{
 		local culledString = _isFileName ? format("%s%s", this.Parameters.DirectoryPath, "raids_edict_of_") : "special.raids_edict_of_";
 		local sugaredID = ::Raids.Standard.setCase(_edictID.slice(culledString.len()), ::Raids.Standard.Case.Upper);
 		return sugaredID;

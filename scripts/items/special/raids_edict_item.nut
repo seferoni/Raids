@@ -23,7 +23,7 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_stackable_item",
 	}
 
 	function assignPropertiesByName( _properName )
-	{
+	{	# Note that the proper name of a given Edict is identical to its sugared ID.
 		this.raids_stackable_item.assignPropertiesByName(_properName);
 		this.setEffectTextByName(_properName);
 	}
@@ -96,11 +96,11 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_stackable_item",
 		);
 	}
 
-	function executeEdictProcedure( _lairs )
+	function executeEdictProcedure( _lairArray )
 	{
 		local isValid = false;
 
-		foreach( lair in _lairs )
+		foreach( lair in _lairArray )
 		{
 			local vacantContainers = clone ::Raids.Edicts.getField("Containers");
 			::Raids.Standard.removeFromArray(::Raids.Edicts.getOccupiedContainers(lair), vacantContainers);
@@ -232,8 +232,8 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_stackable_item",
 	function initialiseContainer( _container, _lair )
 	{
 		::Raids.Standard.setFlag(_container, this.getSugaredID(), _lair);
-		::Raids.Standard.setFlag(format("%sTime", _container), ::World.getTime().Days, _lair);
-		::Raids.Standard.setFlag(format("%sDuration", _container), this.m.DiscoveryDays, _lair);
+		::Raids.Standard.setFlag(format("%sApplicationDay", _container), ::World.getTime().Days, _lair);
+		::Raids.Standard.setFlag(format("%sDiscoveryTime", _container), this.m.DiscoveryDays, _lair);
 	}
 
 	function isCycled()
