@@ -48,8 +48,8 @@
 		local produce = _settlementObject.getProduce();
 		local descriptors = this.getField("CargoDescriptors");
 		local cargoEnum =  ::Raids.Standard.getFlag("CaravanCargo", _caravanObject);
-		local cargoString = ::Raids.Standard.getKey(cargoEnum, descriptors).tolower();
-		local actualProduce = produce.filter(@(_index,_value) _value.find(cargoString) != null);
+		local cargoKey = ::Raids.Standard.getKey(cargoEnum, descriptors).tolower();
+		local actualProduce = produce.filter(@(_index,_value) _value.find(cargoKey) != null);
 
 		if (actualProduce.len() != 0)
 		{
@@ -95,10 +95,11 @@
 	function createCargoEntry( _caravanObject )
 	{
 		local cargoDescriptor = ::Raids.Standard.getKey(::Raids.Standard.getFlag("CaravanCargo", _caravanObject), this.getField("CargoDescriptors"));
+		local cargoString = ::Raids.Strings.Caravans[format("Cargo%s", cargoDescriptor)];
 		return ::Raids.Standard.constructEntry
 		(
 			cargoDescriptor,
-			cargoDescriptor
+			cargoString
 		);
 	}
 
@@ -165,17 +166,19 @@
 		return ::Raids.Standard.constructEntry
 		(
 			"Special",
-			"Famed"
+			::Raids.Strings.Generic.Named
 		);
 	}
 
 	function createWealthEntry( _caravanObject )
 	{
-		local wealthDescriptor = ::Raids.Standard.getKey(::Raids.Standard.getFlag("CaravanWealth", _caravanObject), this.getField("WealthDescriptors"));
+		local caravanWealth = ::Raids.Standard.getFlag("CaravanWealth", _caravanObject);
+		local wealthDescriptor = ::Raids.Standard.getKey(caravanWealth, this.getField("WealthDescriptors"));
+		local wealthString = ::Raids.Strings.Caravans[format("Wealth%s", wealthDescriptor)];
 		return ::Raids.Standard.constructEntry
 		(
 			"Wealth",
-			format("%s (%i)", wealthDescriptor, caravanWealth)
+			format("%s (%i)", wealthString, caravanWealth)
 		);
 	}
 

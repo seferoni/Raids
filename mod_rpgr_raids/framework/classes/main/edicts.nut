@@ -10,7 +10,7 @@
 
 	function addToHistory( _sugaredID, _lairObject )
 	{
-		local history = ::Raids.Standard.getFlag("EdictHistory", _lairObject);
+		local history = this.getHistory(_lairObject);
 		local newHistory = format("%s%s", history == false ? "" : format("%s, ", history), _sugaredID);
 		::Raids.Standard.setFlag("EdictHistory", newHistory, _lairObject);
 	}
@@ -39,7 +39,7 @@
 		return ::Raids.Standard.constructEntry
 		(
 			"History",
-			::Raids.Standard.colourWrap(::Raids.Standard.getFlag("EdictHistory", _lairObject), ::Raids.Standard.Colour.Red)
+			::Raids.Standard.colourWrap(this.getHistoryAsString(_lairObject), ::Raids.Standard.Colour.Red)
 		);
 	}
 
@@ -127,11 +127,6 @@
 		return false;
 	}
 
-	function getAllWritingInstrumentsInstancesInStash()
-	{
-		return ::World.Assets.getStash().getItems().filter(@(_index, _item) _item != null && _item.getID() == "misc.raids_writing_instruments_item");
-	}
-
 	function getAgitationDecayOffset( _lairObject )
 	{
 		local offset = 0;
@@ -142,6 +137,16 @@
 		}
 
 		return offset;
+	}
+
+	function getAllWritingInstrumentsInstancesInStash()
+	{
+		return ::World.Assets.getStash().getItems().filter(@(_index, _item) _item != null && _item.getID() == "misc.raids_writing_instruments_item");
+	}
+
+	function getAllEdictsAsFiles()
+	{
+		return ::IO.enumerateFiles(this.Parameters.DirectoryPath);
 	}
 
 	function getContainerEntries( _lairObject )
@@ -176,11 +181,6 @@
 		}
 
 		return entries;
-	}
-
-	function getAllEdictsAsFiles()
-	{
-		return ::IO.enumerateFiles(this.Parameters.DirectoryPath);
 	}
 
 	function getEdictIDBySugaredID( _sugaredID )
@@ -221,6 +221,24 @@
 		}
 
 		return candidates[0];
+	}
+
+	function getHistory( _lairObject )
+	{
+		return ::Raids.Standard.getFlag("EdictHistory", _lairObject);
+	}
+
+	function getHistoryAsString( _lairObject )
+	{
+		local historyArray = ::Raids.Standard.getListAsArray(this.getHistory(_lairObject));
+		local historyString = "";
+
+		foreach( entry in historyArray )
+		{
+			::Raids.Standard.appendToStringList(::Raids.Strings.Edicts[entry].NameAbbreviated, historyString);
+		}
+
+		return historyString;
 	}
 
 	function getLegibilityEntry( _lairObject )

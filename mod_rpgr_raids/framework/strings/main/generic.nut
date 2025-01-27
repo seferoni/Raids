@@ -3,6 +3,7 @@
 	Agitation = "Agitation",
 	Day = "day",
 	Days = "days",
+	Named = "Famed",
 	NamedCount = "Famed (%i)",
 	Permanent = "permanent",
 	Resources = "resources",
