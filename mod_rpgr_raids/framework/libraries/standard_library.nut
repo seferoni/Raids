@@ -10,12 +10,6 @@
 		Green = "#2a5424",
 		Red = "#691a1a"
 	},
-	Procedures =
-	{
-		Reset = 0,
-		Increase = 1,
-		Decrease = 2
-	},
 	Tooltip =
 	{
 		id = 7,
