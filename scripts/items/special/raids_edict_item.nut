@@ -153,6 +153,11 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_stackable_item",
 		return format(::Raids.Strings.Edicts.Common.EdictScaling, colourWrap(::Raids.Strings.Generic[this.m.ScalingModality == modalities.Agitation ? "Agitation" : "Resources"], "Red"));
 	}
 
+	function getSugaredID()
+	{
+		return ::Raids.Edicts.getSugaredID(this.getID());
+	}
+
 	function getTooltip()
 	{
 		local tooltipArray = this.raids_stackable_item.getTooltip();
