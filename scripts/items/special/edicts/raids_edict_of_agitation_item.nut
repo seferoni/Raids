@@ -15,7 +15,7 @@ this.raids_edict_of_agitation_item <- ::inherit("scripts/items/special/raids_edi
 
 	function createWarningEntry()
 	{
-		local compiledString = ::Raids.Strings.getFragmentsAsCompiledString("WarningFragment", "Edicts", "Agitation", "Green");
+		local compiledString = ::Raids.Strings.getFragmentsAsCompiledString("WarningFragment", "Edicts", "Agitation");
 		return ::Raids.Standard.constructEntry
 		(
 			"Warning",

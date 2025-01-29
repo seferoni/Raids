@@ -18,9 +18,7 @@
 	EdictDiscovery = "This Edict takes effect in %s %s.",
 	EdictWarningFragmentA = "There are no ",
 	EdictWarningFragmentB = "viable lairs within proximity.",
-	EdictWarningFragmentC = "Lairs that are viable and within proximity ",
-	EdictWarningFragmentD = "will display Edict slots on their tooltip.",
 
 	LairActiveEdict = "Edict: %s (%s)",
-	LairVacantEdict = "Edict: Vacant",
+	LairVacantEdict = "Edict: Vacant"
 };

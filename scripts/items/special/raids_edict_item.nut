@@ -88,7 +88,8 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_stackable_item",
 
 	function createWarningEntry()
 	{
-		local compiledString = ::Raids.Strings.getFragmentsAsCompiledString("EdictWarningFragment", "Edicts");
+		local compiledString = ::Raids.Strings.getFragmentsAsCompiledString("EdictWarningFragment", "Edicts", "Common");
+		::logInfo("got " + compiledString + " for warning.");
 		return ::Raids.Standard.constructEntry
 		(
 			"Warning",
