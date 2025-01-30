@@ -124,7 +124,7 @@
 	}
 
 	function getAgitation( _lairObject )
-	{
+	{	// TODO: this should log an error if uninitialised!
 		return ::Raids.Standard.getFlag("Agitation", _lairObject);
 	}
 

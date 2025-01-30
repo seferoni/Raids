@@ -16,5 +16,12 @@
 		::Const.FactionType.OrientalBandits,
 		::Const.FactionType.Undead,
 		::Const.FactionType.Zombies
-	]
+	],
+	TroopTags =
+	{
+		Fodder = 1,
+		Ranged = 2,
+		Melee = 3,
+		Unique = 4
+	}
 };
