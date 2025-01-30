@@ -2,6 +2,7 @@
 {	// TODO: need individual chances for each trait to proc, and need to shuffle the collected array of traits per fetch. most lairs should not have traits!
 	BanditExiles =
 	{
+		Chance = 20,
 		Factions =
 		[
 			::Const.FactionType.Barbarians,
@@ -21,6 +22,7 @@
 	},
 	Bladesmen =
 	{
+		Chance = 30,
 		Factions =
 		[
 			::Const.FactionType.Bandits,
@@ -31,6 +33,7 @@
 	},
 	Cultists =
 	{
+		Chance = 10,
 		Factions =
 		[
 			::Const.FactionType.Bandits
@@ -45,6 +48,7 @@
 	},
 	NobleDeserters =
 	{
+		Chance = 15,
 		Factions =
 		[
 			::Const.FactionType.Bandits,
@@ -73,6 +77,7 @@
 	},
 	SubjugatedGoblins =
 	{
+		Chance = 35,
 		Factions =
 		[
 			::Const.FactionType.Orcs
@@ -84,6 +89,7 @@
 	},
 	OrcAlliance =
 	{
+		Chance = 15,
 		Factions =
 		[
 			::Const.FactionType.Goblins
@@ -95,6 +101,7 @@
 	}
 	Marksmen =
 	{
+		Chance = 30,
 		Factions =
 		[
 			::Const.FactionType.Bandits,
@@ -105,6 +112,7 @@
 	},
 	HiredHands =
 	{
+		Chance = 20,
 		Factions =
 		[
 			::Const.FactionType.Bandits,
@@ -118,6 +126,7 @@
 	},
 	NorthernExiles =
 	{
+		Chance = 15,
 		Factions =
 		[
 			::Const.FactionType.Bandits,
@@ -137,6 +146,7 @@
 	},
 	Necromancy =
 	{
+		Chance = 15,
 		Factions =
 		[
 			::Const.FactionType.Bandits,
@@ -153,14 +163,17 @@
 	},
 	Swarming =
 	{
+		Chance = 40,
 		TroopPreferences = ::Raids.Lairs.getField("TroopTags").Fodder
 	},
 	Mighty =
 	{
+		Chance = 10,
 		TroopPreferences = ::Raids.Lairs.getField("TroopTags").Unique
 	},
 	SouthernExiles =
 	{
+		Chance = 20,
 		Factions =
 		[
 			::Const.FactionType.Bandits,
@@ -192,6 +205,7 @@
 	},
 	TamedDirewolves =
 	{
+		Chance = 15,
 		Factions =
 		[
 			::Const.FactionType.Bandits,
@@ -209,6 +223,7 @@
 	},
 	TamedHyenas =
 	{
+		Chance = 20,
 		Factions =
 		[
 			::Const.FactionType.OrientalBandits,
@@ -223,6 +238,7 @@
 	},
 	TamedSerpents =
 	{
+		Chance = 20,
 		Factions =
 		[
 			::Const.FactionType.OrientalBandits,

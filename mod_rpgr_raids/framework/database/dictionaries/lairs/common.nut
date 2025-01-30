@@ -17,6 +17,11 @@
 		::Const.FactionType.Undead,
 		::Const.FactionType.Zombies
 	],
+	Overrides =
+	{
+		TypeID = "location.undead_crypt",
+		Faction = ::Const.FactionType.Zombies
+	},
 	TroopTags =
 	{
 		Fodder = 1,

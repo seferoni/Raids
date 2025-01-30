@@ -292,6 +292,20 @@
 		}
 	}
 
+	function shuffleArray( _array )
+	{	# This method uses the Fisher-Yates shuffle algorithm.
+		local sequenceLength = _array.len();
+
+		for( local i = 0; i < sequenceLength - 1; i++ )
+		{
+			local j = ::Math.rand(i, sequenceLength - 1);
+			local valueA = _array[i];
+			local valueB = _array[j];
+			_array[j] = valueA;
+			_array[i] = valueB;
+		}
+	}
+
 	function setCase( _string, _case )
 	{
 		local character = _string[0].tochar()[_case]();

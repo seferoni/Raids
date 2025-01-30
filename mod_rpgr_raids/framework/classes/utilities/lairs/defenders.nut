@@ -48,37 +48,6 @@
 		return candidates[::Math.rand(0, candidates.len() - 1)];
 	}
 
-	function getFactionKey( _lairObject )
-	{
-		local typeID = _lairObject.getTypeID();
-
-		foreach( overrideTable in this.getField("Overrides") )
-		{
-			if (overrideTable.TypeID == typeID)
-			{
-				return overrideTable.Faction;
-			}
-		}
-
-		return this.getFactionKeyFromType(this.getFactionType(_lairObject));
-	}
-
-	function getFactionKeyFromType( _factionType )
-	{
-		foreach( factionName, factionEnum in ::Const.FactionType )
-		{
-			if (factionEnum == _factionType)
-			{
-				return factionName;
-			}
-		}
-	}
-
-	function getFactionType( _lairObject )
-	{
-		return ::World.FactionManager.getFaction(_lairObject.getFaction()).getType();
-	}
-
 	function getField( _fieldName )
 	{
 		return ::Raids.Database.getField("Defenders", _fieldName);
@@ -130,9 +99,9 @@
 	function getViableTroopCandidates( _lairObject )
 	{
 		local agitation = ::Raids.Lairs.getAgitation(_lairObject);
+		local factionName = ::Raids.Lairs.getFactionKey(_lairObject);
 		local resources = this.getResourcesForReinforcement(_lairObject);
 		local troopChoices = this.getTroopChoices();
-		local factionName = this.getFactionKey(_lairObject);
 
 		if (!(factionName in ::Raids.Database.Troops))
 		{

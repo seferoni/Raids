@@ -12,7 +12,7 @@
 			return ::Raids.Internal.TERMINATE;
 		}
 
-		::Raids.Defenders.createDefenders(this);
+		::Raids.Lairs.Defenders.createDefenders(this);
 		return ::Raids.Internal.TERMINATE;
 	}, "overrideMethod");
 
