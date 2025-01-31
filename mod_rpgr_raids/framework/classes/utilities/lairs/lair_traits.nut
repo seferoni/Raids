@@ -6,8 +6,21 @@
 	}
 
 	function createTraitEntry( _lairObject )
-	{	// TODO: this needs a special colour. make it gold! also add a trait entry to the icons database.
+	{
+		local trait = this.getTrait(_lairObject);
 
+		if (!trait)
+		{
+			return null;
+		}
+
+		local traitString = ::Raids.Strings.Lairs.Traits[trait]
+
+		return ::Raids.Standard.constructEntry
+		(
+			"Trait",
+			format(::Raids.Strings.Lairs.Common.Traits, ::Raids.Standard.colourWrap(traitString, ::Raids.Standard.Colour.Gold))
+		);
 	}
 
 	function getField( _fieldName )
@@ -15,13 +28,37 @@
 		return ::Raids.Database.getField("Traits", _fieldName);
 	}
 
+	function getTraitField( _traitField, _lairObject )
+	{
+		local traitTable = this.getTraitTableByLair(_lairObject);
+
+		if (!(_traitField in traitTable))
+		{
+			return null;
+		}
+
+		return traitTable[_traitField];
+	}
+
 	function getTrait( _lairObject )
 	{
+		return ::Raids.Standard.getFlag("LairTrait", _lairObject);
+	}
 
+	function getTraitTableByLair( _lairObject )
+	{
+		local trait = this.getTrait(_lairObject);
+
+		if (trait == false)
+		{
+			return null;
+		}
+
+		return this.getField(trait);
 	}
 
 	function getTraitsByFaction( _factionType )
-	{	// TODO: all we really seem to require are the name and chance values. perhaps this could be simplified?
+	{
 		local traits = [];
 		local traitsDatabase = ::Raids.Lairs.getField("Traits");
 		local processTable = function( _tableKey, _table )
@@ -64,5 +101,10 @@
 			this.addTrait(traitTable, _lairObject);
 			break;
 		}
+	}
+
+	function injectTroops( _traitKey, _lairObject )
+	{
+		// TODO:
 	}
 };

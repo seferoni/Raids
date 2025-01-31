@@ -98,6 +98,7 @@
 		}
 
 		::Raids.Lairs.initialiseLairParameters(this);
+		::Raids.Lairs.Traits.initialiseLairTrait(this);
 
 		if (::Raids.Standard.getParameter("DepopulateLairLootOnSpawn"))
 		{

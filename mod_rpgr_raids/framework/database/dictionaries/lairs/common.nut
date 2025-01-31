@@ -21,12 +21,5 @@
 	{
 		TypeID = "location.undead_crypt",
 		Faction = ::Const.FactionType.Zombies
-	},
-	TroopTags =
-	{
-		Fodder = 1,
-		Ranged = 2,
-		Melee = 3,
-		Unique = 4
 	}
 };

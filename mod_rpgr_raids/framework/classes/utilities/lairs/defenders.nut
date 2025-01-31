@@ -53,11 +53,6 @@
 		return ::Raids.Database.getField("Defenders", _fieldName);
 	}
 
-	function getTroopChoices()
-	{
-		return ::Math.rand(this.Parameters.TroopChoicesFloor, this.Parameters.TroopChoicesCeiling);
-	}
-
 	function getNaiveCandidate( _lairObject )
 	{
 		local spawnList = _lairObject.getDefenderSpawnList();
@@ -94,6 +89,11 @@
 	function getTimeScalePrefactor()
 	{	# These values are taken verbatim from the vanilla codebase.
 		return (1.0 + ::World.getTime().Days * 0.0075);
+	}
+
+	function getTroopChoices()
+	{
+		return ::Math.rand(this.Parameters.TroopChoicesFloor, this.Parameters.TroopChoicesCeiling);
 	}
 
 	function getViableTroopCandidates( _lairObject )
@@ -146,7 +146,7 @@
 
 	function reinforceDefenders( _lairObject )
 	{
-		if (!isLairAgitated(_lairObject))
+		if (!this.isLairAgitated(_lairObject))
 		{
 			return;
 		}

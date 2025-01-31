@@ -1,4 +1,4 @@
-::Raids.Strings.Lairs <-
+::Raids.Strings.Lairs.Traits <-
 {	// TODO: fill this out.
 	TraitAvaricious = "Avaricious",
 	TraitNecromancy = "Necromancy",
