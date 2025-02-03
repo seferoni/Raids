@@ -101,9 +101,33 @@
 			this.addTrait(traitTable, _lairObject);
 			break;
 		}
+
+		this.injectItems(traitTable, _lairObject);
+		this.injectTroops(traitTable, _lairObject);
 	}
 
-	function injectTroops( _traitKey, _lairObject )
+	function injectGold( _count, _lairObject )
+	{
+
+	}
+
+	function injectItems( _traitTable, _lairObject )
+	{
+		if (!"AddedItems" in _traitTable)
+		{
+			return;
+		}
+
+		// TODO: if the associated item is gold, this should probably call something else
+		local lootTable = _traitTable.AddedItems[::Math.rand(0, _traitTable.AddedItems.len() - 1)];
+
+		for ( local i = 0; i < lootTable.Num; i++ )
+		{
+			_lairObject.getLoot().add(::new(format("scripts/items/%s", lootTable.Type)));
+		}
+	}
+
+	function injectTroops( _traitTable, _lairObject )
 	{
 		// TODO:
 	}
