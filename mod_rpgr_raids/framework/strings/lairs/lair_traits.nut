@@ -13,7 +13,7 @@
 	MercenaryKnightsName = "Mercenary Knights",
 	NecromancyName = "Necromancy",
 	NobleDesertersName = "Deserters",
-	NobleDesertersSouthern = "Deserters",
+	NobleDesertersSouthernName = "Deserters",
 	NorthernExilesName = "Northern Exiles",
 	OrcAllianceName = "Orc Alliance",
 	PeasantRevoltName = "Peasant Revolt",
@@ -29,5 +29,5 @@
 	TamedSerpentsName = "Tamed Serpents",
 	UndeadVanguardName = "Undead Vanguard",
 	VampiricBroodName = "Vampiric Brood",
-	WitchesCoven = "Coven of Witches"
+	WitchesCovenName = "Coven of Witches"
 };
