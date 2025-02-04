@@ -14,12 +14,11 @@
 			return null;
 		}
 
-		local traitString = ::Raids.Strings.Lairs.Traits[trait]
-
+		local traitString = ::Raids.Strings.Lairs.Traits[format("%sName", trait)];
 		return ::Raids.Standard.constructEntry
 		(
 			"Trait",
-			format(::Raids.Strings.Lairs.Common.Traits, ::Raids.Standard.colourWrap(traitString, ::Raids.Standard.Colour.Gold))
+			::Raids.Standard.colourWrap(traitString, ::Raids.Standard.Colour.Gold)
 		);
 	}
 
