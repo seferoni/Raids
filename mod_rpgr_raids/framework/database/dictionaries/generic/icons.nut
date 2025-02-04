@@ -16,6 +16,7 @@
 	Supplies = "ui/icons/asset_food.png",
 	Time = "ui/icons/action_points.png",
 	Trade = "ui/icons/money.png",
+	Trait = "ui/icons/perks.png",
 	Unassorted = "ui/icons/bag.png",
 	Warning = "ui/icons/warning.png",
 	Wealth = "ui/icons/money2.png"

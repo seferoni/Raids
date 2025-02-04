@@ -93,7 +93,7 @@
 
 		foreach( traitTable in nominalTraits )
 		{
-			if (::Math.rand(1, 100) > traitTable.Chance )
+			if (::Math.rand(1, 100) > traitTable.Chance)
 			{
 				continue;
 			}
@@ -102,13 +102,21 @@
 			break;
 		}
 
+		this.injectGold(traitTable, _lairObject);
 		this.injectItems(traitTable, _lairObject);
 		this.injectTroops(traitTable, _lairObject);
 	}
 
-	function injectGold( _count, _lairObject )
+	function injectGold( _traitTable, _lairObject )
 	{
+		if (!"AddedGold" in _traitTable)
+		{
+			return;
+		}
 
+		local money = ::new("scripts/items/supplies/money_item");
+		money.setAmount(_traitTable.AddedGold);
+		_lairObject.getLoot().add(money);
 	}
 
 	function injectItems( _traitTable, _lairObject )
@@ -118,7 +126,6 @@
 			return;
 		}
 
-		// TODO: if the associated item is gold, this should probably call something else
 		local lootTable = _traitTable.AddedItems[::Math.rand(0, _traitTable.AddedItems.len() - 1)];
 
 		for ( local i = 0; i < lootTable.Num; i++ )
@@ -129,6 +136,12 @@
 
 	function injectTroops( _traitTable, _lairObject )
 	{
-		// TODO:
+		if (!"AddedTroops" in _traitTable)
+		{
+			return;
+		}
+
+		local troopTable = _traitTable.AddedTroops[::Math.rand(0, _traitTable.AddedTroops.len() - 1)];
+		::Raids.Lairs.Defenders.addTroops(troopTable, _lairObject);
 	}
 };

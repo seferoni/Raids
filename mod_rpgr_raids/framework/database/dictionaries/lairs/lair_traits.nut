@@ -16,6 +16,18 @@
 			}
 		]
 	},
+	Avaricious =
+	{
+		Chance = 10,
+		Factions =
+		[
+			::Const.FactionType.Bandits,
+			::Const.FactionType.OrientalBandits,
+			::Const.FactionType.Orcs,
+			::Const.FactionType.Goblins
+		],
+		AddedGold = ::Math.rand(200, 500)
+	},
 	BanditExiles =
 	{
 		Chance = 20,

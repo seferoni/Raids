@@ -388,6 +388,7 @@
 		push(this.createResourcesEntry(_lairObject));
 		push(this.createAgitationEntry(_lairObject));
 		push(this.createTimerEntry(_lairObject));
+		push(this.Traits.createTraitEntry(_lairObject));
 		return entries;
 	}
 

@@ -1,6 +1,7 @@
 ::Raids.Strings.Lairs.Traits <-
 {
 	AssassinsLeagueName = "League of Assassins",
+	AvariciousName = "Avaricious",
 	BanditExilesName = "Brigand Exiles",
 	BeastlyKennelName = "Beastly Kennel",
 	CultistsName = "Cultists",
