@@ -2,19 +2,11 @@
 {
 	::Raids.Patcher.wrap(p, "onExecute", function( _faction )
 	{
-		local grossEntities = ::World.getAllEntitiesAtPos(this.m.Start.getPos(), 1.0), caravan = null;
-
-		foreach( entity in grossEntities )
-		{
-			if (::Raids.Caravans.isPartyViable(entity) && !::Raids.Caravans.isPartyInitialised(entity))
-			{
-				caravan = entity;
-			}
-		}
+		local caravan = ::Raids.Caravans.locateCaravanOnAction(this.m.Start);
 
 		if (caravan == null)
 		{
-			::Raids.Standard.log(format("onExecute found no caravans near %s.", this.m.Start.getName()), true);
+			::Raids.Standard.log(format(::Raids.Strings.Debug.NoCaravanFound, this.m.Start.getName()), true);
 			return;
 		}
 

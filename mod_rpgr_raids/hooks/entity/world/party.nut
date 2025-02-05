@@ -3,7 +3,7 @@
 	::Raids.Patcher.wrap(p, "onCombatStarted", function()
 	{
 		if (!::Raids.Lairs.isPlayerInProximityTo(this.getTile(), 1))
-		{
+		{	// TODO: need an ambient agitation option so that enemies can also raise lair agitation.
 			return;
 		}
 

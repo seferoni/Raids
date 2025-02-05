@@ -182,6 +182,22 @@
 		);
 	}
 
+	function locateCaravanOnAction( _settlementObject )
+	{
+		local grossEntities = ::World.getAllEntitiesAtPos(_settlementObject.getPos(), 1.0);
+		local caravan = null;
+
+		foreach( entity in grossEntities )
+		{
+			if (this.isPartyViable(entity) && !this.isPartyInitialised(entity))
+			{
+				caravan = entity;
+			}
+		}
+
+		return caravan;
+	}
+
 	function formatSituationID( _situationID )
 	{
 		return _situationID.slice("situation.".len());
@@ -261,11 +277,11 @@
 
 		foreach( situation in settlementSituations )
 		{
-			if (this.SynergisticSituations.find(situation) != null)
+			if (this.getField("SynergisticSituations").find(situation) != null)
 			{
 				offset += 1;
 			}
-			else if (this.AntagonisticSituations.find(situation) != null)
+			else if (this.getField("AntagonisticSituations").find(situation) != null)
 			{
 				offset -= 1;
 			}
