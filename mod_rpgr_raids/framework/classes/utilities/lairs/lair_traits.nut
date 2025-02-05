@@ -104,7 +104,7 @@
 				continue;
 			}
 
-			this.addTrait(traitTable, _lairObject);
+			chosenTrait = traitTable;
 			break;
 		}
 
@@ -113,9 +113,10 @@
 			return;
 		}
 
-		this.injectGold(traitTable, _lairObject);
-		this.injectItems(traitTable, _lairObject);
-		this.injectTroops(traitTable, _lairObject);
+		this.addTrait(chosenTrait, _lairObject);
+		this.injectGold(chosenTrait, _lairObject);
+		this.injectItems(chosenTrait, _lairObject);
+		this.injectTroops(chosenTrait, _lairObject);
 	}
 
 	function injectGold( _traitTable, _lairObject )
