@@ -13,6 +13,7 @@
 		}
 
 		::Raids.Lairs.Defenders.createDefenders(this);
+		::Raids.Lairs.Traits.initialiseLairTrait(this); // TODO: ensure that this process flow is ideal
 		return ::Raids.Internal.TERMINATE;
 	}, "overrideMethod");
 
@@ -98,7 +99,6 @@
 		}
 
 		::Raids.Lairs.initialiseLairParameters(this);
-		::Raids.Lairs.Traits.initialiseLairTrait(this);
 
 		if (::Raids.Standard.getParameter("DepopulateLairLootOnSpawn"))
 		{

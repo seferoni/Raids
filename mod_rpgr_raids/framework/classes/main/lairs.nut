@@ -290,7 +290,8 @@
 
 	function getFactionType( _lairObject )
 	{
-		return ::World.FactionManager.getFaction(_lairObject.getFaction()).getType();
+		local worldFaction = ::World.FactionManager.getFaction(_lairObject.getFaction());
+		return worldFaction.getType();
 	}
 
 	function getField( _fieldName )
