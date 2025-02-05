@@ -50,6 +50,7 @@
 	{
 		if (!_iconKey in this.Generic.Icons)
 		{
+			::Raids.Standard.log(format(::Raids.Strings.Debug.InvalidIconPath, _iconKey), true);
 			return null;
 		}
 

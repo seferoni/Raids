@@ -124,7 +124,7 @@
 	}
 
 	function getAgitation( _lairObject )
-	{	// TODO: this should log an error if uninitialised!
+	{
 		return ::Raids.Standard.getFlag("Agitation", _lairObject);
 	}
 
@@ -546,6 +546,12 @@
 	{
 		::Raids.Standard.setFlag("Agitation", this.getField("AgitationDescriptors").Relaxed, _lairObject);
 		::Raids.Edicts.clearHistory(_lairObject);
+	}
+
+	function resetLairBehaviour( _lairObject, _setActive = false )
+	{
+		this.Traits.setTraitActiveState(_setActive, _lairObject);
+		this.Defenders.setDefenderReinforcementState(_setActive, _lairObject);
 	}
 
 	function setAgitation( _lairObject, _procedure )

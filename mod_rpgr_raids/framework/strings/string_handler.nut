@@ -2,7 +2,9 @@
 {
 	function createTables()
 	{
+		this.Debug <- {};
 		this.Edicts <- {};
+		this.Lairs <- {};
 	}
 
 	function compileFragments( _fragmentsArray, _colour )

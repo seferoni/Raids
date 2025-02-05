@@ -7,13 +7,16 @@
 			return;
 		}
 
-		if (::Raids.Standard.getFlag("DefenderSpawnsForbidden", this))
+		if (::Raids.Lairs.Defenders.getDefenderReinforcementState(this))
 		{
-			return ::Raids.Internal.TERMINATE;
+			::Raids.Lairs.Defenders.createDefenders(this);
 		}
 
-		::Raids.Lairs.Defenders.createDefenders(this);
-		::Raids.Lairs.Traits.initialiseLairTrait(this); // TODO: ensure that this process flow is ideal
+		if (!::Raids.Lairs.Traits.getTrait(_lairObject))
+		{
+			::Raids.Lairs.Traits.initialiseLairTrait(this);;
+		}
+
 		return ::Raids.Internal.TERMINATE;
 	}, "overrideMethod");
 
@@ -113,8 +116,8 @@
 			return;
 		}
 
-		local spawnTime = this.getLastSpawnTime(),
-		offset = ::Raids.Lairs.getSpawnTimeOffset(this);
+		local spawnTime = this.getLastSpawnTime();
+		local offset = ::Raids.Lairs.getSpawnTimeOffset(this);
 		this.m.LastSpawnTime = ::Math.max(0.0, spawnTime + offset);
 	});
 });

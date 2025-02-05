@@ -33,6 +33,11 @@
 		this.addTroops(candidate, _lairObject);
 	}
 
+	function setDefenderReinforcementState( _boolean, _lairObject )
+	{
+		::Raids.Standard.setFlag("DefenderReinforcementState", _boolean, candidate);
+	}
+
 	function getCandidate( _lairObject )
 	{
 		local spawnList = _lairObject.getDefenderSpawnList();
@@ -46,6 +51,11 @@
 		}
 
 		return candidates[::Math.rand(0, candidates.len() - 1)];
+	}
+
+	function getDefenderReinforcementState( _lairObject )
+	{
+		return ::Raids.Standard.getFlag("DefenderReinforcementState", _lairObject);
 	}
 
 	function getField( _fieldName )

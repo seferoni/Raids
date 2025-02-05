@@ -9,7 +9,7 @@
 			return;
 		}
 
-		::Raids.Standard.setFlag("DefenderSpawnsForbidden", true, candidate);
+		::Raids.Lairs.resetLairBehaviour(_lairObject);
 		::Raids.Lairs.setAgitation(candidate, ::Raids.Lairs.Procedures.Reset);
 		::Raids.Edicts.clearEdicts(candidate);
 	});
@@ -28,7 +28,7 @@
 			return;
 		}
 
-		::Raids.Standard.setFlag("DefenderSpawnsForbidden", false, candidate);
+		::Raids.Lairs.resetLairBehaviour(_lairObject, true);
 		::Raids.Lairs.updateProperties(candidate);
 	});
 });

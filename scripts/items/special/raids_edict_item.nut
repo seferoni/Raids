@@ -272,9 +272,9 @@ this.raids_edict_item <- ::inherit("scripts/items/raids_stackable_item",
 		this.m.NameAbbreviated = ::Raids.Strings.Edicts[key].NameAbbreviated;
 	}
 
-	function setWarningState( _bool )
+	function setWarningState( _boolean )
 	{
-		this.m.ShowWarning = _bool;
+		this.m.ShowWarning = _boolean;
 	}
 
 	function onUse( _actor, _item = null )

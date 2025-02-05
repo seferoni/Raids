@@ -24,7 +24,7 @@
 			return;
 		}
 
-		if (::Raids.Standard.getParameter("RoamerScaleAgitationRequirement") && ::Raids.Standard.getFlag("Agitation", lair) == ::Raids.Lairs.AgitationDescriptors.Relaxed)
+		if (::Raids.Standard.getParameter("RoamerScaleAgitationRequirement") && ::Raids.Lairs.getAgitation(lair) == ::Raids.Lairs.getField("AgitationDescriptors").Relaxed)
 		{
 			return;
 		}

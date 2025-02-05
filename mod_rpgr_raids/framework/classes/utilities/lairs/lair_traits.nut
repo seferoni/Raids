@@ -27,6 +27,16 @@
 		return ::Raids.Database.getField("Traits", _fieldName);
 	}
 
+	function getTrait( _lairObject )
+	{
+		return ::Raids.Standard.getFlag("LairTrait", _lairObject);
+	}
+
+	function getTraitActiveState( _lairObject )
+	{
+		return ::Raids.Standard.getFlag("TraitActiveState", _lairObject);
+	}
+
 	function getTraitField( _traitField, _lairObject )
 	{
 		local traitTable = this.getTraitTableByLair(_lairObject);
@@ -37,11 +47,6 @@
 		}
 
 		return traitTable[_traitField];
-	}
-
-	function getTrait( _lairObject )
-	{
-		return ::Raids.Standard.getFlag("LairTrait", _lairObject);
 	}
 
 	function getTraitTableByLair( _lairObject )
@@ -85,13 +90,7 @@
 	}
 
 	function initialiseLairTrait( _lairObject )
-	{	// TODO: this needs to account for much. need a flag to determine when it's appropriate to add a trait, including contract behaviour
-	// TODO: ensure that when a lair becomes a contract target, there are no after-effects wrt traits.
-		if (this.getTrait(_lairObject) != false)
-		{
-			return;
-		}
-
+	{
 		local chosenTrait = null;
 		local factionType = ::Raids.Lairs.getFactionType(_lairObject);
 		local nominalTraits = this.getTraitsByFaction(factionType);
@@ -114,6 +113,7 @@
 		}
 
 		this.addTrait(chosenTrait, _lairObject);
+		this.setTraitActiveState(true, _lairObject);
 		this.injectGold(chosenTrait, _lairObject);
 		this.injectItems(chosenTrait, _lairObject);
 		this.injectTroops(chosenTrait, _lairObject);
@@ -155,5 +155,10 @@
 
 		local troopTable = _traitTable.AddedTroops[::Math.rand(0, _traitTable.AddedTroops.len() - 1)];
 		::Raids.Lairs.Defenders.addTroops(troopTable, _lairObject);
+	}
+
+	function setTraitActiveState( _boolean, _lairObject )
+	{
+		::Raids.Standard.setFlag("TraitActiveState", _boolean, _lairObject);
 	}
 };
