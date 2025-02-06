@@ -2,26 +2,26 @@
 {
 	Antagonistic =
 	[
-		"ambushed_trade_routes",
-		"draught",
-		"greenskins",
-		"mine_cavein",
-		"moving_sands",
-		"raided",
-		"short_on_food",
-		"sickness",
-		"slave_revolt",
-		"snow_storms",
-		"warehouse_burned_down"
+		"situation.ambushed_trade_routes",
+		"situation.draught",
+		"situation.greenskins",
+		"situation.mine_cavein",
+		"situation.moving_sands",
+		"situation.raided",
+		"situation.short_on_food",
+		"situation.sickness",
+		"situation.slave_revolt",
+		"situation.snow_storms",
+		"situation.warehouse_burned_down"
 	],
 	Synergistic =
 	[
-		"bread_and_games",
-		"full_nets",
-		"good_harvest",
-		"rich_veins",
-		"safe_roads",
-		"seasonal_fair",
-		"well_supplied"
+		"situation.bread_and_games",
+		"situation.full_nets",
+		"situation.good_harvest",
+		"situation.rich_veins",
+		"situation.safe_roads",
+		"situation.seasonal_fair",
+		"situation.well_supplied"
 	]
 }

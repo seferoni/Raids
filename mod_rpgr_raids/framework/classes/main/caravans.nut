@@ -198,11 +198,6 @@
 		return caravan;
 	}
 
-	function formatSituationID( _situationID )
-	{
-		return _situationID.slice("situation.".len());
-	}
-
 	function getCaravanProperties( _caravanObject )
 	{
 		local properties = {};
@@ -296,14 +291,7 @@
 	function getSituationOffset( _settlementObject )
 	{
 		local offset = 0;
-		local grossSituations = _settlementObject.getSituations();
-
-		if (grossSituations.len() == 0)
-		{
-			return offset;
-		}
-
-		local settlementSituations = grossSituations.map(@(_situation) ::Raids.Caravans.formatSituationID(_situation.getID()));
+		local settlementSituations = _settlementObject.getSituations();
 
 		if (settlementSituations.len() == 0)
 		{
