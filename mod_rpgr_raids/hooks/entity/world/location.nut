@@ -73,7 +73,7 @@
 			return;
 		}
 
-		::Raids.Lairs.updateCombatStatistics(false);
+		::Raids.Standard.setLastFoeWasPartyStatistic(false);
 	});
 
 	::Raids.Patcher.wrap(p, "onDropLootForPlayer", function( _lootTable )

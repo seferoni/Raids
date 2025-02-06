@@ -2,16 +2,7 @@
 {
 	::Raids.Patcher.wrap(p, "onExecute", function( _faction )
 	{
-		local grossEntities = ::World.getAllEntitiesAtPos(this.m.Start.getPos(), 1.0);
-		local caravan = null;
-
-		foreach( entity in grossEntities )
-		{
-			if (::Raids.Caravans.isPartyViable(entity) && !::Raids.Caravans.isPartyInitialised(entity))
-			{
-				caravan = entity;
-			}
-		}
+		local caravan = ::Raids.Caravans.locateCaravanOnAction(this.m.Start);
 
 		if (caravan == null)
 		{

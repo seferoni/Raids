@@ -485,7 +485,7 @@
 			return false;
 		}
 
-		if (_checkProximity && !this.isPlayerInProximityTo(_location.getTile()))
+		if (_checkProximity && !::Raids.Standard.isPlayerInProximityTo(_location.getTile()))
 		{
 			return false;
 		}
@@ -506,11 +506,6 @@
 		}
 
 		return false;
-	}
-
-	function isPlayerInProximityTo( _tile, _threshold = 6 )
-	{
-		return ::World.State.getPlayer().getTile().getDistanceTo(_tile) <= _threshold;
 	}
 
 	function repopulateNamedLoot( _lairObject )
@@ -609,11 +604,6 @@
 		this.setAgitation(_lairObject, ::Raids.Standard.getProcedures().Reset);
 		this.depopulateNamedLoot(_lairObject);
 		this.updateProperties(_lairObject);
-	}
-
-	function updateCombatStatistics( _isParty )
-	{
-		::Raids.Standard.setFlag("LastFoeWasParty", _isParty, ::World.Statistics);
 	}
 
 	function updateProperties( _lairObject, _createDefenders = true )

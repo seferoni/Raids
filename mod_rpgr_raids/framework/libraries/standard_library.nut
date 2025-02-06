@@ -87,6 +87,18 @@
 		return list;
 	}
 
+	function getCombatStatistics()
+	{
+		local statistics =
+		{
+			LastCombatWasArena = ::Raids.Standard.getFlag("LastCombatWasArena", ::World.Statistics),
+			LastCombatWasDefeat = ::Raids.Standard.getFlagAsInt("LastCombatResult", ::World.Statistics) != 1,
+			LastCombatFaction = ::Raids.Standard.getFlag("LastCombatFaction", ::World.Statistics),
+			LastFoeWasParty = ::Raids.Standard.getFlag("LastFoeWasParty", ::World.Statistics),
+		};
+		return statistics;
+	}
+
 	function getFlag( _string, _object )
 	{
 		local flagValue = _object.getFlags().get(format("%s.%s", ::Raids.ID, _string));
@@ -203,6 +215,11 @@
 		_object.getFlags().increment(flag, _value);
 	}
 
+	function isPlayerInProximityTo( _tile, _threshold = 6 )
+	{
+		return ::World.State.getPlayer().getTile().getDistanceTo(_tile) <= _threshold;
+	}
+
 	function isWeakRef( _object )
 	{
 		if (typeof _object != "instance")
@@ -317,5 +334,10 @@
 	{
 		local flag = _isNative ? format("%s", _string) : format("%s.%s", ::Raids.ID, _string);
 		_object.getFlags().set(flag, _value);
+	}
+
+	function setLastFoeWasPartyStatistic( _isParty )
+	{
+		this.setFlag("LastFoeWasParty", _isParty, ::World.Statistics);
 	}
 };

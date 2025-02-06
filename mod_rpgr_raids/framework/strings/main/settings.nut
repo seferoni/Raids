@@ -9,6 +9,9 @@
 	AgitationResourceModifierName = "Agitation Resource Modifier",
 	AgitationResourceModifierDescription = "Controls how lair resource calculation is handled after each Agitation update. Higher percentage values result in greater resources, and therefore more powerful garrisoned troops and more loot.",
 
+	AmbientAgitationName = "Ambient Agitation",
+	AmbientAgitationDescription = "Permits NPC parties to raise the Agitation of nearby lairs upon engaging roaming parties.",
+
 	CaravanReinforcementChanceName = "Caravan Reinforcement Chance",
 	CaravanReinforcementChanceDescription = "Determines the percentage change for caravan troop count and composition reinforcement based on caravan wealth, and in special cases, cargo type. Caravans that are not reinforced can never carry named items.",
 

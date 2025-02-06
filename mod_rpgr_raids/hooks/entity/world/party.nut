@@ -2,17 +2,17 @@
 {
 	::Raids.Patcher.wrap(p, "onCombatStarted", function()
 	{
-		if (!::Raids.Lairs.isPlayerInProximityTo(this.getTile(), 1))
-		{	// TODO: need an ambient agitation option so that enemies can also raise lair agitation.
+		if (!::Raids.Standard.isPlayerInProximityTo(this.getTile(), 1))
+		{
 			return;
 		}
 
 		if (::Raids.Caravans.isPartyViable(this) && ::Raids.Caravans.isPartyInitialised(this))
 		{
-			::Raids.Caravans.updateOrigin(this);
+			::Raids.Caravans.updateOriginOnCombatStart(this);
 		}
 
-		::Raids.Lairs.updateCombatStatistics(true);
+		::Raids.Standard.setLastFoeWasPartyStatistic(true);
 	});
 
 	::Raids.Patcher.wrap(p, "onDropLootForPlayer", function( _lootTable )
@@ -27,7 +27,7 @@
 			return;
 		}
 
-		if (!::Raids.Standard.getFlag("CaravanHasNamedItems", this))
+		if (!::Raids.Caravans.getNamedItemCarrierState(this))
 		{
 			return;
 		}

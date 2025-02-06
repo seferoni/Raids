@@ -11,7 +11,11 @@
 		Default = 90,
 		Range = [50, 150],
 		Interval = 10
-	}
+	},
+	AmbientAgitation =
+	{
+		Default = true,
+	},
 	DepopulateLairLootOnSpawn =
 	{
 		Default = true,

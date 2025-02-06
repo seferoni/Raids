@@ -2,32 +2,32 @@
 {
 	::Raids.Patcher.wrap(p, "onCombatFinished", function()
 	{
-		if (!::Raids.Standard.getFlag("LastFoeWasParty", ::World.Statistics))
+		local statistics = ::Raids.Standard.getCombatStatistics();
+
+		if (!statistics.LastFoeWasParty)
 		{
 			return;
 		}
 
-		if (::Raids.Standard.getFlag("LastCombatWasArena", ::World.Statistics))
+		if (statistics.LastCombatWasArena)
 		{
 			return;
 		}
 
-		local factionIndex = ::Raids.Standard.getFlag("LastCombatFaction", ::World.Statistics);
-
-		if (!(factionIndex in ::World.FactionManager.m.Factions))
+		if (statistics.LastCombatWasDefeat || ::World.getPlayerRoster().getSize() == 0 || !::World.Assets.getOrigin().onCombatFinished())
 		{
-			::Raids.Standard.log("Retrieved faction index was out of bounds, aborting lair agitation procedure.", true);
 			return;
 		}
 
-		local faction = ::World.FactionManager.getFaction(factionIndex);
+		if (!(statistics.LastCombatFaction in ::World.FactionManager.m.Factions))
+		{
+			::Raids.Standard.log(format(::Raids.Strings.Debug.UndefinedFaction, statistics.LastCombatFaction), true);
+			return;
+		}
+
+		local faction = ::World.FactionManager.getFaction(statistics.LastCombatFaction);
 
 		if (!::Raids.Lairs.isFactionViable(faction))
-		{
-			return;
-		}
-
-		if (::World.getPlayerRoster().getSize() == 0 || !::World.Assets.getOrigin().onCombatFinished() || ::Raids.Standard.getFlagAsInt("LastCombatResult", ::World.Statistics) != 1)
 		{
 			return;
 		}
