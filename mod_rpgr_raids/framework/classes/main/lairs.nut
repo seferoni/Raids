@@ -543,12 +543,6 @@
 		::Raids.Edicts.clearHistory(_lairObject);
 	}
 
-	function resetLairBehaviour( _lairObject, _setActive = false )
-	{
-		this.Traits.setTraitActiveState(_setActive, _lairObject);
-		this.Defenders.setDefenderReinforcementState(_setActive, _lairObject);
-	}
-
 	function setAgitation( _lairObject, _procedure )
 	{
 		if (!this.isLairViableForProcedure(_lairObject, _procedure))

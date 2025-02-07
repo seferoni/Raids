@@ -522,9 +522,9 @@
 		::Raids.Standard.setFlag("CaravanCargo", _cargoEnum, _caravanObject);
 	}
 
-	function setCaravanOrigin( _caravanObject, _settlementObject )
+	function setCaravanOrigin( _settlementFaction, _caravanObject )
 	{
-		::Raids.Standard.setFlag("CaravanOrigin", _settlementObject.getFaction(), _caravanObject);
+		::Raids.Standard.setFlag("CaravanOrigin", _settlementFaction, _caravanObject);
 	}
 
 	function setCaravanWealth( _wealthEnum, _caravanObject )

@@ -9,7 +9,7 @@
 	}
 
 	function addTroops( _troopTable, _lairObject )
-	{
+	{	// TODO: Very oddly structured. There ought be a better way.
 		foreach( troop in _troopTable.Troops )
 		{
 			for( local i = 0; i < troop.Num; i++ )
@@ -34,7 +34,7 @@
 	}
 
 	function setDefenderReinforcementState( _boolean, _lairObject )
-	{
+	{	// TODO: this does need to be forbidden
 		::Raids.Standard.setFlag("DefenderReinforcementState", _boolean, candidate);
 	}
 

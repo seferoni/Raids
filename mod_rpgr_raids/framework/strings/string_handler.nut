@@ -58,6 +58,7 @@
 	{
 		this.loadFolder("main");
 		this.loadFolder("edicts");
+		this.loadFolder("lairs");
 	}
 
 	function loadFolder( _path )

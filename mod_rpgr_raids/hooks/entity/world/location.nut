@@ -7,12 +7,14 @@
 			return;
 		}
 
+		// TODO: the following conditions are not evaluated in a manner that produces desired behaviour
+
 		if (::Raids.Lairs.Defenders.getDefenderReinforcementState(this))
 		{
 			::Raids.Lairs.Defenders.createDefenders(this);
 		}
 
-		if (!::Raids.Lairs.Traits.getTrait(_lairObject))
+		if (!::Raids.Lairs.Traits.getTrait(this))
 		{
 			::Raids.Lairs.Traits.initialiseLairTrait(this);;
 		}

@@ -9,7 +9,7 @@
 			return;
 		}
 
-		::Raids.Lairs.resetLairBehaviour(_lairObject);
+		// TODO: need to forbid trait and defender behaviour here.
 		::Raids.Lairs.setAgitation(candidate, ::Raids.Lairs.Procedures.Reset);
 		::Raids.Edicts.clearEdicts(candidate);
 	});
@@ -28,7 +28,7 @@
 			return;
 		}
 
-		::Raids.Lairs.resetLairBehaviour(_lairObject, true);
+		// TODO: need to enable trait and defender behaviour here.
 		::Raids.Lairs.updateProperties(candidate);
 	});
 });

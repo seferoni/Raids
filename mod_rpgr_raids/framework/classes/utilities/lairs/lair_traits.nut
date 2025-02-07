@@ -33,7 +33,7 @@
 	}
 
 	function getTraitActiveState( _lairObject )
-	{
+	{	// TODO: this is never used.
 		return ::Raids.Standard.getFlag("TraitActiveState", _lairObject);
 	}
 
@@ -90,7 +90,7 @@
 	}
 
 	function initialiseLairTrait( _lairObject )
-	{
+	{	// TODO: will need to reinitialise traits when contracts end
 		local chosenTrait = null;
 		local factionType = ::Raids.Lairs.getFactionType(_lairObject);
 		local nominalTraits = this.getTraitsByFaction(factionType);
@@ -121,7 +121,7 @@
 
 	function injectGold( _traitTable, _lairObject )
 	{
-		if (!"AddedGold" in _traitTable)
+		if (!("AddedGold" in _traitTable))
 		{
 			return;
 		}
@@ -133,7 +133,7 @@
 
 	function injectItems( _traitTable, _lairObject )
 	{
-		if (!"AddedItems" in _traitTable)
+		if (!("AddedItems" in _traitTable))
 		{
 			return;
 		}
@@ -148,12 +148,18 @@
 
 	function injectTroops( _traitTable, _lairObject )
 	{
-		if (!"AddedTroops" in _traitTable)
+		if (!("AddedTroops" in _traitTable))
 		{
 			return;
 		}
 
-		local troopTable = _traitTable.AddedTroops[::Math.rand(0, _traitTable.AddedTroops.len() - 1)];
+		local troopTable =
+		{	// TODO: Unsatisfactory means of passing data.
+			Troops =
+			[
+				_traitTable.AddedTroops[::Math.rand(0, _traitTable.AddedTroops.len() - 1)]
+			],
+		};
 		::Raids.Lairs.Defenders.addTroops(troopTable, _lairObject);
 	}
 
