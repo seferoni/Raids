@@ -27,8 +27,8 @@
 			return;
 		}
 
-		local count = ::Raids.Lairs.getTreasureCount(this),
-		offset = ::Raids.Edicts.getTreasureOffset(this);
+		local count = ::Raids.Lairs.getTreasureCount(this);
+		local offset = ::Raids.Edicts.getTreasureOffset(this);
 		return [count + offset, _items, _lootTable];
 	}, "overrideArguments");
 
