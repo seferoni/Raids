@@ -7,6 +7,11 @@
 
 	function applyTraitEffects( _lairObject )
 	{
+		if (this.getTraitForbiddenState(_lairObject))
+		{
+			return;
+		}
+
 		local traitTable = this.getTraitTableByLair(_lairObject);
 
 		if (traitTable == null)
@@ -37,7 +42,7 @@
 		return ::Raids.Standard.constructEntry
 		(
 			"Trait",
-			::Raids.Standard.colourWrap(traitString, ::Raids.Standard.Colour.Gold)
+			::Raids.Standard.colourWrap(traitString, ::Raids.Standard.Colour.Red)
 		);
 	}
 
@@ -134,7 +139,6 @@
 
 		::logInfo("applying " + chosenTrait.Name + " to " + _lairObject.getName())
 		this.addTrait(chosenTrait, _lairObject);
-		this.setTraitInertState(true, _lairObject);
 		this.applyTraitEffects(_lairObject);
 	}
 
@@ -166,7 +170,8 @@
 	}
 
 	function injectTroops( _traitTable, _lairObject )
-	{
+	{	// TODO: for some reason, this is clearing troops prior to injection
+		::logInfo("initially had " + _lairObject.getTroops().len() + " for " + _lairObject.getName())
 		if (!("AddedTroops" in _traitTable))
 		{
 			return;
@@ -181,9 +186,10 @@
 		};
 
 		::Raids.Lairs.Defenders.addTroops(troopTable, _lairObject);
+		::logInfo("have " + _lairObject.getTroops().len() + " for " + _lairObject.getName() + " after injection")
 	}
 
-	function setTraitInertState( _boolean, _lairObject )
+	function setTraitForbiddenState( _boolean, _lairObject )
 	{
 		::Raids.Standard.setFlag("TraitForbidden", _boolean, _lairObject);
 	}

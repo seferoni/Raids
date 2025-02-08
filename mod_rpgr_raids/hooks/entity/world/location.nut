@@ -7,14 +7,23 @@
 			return;
 		}
 
-		if (!::Raids.Lairs.Defenders.getReinforcementForbiddenState(this))
+		if (::Raids.Lairs.Defenders.getReinforcementForbiddenState(this))
 		{
-			::Raids.Lairs.Defenders.createDefenders(this);
+			return ::Raids.Internal.TERMINATE;
 		}
 
-		if (!::Raids.Lairs.Traits.getTrait(this) && !::Raids.Lairs.Traits.getTraitForbiddenState(this))
+		::logInfo("creating Defenders for " + this.getName())
+		::Raids.Lairs.Defenders.createDefenders(this);
+		::logInfo("generated " + this.getTroops().len() + " troops ")
+
+		if (::Raids.Lairs.Traits.getTraitForbiddenState(this))
 		{
-			::Raids.Lairs.Traits.initialiseLairTrait(this);;
+			return ::Raids.Internal.TERMINATE;
+		}
+
+		if (!::Raids.Lairs.Traits.getTrait(this))
+		{
+			::Raids.Lairs.Traits.initialiseLairTrait(this);
 		}
 
 		return ::Raids.Internal.TERMINATE;

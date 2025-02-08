@@ -23,7 +23,7 @@
 
 	function createDefenders( _lairObject, _overrideAgitationRequirement = false )
 	{
-		if (!this.isLairAgitated(_lairObject) && !_overrideAgitationRequirement)
+		if (this.isLairAgitated(_lairObject) && !_overrideAgitationRequirement)
 		{
 			return;
 		}
