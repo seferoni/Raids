@@ -16,7 +16,7 @@
 
 		this.injectGold(traitTable, _lairObject);
 		this.injectItems(traitTable, _lairObject);
-		this.injectTroops(chosenTrait, _lairObject);
+		this.injectTroops(traitTable, _lairObject);
 	}
 
 	function createTraitEntry( _lairObject )
@@ -41,14 +41,14 @@
 		);
 	}
 
-	function getField( _fieldName )
-	{
-		return ::Raids.Database.getField("Traits", _fieldName);
-	}
-
 	function getTrait( _lairObject )
 	{
 		return ::Raids.Standard.getFlag("LairTrait", _lairObject);
+	}
+
+	function getTraitTables()
+	{
+		return ::Raids.Lairs.getField("Traits");
 	}
 
 	function getTraitForbiddenState( _lairObject )
@@ -70,20 +70,21 @@
 
 	function getTraitTableByLair( _lairObject )
 	{
-		local trait = this.getTrait(_lairObject);
+		local traitKey = this.getTrait(_lairObject);
 
-		if (trait == false)
+		if (traitKey == false)
 		{
 			return null;
 		}
 
-		return this.getField(trait);
+		local traitsDatabase = this.getTraitTables();
+		return traitsDatabase[traitKey];
 	}
 
 	function getTraitsByFaction( _factionType )
 	{
 		local traits = [];
-		local traitsDatabase = ::Raids.Lairs.getField("Traits");
+		local traitsDatabase = this.getTraitTables();
 		local processTable = function( _tableKey, _table )
 		{
 			_table.Name <- _tableKey;

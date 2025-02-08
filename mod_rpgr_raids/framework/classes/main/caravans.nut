@@ -128,7 +128,7 @@
 	{
 		if (this.getFactionType(_caravanObject) == ::Const.FactionType.OrientalCityState)
 		{
-			return this.SouthernGoods;
+			return this.getField("Goods").Southern;
 		}
 
 		local exclusionList = this.getExcludedGoodsList();
@@ -278,7 +278,7 @@
 	function getReinforcementCount( _caravanObject )
 	{
 		local wealth = this.getCaravanProperties(_caravanObject).Wealth;
-		local iterations = wealth + ::Math.rand(wealth - this.getField("WealthDescriptors").Moderate, wealth) + timeOffset;
+		local iterations = wealth + ::Math.rand(wealth - this.getField("WealthDescriptors").Moderate, wealth);
 
 		if (::World.getTime().Days >= this.Parameters.ReinforcementThresholdDays)
 		{
@@ -298,13 +298,15 @@
 			return offset;
 		}
 
+		local situationsDatabase = this.getField("Situations");
+
 		foreach( situation in settlementSituations )
 		{
-			if (this.getField("SynergisticSituations").find(situation) != null)
+			if (situationsDatabase.Synergistic.find(situation) != null)
 			{
 				offset += 1;
 			}
-			else if (this.getField("AntagonisticSituations").find(situation) != null)
+			else if (situationsDatabase.Antagonistic.find(situation) != null)
 			{
 				offset -= 1;
 			}

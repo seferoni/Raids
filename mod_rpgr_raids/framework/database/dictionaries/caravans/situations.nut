@@ -24,4 +24,4 @@
 		"situation.seasonal_fair",
 		"situation.well_supplied"
 	]
-}
+};

@@ -210,7 +210,7 @@
 	}
 
 	function setReinforcementForbiddenState( _boolean, _lairObject )
-	{	// TODO: this does need to be forbidden
+	{
 		::Raids.Standard.setFlag("ReinforcementForbidden", _boolean, candidate);
 	}
 
