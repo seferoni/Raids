@@ -520,7 +520,7 @@
 				Num = ::Math.rand(6, 10)
 			},
 			{
-				Num = ::Const.World.Spawn.Troops.SkeletonHeavyPolearm,
+				Type = ::Const.World.Spawn.Troops.SkeletonHeavyPolearm,
 				Num = ::Math.rand(4, 6)
 			}
 		]

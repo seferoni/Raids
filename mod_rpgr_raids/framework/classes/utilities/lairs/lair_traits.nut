@@ -110,7 +110,7 @@
 	}
 
 	function initialiseLairTrait( _lairObject )
-	{	// TODO: will need to reinitialise traits when contracts end
+	{
 		local chosenTrait = null;
 		local factionType = ::Raids.Lairs.getFactionType(_lairObject);
 		local nominalTraits = this.getTraitsByFaction(factionType);
@@ -132,6 +132,7 @@
 			return;
 		}
 
+		::logInfo("applying " + chosenTrait.Name + " to " + _lairObject.getName())
 		this.addTrait(chosenTrait, _lairObject);
 		this.setTraitInertState(true, _lairObject);
 		this.applyTraitEffects(_lairObject);
@@ -178,6 +179,7 @@
 				_traitTable.AddedTroops[::Math.rand(0, _traitTable.AddedTroops.len() - 1)]
 			],
 		};
+
 		::Raids.Lairs.Defenders.addTroops(troopTable, _lairObject);
 	}
 
