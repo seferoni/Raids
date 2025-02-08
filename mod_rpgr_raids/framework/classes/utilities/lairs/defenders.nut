@@ -50,7 +50,7 @@
 
 	function getReinforcementForbiddenState( _lairObject )
 	{
-		return ::Raids.Standard.getFlag("ReinforcementForbiddenState", _lairObject);
+		return ::Raids.Standard.getFlag("ReinforcementForbidden", _lairObject);
 	}
 
 	function getField( _fieldName )
@@ -211,7 +211,7 @@
 
 	function setReinforcementForbiddenState( _boolean, _lairObject )
 	{	// TODO: this does need to be forbidden
-		::Raids.Standard.setFlag("ReinforcementForbiddenState", _boolean, candidate);
+		::Raids.Standard.setFlag("ReinforcementForbidden", _boolean, candidate);
 	}
 
 	function updateProperties( _lairObject )

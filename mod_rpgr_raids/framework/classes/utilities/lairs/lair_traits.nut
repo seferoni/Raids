@@ -6,7 +6,7 @@
 	}
 
 	function applyTraitEffects( _lairObject )
-	{	// TODO: use this for contract end!
+	{
 		local traitTable = this.getTraitTableByLair(_lairObject);
 
 		if (traitTable == null)
@@ -53,7 +53,7 @@
 
 	function getTraitForbiddenState( _lairObject )
 	{
-		return ::Raids.Standard.getFlag("TraitInertState", _lairObject);
+		return ::Raids.Standard.getFlag("TraitForbidden", _lairObject);
 	}
 
 	function getTraitField( _traitField, _lairObject )
@@ -182,6 +182,6 @@
 
 	function setTraitInertState( _boolean, _lairObject )
 	{
-		::Raids.Standard.setFlag("TraitInertState", _boolean, _lairObject);
+		::Raids.Standard.setFlag("TraitForbidden", _boolean, _lairObject);
 	}
 };
