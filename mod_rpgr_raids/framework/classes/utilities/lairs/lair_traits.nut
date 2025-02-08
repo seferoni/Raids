@@ -5,11 +5,30 @@
 		::Raids.Standard.setFlag("LairTrait", _traitTable.Name, _lairObject);
 	}
 
+	function applyTraitEffects( _lairObject )
+	{	// TODO: use this for contract end!
+		local traitTable = this.getTraitTableByLair(_lairObject);
+
+		if (traitTable == null)
+		{
+			return;
+		}
+
+		this.injectGold(traitTable, _lairObject);
+		this.injectItems(traitTable, _lairObject);
+		this.injectTroops(chosenTrait, _lairObject);
+	}
+
 	function createTraitEntry( _lairObject )
 	{
 		local trait = this.getTrait(_lairObject);
 
 		if (!trait)
+		{
+			return null;
+		}
+
+		if (this.getTraitForbiddenState(_lairObject))
 		{
 			return null;
 		}
@@ -32,9 +51,9 @@
 		return ::Raids.Standard.getFlag("LairTrait", _lairObject);
 	}
 
-	function getTraitActiveState( _lairObject )
-	{	// TODO: this is never used.
-		return ::Raids.Standard.getFlag("TraitActiveState", _lairObject);
+	function getTraitForbiddenState( _lairObject )
+	{
+		return ::Raids.Standard.getFlag("TraitInertState", _lairObject);
 	}
 
 	function getTraitField( _traitField, _lairObject )
@@ -113,10 +132,8 @@
 		}
 
 		this.addTrait(chosenTrait, _lairObject);
-		this.setTraitActiveState(true, _lairObject);
-		this.injectGold(chosenTrait, _lairObject);
-		this.injectItems(chosenTrait, _lairObject);
-		this.injectTroops(chosenTrait, _lairObject);
+		this.setTraitInertState(true, _lairObject);
+		this.applyTraitEffects(_lairObject);
 	}
 
 	function injectGold( _traitTable, _lairObject )
@@ -163,8 +180,8 @@
 		::Raids.Lairs.Defenders.addTroops(troopTable, _lairObject);
 	}
 
-	function setTraitActiveState( _boolean, _lairObject )
+	function setTraitInertState( _boolean, _lairObject )
 	{
-		::Raids.Standard.setFlag("TraitActiveState", _boolean, _lairObject);
+		::Raids.Standard.setFlag("TraitInertState", _boolean, _lairObject);
 	}
 };

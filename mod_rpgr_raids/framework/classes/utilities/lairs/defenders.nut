@@ -33,11 +33,6 @@
 		this.addTroops(candidate, _lairObject);
 	}
 
-	function setDefenderReinforcementState( _boolean, _lairObject )
-	{	// TODO: this does need to be forbidden
-		::Raids.Standard.setFlag("DefenderReinforcementState", _boolean, candidate);
-	}
-
 	function getCandidate( _lairObject )
 	{
 		local spawnList = _lairObject.getDefenderSpawnList();
@@ -53,9 +48,9 @@
 		return candidates[::Math.rand(0, candidates.len() - 1)];
 	}
 
-	function getDefenderReinforcementState( _lairObject )
+	function getReinforcementForbiddenState( _lairObject )
 	{
-		return ::Raids.Standard.getFlag("DefenderReinforcementState", _lairObject);
+		return ::Raids.Standard.getFlag("ReinforcementForbiddenState", _lairObject);
 	}
 
 	function getField( _fieldName )
@@ -212,6 +207,11 @@
 		{
 			_troopArray.pop();
 		}
+	}
+
+	function setReinforcementForbiddenState( _boolean, _lairObject )
+	{	// TODO: this does need to be forbidden
+		::Raids.Standard.setFlag("ReinforcementForbiddenState", _boolean, candidate);
 	}
 
 	function updateProperties( _lairObject )
