@@ -9,8 +9,8 @@
 	}
 
 	function addTroops( _troopTable, _lairObject )
-	{	// TODO: Very oddly structured. There ought be a better way.
-		foreach( troop in _troopTable.Troops )
+	{
+		foreach( troop in _troopTable )
 		{
 			for( local i = 0; i < troop.Num; i++ )
 			{
@@ -71,7 +71,7 @@
 
 	function getResourcesForReinforcement( _lairObject )
 	{
-		return ::Math.floor(_lairObject.getResources() * ::Raids.Standard.getPercentageSetting("AgitationResourceModifier"));
+		return ::Math.floor(_lairObject.getResources() * ::Raids.Standard.getPercentageParameter("AgitationResourceModifier"));
 	}
 
 	function getResourcesPrefactor( _lairObject )
@@ -80,7 +80,7 @@
 
 		if (_lairObject.m.IsScalingDefenders)
 		{
-			prefactor *= ::Math.minf(::Raids.Standard.getPercentageSetting("TimeScalePrefactorCeiling"), this.getTimeScalePrefactor());
+			prefactor *= ::Math.minf(::Raids.Standard.getPercentageParameter("TimeScalePrefactorCeiling"), this.getTimeScalePrefactor());
 		}
 
 		if (!_lairObject.isAlliedWithPlayer())
@@ -164,10 +164,7 @@
 		}
 
 		local allocatedResources = ::Math.floor(this.getResourcesForReinforcement(_lairObject) / troopPool.len());
-		local selection =
-		{
-			Troops = []
-		};
+		local selection = [];
 
 		foreach( troopTable in troopPool )
 		{
@@ -179,7 +176,7 @@
 			# Assign fields for the addTroops method to reference.
 			newTroop.Type <- troopTable.Type;
 			newTroop.Num <- ::Math.min(troopTable.MaxCount, troopCount);
-			selection.Troops.push(newTroop);
+			selection.push(newTroop);
 		}
 
 		this.addTroops(selection, _lairObject);

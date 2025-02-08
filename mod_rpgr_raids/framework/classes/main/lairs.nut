@@ -327,7 +327,7 @@
 	function getPartyResources( _lairObject )
 	{
 		local baseResourceModifier = this.getBaseResourceModifier(::Raids.Standard.getFlag("BaseResources", _lairObject));
-		local configurableModifier = ::Raids.Standard.getPercentageSetting("RoamerResourceModifier");
+		local configurableModifier = ::Raids.Standard.getPercentageParameter("RoamerResourceModifier");
 		return _lairObject.getResources() * this.getTimeModifier() * baseResourceModifier * configurableModifier;
 	}
 
@@ -335,7 +335,7 @@
 	{
 		local agitation = this.getAgitation(_lairObject);
 		local baseResources = ::Raids.Standard.getFlag("BaseResources", _lairObject);
-		local configurableModifier = ::Raids.Standard.getPercentageSetting("AgitationResourceModifier");
+		local configurableModifier = ::Raids.Standard.getPercentageParameter("AgitationResourceModifier");
 
 		# Create a modifier meant to modulate resource scaling behaviour at both extremes.
 		local interpolatedModifier = -0.0006 * baseResources + 0.6;

@@ -42,7 +42,7 @@
 		return ::Raids.Standard.constructEntry
 		(
 			"Trait",
-			::Raids.Standard.colourWrap(traitString, ::Raids.Standard.Colour.Red)
+			::Raids.Standard.colourWrap(traitString, ::Raids.Standard.Colour.Gold)
 		);
 	}
 
@@ -170,22 +170,14 @@
 	}
 
 	function injectTroops( _traitTable, _lairObject )
-	{	// TODO: for some reason, this is clearing troops prior to injection
+	{
 		::logInfo("initially had " + _lairObject.getTroops().len() + " for " + _lairObject.getName())
 		if (!("AddedTroops" in _traitTable))
 		{
 			return;
 		}
 
-		local troopTable =
-		{	// TODO: Unsatisfactory means of passing data.
-			Troops =
-			[
-				_traitTable.AddedTroops[::Math.rand(0, _traitTable.AddedTroops.len() - 1)]
-			],
-		};
-
-		::Raids.Lairs.Defenders.addTroops(troopTable, _lairObject);
+		::Raids.Lairs.Defenders.addTroops([_traitTable.AddedTroops[::Math.rand(0, _traitTable.AddedTroops.len() - 1)]], _lairObject);
 		::logInfo("have " + _lairObject.getTroops().len() + " for " + _lairObject.getName() + " after injection")
 	}
 
