@@ -119,7 +119,6 @@
 		Factions =
 		[
 			::Const.FactionType.Bandits,
-			::Const.FactionType.Barbarians,
 			::Const.FactionType.OrientalBandits
 		],
 		AddedTroops =
