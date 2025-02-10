@@ -28,9 +28,9 @@
 			return;
 		}
 
-		local candidate = this.getCandidate(_lairObject);
+		local defenderTable = this.getCandidate(_lairObject);
 		this.updateProperties(_lairObject);
-		this.addTroops(candidate, _lairObject);
+		this.addTroops(defenderTable.Troops, _lairObject);
 	}
 
 	function getCandidate( _lairObject )

@@ -7,7 +7,7 @@
 	},
 	Colour =
 	{
-		Gold = "#cfbe29"
+		Gold = "#7a5d01"
 		Green = "#2a5424",
 		Red = "#691a1a"
 	},
