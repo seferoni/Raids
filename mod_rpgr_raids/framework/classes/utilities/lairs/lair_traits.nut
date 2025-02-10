@@ -38,6 +38,11 @@
 			return null;
 		}
 
+		if (!::Raids.Standard.getParameter("ShowLairTraitEntry"))
+		{
+			return null;
+		}
+
 		local traitString = ::Raids.Strings.Lairs.Traits[format("%sName", trait)];
 		return ::Raids.Standard.constructEntry
 		(

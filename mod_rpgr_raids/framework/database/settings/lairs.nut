@@ -42,6 +42,10 @@
 	{
 		Default = true,
 	},
+	ShowLairTraitEntry =
+	{
+		Default = true,
+	},
 	ShowNamedLootEntry =
 	{
 		Default = true,

@@ -18,6 +18,9 @@
 	DepopulateLairLootOnSpawnName = "Depopulate Lair Loot on Spawn",
 	DepopulateLairLootOnSpawnDescription = "Determines whether Raids should depopulate newly spawned lairs of named loot.",
 
+	ShowLairTraitEntryName = "Show Lair Trait Entry",
+	ShowLairTraitEntryDescription = "Determines whether lairs display their designated trait, if present.",
+
 	ShowNamedLootEntryName = "Show Named Loot Entry",
 	ShowNamedLootEntryDescription = "Determines whether lairs display the number of currently retained named items on their tooltips.",
 
