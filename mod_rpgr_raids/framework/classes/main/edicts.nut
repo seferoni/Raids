@@ -36,6 +36,11 @@
 
 	function createHistoryEntry( _lairObject )
 	{
+		if (!::Raids.Standard.getFlag("EdictHistory", _lairObject))
+		{
+			return null;
+		}
+
 		return ::Raids.Standard.constructEntry
 		(
 			"History",
@@ -162,12 +167,14 @@
 			return entries;
 		}
 
+		local push = @(_entry) ::Raids.Standard.push(_entry, entries);
+
 		foreach( container in occupiedContainers )
 		{
 			local inDiscovery = ::Raids.Standard.getFlag(format("%sTime", container), _lairObject) != false;
 			local sugaredID = ::Raids.Standard.getFlag(container, _lairObject);
 			local activeState = inDiscovery ? "Discovery" : "Active";
-			entries.push(this.createTooltipEntry(sugaredID, activeState));
+			push(this.createTooltipEntry(sugaredID, activeState));
 		}
 
 		if (entries.len() < naiveContainers.len())
@@ -176,7 +183,7 @@
 
 			for( local i = 0; i < iterations; i++ )
 			{
-				entries.push(vacantEntry);
+				push(vacantEntry);
 			}
 		}
 
@@ -243,6 +250,11 @@
 
 	function getLegibilityEntry( _lairObject )
 	{
+		if (!this.findEdict("Legibility", _lairObject))
+		{
+			return null;
+		}
+
 		return this.createTooltipEntry("Legibility", "Discovery");
 	}
 
@@ -261,6 +273,11 @@
 
 	function getNamedLootEntry( _lairObject )
 	{
+		if (!::Raids.Standard.getParameter("ShowNamedLootEntry"))
+		{
+			return null;
+		}
+
 		local count = 0;
 		local loot = _lairObject.getLoot().getItems();
 		local namedLootChance = ::Raids.Lairs.getNamedLootChance(_lairObject) + this.getNamedLootChanceOffset(_lairObject);
@@ -285,13 +302,10 @@
 	function getNonviableEntries( _lairObject )
 	{
 		local entries = [];
+		local push = @(_entry) ::Raids.Standard.push(_entry, entries);
 
-		if (this.findEdict("Legibility", _lairObject) != false)
-		{
-			entries.push(this.getLegibilityEntry(_lairObject));
-		}
-
-		entries.extend(this.getSpecialEntries(_lairObject));
+		push(this.getLegibilityEntry(_lairObject));
+		push(this.getSpecialEntries(_lairObject));
 		return entries;
 	}
 
@@ -314,17 +328,10 @@
 	function getSpecialEntries( _lairObject )
 	{
 		local entries = [];
+		local push = @(_entry) ::Raids.Standard.push(_entry, entries);
 
-		if (::Raids.Standard.getParameter("ShowNamedLootEntry"))
-		{
-			entries.push(this.getNamedLootEntry(_lairObject));
-		}
-
-		if (::Raids.Standard.getFlag("EdictHistory", _lairObject) != false)
-		{
-			entries.push(this.createHistoryEntry(_lairObject));
-		}
-
+		push(this.getNamedLootEntry(_lairObject));
+		push(this.createHistoryEntry(_lairObject));
 		return entries;
 	}
 
@@ -349,8 +356,11 @@
 
 	function getTooltipEntries( _lairObject )
 	{
-		local entries = this.getContainerEntries(_lairObject);
-		entries.extend(this.getSpecialEntries(_lairObject));
+		local entries = [];
+		local push = @(_entry) ::Raids.Standard.push(_entry, entries);
+
+		push(this.getContainerEntries(_lairObject));
+		push(this.getSpecialEntries(_lairObject));
 		return entries;
 	}
 

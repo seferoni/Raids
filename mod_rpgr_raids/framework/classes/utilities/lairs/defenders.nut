@@ -48,11 +48,6 @@
 		return candidates[::Math.rand(0, candidates.len() - 1)];
 	}
 
-	function getReinforcementForbiddenState( _lairObject )
-	{
-		return ::Raids.Standard.getFlag("ReinforcementForbidden", _lairObject);
-	}
-
 	function getField( _fieldName )
 	{
 		return ::Raids.Database.getField("Defenders", _fieldName);
@@ -67,6 +62,11 @@
 
 		# Return random party from within partitioned spawnlist.
 		return spawnList[::Math.rand(0, ceiling)];
+	}
+
+	function getReinforcementForbiddenState( _lairObject )
+	{
+		return ::Raids.Standard.getFlag("ReinforcementForbidden", _lairObject);
 	}
 
 	function getResourcesForReinforcement( _lairObject )
