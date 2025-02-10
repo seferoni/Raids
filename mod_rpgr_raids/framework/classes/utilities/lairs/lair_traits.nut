@@ -136,12 +136,6 @@
 		local factionType = ::Raids.Lairs.getFactionType(_lairObject);
 		local nominalTraits = this.getTraitsByFaction(factionType);
 		local chosenTrait = this.pickFromWeightedArray(nominalTraits);
-
-		if (chosenTrait == null)
-		{
-			return;
-		}
-
 		::logInfo("applying " + chosenTrait.Name + " to " + _lairObject.getName())
 		this.addTrait(chosenTrait, _lairObject);
 		this.applyTraitEffects(_lairObject);
