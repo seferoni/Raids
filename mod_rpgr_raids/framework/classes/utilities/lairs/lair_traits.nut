@@ -188,7 +188,7 @@
 	function pickFromWeightedArray( _weightedArray )
 	{
 		local cumulativeWeight = 0;
-		local randomNumber = ::Math.rand(0, this.getCumulativeWeight(_weightedArray));
+		local randomNumber = ::Math.rand(0, this.getTotalWeight(_weightedArray));
 
 		foreach( traitKey, traitTable in _weightedArray )
 		{

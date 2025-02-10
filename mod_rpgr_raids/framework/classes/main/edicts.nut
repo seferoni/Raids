@@ -15,12 +15,6 @@
 		::Raids.Standard.setFlag("EdictHistory", newHistory, _lairObject);
 	}
 
-	function createEdict( _writingInstruments = null )
-	{
-		local edicts = _writingInstruments == null ? this.getAllEdictsAsFiles() : _writingInstruments.getEdictSelectionAsFiles();
-		return ::new(edicts[::Math.rand(0, edicts.len() - 1)]);
-	}
-
 	function clearEdicts( _lairObject )
 	{
 		foreach( container in this.getField("Containers") )
@@ -32,6 +26,12 @@
 	function clearHistory( _lairObject )
 	{
 		::Raids.Standard.setFlag("EdictHistory", false, _lairObject);
+	}
+
+	function createEdict( _writingInstruments = null )
+	{
+		local edicts = _writingInstruments == null ? this.getAllEdictsAsFiles() : _writingInstruments.getEdictSelectionAsFiles();
+		return ::new(edicts[::Math.rand(0, edicts.len() - 1)]);
 	}
 
 	function createHistoryEntry( _lairObject )
