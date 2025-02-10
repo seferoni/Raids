@@ -51,5 +51,11 @@
 		Default = 150,
 		Range = [100, 300],
 		Interval = 10
+	},
+	TraitChance =
+	{
+		Default = 35,
+		Range = [0, 100],
+		Interval = 5
 	}
 };

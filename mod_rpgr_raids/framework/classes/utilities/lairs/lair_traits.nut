@@ -46,6 +46,18 @@
 		);
 	}
 
+	function getTotalWeight( _weightedArray )
+	{
+		local totalWeight = 0;
+
+		foreach( tableKey, table in _weightedArray )
+		{
+			totalWeight += table.Weight;
+		}
+
+		return totalWeight;
+	}
+
 	function getTrait( _lairObject )
 	{
 		return ::Raids.Standard.getFlag("LairTrait", _lairObject);
@@ -116,21 +128,14 @@
 
 	function initialiseLairTrait( _lairObject )
 	{
-		local chosenTrait = null;
+		if (::Math.rand(1, 100) > ::Raids.Standard.getParameter("TraitChance"))
+		{
+			return;
+		}
+
 		local factionType = ::Raids.Lairs.getFactionType(_lairObject);
 		local nominalTraits = this.getTraitsByFaction(factionType);
-		::Raids.Standard.shuffleArray(nominalTraits);
-
-		foreach( traitTable in nominalTraits )
-		{
-			if (::Math.rand(1, 100) > traitTable.Chance)
-			{
-				continue;
-			}
-
-			chosenTrait = traitTable;
-			break;
-		}
+		local chosenTrait = this.pickFromWeightedArray(nominalTraits);
 
 		if (chosenTrait == null)
 		{
@@ -179,6 +184,22 @@
 
 		::Raids.Lairs.Defenders.addTroops([_traitTable.AddedTroops[::Math.rand(0, _traitTable.AddedTroops.len() - 1)]], _lairObject);
 		::logInfo("have " + _lairObject.getTroops().len() + " for " + _lairObject.getName() + " after injection")
+	}
+
+	function pickFromWeightedArray( _weightedArray )
+	{
+		local cumulativeWeight = 0;
+		local randomNumber = ::Math.rand(0, this.getCumulativeWeight(_weightedArray));
+
+		foreach( traitKey, traitTable in _weightedArray )
+		{
+			cumulativeWeight += traitTable.Weight;
+
+			if (randomNumber < cumulativeWeight)
+			{
+				return traitKey;
+			}
+		}
 	}
 
 	function setTraitForbiddenState( _boolean, _lairObject )

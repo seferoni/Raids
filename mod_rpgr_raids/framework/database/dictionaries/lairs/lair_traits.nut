@@ -2,7 +2,7 @@
 {
 	AssassinsLeague =
 	{
-		Chance = 5,
+		Weight = 1,
 		Factions =
 		[
 			::Const.FactionType.Bandits,
@@ -18,7 +18,7 @@
 	},
 	Avaricious =
 	{
-		Chance = 10,
+		Weight = 3,
 		Factions =
 		[
 			::Const.FactionType.Bandits,
@@ -30,7 +30,7 @@
 	},
 	BanditExiles =
 	{
-		Chance = 20,
+		Weight = 3,
 		Factions =
 		[
 			::Const.FactionType.Barbarians,
@@ -50,7 +50,7 @@
 	},
 	BeastlyKennel =
 	{
-		Chance = 10,
+		Weight = 2,
 		Factions =
 		[
 			::Const.FactionType.Barbarians,
@@ -67,7 +67,7 @@
 	},
 	Cultists =
 	{
-		Chance = 10,
+		Weight = 1,
 		Factions =
 		[
 			::Const.FactionType.Bandits,
@@ -84,7 +84,7 @@
 	},
 	EnthralledMasses =
 	{
-		Chance = 10,
+		Weight = 3,
 		Factions =
 		[
 			::Const.FactionType.Barbarians
@@ -99,7 +99,7 @@
 	},
 	HeroesGraveyard =
 	{
-		Chance = 10,
+		Weight = 2,
 		Factions =
 		[
 			::Const.FactionType.Undead,
@@ -115,7 +115,7 @@
 	},
 	HiredHands =
 	{
-		Chance = 15,
+		Weight = 2,
 		Factions =
 		[
 			::Const.FactionType.Bandits,
@@ -143,7 +143,7 @@
 	},
 	HolyCongregation =
 	{
-		Chance = 10,
+		Weight = 1,
 		Factions =
 		[
 			::Const.FactionType.Undead,
@@ -159,7 +159,7 @@
 	},
 	Marksmen =
 	{
-		Chance = 10,
+		Weight = 2,
 		Factions =
 		[
 			::Const.FactionType.Bandits
@@ -174,7 +174,7 @@
 	},
 	MarksmenSouthern =
 	{
-		Chance = 10,
+		Weight = 2,
 		Factions =
 		[
 			::Const.FactionType.OrientalBandits
@@ -189,7 +189,7 @@
 	},
 	MercenaryKnights =
 	{
-		Chance = 5,
+		Weight = 1,
 		Factions =
 		[
 			::Const.FactionType.Bandits,
@@ -205,7 +205,7 @@
 	},
 	NobleDeserters =
 	{
-		Chance = 15,
+		Weight = 2,
 		Factions =
 		[
 			::Const.FactionType.Bandits,
@@ -233,7 +233,7 @@
 	},
 	NobleDesertersSouthern =
 	{
-		Chance = 10,
+		Weight = 2,
 		Factions =
 		[
 			::Const.FactionType.OrientalBandits
@@ -256,7 +256,7 @@
 	},
 	NorthernExiles =
 	{
-		Chance = 15,
+		Weight = 2,
 		Factions =
 		[
 			::Const.FactionType.Bandits,
@@ -276,7 +276,7 @@
 	},
 	Necromancy =
 	{
-		Chance = 15,
+		Weight = 1,
 		Factions =
 		[
 			::Const.FactionType.Bandits,
@@ -293,7 +293,7 @@
 	},
 	OrcAlliance =
 	{
-		Chance = 15,
+		Weight = 1,
 		Factions =
 		[
 			::Const.FactionType.Goblins
@@ -316,7 +316,7 @@
 	},
 	PeasantRevolt =
 	{
-		Chance = 10,
+		Weight = 2,
 		Factions =
 		[
 			::Const.FactionType.Bandits,
@@ -331,7 +331,7 @@
 	},
 	PeasantRevoltSouthern =
 	{
-		Chance = 10,
+		Weight = 2,
 		Factions =
 		[
 			::Const.FactionType.OrientalBandits
@@ -346,7 +346,7 @@
 	},
 	RoguesCoterie =
 	{
-		Chance = 10,
+		Weight = 1,
 		Factions =
 		[
 			::Const.FactionType.Bandits
@@ -361,7 +361,7 @@
 	},
 	RenegadeMilitia =
 	{
-		Chance = 10,
+		Weight = 2,
 		Factions =
 		[
 			::Const.FactionType.Bandits,
@@ -384,7 +384,7 @@
 	},
 	SubjugatedGoblins =
 	{
-		Chance = 35,
+		Weight = 2,
 		Factions =
 		[
 			::Const.FactionType.Orcs
@@ -407,7 +407,7 @@
 	},
 	SlaveRevolt =
 	{
-		Chance = 15,
+		Weight = 2,
 		Factions =
 		[
 			::Const.FactionType.OrientalBandits,
@@ -422,7 +422,7 @@
 	},
 	SouthernExiles =
 	{
-		Chance = 20,
+		Weight = 2,
 		Factions =
 		[
 			::Const.FactionType.Bandits,
@@ -442,7 +442,7 @@
 	},
 	SwordmastersKeep =
 	{
-		Chance = 5,
+		Weight = 1,
 		Factions =
 		[
 			::Const.FactionType.Bandits,
@@ -458,7 +458,7 @@
 	},
 	TamedDirewolves =
 	{
-		Chance = 15,
+		Weight = 1,
 		Factions =
 		[
 			::Const.FactionType.Bandits,
@@ -476,7 +476,7 @@
 	},
 	TamedHyenas =
 	{
-		Chance = 20,
+		Weight = 1,
 		Factions =
 		[
 			::Const.FactionType.OrientalBandits,
@@ -491,7 +491,7 @@
 	},
 	TamedSerpents =
 	{
-		Chance = 20,
+		Weight = 1,
 		Factions =
 		[
 			::Const.FactionType.OrientalBandits,
@@ -506,7 +506,7 @@
 	},
 	UndeadVanguard =
 	{
-		Chance = 10,
+		Weight = 3,
 		Factions =
 		[
 			::Const.FactionType.Undead,
@@ -526,7 +526,7 @@
 	},
 	VampiricBrood =
 	{
-		Chance = 10,
+		Weight = 2,
 		Factions =
 		[
 			::Const.FactionType.Undead,
@@ -542,7 +542,7 @@
 	},
 	WitchesCoven =
 	{
-		Chance = 5,
+		Weight = 1,
 		Factions =
 		[
 			::Const.FactionType.Bandits,

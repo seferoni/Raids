@@ -33,6 +33,9 @@
 	TimeScalePrefactorCeilingName = "Time Scale Prefactor Ceiling",
 	TimeScalePrefactorCeilingDescription = "Determines the maximum value beyond which the further passage of time no longer affects location strength. In the base game, this is at 300. This has a very significant effect on location difficulty.",
 
+	TraitChanceName = "Lair Trait Chance",
+	TraitChanceDescription = "Determines the chance for any given lair to accept a trait upon creation.",
+
 	FactionSpecificNamedLootChanceName = "Faction Specific Named Loot Chance",
 	FactionSpecificNamedLootChanceDescription = "Determines the percentage chance for lairs to drop faction-specific named loot only, when conditions obtain.",
 
