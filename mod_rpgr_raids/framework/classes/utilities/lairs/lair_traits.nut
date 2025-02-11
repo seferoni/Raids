@@ -186,17 +186,17 @@
 	}
 
 	function pickFromWeightedArray( _weightedArray )
-	{
+	{	// TODO: this is returning null for edge cases, which should not be possible
 		local cumulativeWeight = 0;
 		local randomNumber = ::Math.rand(0, this.getTotalWeight(_weightedArray));
 
-		foreach( traitKey, traitTable in _weightedArray )
+		foreach( index, traitTable in _weightedArray )
 		{
 			cumulativeWeight += traitTable.Weight;
 
 			if (randomNumber < cumulativeWeight)
 			{
-				return traitKey;
+				return traitTable;
 			}
 		}
 	}
