@@ -57,7 +57,7 @@
 
 		foreach( index, traitTable in _weightedArray )
 		{
-			totalWeight += table.Weight;
+			totalWeight += traitTable.Weight;
 		}
 
 		return totalWeight;

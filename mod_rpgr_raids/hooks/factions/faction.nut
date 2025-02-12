@@ -1,5 +1,5 @@
 ::Raids.Patcher.hookTree("scripts/factions/faction", function( p )
-{
+{	// TODO: when roamers are spawned, it appears that lairs clear their defender pool, resetting lair troop effects
 	::Raids.Patcher.wrap(p, "spawnEntity", function( _tile, _name, _uniqueName, _template, _resources )
 	{
 		if (::Math.rand(1, 100) > ::Raids.Standard.getParameter("RoamerScaleChance"))
