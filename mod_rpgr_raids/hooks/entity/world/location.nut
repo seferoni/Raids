@@ -13,7 +13,7 @@
 		}
 
 		::logInfo("creating Defenders for " + this.getName())
-		::Raids.Lairs.Defenders.createDefenders(this);
+		::Raids.Lairs.Defenders.createDefenders(this); // TODO: if this implementation holds trait-specific troops in memory, could work
 		::logInfo("generated " + this.getTroops().len() + " troops ")
 
 		if (::Raids.Lairs.Traits.getTraitForbiddenState(this))

@@ -68,6 +68,18 @@
 		return ::Raids.Standard.getFlag("LairTrait", _lairObject);
 	}
 
+	function getTraitProperties( _lairObject )
+	{	// TODO: implement this
+		local properties =
+		{
+			TraitName = this.getTrait(_lairObject),
+			TraitTroopIndex = plc,
+			TraitItemIndex = plc,
+			TraitGoldValue = plc
+		};
+		return properties;
+	}
+
 	function getTraitTables()
 	{
 		return ::Raids.Lairs.getField("Traits");
@@ -132,7 +144,7 @@
 	}
 
 	function initialiseLairTrait( _lairObject )
-	{
+	{	// TODO: need trait index, item index, and gold value flags
 		if (::Math.rand(1, 100) > ::Raids.Standard.getParameter("TraitChance"))
 		{
 			return;
