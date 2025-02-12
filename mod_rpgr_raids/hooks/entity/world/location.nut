@@ -12,20 +12,14 @@
 			return ::Raids.Internal.TERMINATE;
 		}
 
-		::logInfo("creating Defenders for " + this.getName())
-		::Raids.Lairs.Defenders.createDefenders(this); // TODO: if this implementation holds trait-specific troops in memory, could work
-		::logInfo("generated " + this.getTroops().len() + " troops ")
-
-		if (::Raids.Lairs.Traits.getTraitForbiddenState(this))
-		{
-			return ::Raids.Internal.TERMINATE;
-		}
-
-		if (!::Raids.Lairs.Traits.getTrait(this))
+		if (!::Raids.Lairs.Traits.getTraitProperties(this).TraitKey)
 		{
 			::Raids.Lairs.Traits.initialiseLairTrait(this);
 		}
 
+		::logInfo("creating Defenders for " + this.getName())
+		::Raids.Lairs.Defenders.createDefenders(this);
+		::logInfo("generated " + this.getTroops().len() + " troops")
 		return ::Raids.Internal.TERMINATE;
 	}, "overrideMethod");
 
@@ -38,7 +32,7 @@
 
 		local count = ::Raids.Lairs.getTreasureCount(this);
 		local offset = ::Raids.Edicts.getTreasureOffset(this);
-		return [count + offset, _items, _lootTable];
+		return [count + offset, _items, _lootTable]; // TODO: need to inject items into _lootTable by lair trait
 	}, "overrideArguments");
 
 	::Raids.Patcher.wrap(p, "dropMoney", function( _num, _lootTable )

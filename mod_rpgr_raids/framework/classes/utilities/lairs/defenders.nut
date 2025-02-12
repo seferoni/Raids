@@ -29,7 +29,8 @@
 		}
 
 		local defenderTable = this.getCandidate(_lairObject);
-		this.updateProperties(_lairObject);
+		::Raids.Lairs.resetTroopPool(_lairObject);
+		this.updatePropertiesOnDefenderRefresh(_lairObject);
 		this.addTroops(defenderTable.Troops, _lairObject);
 	}
 
@@ -211,9 +212,13 @@
 		::Raids.Standard.setFlag("ReinforcementForbidden", _boolean, candidate);
 	}
 
-	function updateProperties( _lairObject )
+	function resetTroopPool( _lairObject )
 	{
 		_lairObject.m.Troops = [];
+	}
+
+	function updatePropertiesOnDefenderRefresh( _lairObject )
+	{
 		_lairObject.m.DefenderSpawnDay = ::World.getTime().Days;
 	}
 };

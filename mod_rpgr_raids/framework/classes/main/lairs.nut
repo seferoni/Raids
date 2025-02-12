@@ -301,7 +301,15 @@
 
 	function getMoneyCount( _lairObject )
 	{
-		return _lairObject.getResources();
+		local baseValue = _lairObject.getResources();
+		local traitGoldOffset = this.Traits.getTraitProperties(_lairObject).TraitGoldValue;
+
+		if (traitGoldOffset != false)
+		{
+			baseValue += traitGoldOffset;
+		}
+
+		return baseValue;
 	}
 
 	function getNaiveNamedLootChance( _lairObject )
@@ -541,6 +549,20 @@
 	{
 		::Raids.Standard.setFlag("Agitation", this.getField("AgitationDescriptors").Relaxed, _lairObject);
 		::Raids.Edicts.clearHistory(_lairObject);
+	}
+
+	function resetTroopPool( _lairObject )
+	{
+		local traitProperties = this.Traits.getTraitProperties(_lairObject);
+
+		if (this.Traits.getTraitForbiddenState(_lairObject) || !traitProperties.TraitName || !traitProperties.TraitTroopIndex)
+		{
+			_lairObject.m.Troops = [];
+			return;
+		}
+
+		local traitTable = this.Traits.getTraitTables()[traitProperties.TraitName];
+		this.Traits.injectTroops(traitTable, _lairObject);
 	}
 
 	function setAgitation( _lairObject, _procedure )
