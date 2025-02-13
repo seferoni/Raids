@@ -46,7 +46,7 @@
 
 		foreach( lair in lairs )
 		{
-			::Raids.Lairs.setAgitation(lair, ::Raids.Lairs.Procedures.Increment);
+			::Raids.Lairs.setAgitation(lair, ::Raids.Standard.getProcedures().Increment);
 		}
 	});
 });

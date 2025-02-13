@@ -6,7 +6,7 @@
 	AvariciousName = "Avaricious",
 	AvariciousDescription = "This lair is host to a substantial bounty of crowns.",
 
-	BeastTrophies = "Beast Trophies",
+	BeastTrophiesName = "Beast Trophies",
 	BeastTrophiesDescription = "The denizens of this lair fancy themselves beast hunters, maintaining a sizeable collection of trophies.",
 
 	BeastTrophiesSouthern = "Beast Trophies",

@@ -28,8 +28,9 @@
 			_lootTable.push(::new("scripts/items/special/raids_official_document_item"));
 		}
 
-		if (this.isLocationTypeViable(_locationObject))
+		if (this.isLocationTypeViable(_locationObject.getLocationType()))
 		{
+			::logInfo("location type viable, injecting items")
 			this.Traits.injectItems(_lootTable, _locationObject);
 		}
 	}
@@ -552,14 +553,14 @@
 	{
 		local traitProperties = this.Traits.getTraitProperties(_lairObject);
 
-		if (this.Traits.getTraitForbiddenState(_lairObject) || !traitProperties.TraitName || !traitProperties.TraitTroopIndex)
+		if (this.Traits.getTraitForbiddenState(_lairObject) || !traitProperties.TraitKey || !traitProperties.TraitTroopIndex)
 		{
 			_lairObject.m.Troops = [];
 			return;
 		}
 
-		local traitTable = this.Traits.getTraitTables()[traitProperties.TraitName];
-		this.Traits.injectTroops(traitTable, _lairObject);
+		local traitTable = this.Traits.getTraitTables()[traitProperties.TraitKey];
+		this.Traits.injectTroops(_lairObject);
 	}
 
 	function setAgitation( _lairObject, _procedure )

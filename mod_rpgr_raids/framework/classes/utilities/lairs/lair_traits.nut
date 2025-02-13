@@ -137,7 +137,7 @@
 	}
 
 	function injectItems( _lootTable, _lairObject )
-	{
+	{	// TODO: this is not working
 		local traitTable = this.getTraitTableByLair(_lairObject);
 
 		if ("AddedGold" in traitTable)
@@ -149,15 +149,19 @@
 
 		if (!("AddedItems" in traitTable))
 		{
+			::logInfo("no items to add, aborting")
 			return;
 		}
 
-		local count = ::Raids.Lairs.getAgitation(_lairObject);
+		::logInfo("injecting items")
+		local count = ::Raids.Lairs.getAgitation(_lairObject); // TODO: using agitation as a count is intuitive, but limiting
 		local itemArray = traitTable.AddedItems;
 
 		for( local i = 0; i < count; i++ )
 		{
-			_lootTable.push(::new(itemArray[::Math.rand(0, itemArray.len() - 1)]));
+			local script = itemArray[::Math.rand(0, itemArray.len() - 1)];
+			::logInfo("injected " + script);
+			_lootTable.push(::new(script));
 		}
 	}
 
@@ -170,8 +174,8 @@
 			return;
 		}
 
-		local troopIndex = this.getTraitProperties(_lairObject).LairTraitTroopIndex;
-		::Raids.Lairs.Defenders.addTroops([_traitTable.AddedTroops[troopIndex]], _lairObject);
+		local troopIndex = this.getTraitProperties(_lairObject).TraitTroopIndex;
+		::Raids.Lairs.Defenders.addTroops([traitTable.AddedTroops[troopIndex]], _lairObject);
 		::logInfo("have " + _lairObject.getTroops().len() + " for " + _lairObject.getName() + " after injection")
 	}
 

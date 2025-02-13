@@ -379,7 +379,7 @@
 			return true;
 		}
 
-		if (this.getField("LocationOverrides").find(_lairObject.getTypeID()) != null)
+		if (this.getField("LocationOverrides").find(_lairObject.getTypeID()) != null) // TODO: this won't work for many reasons
 		{
 			return true;
 		}

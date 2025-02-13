@@ -18,8 +18,10 @@
 		::Const.FactionType.Zombies
 	],
 	Overrides =
-	{
-		TypeID = "location.undead_crypt",
-		Faction = ::Const.FactionType.Zombies
-	}
+	[
+		{
+			TypeID = "location.undead_crypt",
+			Faction = ::Const.FactionType.Zombies
+		}
+	]
 };

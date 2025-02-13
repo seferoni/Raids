@@ -13,7 +13,7 @@
 		}
 
 		if (!::Raids.Lairs.Traits.getTraitProperties(this).TraitKey)
-		{
+		{	// TODO: this doesn't account for lairs that were never eligible for a trait!
 			::Raids.Lairs.Traits.initialiseLairTrait(this);
 		}
 

@@ -3,7 +3,7 @@
 	function executeAgitationProcedure( _lairObject )
 	{
 		this.resetContainer(this.findEdict("Agitation", _lairObject), _lairObject, false);
-		::Raids.Lairs.setAgitation(_lairObject, ::Raids.Lairs.Procedures.Increment);
+		::Raids.Lairs.setAgitation(_lairObject, ::Raids.Standard.getProcedures().Increment);
 	}
 
 	function executeDiminutionProcedure( _lairObject )

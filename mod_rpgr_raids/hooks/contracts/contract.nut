@@ -11,7 +11,7 @@
 
 		::Raids.Lairs.Defenders.setReinforcementForbiddenState(true, _lairObject);
 		::Raids.Lairs.Traits.setTraitForbiddenState(true, _lairObject);
-		::Raids.Lairs.setAgitation(candidate, ::Raids.Lairs.Procedures.Reset);
+		::Raids.Lairs.setAgitation(candidate, ::Raids.Standard.getProcedures().Reset);
 		::Raids.Edicts.clearEdicts(candidate);
 	});
 
