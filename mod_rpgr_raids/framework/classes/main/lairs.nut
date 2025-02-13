@@ -27,6 +27,11 @@
 		{
 			_lootTable.push(::new("scripts/items/special/raids_official_document_item"));
 		}
+
+		if (this.isLocationTypeViable(_locationObject))
+		{
+			this.Traits.injectItems(_lootTable, _locationObject);
+		}
 	}
 
 	function createAgitationEntry( _lairObject )
@@ -301,15 +306,7 @@
 
 	function getMoneyCount( _lairObject )
 	{
-		local baseValue = _lairObject.getResources();
-		local traitGoldOffset = this.Traits.getTraitProperties(_lairObject).TraitGoldValue;
-
-		if (traitGoldOffset != false)
-		{
-			baseValue += traitGoldOffset;
-		}
-
-		return baseValue;
+		return _lairObject.getResources();
 	}
 
 	function getNaiveNamedLootChance( _lairObject )

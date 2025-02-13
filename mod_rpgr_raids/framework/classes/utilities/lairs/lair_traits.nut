@@ -2,31 +2,28 @@
 {
 	function addTrait( _traitTable, _lairObject )
 	{
-		::Raids.Standard.setFlag("LairTrait", _traitTable.Name, _lairObject);
-		// TODO: write assignTraitProperties here
-	}
-
-	function applyTraitEffects( _lairObject )
-	{
-		if (this.getTraitForbiddenState(_lairObject))
+		local pickRandom = function( _propertyKey )
 		{
-			return;
-		}
+			if (!(_propertyKey in _traitTable))
+			{
+				return false;
+			}
 
-		local traitTable = this.getTraitTableByLair(_lairObject);
+			local propertyArray = _traitTable[_propertyKey];
+			return ::Math.rand(0, propertyArray.len() - 1);
+		};
 
-		if (traitTable == null)
-		{
-			return;
-		}
-
-		this.injectGold(traitTable, _lairObject);
-		this.injectItems(traitTable, _lairObject);
-		this.injectTroops(traitTable, _lairObject);
+		::Raids.Standard.setFlag("LairTraitKey", _traitTable.Name, _lairObject);
+		::Raids.Standard.setFlag("LairTraitTroopIndex", pickRandom("AddedTroops"), _lairObject);
 	}
 
 	function createTraitEntry( _lairObject )
 	{
+		if (!::Raids.Standard.getParameter("ShowLairTraitEntry"))
+		{
+			return null;
+		}
+
 		local traitKey = this.getTraitProperties(_lairObject).TraitKey;
 
 		if (!traitKey)
@@ -35,11 +32,6 @@
 		}
 
 		if (this.getTraitForbiddenState(_lairObject))
-		{
-			return null;
-		}
-
-		if (!::Raids.Standard.getParameter("ShowLairTraitEntry"))
 		{
 			return null;
 		}
@@ -68,10 +60,8 @@
 	{
 		local properties =
 		{
-			TraitKey = ::Raids.Standard.getFlag("LairTrait", _lairObject),
-			TraitTroopIndex = ::Raids.Standard.getFlag("LairTraitTroopIndex", _lairObject),
-			TraitItemIndex = ::Raids.Standard.getFlag("LairTraitItemIndex", _lairObject),
-			TraitGoldValue = ::Raids.Standard.getFlag("LairTraitGoldValue", _lairObject)
+			TraitKey = ::Raids.Standard.getFlag("LairTraitKey", _lairObject),
+			TraitTroopIndex = ::Raids.Standard.getFlag("LairTraitTroopIndex", _lairObject)
 		};
 		return properties;
 	}
@@ -84,18 +74,6 @@
 	function getTraitForbiddenState( _lairObject )
 	{
 		return ::Raids.Standard.getFlag("TraitForbidden", _lairObject);
-	}
-
-	function getTraitField( _traitField, _lairObject )
-	{
-		local traitTable = this.getTraitTableByLair(_lairObject);
-
-		if (!(_traitField in traitTable))
-		{
-			return null;
-		}
-
-		return traitTable[_traitField];
 	}
 
 	function getTraitTableByLair( _lairObject )
@@ -111,7 +89,7 @@
 		return traitsDatabase[traitKey];
 	}
 
-	function getTraitsByFaction( _factionType )
+	function getViableTraitsByFaction( _factionType )
 	{
 		local traits = [];
 		local traitsDatabase = this.getTraitTables();
@@ -152,22 +130,47 @@
 		}
 
 		local factionType = ::Raids.Lairs.getFactionType(_lairObject);
-		local nominalTraits = this.getTraitsByFaction(factionType);
+		local nominalTraits = this.getViableTraitsByFaction(factionType);
 		local chosenTrait = this.pickFromWeightedArray(nominalTraits);
 		::logInfo("applying " + chosenTrait.Name + " to " + _lairObject.getName())
 		this.addTrait(chosenTrait, _lairObject);
 	}
 
-	function injectTroops( _traitTable, _lairObject )
+	function injectItems( _lootTable, _lairObject )
 	{
-		::logInfo("initially had " + _lairObject.getTroops().len() + " for " + _lairObject.getName())
-		if (!("AddedTroops" in _traitTable))
+		local traitTable = this.getTraitTableByLair(_lairObject);
+
+		if ("AddedGold" in traitTable)
+		{
+			local money = ::new("scripts/items/supplies/money_item");
+			money.setAmount(traitTable.AddedGold);
+			_lootTable.push(money);
+		}
+
+		if (!("AddedItems" in traitTable))
 		{
 			return;
 		}
 
-		local troopIndex = ::Math.rand(0, _traitTable.AddedTroops.len() - 1);
-		::Raids.Standard.setFlag("TraitTroopIndex", troopIndex, _lairObject);
+		local count = ::Raids.Lairs.getAgitation(_lairObject);
+		local itemArray = traitTable.AddedItems;
+
+		for( local i = 0; i < count; i++ )
+		{
+			_lootTable.push(::new(itemArray[::Math.rand(0, itemArray.len() - 1)]));
+		}
+	}
+
+	function injectTroops( _lairObject )
+	{	::logInfo("initially had " + _lairObject.getTroops().len() + " for " + _lairObject.getName())
+		local traitTable = this.getTraitTableByLair(_lairObject);
+
+		if (!("AddedTroops" in traitTable))
+		{
+			return;
+		}
+
+		local troopIndex = this.getTraitProperties(_lairObject).LairTraitTroopIndex;
 		::Raids.Lairs.Defenders.addTroops([_traitTable.AddedTroops[troopIndex]], _lairObject);
 		::logInfo("have " + _lairObject.getTroops().len() + " for " + _lairObject.getName() + " after injection")
 	}

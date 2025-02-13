@@ -48,6 +48,46 @@
 			}
 		]
 	},
+	BeastTrophies =
+	{
+		Weight = 2,
+		Factions =
+		[
+			::Const.FactionType.Bandits,
+			::Const.FactionType.Barbarians,
+			::Const.FactionType.Goblins,
+			::Const.FactionType.Orcs
+		],
+		AddedItems =
+		[
+			"scripts/items/misc/adrenaline_gland_item",
+			"scripts/items/misc/ghoul_brain_item",
+			"scripts/items/misc/ghoul_horn_item",
+			"scripts/items/misc/ghoul_teeth_item",
+			"scripts/items/misc/poison_gland_item",
+			"scripts/items/misc/spider_silk_item",
+			"scripts/items/misc/unhold_bones_item",
+			"scripts/items/misc/unhold_heart_item",
+			"scripts/items/misc/unhold_hide_item",
+			"scripts/items/misc/werewolf_pelt_item",
+		]
+	},
+	BeastTrophiesSouthern =
+	{
+		Weight = 2,
+		Factions =
+		[
+			::Const.FactionType.OrientalBandits
+		],
+		AddedItems =
+		[
+			"scripts/items/misc/acidic_saliva_item",
+			"scripts/items/misc/glistening_scales_item",
+			"scripts/items/misc/hyena_fur_item",
+			"scripts/items/misc/serpent_skin_item",
+			"scripts/items/misc/sulfurous_rocks_item"
+		]
+	},
 	BeastlyKennel =
 	{
 		Weight = 2,

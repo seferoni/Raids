@@ -32,7 +32,7 @@
 
 		local count = ::Raids.Lairs.getTreasureCount(this);
 		local offset = ::Raids.Edicts.getTreasureOffset(this);
-		return [count + offset, _items, _lootTable]; // TODO: need to inject items into _lootTable by lair trait
+		return [count + offset, _items, _lootTable];
 	}, "overrideArguments");
 
 	::Raids.Patcher.wrap(p, "dropMoney", function( _num, _lootTable )

@@ -31,7 +31,6 @@
 
 		::Raids.Lairs.Defenders.setReinforcementForbiddenState(false, _lairObject);
 		::Raids.Lairs.Traits.setTraitForbiddenState(false, _lairObject);
-		::Raids.Lairs.Traits.applyTraitEffects(_lairObject);
 		::Raids.Lairs.updateProperties(candidate);
 	});
 });
