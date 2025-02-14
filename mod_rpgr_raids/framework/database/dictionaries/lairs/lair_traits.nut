@@ -161,6 +161,7 @@
 			::Const.FactionType.Bandits,
 			::Const.FactionType.OrientalBandits
 		],
+		AddedGold = ::Math.rand(100, 200),
 		AddedTroops =
 		[
 			{
@@ -592,7 +593,7 @@
 		[
 			{
 				Type = ::Const.World.Spawn.Troops.Hexe,
-				Num = ::Math.rand(1, 4)
+				Num = ::Math.rand(1, 3)
 			}
 		]
 	}

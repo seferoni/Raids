@@ -12,8 +12,8 @@
 			return ::Raids.Internal.TERMINATE;
 		}
 
-		if (!::Raids.Lairs.Traits.getTraitProperties(this).TraitKey)
-		{	// TODO: this doesn't account for lairs that were never eligible for a trait!
+		if (!::Raids.Lairs.Traits.getTraitProperties(this).LairTraitInitialised)
+		{
 			::Raids.Lairs.Traits.initialiseLairTrait(this);
 		}
 
@@ -45,6 +45,16 @@
 		local count = ::Raids.Lairs.getMoneyCount(this);
 		return [count, _lootTable];
 	}, "overrideArguments");
+
+	::Raids.Patcher.wrap(p, "getDescription", function( _descriptionString )
+	{
+		if (!::Raids.Lairs.isLocationViable(this, true, true))
+		{
+			return;
+		}
+
+		return format("%s %s", _descriptionString, ::Raids.Lairs.Traits.getDescription(this));
+	});
 
 	::Raids.Patcher.wrap(p, "getTooltip", function()
 	{

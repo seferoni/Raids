@@ -20,10 +20,6 @@
 		"Diminution",
 		"Opportunism"
 	],
-	LocationOverrides =
-	[
-		"location.undead_crypt"
-	],
 	ScalingModalities =
 	{
 		Static = 0,

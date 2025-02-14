@@ -1,5 +1,10 @@
 ::Raids.Lairs.Traits <-
 {
+	Parameters =
+	{
+		ItemCountBase = ::Math.rand(1, 3)
+	}
+
 	function addTrait( _traitTable, _lairObject )
 	{
 		local pickRandom = function( _propertyKey )
@@ -44,6 +49,18 @@
 		);
 	}
 
+	function getDescription( _lairObject )
+	{
+		local traitKey = this.getTraitProperties(_lairObject).TraitKey;
+
+		if (!traitKey)
+		{
+			return "";
+		}
+
+		return ::Raids.Strings.Lairs.Traits[format("%sDescription", traitKey)];
+	}
+
 	function getTotalWeight( _weightedArray )
 	{
 		local totalWeight = 0;
@@ -60,6 +77,7 @@
 	{
 		local properties =
 		{
+			TraitInitialised = ::Raids.Standard.getFlag("LairTraitInitialised", _lairObject),
 			TraitKey = ::Raids.Standard.getFlag("LairTraitKey", _lairObject),
 			TraitTroopIndex = ::Raids.Standard.getFlag("LairTraitTroopIndex", _lairObject)
 		};
@@ -124,6 +142,8 @@
 			return;
 		}
 
+		::Raids.Standard.setFlag("LairTraitInitialised", true, _lairObject);
+
 		if (::Math.rand(1, 100) > ::Raids.Standard.getParameter("TraitChance"))
 		{
 			return;
@@ -137,7 +157,7 @@
 	}
 
 	function injectItems( _lootTable, _lairObject )
-	{	// TODO: this is not working
+	{
 		local traitTable = this.getTraitTableByLair(_lairObject);
 
 		if ("AddedGold" in traitTable)
@@ -153,8 +173,8 @@
 			return;
 		}
 
-		::logInfo("injecting items")
-		local count = ::Raids.Lairs.getAgitation(_lairObject); // TODO: using agitation as a count is intuitive, but limiting
+		::logInfo("injecting items");
+		local count = this.Parameters.ItemCountBase + ::Raids.Lairs.getAgitation(_lairObject);
 		local itemArray = traitTable.AddedItems;
 
 		for( local i = 0; i < count; i++ )

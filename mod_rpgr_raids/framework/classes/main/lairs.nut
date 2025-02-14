@@ -270,14 +270,11 @@
 
 	function getFactionKey( _lairObject )
 	{
-		local typeID = _lairObject.getTypeID();
+		local overrideTable = this.getOverride(_lairObject);
 
-		foreach( overrideTable in this.getField("Overrides") )
+		if (overrideTable != null)
 		{
-			if (overrideTable.TypeID == typeID)
-			{
-				return overrideTable.Faction;
-			}
+			return overrideTable.Faction;
 		}
 
 		return this.getFactionKeyFromType(this.getFactionType(_lairObject));
@@ -328,6 +325,21 @@
 		local baseChance = ::Raids.Standard.getFlag("BaseNamedItemChance", _lairObject);
 		local agitation = this.getAgitation(_lairObject);
 		return baseChance + ((agitation - 1) * this.Parameters.NamedItemChancePerAgitationTier);
+	}
+
+	function getOverride( _lairObject )
+	{
+		local typeID = _lairObject.getTypeID();
+
+		foreach( overrideTable in this.getField("Overrides") )
+		{
+			if (overrideTable.TypeID == typeID)
+			{
+				return overrideTable;
+			}
+		}
+
+		return null;
 	}
 
 	function getPartyResources( _lairObject )

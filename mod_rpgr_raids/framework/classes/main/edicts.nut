@@ -379,7 +379,9 @@
 			return true;
 		}
 
-		if (this.getField("LocationOverrides").find(_lairObject.getTypeID()) != null) // TODO: this won't work for many reasons
+		local override = ::Raids.Lairs.getOverride(_lairObject);
+
+		if (override != null && viableFactions.find(override.Faction) != null)
 		{
 			return true;
 		}
