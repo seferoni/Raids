@@ -1,5 +1,5 @@
 ::Raids.Strings.Lairs.Traits <-
-{
+{	// TODO: need to implement descriptions in tooltip
 	AssassinsLeagueName = "League of Assassins",
 	AssassinsLeagueDescription = "A secretive order of assassins have taken up residence here."
 
