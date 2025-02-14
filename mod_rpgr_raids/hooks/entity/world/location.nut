@@ -12,7 +12,7 @@
 			return ::Raids.Internal.TERMINATE;
 		}
 
-		if (!::Raids.Lairs.Traits.getTraitProperties(this).LairTraitInitialised)
+		if (!::Raids.Lairs.Traits.getTraitProperties(this).TraitInitialised)
 		{
 			::Raids.Lairs.Traits.initialiseLairTrait(this);
 		}
@@ -20,6 +20,7 @@
 		::logInfo("creating Defenders for " + this.getName())
 		::Raids.Lairs.Defenders.createDefenders(this);
 		::logInfo("generated " + this.getTroops().len() + " troops")
+		::MSU.Log.printStackTrace();
 		return ::Raids.Internal.TERMINATE;
 	}, "overrideMethod");
 
@@ -46,16 +47,6 @@
 		return [count, _lootTable];
 	}, "overrideArguments");
 
-	::Raids.Patcher.wrap(p, "getDescription", function( _descriptionString )
-	{
-		if (!::Raids.Lairs.isLocationViable(this, true, true))
-		{
-			return;
-		}
-
-		return format("%s %s", _descriptionString, ::Raids.Lairs.Traits.getDescription(this));
-	});
-
 	::Raids.Patcher.wrap(p, "getTooltip", function()
 	{
 		if (!::Raids.Lairs.isLocationViable(this, true, true))
@@ -74,6 +65,7 @@
 			return;
 		}
 
+		::Raids.Lairs.Traits.modifyDescription(_tooltipArray, this); // TODO: this looks rather ugly.
 		_tooltipArray.extend(::Raids.Lairs.getTooltipEntries(this));
 		_tooltipArray.extend(::Raids.Edicts[format("get%sEntries", ::Raids.Edicts.isLairViable(this) ? "Tooltip" : "Nonviable")](this));
 		return _tooltipArray;
@@ -121,6 +113,11 @@
 			::Raids.Lairs.depopulateNamedLoot(this, ::Raids.Lairs.Parameters.NamedItemRemovalChanceOnSpawn);
 		}
 	});
+
+	::Raids.Patcher.wrap(p, "onVisibleToPlayer", function()
+	{
+		return ::Raids.Internal.TERMINATE;
+	}, "overrideMethod");
 
 	::Raids.Patcher.wrap(p, "setLastSpawnTimeToNow", function()
 	{

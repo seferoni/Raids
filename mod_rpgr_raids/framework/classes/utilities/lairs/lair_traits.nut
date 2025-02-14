@@ -199,6 +199,27 @@
 		::logInfo("have " + _lairObject.getTroops().len() + " for " + _lairObject.getName() + " after injection")
 	}
 
+	function modifyDescription( _tooltipArray, _lairObject )
+	{
+		local descriptionEntry = null;
+
+		foreach( table in _tooltipArray )
+		{
+			if (table.id == 2 && table.type == "description")
+			{
+				descriptionEntry = table;
+			}
+		}
+
+		if (descriptionEntry == null)
+		{
+			::Raids.Standard.log(format(::Raids.Strings.Debug.NoDescriptionEntryFound, _lairObject.getName()), true);
+			return;
+		}
+
+		descriptionEntry.text = format("%s %s", descriptionEntry.text, this.getDescription(_lairObject));
+	}
+
 	function pickFromWeightedArray( _weightedArray )
 	{
 		local cumulativeWeight = 0;
