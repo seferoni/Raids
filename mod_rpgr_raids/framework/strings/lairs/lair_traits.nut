@@ -82,16 +82,16 @@
 	SwordmastersKeepDescription = "A wandering band of battle-forged swordsmen have taken up residence here.",
 
 	TamedDirewolvesName = "Tamed Direwolves",
-	TamedDirewolvesDescription = "",
-	// TODO: fill this
+	TamedDirewolvesDescription = "A pack of mighty direwolves, subdued to the point of tenuous domestication, bolster this lair's retinue.",
+
 	TamedHyenasName = "Tamed Hyenas",
-	TamedHyenasDescription = "",
+	TamedHyenasDescription = "A clan of mighty hyenas, subdued to the point of tenuous domestication, bolster this lair's retinue.",
 
 	TamedSerpentsName = "Tamed Serpents",
-	TamedSerpentsDescription = "",
+	TamedSerpentsDescription = "A den of mighty serpents, subdued to the point of tenuous domestication, bolster this lair's retinue.",
 
 	UndeadVanguardName = "Undead Vanguard",
-	UndeadVanguardDescription = "",
+	UndeadVanguardDescription = "Numbering tall within the ranks of this lair's denizens are powerful ancient legionaries, roused from restless slumber.",
 
 	VampiricBroodName = "Vampiric Brood",
 	VampiricBroodDescription = "Fearsome necrosavants have taken up residence in this lair.",
