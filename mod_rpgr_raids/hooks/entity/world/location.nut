@@ -65,9 +65,7 @@
 			return;
 		}
 
-		::Raids.Lairs.Traits.modifyDescription(_tooltipArray, this); // TODO: this looks rather ugly.
-		_tooltipArray.extend(::Raids.Lairs.getTooltipEntries(this));
-		_tooltipArray.extend(::Raids.Edicts[format("get%sEntries", ::Raids.Edicts.isLairViable(this) ? "Tooltip" : "Nonviable")](this));
+		::Raids.Lairs.modifyTooltip(_tooltipArray, _lairObject);
 		return _tooltipArray;
 	});
 

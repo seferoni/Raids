@@ -526,6 +526,13 @@
 		return false;
 	}
 
+	function modifyTooltip( _tooltipArray, _lairObject )
+	{
+		this.Traits.modifyDescription(_tooltipArray, _lairObject);
+		_tooltipArray.extend(this.getTooltipEntries(_lairObject));
+		_tooltipArray.extend(::Raids.Edicts[format("get%sEntries", ::Raids.Edicts.isLairViable(_lairObject) ? "Tooltip" : "Nonviable")](_lairObject));
+	}
+
 	function repopulateNamedLoot( _lairObject )
 	{
 		local iterations = 0;
