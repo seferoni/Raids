@@ -570,11 +570,11 @@
 
 	function resetTroopPool( _lairObject )
 	{
+		_lairObject.m.Troops = [];
 		local traitProperties = this.Traits.getTraitProperties(_lairObject);
 
 		if (this.Traits.getTraitForbiddenState(_lairObject) || !traitProperties.TraitKey || !traitProperties.TraitTroopIndex)
 		{
-			_lairObject.m.Troops = [];
 			return;
 		}
 
