@@ -6,14 +6,14 @@
 	AvariciousName = "Avaricious",
 	AvariciousDescription = "This lair is host to a substantial bounty of crowns.",
 
+	BanditExilesName = "Brigand Exiles",
+	BanditExilesDescription = "Wayward bandits, cast away like flotsam by the conflicts of the realm, have taken up refuge in this lair.",
+
 	BeastTrophiesName = "Beast Trophies",
 	BeastTrophiesDescription = "The denizens of this lair fancy themselves beast hunters, maintaining a sizeable collection of trophies.",
 
-	BeastTrophiesSouthern = "Beast Trophies",
+	BeastTrophiesSouthernName = "Beast Trophies",
 	BeastTrophiesSouthernDescription = "The denizens of this lair fancy themselves beast hunters, maintaining a sizeable collection of trophies.",
-
-	BanditExilesName = "Brigand Exiles",
-	BanditExilesDescription = "Wayward bandits, cast away like flotsam by the conflicts of the realm, have taken up refuge in this lair.",
 
 	BeastlyKennelName = "Beastly Kennel",
 	BeastlyKennelDescription = "A shrewd houndmaster tends to a number of ferocious wardogs in this lair.",
@@ -28,7 +28,7 @@
 	HeroesGraveyardDescription = "Mighty adventurers of yore have taken up vigil in this blighted sepulchre.",
 
 	HiredHandsName = "Hired Hands",
-	HiredHandsDescription = "The denizens of this lair have enlisted the aid of especially unscrupulous sellswords.",
+	HiredHandsDescription = "The denizens of this lair have enlisted the aid of an especially unscrupulous sellsword company.",
 
 	HolyCongregationName = "Holy Congregation",
 	HolyCongregationDescription = "Devotants to a faith lost with the empires of old gather here for worship.",
@@ -64,7 +64,7 @@
 	PeasantRevolutionDescription = "Unjust law and exorbitant taxes have rendered these paupered peasants little more than starved nomads.",
 
 	RenegadeMilitiaName = "Renegade Militia",
-	RenegadeMilitiaDescription = "Armed peasants and freemen alike, spurned by their liege lord, have resorted to banditry.",
+	RenegadeMilitiaDescription = "Armed peasants and freemen alike, spurned by their liege lord, have bandied together with the denizens of this lair.",
 
 	RoguesCoterieName = "Coterie of Rogues",
 	RoguesCoterieDescription = "A wandering band of expert archers have taken up residence here.",
@@ -72,14 +72,14 @@
 	SlaveRevoltName = "Slave Revolt",
 	SlaveRevoltDescription = "A band of former slaves have taken up residence here.",
 
-	SubjugatedGoblinsName = "Subjugated Goblins",
-	SubjugatedGoblinsDescription = "Enslaved goblin outriders, collected as tribute, fight in service of their orc masters.",
-
 	SouthernExilesName = "Southern Exiles",
 	SouthernExilesDescription = "A roving band of nomads have made a tenuous alliance with the denizens of this lair.",
 
+	SubjugatedGoblinsName = "Subjugated Goblins",
+	SubjugatedGoblinsDescription = "Enslaved goblin outriders, collected as tribute, fight in service of their orc masters.",
+
 	SwordmastersKeepName = "Swordmasters' Keep",
-	SwordmastersKeepDescription = "A wandering band of expert swordsmen have taken up residence here.",
+	SwordmastersKeepDescription = "A wandering band of battle-forged swordsmen have taken up residence here.",
 
 	TamedDirewolvesName = "Tamed Direwolves",
 	TamedDirewolvesDescription = "",
@@ -94,8 +94,8 @@
 	UndeadVanguardDescription = "",
 
 	VampiricBroodName = "Vampiric Brood",
-	VampiricBroodDescription = "",
+	VampiricBroodDescription = "Fearsome necrosavants have taken up residence in this lair.",
 
 	WitchesCovenName = "Coven of Witches",
-	WitchesCovenDescription = ""
+	WitchesCovenDescription = "The denizens of this lair have been compelled into service by a crafty coven of witches."
 };

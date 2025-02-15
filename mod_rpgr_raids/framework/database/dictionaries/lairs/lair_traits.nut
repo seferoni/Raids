@@ -244,6 +244,23 @@
 			}
 		]
 	},
+	Necromancy =
+	{
+		Weight = 1,
+		Factions =
+		[
+			::Const.FactionType.Bandits,
+			::Const.FactionType.Barbarians,
+			::Const.FactionType.OrientalBandits
+		],
+		AddedTroops =
+		[
+			{
+				Type = ::Const.World.Spawn.Troops.Necromancer,
+				Num = ::Math.rand(1, 2)
+			}
+		]
+	},
 	NobleDeserters =
 	{
 		Weight = 2,
@@ -315,23 +332,6 @@
 			},
 		]
 	},
-	Necromancy =
-	{
-		Weight = 1,
-		Factions =
-		[
-			::Const.FactionType.Bandits,
-			::Const.FactionType.Barbarians,
-			::Const.FactionType.OrientalBandits
-		],
-		AddedTroops =
-		[
-			{
-				Type = ::Const.World.Spawn.Troops.Necromancer,
-				Num = ::Math.rand(1, 2)
-			}
-		]
-	},
 	OrcAlliance =
 	{
 		Weight = 1,
@@ -385,21 +385,6 @@
 			}
 		]
 	},
-	RoguesCoterie =
-	{
-		Weight = 1,
-		Factions =
-		[
-			::Const.FactionType.Bandits
-		],
-		AddedTroops =
-		[
-			{
-				Type = ::Const.World.Spawn.Troops.MasterArcher,
-				Num = ::Math.rand(2, 5)
-			}
-		]
-	},
 	RenegadeMilitia =
 	{
 		Weight = 2,
@@ -423,26 +408,18 @@
 			}
 		]
 	},
-	SubjugatedGoblins =
+	RoguesCoterie =
 	{
-		Weight = 2,
+		Weight = 1,
 		Factions =
 		[
-			::Const.FactionType.Orcs
+			::Const.FactionType.Bandits
 		],
 		AddedTroops =
 		[
 			{
-				Type = ::Const.World.Spawn.Troops.GoblinAmbusher,
-				Num = ::Math.rand(3, 6)
-			},
-			{
-				Type = ::Const.World.Spawn.Troops.GoblinWolfrider,
-				Num = ::Math.rand(2, 4)
-			},
-			{
-				Type = ::Const.World.Spawn.Troops.GoblinOverseer,
-				Num = 1
+				Type = ::Const.World.Spawn.Troops.MasterArcher,
+				Num = ::Math.rand(2, 5)
 			}
 		]
 	},
@@ -478,6 +455,29 @@
 			{
 				Type = ::Const.World.Spawn.Troops.NomadArcher,
 				Num = ::Math.rand(2, 6)
+			}
+		]
+	},
+	SubjugatedGoblins =
+	{
+		Weight = 2,
+		Factions =
+		[
+			::Const.FactionType.Orcs
+		],
+		AddedTroops =
+		[
+			{
+				Type = ::Const.World.Spawn.Troops.GoblinAmbusher,
+				Num = ::Math.rand(3, 6)
+			},
+			{
+				Type = ::Const.World.Spawn.Troops.GoblinWolfrider,
+				Num = ::Math.rand(2, 4)
+			},
+			{
+				Type = ::Const.World.Spawn.Troops.GoblinOverseer,
+				Num = 1
 			}
 		]
 	},
