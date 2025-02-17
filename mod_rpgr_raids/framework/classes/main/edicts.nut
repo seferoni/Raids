@@ -343,7 +343,7 @@
 	}
 
 	function getTreasureOffset( _lairObject )
-	{
+	{	// TODO: look at the official bug report filed for abundance on nexus.
 		local offset = 0;
 
 		if (this.findEdictInHistory("Abundance", _lairObject) != false)

@@ -7,7 +7,7 @@
 	}
 
 	function executeDiminutionProcedure( _lairObject )
-	{	// TODO: look at the official bug report filed for diminution on nexus.
+	{
 		local garbage = [];
 		local troops = _lairObject.getTroops();
 		local removalCount = ::Math.ceil(this.Parameters.DiminutionPrefactor * ::Raids.Lairs.getAgitation(_lairObject) * troops.len());
