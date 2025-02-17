@@ -343,12 +343,12 @@
 	}
 
 	function getTreasureOffset( _lairObject )
-	{	// TODO: look at the official bug report filed for abundance on nexus.
+	{
 		local offset = 0;
 
 		if (this.findEdictInHistory("Abundance", _lairObject) != false)
 		{
-			offset = ::Math.min(this.getField("AbundanceCeiling"), this.getField("AbundanceOffset") * ::Raids.Lairs.getAgitation(_lairObject));
+			offset = ::Math.min(this.getField("AbundanceCeiling"), this.getField("AbundanceOffset") + ::Raids.Lairs.getAgitation(_lairObject));
 		}
 
 		return offset;
