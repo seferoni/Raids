@@ -2,7 +2,6 @@
 {
 	function createTables()
 	{
-		this.Debug <- {};
 		this.Edicts <- {};
 		this.Lairs <- {};
 	}
