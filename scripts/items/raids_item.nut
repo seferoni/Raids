@@ -30,7 +30,7 @@ this.raids_item <- ::inherit("scripts/items/item",
 	{
 		this.m.DescriptionPrefix <- "";
 		this.m.GFXPathPrefix <- "consumables/";
-		this.m.Warnings <- {};
+		this.m.Warnings <- {}; // TODO: by what black magic sorcery is this still functioning, despite the fact that we've furnished no fields?
 	}
 
 	function createFlags()
@@ -135,6 +135,14 @@ this.raids_item <- ::inherit("scripts/items/item",
 	function playWarningSound()
 	{
 		this.playSound(this.m.WarningSound);
+	}
+
+	function resetWarnings()
+	{
+		foreach( warningKey, warningValue in this.m.Warnings )
+		{
+			warningValue = false;
+		}
 	}
 
 	function setIDByName( _properName )
