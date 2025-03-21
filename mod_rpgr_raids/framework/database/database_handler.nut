@@ -63,7 +63,7 @@
 
 		foreach( parameterType, parameterTable in this.Settings )
 		{
-			::Raids.Standard.extendTable(parameterDictionary, agglomeratedParameters);
+			::Raids.Standard.extendTable(parameterTable, agglomeratedParameters);
 		}
 
 		return agglomeratedParameters;
