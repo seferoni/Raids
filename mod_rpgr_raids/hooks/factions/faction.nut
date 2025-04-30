@@ -1,13 +1,14 @@
-::Raids.Patcher.hookTree("scripts/factions/faction", function( p )
+local Raids = ::RPGR_Raids;
+::mods_hookBaseClass("factions/faction", function( _object )
 {
-	::Raids.Patcher.wrap(p, "spawnEntity", function( _tile, _name, _uniqueName, _template, _resources )
+	Raids.Standard.wrap(_object, "spawnEntity", function( _tile, _name, _uniqueName, _template, _resources )
 	{
-		if (::Math.rand(1, 100) > ::Raids.Standard.getParameter("RoamerScaleChance"))
+		if (::Math.rand(1, 100) > Raids.Standard.getSetting("RoamerScaleChance"))
 		{
 			return;
 		}
 
-		if (!::Raids.Lairs.isFactionViable(this))
+		if (!Raids.Lairs.isFactionViable(this))
 		{
 			return;
 		}
@@ -17,18 +18,18 @@
 			return;
 		}
 
-		local lair = ::Raids.Lairs.getCandidateAtPosition(_tile.Coords);
+		local lair = Raids.Lairs.getCandidateAtPosition(_tile.Coords);
 
 		if (lair == null)
 		{
 			return;
 		}
 
-		if (::Raids.Standard.getParameter("RoamerScaleAgitationRequirement") && ::Raids.Lairs.getAgitation(lair) == ::Raids.Lairs.getField("AgitationDescriptors").Relaxed)
+		if (Raids.Standard.getSetting("RoamerScaleAgitationRequirement") && Raids.Standard.getFlag("Agitation", lair) == Raids.Lairs.AgitationDescriptors.Relaxed)
 		{
 			return;
 		}
 
-		return [_tile, _name, _uniqueName, _template, _resources + ::Raids.Lairs.getPartyResources(lair)];
+		return [_tile, _name, _uniqueName, _template, _resources + Raids.Lairs.getPartyResources(lair)];
 	}, "overrideArguments");
 });

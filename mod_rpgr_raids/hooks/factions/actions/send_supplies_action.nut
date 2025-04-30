@@ -1,15 +1,24 @@
-::Raids.Patcher.hook("scripts/factions/actions/send_supplies_action", function( p )
+local Raids = ::RPGR_Raids;
+::mods_hookExactClass("factions/actions/send_supplies_action", function( _object )
 {
-	::Raids.Patcher.wrap(p, "onExecute", function( _faction )
+	Raids.Standard.wrap(_object, "onExecute", function( _faction )
 	{
-		local caravan = ::Raids.Caravans.locateCaravanOnAction(this.m.Start);
+		local grossEntities = ::World.getAllEntitiesAtPos(this.m.Start.getPos(), 1.0), caravan = null;
+
+		foreach( entity in grossEntities )
+		{
+			if (Raids.Caravans.isPartyViable(entity) && !Raids.Caravans.isPartyInitialised(entity))
+			{
+				caravan = entity;
+			}
+		}
 
 		if (caravan == null)
 		{
-			::Raids.Standard.log(format(::Raids.Strings.Debug.NoCaravanFound, this.m.Start.getName()), true);
+			Raids.Standard.log(format("onExecute found no caravans near %s.", this.m.Start.getName()), true);
 			return;
 		}
 
-		::Raids.Caravans.initialiseCaravanParameters(caravan, this.m.Start);
+		Raids.Caravans.initialiseCaravanParameters(caravan, this.m.Start);
 	});
 });

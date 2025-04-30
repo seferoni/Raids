@@ -1,54 +1,55 @@
-::Raids.Patcher.hook("scripts/entity/world/party", function( p )
+local Raids = ::RPGR_Raids;
+::mods_hookExactClass("entity/world/party", function( _object )
 {
-	::Raids.Patcher.wrap(p, "onCombatStarted", function()
+	Raids.Standard.wrap(_object, "onCombatStarted", function()
 	{
-		if (!::Raids.Standard.isPlayerInProximityTo(this.getTile(), 1))
+		if (!Raids.Lairs.isPlayerInProximityTo(this.getTile(), 1))
 		{
 			return;
 		}
 
-		if (::Raids.Caravans.isPartyViable(this) && ::Raids.Caravans.isPartyInitialised(this))
+		if (Raids.Caravans.isPartyViable(this) && Raids.Caravans.isPartyInitialised(this))
 		{
-			::Raids.Caravans.updateOriginOnCombatStart(this);
+			Raids.Caravans.updateOrigin(this);
 		}
 
-		::Raids.Standard.setLastFoeWasPartyStatistic(true);
+		Raids.Lairs.updateCombatStatistics(true);
 	});
 
-	::Raids.Patcher.wrap(p, "onDropLootForPlayer", function( _lootTable )
+	Raids.Standard.wrap(_object, "onDropLootForPlayer", function( _lootTable )
 	{
-		if (!::Raids.Caravans.isPartyViable(this))
+		if (!Raids.Caravans.isPartyViable(this))
 		{
 			return;
 		}
 
-		if (!::Raids.Caravans.isPartyInitialised(this))
+		if (!Raids.Caravans.isPartyInitialised(this))
 		{
 			return;
 		}
 
-		if (!::Raids.Caravans.getNamedItemCarrierState(this))
+		if (!Raids.Standard.getFlag("CaravanHasNamedItems", this))
 		{
 			return;
 		}
 
-		::Raids.Caravans.addNamedCargo(_lootTable, this);
+		Raids.Caravans.addNamedCargo(_lootTable, this);
 		return [_lootTable];
 	}, "overrideArguments");
 
-	::Raids.Patcher.wrap(p, "getTooltip", function( _tooltipArray )
+	Raids.Standard.wrap(_object, "getTooltip", function( _tooltipArray )
 	{
-		if (!::Raids.Caravans.isPartyViable(this))
+		if (!Raids.Caravans.isPartyViable(this))
 		{
 			return;
 		}
 
-		if (!::Raids.Caravans.isPartyInitialised(this))
+		if (!Raids.Caravans.isPartyInitialised(this))
 		{
 			return;
 		}
 
-		_tooltipArray.extend(::Raids.Caravans.getTooltipEntries(this));
+		_tooltipArray.extend(Raids.Caravans.getTooltipEntries(this));
 		return _tooltipArray;
 	});
 });

@@ -1,36 +1,36 @@
-::Raids.Patcher.hookTree("scripts/contracts/contract", function( p )
+local Raids = ::RPGR_Raids;
+::mods_hookBaseClass("contracts/contract", function( _object )
 {
-	::Raids.Patcher.wrap(p, "start", function()
+	Raids.Standard.wrap(_object, "start", function()
 	{
-		local candidate = ::Raids.Lairs.getCandidateByContract(this);
+		local candidate = Raids.Lairs.getCandidateByContract(this);
 
 		if (candidate == null)
 		{
 			return;
 		}
 
-		::Raids.Lairs.Defenders.setReinforcementForbiddenState(true, _lairObject);
-		::Raids.Lairs.Traits.setTraitForbiddenState(true, _lairObject);
-		::Raids.Lairs.setAgitation(candidate, ::Raids.Standard.getProcedures().Reset);
-		::Raids.Edicts.clearEdicts(candidate);
+		Raids.Standard.setFlag("DefenderSpawnsForbidden", true, candidate);
+		Raids.Lairs.setAgitation(candidate, Raids.Lairs.Procedures.Reset);
+		Raids.Edicts.clearEdicts(candidate);
 	});
 
-	::Raids.Patcher.wrap(p, "onClear", function()
+	Raids.Standard.wrap(_object, "onClear", function()
 	{
 		if (!this.isActive())
 		{
 			return;
 		}
 
-		local candidate = ::Raids.Lairs.getCandidateByContract(this);
+		local candidate = Raids.Lairs.getCandidateByContract(this);
 
 		if (candidate == null)
 		{
 			return;
 		}
 
-		::Raids.Lairs.Defenders.setReinforcementForbiddenState(false, _lairObject);
-		::Raids.Lairs.Traits.setTraitForbiddenState(false, _lairObject);
-		::Raids.Lairs.updateProperties(candidate);
+		# Named loot depopulation is not carried out here.
+		Raids.Standard.setFlag("DefenderSpawnsForbidden", false, candidate);
+		Raids.Lairs.updateProperties(candidate);
 	});
 });
