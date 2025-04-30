@@ -1,7 +1,7 @@
 local Raids = ::RPGR_Raids;
 ::mods_hookBaseClass("factions/faction", function( _object )
 {
-	Raids.Standard.wrap(_object, "spawnEntity", function( _tile, _name, _uniqueName, _template, _resources )
+	Raids.Standard.wrap(_object, "spawnEntity", function( _tile, _name, _uniqueName, _template, _resources, _minibossify = 0 )
 	{
 		if (::Math.rand(1, 100) > Raids.Standard.getSetting("RoamerScaleChance"))
 		{
@@ -30,6 +30,6 @@ local Raids = ::RPGR_Raids;
 			return;
 		}
 
-		return [_tile, _name, _uniqueName, _template, _resources + Raids.Lairs.getPartyResources(lair)];
+		return [_tile, _name, _uniqueName, _template, _resources + Raids.Lairs.getPartyResources(lair), _minibossify];
 	}, "overrideArguments");
 });
