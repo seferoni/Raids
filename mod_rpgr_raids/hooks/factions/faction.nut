@@ -1,6 +1,6 @@
 ::Raids.Patcher.hookTree("scripts/factions/faction", function( p )
 {
-	::Raids.Patcher.wrap(p, "spawnEntity", function( _tile, _name, _uniqueName, _template, _resources )
+	::Raids.Patcher.wrap(p, "spawnEntity", function( _tile, _name, _uniqueName, _template, _resources, _minibossify = 0 )
 	{
 		if (::Math.rand(1, 100) > ::Raids.Standard.getParameter("RoamerScaleChance"))
 		{
@@ -29,6 +29,6 @@
 			return;
 		}
 
-		return [_tile, _name, _uniqueName, _template, _resources + ::Raids.Lairs.getPartyResources(lair)];
+		return [_tile, _name, _uniqueName, _template, _resources + ::Raids.Lairs.getPartyResources(lair), _minibossify];
 	}, "overrideArguments");
 });
